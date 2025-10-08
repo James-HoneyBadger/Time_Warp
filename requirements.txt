@@ -1,0 +1,14 @@
+# JAMES IDE Requirements
+# Core dependencies for the Joint Algorithm Model Environment System
+
+# No external dependencies required for basic functionality
+# JAMES IDE runs on standard Python libraries:
+# - tkinter (included with Python)
+# - json (included with Python)
+# - os (included with Python)
+# - sys (included with Python)
+# - threading (included with Python)
+# - subprocess (included with Python)
+
+# Optional dependencies for enhanced features:
+# aiml>=0.9.2  # For AI/ML integration features (if using ml tools)
