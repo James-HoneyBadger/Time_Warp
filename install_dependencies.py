@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JAMES Dependency Installer
-Installs all required and optional dependencies for JAMES IDE
+TimeWarp IDE Dependency Installer
+Installs all required and optional dependencies for TimeWarp IDE
 """
 
 import subprocess
@@ -19,8 +19,8 @@ def install_package(package):
         return False
 
 def main():
-    """Install all JAMES dependencies"""
-    print("🔧 Installing JAMES IDE Dependencies")
+    """Install all TimeWarp IDE dependencies"""
+    print("🔧 Installing TimeWarp IDE Dependencies")
     print("=" * 40)
     
     # Required dependencies
@@ -57,7 +57,7 @@ def main():
     print("\n" + "=" * 40)
     if required_success == len(required_packages):
         print("✅ All required dependencies installed successfully!")
-        print("🚀 JAMES IDE is ready to use!")
+        print("🚀 TimeWarp IDE is ready to use!")
     else:
         print("⚠️  Some required dependencies failed to install")
         print("Please check the error messages above")

@@ -1,5 +1,5 @@
 """
-JAMES Advanced Debugging System
+TimeWarp Advanced Debugging System
 Professional debugging capabilities for educational programming environment
 """
 

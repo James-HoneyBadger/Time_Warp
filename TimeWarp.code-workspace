@@ -16,8 +16,7 @@
             "*.timewarp": "python",
             "*.pilot": "plaintext",
             "*.bas": "basic",
-            "*.logo": "lisp",
-            "*.jtc": "json"
+            "*.logo": "lisp"
         },
         "git.autofetch": true,
         "git.enableSmartCommit": true,
@@ -25,12 +24,18 @@
         "files.exclude": {
             "**/__pycache__": true,
             "**/*.pyc": true,
+            "**/.Time_Warp": false,
             "**/james_env": true,
+            "**/james_venv": true,
+            "**/.JAMES": true,
+            "**/JAMES": true,
             "**/.pytest_cache": true,
             "**/debug_*.py": true,
             "**/test_*.py": true,
             "**/*_backup.py": true,
-            "**/*_corrupted*.py": true
+            "**/*_corrupted*.py": true,
+            "**/*.jtc": true,
+            "**/*.JTC": true
         },
         "python.testing.pytestEnabled": true,
         "explorer.fileNesting.enabled": true,

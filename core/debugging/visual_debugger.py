@@ -1,5 +1,5 @@
 """
-Visual Debugger for JAMES IDE
+Visual Debugger for TimeWarp IDE
 Comprehensive debugging interface with breakpoints, variable inspection, and call stack visualization
 """
 
@@ -368,7 +368,7 @@ class VisualDebugger:
         """Debug worker thread"""
         try:
             # Create custom debugger
-            debugger = JAMESDebugger(self)
+            debugger = TimeWarpDebugger(self)
             
             # Set up debugging environment
             global_vars = {'__name__': '__main__', '__file__': filename}
@@ -427,8 +427,8 @@ class VisualDebugger:
         self.variable_inspector.update_variables(local_vars, global_vars)
 
 
-class JAMESDebugger(pdb.Pdb):
-    """Custom debugger for JAMES IDE"""
+class TimeWarpDebugger(pdb.Pdb):
+    """Custom debugger for TimeWarp IDE"""
     
     def __init__(self, visual_debugger: VisualDebugger):
         super().__init__()

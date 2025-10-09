@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-JAMES IDE Theme Button Fixes Summary
+TimeWarp IDE Theme Button Fixes Summary
 Fixed the problematic theme button behavior and UI duplication issues
 """
 
 def demonstrate_fixes():
-    print("🔧 JAMES IDE Theme Button Fixes")
+    print("🔧 TimeWarp IDE Theme Button Fixes")
     print("=" * 40)
     
     print("\n❌ Issues Fixed:")

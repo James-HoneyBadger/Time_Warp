@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-JAMES IDE Theme Polish Summary
+TimeWarp IDE Theme Polish Summary
 Tests the improved theme system with consistent theming across all components
 """
 
 def demonstrate_theme_improvements():
-    print("🎨 JAMES IDE Theme System Improvements")
+    print("🎨 TimeWarp IDE Theme System Improvements")
     print("=" * 50)
     
     print("\n✅ Issues Fixed:")

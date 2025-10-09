@@ -1,11 +1,11 @@
-# JAMES IDE Copilot Instructions
+# TimeWarp IDE Copilot Instructions
 
-JAMES (Joint Algorithm Model Environment System) is an educational programming IDE supporting multiple languages with turtle graphics, built in Python using tkinter.
+TimeWarp IDE is an educational programming IDE supporting multiple languages with turtle graphics, built in Python using tkinter.
 
 ## Architecture Overview
 
 ### Core Structure
-- **Main Application**: `JAMES.py` - Entry point with comprehensive UI and component integration
+- **Main Application**: `TimeWarp.py` - Entry point with comprehensive UI and component integration
 - **Core Interpreter**: `core/interpreter.py` - Central execution engine for all languages
 - **Language Executors**: `core/languages/` - Individual language implementations (PILOT, BASIC, Logo, etc.)
 - **Theme System**: `tools/theme.py` - Persistent theme management with 8 built-in themes
@@ -19,7 +19,7 @@ Each language has dedicated executor classes in `core/languages/`:
 - **Python/JavaScript/Perl**: Modern scripting language support
 
 ### Key Components
-- **JAMESInterpreter**: Central execution engine that dispatches to language-specific executors
+- **TimeWarpInterpreter**: Central execution engine that dispatches to language-specific executors
 - **ThemeManager**: JSON-based configuration with 8 themes (4 dark: Dracula, Monokai, Solarized Dark, Ocean; 4 light: Spring, Sunset, Candy, Forest)
 - **Plugin System**: `PluginManager` with sample plugin architecture in `plugins/sample_plugin/`
 - **Game Engine**: Complete 2D game framework in `games/engine/` with physics, rendering, and object management
@@ -28,18 +28,18 @@ Each language has dedicated executor classes in `core/languages/`:
 
 ### File Naming Conventions
 - **Test files**: `test_*.py` for unit tests, `*_test.py` for integration tests
-- **Language demos**: `*.pilot`, `*.bas`, `*.logo` for example programs
+- **Language demos**: `*.pilot`, `*.bas`, `*.logo`, `*.timewarp` for example programs
 - **Compiled output**: `*_compiled` files for interpreter execution results
-- **JTC files**: `.jtc` extension for JAMES-specific test cases
+- **TimeWarp files**: `.timewarp` extension for multi-language test cases
 
 ### Configuration Management
-- User settings stored in `~/.james/config.json`
+- User settings stored in `~/.timewarp/config.json`
 - Theme preferences persist between sessions
-- Virtual environment auto-created in `james_venv/`
+- Virtual environment auto-created in `.Time_Warp/`
 
 ### Error Handling Patterns
 ```python
-# Standard JAMES error pattern
+# Standard TimeWarp error pattern
 try:
     result = self._execute_language_specific_command(command)
     return result
@@ -51,13 +51,13 @@ except Exception as e:
 
 ## Development Workflows
 
-### Running JAMES
+### Running TimeWarp
 ```bash
 # Primary method - auto-creates venv if needed
-python JAMES.py
+python TimeWarp.py
 
 # Alternative with shell script
-./start_james.sh
+./start_timewarp.sh
 ```
 
 ### Testing
@@ -93,7 +93,7 @@ See `plugins/sample_plugin/` for complete plugin template including:
 ## Critical Integration Points
 
 ### Interpreter-UI Communication
-- Commands executed through `JAMESInterpreter.execute()` method
+- Commands executed through `TimeWarpInterpreter.execute()` method
 - Results displayed via `self.output_text.insert()` in main UI
 - Error handling centralized through interpreter's error display system
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JAMES IDE Test Runner
-Tests the enhanced JAMES IDE system
+TimeWarp IDE Test Runner
+Tests the enhanced TimeWarp IDE system
 """
 
 import sys
@@ -14,7 +14,7 @@ sys.path.insert(0, project_root)
 
 def discover_and_run_tests():
     """Discover and run all tests"""
-    print("🧪 Running JAMES IDE Test Suite")
+    print("🧪 Running TimeWarp IDE Test Suite")
     print("=" * 50)
     
     # Discover tests in the tests directory
@@ -23,10 +23,10 @@ def discover_and_run_tests():
     
     try:
         # Try to load the integration test specifically
-        from core.language.tests.test_integration import TestJamesIntegration
+        from core.language.tests.test_integration import TestTimeWarpIntegration
         
         suite = unittest.TestSuite()
-        suite.addTests(loader.loadTestsFromTestCase(TestJamesIntegration))
+        suite.addTests(loader.loadTestsFromTestCase(TestTimeWarpIntegration))
         
         # Run tests
         runner = unittest.TextTestRunner(verbosity=2)
@@ -46,7 +46,7 @@ def main():
     
     if success:
         print("✅ All tests passed!")
-        print("\\n🎉 JAMES IDE Enhancement Complete!")
+        print("\\n🎉 TimeWarp IDE Enhancement Complete!")
         print("\\nRefactoring Summary:")
         print("  ✅ Modular directory structure created")
         print("  ✅ Centralized error handling implemented")
@@ -66,7 +66,7 @@ def main():
     else:
         print(f"❌ Tests failed: {failures} failures, {errors} errors")
         print("\\nSome tests failed, but refactoring structure is complete.")
-        print("The enhanced architecture provides a solid foundation for JAMES IDE.")
+        print("The enhanced architecture provides a solid foundation for TimeWarp IDE.")
         return 1
 
 if __name__ == '__main__':

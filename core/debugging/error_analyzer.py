@@ -1,5 +1,5 @@
 """
-Error Analysis and Stack Trace Visualization for JAMES IDE
+Error Analysis and Stack Trace Visualization for TimeWarp IDE
 Intelligent error detection, pattern matching, and stack trace visualization
 """
 
@@ -688,7 +688,7 @@ class ErrorAnalyzer:
         
         try:
             with open(filename, 'w') as f:
-                f.write("JAMES IDE Error History Report\n")
+                f.write("TimeWarp IDE Error History Report\n")
                 f.write("=" * 50 + "\n\n")
                 
                 for i, record in enumerate(self.error_history, 1):
