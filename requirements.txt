@@ -1,8 +1,8 @@
 # TimeWarp IDE Requirements
-# Core dependencies for the Joint Algorithm Model Environment System
+# Core dependencies for the Educational Programming IDE
 
-# Runtime dependencies (all included with Python standard library)
-# - tkinter (GUI framework)
+# Runtime dependencies (most included with Python standard library)
+# - tkinter (GUI framework) 
 # - json (configuration management)
 # - os, sys (system interface)
 # - threading (concurrent execution)
@@ -10,14 +10,14 @@
 # - turtle (graphics engine)
 # - pathlib (file system operations)
 
+# Required runtime dependencies
+pygame>=2.0.0           # Graphics and multimedia support
+
 # Development dependencies
 pytest>=7.0.0          # Testing framework
 black>=22.0.0           # Code formatting
 flake8>=4.0.0          # Linting
-mypy>=0.910            # Type checking
-pre-commit>=2.15.0     # Git hooks for code quality
 
-# Optional runtime dependencies for enhanced features
-# pygame>=2.0.0        # Advanced graphics (uncomment if needed)
+# Optional runtime dependencies for enhanced features  
 # PIL>=8.0.0           # Image processing (uncomment if needed)
 # numpy>=1.20.0        # Mathematical operations (uncomment if needed)
