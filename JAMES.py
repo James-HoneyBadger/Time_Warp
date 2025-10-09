@@ -2076,8 +2076,41 @@ def add_tools_methods():
         dialog.protocol("WM_DELETE_WINDOW", lambda: dialog.destroy())
     
     def show_iot_manager(self):
-        """Show IoT device manager"""
-        messagebox.showinfo("IoT Manager", "IoT Device Manager\\n\\nDevice Discovery\\nConnection Management\\nCommand Interface\\n\\nComing soon!")
+        """Show comprehensive IoT Device Manager with device discovery, control, and monitoring"""
+        iot_window = tk.Toplevel(self.root)
+        iot_window.title("🌐 IoT Device Manager - JAMES")
+        iot_window.geometry("900x700")
+        iot_window.transient(self.root)
+        iot_window.grab_set()
+        
+        # Create notebook for IoT management
+        notebook = ttk.Notebook(iot_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Device Discovery Tab
+        discovery_frame = ttk.Frame(notebook)
+        notebook.add(discovery_frame, text="🔍 Device Discovery")
+        self.setup_device_discovery_tab(discovery_frame)
+        
+        # Device Control Tab
+        control_frame = ttk.Frame(notebook)
+        notebook.add(control_frame, text="🎛️ Device Control")
+        self.setup_device_control_tab(control_frame)
+        
+        # Network Monitoring Tab
+        network_frame = ttk.Frame(notebook)
+        notebook.add(network_frame, text="🌐 Network Monitor")
+        self.setup_network_monitoring_tab(network_frame)
+        
+        # Protocols Tab
+        protocols_frame = ttk.Frame(notebook)
+        notebook.add(protocols_frame, text="📡 Protocols")
+        self.setup_protocols_tab(protocols_frame)
+        
+        # Data Analytics Tab
+        analytics_frame = ttk.Frame(notebook)
+        notebook.add(analytics_frame, text="📊 Data Analytics")
+        self.setup_iot_analytics_tab(analytics_frame)
     
     def show_sensor_visualizer(self):
         """Show sensor visualizer"""
@@ -3106,7 +3139,7 @@ Specifications:
     
     def add_automation_rule(self):
         """Add automation rule"""
-        rule = tk.simpledialog.askstring("Add Rule", "Enter automation rule:")
+        rule = simpledialog.askstring("Add Rule", "Enter automation rule:")
         if rule:
             self.rules_listbox.insert(tk.END, rule)
             messagebox.showinfo("Rule Added", "Automation rule added successfully")
@@ -3116,7 +3149,7 @@ Specifications:
         selection = self.rules_listbox.curselection()
         if selection:
             old_rule = self.rules_listbox.get(selection[0])
-            new_rule = tk.simpledialog.askstring("Edit Rule", "Edit automation rule:", initialvalue=old_rule)
+            new_rule = simpledialog.askstring("Edit Rule", "Edit automation rule:", initialvalue=old_rule)
             if new_rule:
                 self.rules_listbox.delete(selection[0])
                 self.rules_listbox.insert(selection[0], new_rule)
@@ -3142,34 +3175,34 @@ Specifications:
         """Stop automation system"""
         messagebox.showinfo("Automation", "Automation system stopped\\n\\nAll rules are now inactive")
     
-    # Add hardware methods to JAMESII class
-    JAMESII.setup_gpio_tab = setup_gpio_tab
-    JAMESII.setup_sensors_tab = setup_sensors_tab
-    JAMESII.setup_devices_tab = setup_devices_tab
-    JAMESII.setup_automation_tab = setup_automation_tab
-    JAMESII.get_gpio_pin_color = get_gpio_pin_color
-    JAMESII.toggle_gpio_pin = toggle_gpio_pin
-    JAMESII.update_pin_mode = update_pin_mode
-    JAMESII.update_pin_value = update_pin_value
-    JAMESII.get_selected_pin_number = get_selected_pin_number
-    JAMESII.read_gpio_pin = read_gpio_pin
-    JAMESII.write_gpio_pin = write_gpio_pin
-    JAMESII.reset_all_gpio = reset_all_gpio
-    JAMESII.add_sensor = add_sensor
-    JAMESII.remove_sensor = remove_sensor
-    JAMESII.refresh_sensor_data = refresh_sensor_data
-    JAMESII.start_sensor_monitoring = start_sensor_monitoring
-    JAMESII.stop_sensor_monitoring = stop_sensor_monitoring
-    JAMESII.control_device = control_device
-    JAMESII.device_action = device_action
-    JAMESII.show_device_info = show_device_info
-    JAMESII.configure_device = configure_device
-    JAMESII.scan_devices = scan_devices
-    JAMESII.add_automation_rule = add_automation_rule
-    JAMESII.edit_automation_rule = edit_automation_rule
-    JAMESII.delete_automation_rule = delete_automation_rule
-    JAMESII.start_automation = start_automation
-    JAMESII.stop_automation = stop_automation
+    # Add hardware methods to JAMESII class using setattr
+    setattr(JAMESII, 'setup_gpio_tab', setup_gpio_tab)
+    setattr(JAMESII, 'setup_sensors_tab', setup_sensors_tab)
+    setattr(JAMESII, 'setup_devices_tab', setup_devices_tab)
+    setattr(JAMESII, 'setup_automation_tab', setup_automation_tab)
+    setattr(JAMESII, 'get_gpio_pin_color', get_gpio_pin_color)
+    setattr(JAMESII, 'toggle_gpio_pin', toggle_gpio_pin)
+    setattr(JAMESII, 'update_pin_mode', update_pin_mode)
+    setattr(JAMESII, 'update_pin_value', update_pin_value)
+    setattr(JAMESII, 'get_selected_pin_number', get_selected_pin_number)
+    setattr(JAMESII, 'read_gpio_pin', read_gpio_pin)
+    setattr(JAMESII, 'write_gpio_pin', write_gpio_pin)
+    setattr(JAMESII, 'reset_all_gpio', reset_all_gpio)
+    setattr(JAMESII, 'add_sensor', add_sensor)
+    setattr(JAMESII, 'remove_sensor', remove_sensor)
+    setattr(JAMESII, 'refresh_sensor_data', refresh_sensor_data)
+    setattr(JAMESII, 'start_sensor_monitoring', start_sensor_monitoring)
+    setattr(JAMESII, 'stop_sensor_monitoring', stop_sensor_monitoring)
+    setattr(JAMESII, 'control_device', control_device)
+    setattr(JAMESII, 'device_action', device_action)
+    setattr(JAMESII, 'show_device_info', show_device_info)
+    setattr(JAMESII, 'configure_device', configure_device)
+    setattr(JAMESII, 'scan_devices', scan_devices)
+    setattr(JAMESII, 'add_automation_rule', add_automation_rule)
+    setattr(JAMESII, 'edit_automation_rule', edit_automation_rule)
+    setattr(JAMESII, 'delete_automation_rule', delete_automation_rule)
+    setattr(JAMESII, 'start_automation', start_automation)
+    setattr(JAMESII, 'stop_automation', stop_automation)
     
     # Add existing methods to JAMESII class
     JAMESII.show_hardware_controller = show_hardware_controller
