@@ -1992,5 +1992,73 @@ def main():
         sys.exit(1)
 
 
+# Additional Tools Menu Methods - extending JAMESII class
+def add_tools_methods():
+    """Add tools menu methods to JAMESII class"""
+    
+    def show_hardware_controller(self):
+        """Show hardware controller interface"""
+        messagebox.showinfo("Hardware Controller", "Hardware Controller\\n\\nGPIO Control Interface\\nRaspberry Pi Integration\\nSensor Management\\n\\nComing soon!")
+    
+    def show_iot_manager(self):
+        """Show IoT device manager"""
+        messagebox.showinfo("IoT Manager", "IoT Device Manager\\n\\nDevice Discovery\\nConnection Management\\nCommand Interface\\n\\nComing soon!")
+    
+    def show_sensor_visualizer(self):
+        """Show sensor visualizer"""
+        messagebox.showinfo("Sensor Visualizer", "Sensor Data Visualizer\\n\\nReal-time Data Display\\nMultiple Sensor Types\\nData Export\\n\\nComing soon!")
+    
+    def show_learning_assistant(self):
+        """Show learning assistant"""
+        messagebox.showinfo("Learning Assistant", "Learning Assistant\\n\\nInteractive Tutorials\\nCode Examples\\nProgress Tracking\\n\\nComing soon!")
+    
+    def show_code_examples(self):
+        """Show code examples browser"""
+        messagebox.showinfo("Code Examples", "Code Examples Browser\\n\\nLanguage Examples\\nCopy to Editor\\nRun Examples\\n\\nComing soon!")
+    
+    def show_testing_framework(self):
+        """Show testing framework"""
+        messagebox.showinfo("Testing Framework", "Testing Framework\\n\\nUnit Testing\\nCode Coverage\\nTest Reports\\n\\nComing soon!")
+    
+    def show_graphics_canvas(self):
+        """Show standalone graphics canvas"""
+        messagebox.showinfo("Graphics Canvas", "Graphics canvas is available in the main window!\\n\\nTurtle Graphics\\nDrawing Tools\\nExport Options")
+    
+    def show_code_converter(self):
+        """Show code converter between languages"""
+        messagebox.showinfo("Code Converter", "Multi-Language Converter\\n\\nPILOT ↔ BASIC\\nSyntax Translation\\nSmart Conversion\\n\\nComing soon!")
+    
+    def show_system_info(self):
+        """Show system information"""
+        try:
+            import platform
+            import sys
+            info = f"""JAMES IDE System Information
+            
+Python: {sys.version.split()[0]}
+Platform: {platform.system()} {platform.release()}
+Architecture: {platform.architecture()[0]}
+JAMES Version: 2.0 Enhanced
+Interpreter: {'Available' if self.interpreter else 'Not initialized'}
+Graphics: {'Available' if hasattr(self, 'graphics_canvas') else 'Not initialized'}"""
+            messagebox.showinfo("System Information", info)
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not get system info: {e}")
+    
+    # Add methods to JAMESII class
+    JAMESII.show_hardware_controller = show_hardware_controller
+    JAMESII.show_iot_manager = show_iot_manager 
+    JAMESII.show_sensor_visualizer = show_sensor_visualizer
+    JAMESII.show_learning_assistant = show_learning_assistant
+    JAMESII.show_code_examples = show_code_examples
+    JAMESII.show_testing_framework = show_testing_framework
+    JAMESII.show_graphics_canvas = show_graphics_canvas
+    JAMESII.show_code_converter = show_code_converter
+    JAMESII.show_system_info = show_system_info
+
+# Add the tools methods
+add_tools_methods()
+
+
 if __name__ == "__main__":
     main()
