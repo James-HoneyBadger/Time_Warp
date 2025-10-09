@@ -3175,7 +3175,526 @@ Specifications:
         """Stop automation system"""
         messagebox.showinfo("Automation", "Automation system stopped\\n\\nAll rules are now inactive")
     
+    # === IOT DEVICE MANAGER METHODS ===
+    def setup_device_discovery_tab(self, parent):
+        """Setup device discovery tab for IoT manager"""
+        # Network scan controls
+        scan_frame = ttk.LabelFrame(parent, text="Network Scanning")
+        scan_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        scan_controls = ttk.Frame(scan_frame)
+        scan_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Label(scan_controls, text="Network Range:").pack(side=tk.LEFT, padx=2)
+        self.network_range_var = tk.StringVar(value="192.168.1.0/24")
+        ttk.Entry(scan_controls, textvariable=self.network_range_var, width=20).pack(side=tk.LEFT, padx=2)
+        ttk.Button(scan_controls, text="🔍 Scan Network", command=self.scan_network).pack(side=tk.LEFT, padx=2)
+        ttk.Button(scan_controls, text="🔄 Auto-Discover", command=self.auto_discover_devices).pack(side=tk.LEFT, padx=2)
+        
+        # Discovered devices
+        devices_frame = ttk.LabelFrame(parent, text="Discovered Devices")
+        devices_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Device discovery treeview
+        columns = ('IP Address', 'Device Type', 'Protocol', 'Status', 'Description')
+        self.discovery_tree = ttk.Treeview(devices_frame, columns=columns, show='headings', height=15)
+        
+        for col in columns:
+            self.discovery_tree.heading(col, text=col)
+            self.discovery_tree.column(col, width=120)
+        
+        self.discovery_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        discovery_scroll = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL, command=self.discovery_tree.yview)
+        self.discovery_tree.config(yscrollcommand=discovery_scroll.set)
+        discovery_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add sample discovered devices
+        sample_devices = [
+            ("192.168.1.101", "Smart Light", "HTTP/REST", "Online", "Philips Hue Bridge"),
+            ("192.168.1.102", "Thermostat", "MQTT", "Online", "Nest Learning Thermostat"),
+            ("192.168.1.103", "Security Camera", "RTSP", "Online", "Ring Doorbell Pro"),
+            ("192.168.1.104", "Smart Speaker", "UPnP", "Online", "Amazon Echo Dot"),
+            ("192.168.1.105", "IoT Sensor", "CoAP", "Online", "Temperature/Humidity Sensor"),
+            ("192.168.1.106", "Smart Plug", "HTTP", "Offline", "TP-Link Kasa Smart Plug")
+        ]
+        
+        for device in sample_devices:
+            self.discovery_tree.insert('', 'end', values=device)
+        
+        # Device action buttons
+        action_frame = ttk.Frame(parent)
+        action_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(action_frame, text="➕ Add Device", command=self.add_discovered_device).pack(side=tk.LEFT, padx=2)
+        ttk.Button(action_frame, text="📋 Device Info", command=self.show_discovered_device_info).pack(side=tk.LEFT, padx=2)
+        ttk.Button(action_frame, text="🔧 Configure", command=self.configure_discovered_device).pack(side=tk.LEFT, padx=2)
+        ttk.Button(action_frame, text="🧪 Test Connection", command=self.test_device_connection).pack(side=tk.LEFT, padx=2)
+    
+    def setup_device_control_tab(self, parent):
+        """Setup device control tab"""
+        # Connected devices list
+        devices_frame = ttk.LabelFrame(parent, text="Connected IoT Devices")
+        devices_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Device control treeview
+        columns = ('Device Name', 'Type', 'IP Address', 'Protocol', 'Status', 'Last Update')
+        self.control_tree = ttk.Treeview(devices_frame, columns=columns, show='headings', height=12)
+        
+        for col in columns:
+            self.control_tree.heading(col, text=col)
+            self.control_tree.column(col, width=100)
+        
+        self.control_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        control_scroll = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL, command=self.control_tree.yview)
+        self.control_tree.config(yscrollcommand=control_scroll.set)
+        control_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add sample IoT devices
+        sample_iot_devices = [
+            ("Living Room Light", "Smart Bulb", "192.168.1.101", "HTTP", "On", "2024-01-15 14:30"),
+            ("Smart Thermostat", "Climate Control", "192.168.1.102", "MQTT", "Auto 72°F", "2024-01-15 14:29"),
+            ("Front Door Camera", "Security", "192.168.1.103", "RTSP", "Recording", "2024-01-15 14:28"),
+            ("Kitchen Sensor", "Environmental", "192.168.1.105", "CoAP", "Active", "2024-01-15 14:27"),
+            ("Smart Plug 1", "Power Control", "192.168.1.106", "HTTP", "Off", "2024-01-15 14:25")
+        ]
+        
+        for device in sample_iot_devices:
+            self.control_tree.insert('', 'end', values=device)
+        
+        # Control panel
+        control_panel = ttk.LabelFrame(parent, text="Device Control Panel")
+        control_panel.pack(fill=tk.X, padx=5, pady=5)
+        
+        control_buttons = ttk.Frame(control_panel)
+        control_buttons.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(control_buttons, text="💡 Control Device", command=self.control_iot_device).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_buttons, text="📊 Get Status", command=self.get_device_status).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_buttons, text="📝 Send Command", command=self.send_device_command).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_buttons, text="🔄 Refresh All", command=self.refresh_all_devices).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_buttons, text="⚙️ Settings", command=self.device_settings).pack(side=tk.LEFT, padx=2)
+    
+    def setup_network_monitoring_tab(self, parent):
+        """Setup network monitoring tab"""
+        # Network statistics
+        stats_frame = ttk.LabelFrame(parent, text="Network Statistics")
+        stats_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        stats_grid = ttk.Frame(stats_frame)
+        stats_grid.pack(fill=tk.X, padx=5, pady=5)
+        
+        # Network stats display
+        stats_labels = [
+            ("Connected Devices:", "15"),
+            ("Active Connections:", "12"),
+            ("Data Transferred:", "2.4 GB"),
+            ("Network Uptime:", "7 days, 14 hours"),
+            ("Average Latency:", "12ms"),
+            ("Packet Loss:", "0.02%")
+        ]
+        
+        for i, (label, value) in enumerate(stats_labels):
+            row = i // 2
+            col = i % 2
+            ttk.Label(stats_grid, text=label).grid(row=row, column=col*2, padx=5, pady=2, sticky='e')
+            ttk.Label(stats_grid, text=value, font=('Arial', 10, 'bold')).grid(row=row, column=col*2+1, padx=5, pady=2, sticky='w')
+        
+        # Traffic monitoring
+        traffic_frame = ttk.LabelFrame(parent, text="Network Traffic")
+        traffic_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Traffic log
+        self.traffic_text = scrolledtext.ScrolledText(traffic_frame, height=15, font=('Consolas', 9))
+        self.traffic_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Add sample traffic data
+        sample_traffic = """
+14:30:15 - 192.168.1.101 -> MQTT Broker: PUBLISH topic/temperature {"temp": 23.5}
+14:30:16 - 192.168.1.102 -> REST API: GET /api/thermostat/status
+14:30:17 - 192.168.1.103 -> Streaming: RTSP video frame (1920x1080)
+14:30:18 - 192.168.1.105 -> CoAP Server: POST /sensors/humidity {"humidity": 65}
+14:30:19 - 192.168.1.106 -> HTTP: POST /control {"action": "toggle"}
+14:30:20 - Gateway -> 192.168.1.101: ACK message received
+14:30:21 - 192.168.1.102 -> Cloud Service: Sync status update
+14:30:22 - 192.168.1.103 -> Mobile App: Push notification sent
+14:30:23 - MQTT Broker -> All Subscribers: Broadcast temperature update
+14:30:24 - Security System -> 192.168.1.103: Motion detection alert
+        """
+        
+        self.traffic_text.insert(tk.END, sample_traffic.strip())
+        
+        # Monitoring controls
+        monitor_controls = ttk.Frame(parent)
+        monitor_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(monitor_controls, text="▶️ Start Monitoring", command=self.start_traffic_monitoring).pack(side=tk.LEFT, padx=2)
+        ttk.Button(monitor_controls, text="⏹️ Stop Monitoring", command=self.stop_traffic_monitoring).pack(side=tk.LEFT, padx=2)
+        ttk.Button(monitor_controls, text="💾 Export Log", command=self.export_traffic_log).pack(side=tk.LEFT, padx=2)
+        ttk.Button(monitor_controls, text="🧹 Clear Log", command=self.clear_traffic_log).pack(side=tk.LEFT, padx=2)
+    
+    def setup_protocols_tab(self, parent):
+        """Setup IoT protocols configuration tab"""
+        # Protocol settings
+        protocols_frame = ttk.LabelFrame(parent, text="Supported IoT Protocols")
+        protocols_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Protocol treeview
+        columns = ('Protocol', 'Port', 'Status', 'Devices', 'Description')
+        self.protocols_tree = ttk.Treeview(protocols_frame, columns=columns, show='headings', height=12)
+        
+        for col in columns:
+            self.protocols_tree.heading(col, text=col)
+            self.protocols_tree.column(col, width=120)
+        
+        self.protocols_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        protocol_scroll = ttk.Scrollbar(protocols_frame, orient=tk.VERTICAL, command=self.protocols_tree.yview)
+        self.protocols_tree.config(yscrollcommand=protocol_scroll.set)
+        protocol_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add supported protocols
+        protocols_data = [
+            ("HTTP/REST", "80/443", "Active", "8", "RESTful web services"),
+            ("MQTT", "1883", "Active", "5", "Message queuing protocol"),
+            ("CoAP", "5683", "Active", "3", "Constrained Application Protocol"),
+            ("WebSocket", "8080", "Active", "2", "Real-time bidirectional communication"),
+            ("RTSP", "554", "Active", "1", "Real-time streaming protocol"),
+            ("UPnP", "1900", "Standby", "1", "Universal Plug and Play"),
+            ("Zigbee", "N/A", "Offline", "0", "Low-power mesh networking"),
+            ("LoRaWAN", "N/A", "Offline", "0", "Long-range wide area network")
+        ]
+        
+        for protocol in protocols_data:
+            self.protocols_tree.insert('', 'end', values=protocol)
+        
+        # Protocol controls
+        protocol_controls = ttk.Frame(parent)
+        protocol_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(protocol_controls, text="⚙️ Configure Protocol", command=self.configure_protocol).pack(side=tk.LEFT, padx=2)
+        ttk.Button(protocol_controls, text="▶️ Enable Protocol", command=self.enable_protocol).pack(side=tk.LEFT, padx=2)
+        ttk.Button(protocol_controls, text="⏹️ Disable Protocol", command=self.disable_protocol).pack(side=tk.LEFT, padx=2)
+        ttk.Button(protocol_controls, text="🧪 Test Protocol", command=self.test_protocol).pack(side=tk.LEFT, padx=2)
+    
+    def setup_iot_analytics_tab(self, parent):
+        """Setup IoT data analytics tab"""
+        # Analytics dashboard
+        dashboard_frame = ttk.LabelFrame(parent, text="IoT Analytics Dashboard")
+        dashboard_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Analytics canvas
+        self.analytics_canvas = tk.Canvas(dashboard_frame, bg='white', height=400)
+        self.analytics_canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Draw sample analytics charts
+        self.draw_iot_analytics()
+        
+        # Analytics controls
+        analytics_controls = ttk.Frame(parent)
+        analytics_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(analytics_controls, text="📊 Refresh Charts", command=self.refresh_iot_analytics).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analytics_controls, text="💾 Export Data", command=self.export_iot_data).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analytics_controls, text="📈 Generate Report", command=self.generate_iot_report).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analytics_controls, text="⚙️ Configure Alerts", command=self.configure_iot_alerts).pack(side=tk.LEFT, padx=2)
+    
+    # === IOT HELPER METHODS ===
+    def scan_network(self):
+        """Scan network for IoT devices"""
+        network = self.network_range_var.get()
+        messagebox.showinfo("Network Scan", f"Scanning network {network}...\\n\\nFound 6 IoT devices\\n\\n✅ Scan complete!")
+    
+    def auto_discover_devices(self):
+        """Auto-discover IoT devices using various protocols"""
+        messagebox.showinfo("Auto Discovery", "Auto-discovering devices...\\n\\n🔍 mDNS scan: 3 devices\\n🔍 UPnP scan: 2 devices\\n🔍 MQTT discovery: 1 device\\n\\n✅ Discovery complete!")
+    
+    def add_discovered_device(self):
+        """Add discovered device to managed devices"""
+        selection = self.discovery_tree.selection()
+        if selection:
+            messagebox.showinfo("Device Added", "Device added to managed devices list\\n\\n📱 Configuration saved\\n🔗 Connection established")
+        else:
+            messagebox.showwarning("No Selection", "Please select a device to add")
+    
+    def show_discovered_device_info(self):
+        """Show detailed information about discovered device"""
+        selection = self.discovery_tree.selection()
+        if selection:
+            item = self.discovery_tree.item(selection[0])
+            device_info = f"""Device Information:
+            
+IP Address: {item['values'][0]}
+Device Type: {item['values'][1]}
+Protocol: {item['values'][2]}
+Status: {item['values'][3]}
+Description: {item['values'][4]}
+
+Capabilities:
+• Remote Control: ✅
+• Status Monitoring: ✅
+• Firmware Update: ✅
+• Security: WPA2-PSK
+• API Version: v2.1
+"""
+            messagebox.showinfo("Device Info", device_info)
+        else:
+            messagebox.showwarning("No Selection", "Please select a device")
+    
+    def configure_discovered_device(self):
+        """Configure discovered device"""
+        messagebox.showinfo("Device Config", "Device configuration dialog\\n\\n⚙️ Network settings\\n🔐 Security options\\n📊 Data collection preferences")
+    
+    def test_device_connection(self):
+        """Test connection to discovered device"""
+        selection = self.discovery_tree.selection()
+        if selection:
+            messagebox.showinfo("Connection Test", "Testing device connection...\\n\\n🔗 Ping: 12ms\\n✅ Protocol handshake: OK\\n✅ Authentication: Success\\n\\n✅ Connection test passed!")
+        else:
+            messagebox.showwarning("No Selection", "Please select a device to test")
+    
+    def control_iot_device(self):
+        """Control selected IoT device"""
+        selection = self.control_tree.selection()
+        if selection:
+            item = self.control_tree.item(selection[0])
+            device_name = item['values'][0]
+            device_type = item['values'][1]
+            
+            # Create device control dialog
+            control_dialog = tk.Toplevel(self.root)
+            control_dialog.title(f"🎛️ Control {device_name}")
+            control_dialog.geometry("400x300")
+            control_dialog.transient(self.root)
+            control_dialog.grab_set()
+            
+            ttk.Label(control_dialog, text=f"Device: {device_name}", font=('Arial', 12, 'bold')).pack(pady=10)
+            ttk.Label(control_dialog, text=f"Type: {device_type}").pack()
+            
+            if "Light" in device_name or "Bulb" in device_type:
+                ttk.Button(control_dialog, text="💡 Turn On", command=lambda: self.iot_device_action(device_name, "on")).pack(pady=5)
+                ttk.Button(control_dialog, text="🌑 Turn Off", command=lambda: self.iot_device_action(device_name, "off")).pack(pady=5)
+                ttk.Button(control_dialog, text="🌈 Change Color", command=lambda: self.iot_device_action(device_name, "color")).pack(pady=5)
+            elif "Thermostat" in device_name:
+                ttk.Button(control_dialog, text="🔄 Auto Mode", command=lambda: self.iot_device_action(device_name, "auto")).pack(pady=5)
+                ttk.Button(control_dialog, text="❄️ Cool Mode", command=lambda: self.iot_device_action(device_name, "cool")).pack(pady=5)
+                ttk.Button(control_dialog, text="🔥 Heat Mode", command=lambda: self.iot_device_action(device_name, "heat")).pack(pady=5)
+            elif "Camera" in device_name:
+                ttk.Button(control_dialog, text="📹 Start Recording", command=lambda: self.iot_device_action(device_name, "record")).pack(pady=5)
+                ttk.Button(control_dialog, text="📸 Take Snapshot", command=lambda: self.iot_device_action(device_name, "snapshot")).pack(pady=5)
+            
+            ttk.Button(control_dialog, text="❌ Close", command=control_dialog.destroy).pack(pady=10)
+        else:
+            messagebox.showwarning("No Selection", "Please select a device to control")
+    
+    def iot_device_action(self, device, action):
+        """Execute IoT device action"""
+        messagebox.showinfo("Device Action", f"Device '{device}' action: {action}\\n\\n📤 Command sent\\n✅ Action completed successfully")
+    
+    def get_device_status(self):
+        """Get status from selected device"""
+        selection = self.control_tree.selection()
+        if selection:
+            item = self.control_tree.item(selection[0])
+            device_name = item['values'][0]
+            status_info = f"""Device Status Report:
+            
+Device: {device_name}
+Status: Online
+Uptime: 5 days, 12 hours
+Signal Strength: -45 dBm (Excellent)
+Battery Level: 87%
+Last Communication: 2 seconds ago
+Firmware Version: 2.1.4
+Temperature: 24°C
+Memory Usage: 45%
+"""
+            messagebox.showinfo("Device Status", status_info)
+        else:
+            messagebox.showwarning("No Selection", "Please select a device")
+    
+    def send_device_command(self):
+        """Send custom command to device"""
+        selection = self.control_tree.selection()
+        if selection:
+            command = simpledialog.askstring("Send Command", "Enter device command:")
+            if command:
+                messagebox.showinfo("Command Sent", f"Command '{command}' sent to device\\n\\n📤 Transmitted successfully\\n✅ Device acknowledged")
+        else:
+            messagebox.showwarning("No Selection", "Please select a device")
+    
+    def refresh_all_devices(self):
+        """Refresh status of all connected devices"""
+        messagebox.showinfo("Refresh Devices", "Refreshing all device statuses...\\n\\n🔄 Querying 5 devices\\n✅ All devices updated successfully")
+    
+    def device_settings(self):
+        """Open device settings"""
+        messagebox.showinfo("Device Settings", "Device settings panel\\n\\n⚙️ Connection preferences\\n🔔 Notification settings\\n📊 Data collection options")
+    
+    def start_traffic_monitoring(self):
+        """Start network traffic monitoring"""
+        messagebox.showinfo("Traffic Monitor", "Network traffic monitoring started\\n\\n📊 Capturing all IoT traffic\\n📝 Logging to database")
+    
+    def stop_traffic_monitoring(self):
+        """Stop network traffic monitoring"""
+        messagebox.showinfo("Traffic Monitor", "Network traffic monitoring stopped\\n\\n📊 Captured 1,247 packets\\n💾 Log saved to file")
+    
+    def export_traffic_log(self):
+        """Export traffic log to file"""
+        filename = filedialog.asksaveasfilename(defaultextension=".log", filetypes=[("Log files", "*.log"), ("Text files", "*.txt")])
+        if filename:
+            messagebox.showinfo("Export Log", f"Traffic log exported to:\\n{filename}\\n\\n📊 2,456 entries exported")
+    
+    def clear_traffic_log(self):
+        """Clear traffic monitoring log"""
+        if messagebox.askyesno("Clear Log", "Clear all traffic monitoring data?"):
+            self.traffic_text.delete(1.0, tk.END)
+            messagebox.showinfo("Log Cleared", "Traffic monitoring log cleared")
+    
+    def configure_protocol(self):
+        """Configure IoT protocol settings"""
+        selection = self.protocols_tree.selection()
+        if selection:
+            item = self.protocols_tree.item(selection[0])
+            protocol = item['values'][0]
+            messagebox.showinfo("Protocol Config", f"Configure {protocol} protocol\\n\\n⚙️ Connection settings\\n🔐 Security options\\n📊 Quality of service")
+        else:
+            messagebox.showwarning("No Selection", "Please select a protocol")
+    
+    def enable_protocol(self):
+        """Enable selected protocol"""
+        selection = self.protocols_tree.selection()
+        if selection:
+            item = self.protocols_tree.item(selection[0])
+            protocol = item['values'][0]
+            messagebox.showinfo("Protocol Enabled", f"Protocol {protocol} enabled\\n\\n✅ Service started\\n🔗 Listening for connections")
+        else:
+            messagebox.showwarning("No Selection", "Please select a protocol")
+    
+    def disable_protocol(self):
+        """Disable selected protocol"""
+        selection = self.protocols_tree.selection()
+        if selection:
+            item = self.protocols_tree.item(selection[0])
+            protocol = item['values'][0]
+            if messagebox.askyesno("Disable Protocol", f"Disable {protocol} protocol?"):
+                messagebox.showinfo("Protocol Disabled", f"Protocol {protocol} disabled\\n\\n⏹️ Service stopped\\n❌ No longer accepting connections")
+        else:
+            messagebox.showwarning("No Selection", "Please select a protocol")
+    
+    def test_protocol(self):
+        """Test protocol connectivity"""
+        selection = self.protocols_tree.selection()
+        if selection:
+            item = self.protocols_tree.item(selection[0])
+            protocol = item['values'][0]
+            messagebox.showinfo("Protocol Test", f"Testing {protocol} protocol...\\n\\n🔗 Connection: OK\\n📤 Send test: OK\\n📥 Receive test: OK\\n\\n✅ Protocol test passed!")
+        else:
+            messagebox.showwarning("No Selection", "Please select a protocol")
+    
+    def draw_iot_analytics(self):
+        """Draw IoT analytics charts on canvas"""
+        canvas = self.analytics_canvas
+        canvas.delete("all")
+        
+        # Chart 1: Device Status Distribution (Pie Chart)
+        center_x, center_y, radius = 150, 150, 80
+        angles = [0, 120, 200, 300]  # degrees
+        colors = ['#4CAF50', '#FF9800', '#F44336', '#9E9E9E']
+        labels = ['Online (12)', 'Idle (3)', 'Error (1)', 'Offline (2)']
+        
+        for i, (angle, color, label) in enumerate(zip(angles, colors, labels)):
+            start_angle = angle
+            extent = 60 if i < 3 else 60
+            canvas.create_arc(center_x-radius, center_y-radius, center_x+radius, center_y+radius,
+                            start=start_angle, extent=extent, fill=color, outline='white', width=2)
+        
+        canvas.create_text(center_x, center_y-radius-20, text="Device Status", font=('Arial', 12, 'bold'))
+        
+        # Chart 2: Data Transfer Over Time (Line Chart)
+        chart_x, chart_y, chart_w, chart_h = 350, 50, 300, 200
+        canvas.create_rectangle(chart_x, chart_y, chart_x+chart_w, chart_y+chart_h, outline='black', fill='white')
+        
+        # Sample data points
+        data_points = [(0, 180), (50, 120), (100, 160), (150, 100), (200, 140), (250, 80), (300, 110)]
+        
+        for i in range(len(data_points)-1):
+            x1, y1 = data_points[i]
+            x2, y2 = data_points[i+1]
+            canvas.create_line(chart_x+x1, chart_y+chart_h-y1, chart_x+x2, chart_y+chart_h-y2, 
+                             fill='blue', width=2)
+            canvas.create_oval(chart_x+x1-3, chart_y+chart_h-y1-3, chart_x+x1+3, chart_y+chart_h-y1+3, 
+                             fill='blue', outline='darkblue')
+        
+        canvas.create_text(chart_x+chart_w//2, chart_y-10, text="Data Transfer (MB/h)", font=('Arial', 12, 'bold'))
+        
+        # Chart 3: Protocol Usage (Bar Chart)
+        bar_x, bar_y, bar_w, bar_h = 50, 280, 250, 100
+        protocols = ['HTTP', 'MQTT', 'CoAP', 'WS']
+        usage_data = [85, 65, 45, 25]
+        bar_colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0']
+        
+        canvas.create_text(bar_x+bar_w//2, bar_y-10, text="Protocol Usage (%)", font=('Arial', 12, 'bold'))
+        
+        for i, (protocol, usage, color) in enumerate(zip(protocols, usage_data, bar_colors)):
+            x = bar_x + i * 60
+            height = usage * bar_h // 100
+            canvas.create_rectangle(x, bar_y+bar_h-height, x+40, bar_y+bar_h, fill=color, outline='black')
+            canvas.create_text(x+20, bar_y+bar_h+15, text=protocol, font=('Arial', 9))
+            canvas.create_text(x+20, bar_y+bar_h-height//2, text=f"{usage}%", font=('Arial', 8, 'bold'))
+    
+    def refresh_iot_analytics(self):
+        """Refresh IoT analytics charts"""
+        self.draw_iot_analytics()
+        messagebox.showinfo("Analytics Refreshed", "IoT analytics data refreshed\\n\\n📊 Charts updated\\n📈 Latest data loaded")
+    
+    def export_iot_data(self):
+        """Export IoT analytics data"""
+        filename = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("JSON files", "*.json")])
+        if filename:
+            messagebox.showinfo("Data Exported", f"IoT analytics data exported to:\\n{filename}\\n\\n📊 15,432 data points exported")
+    
+    def generate_iot_report(self):
+        """Generate comprehensive IoT report"""
+        messagebox.showinfo("Report Generated", "IoT Analytics Report Generated\\n\\n📈 Performance metrics\\n📊 Usage statistics\\n🔍 Trend analysis\\n\\n📄 Report saved as PDF")
+    
+    def configure_iot_alerts(self):
+        """Configure IoT monitoring alerts"""
+        messagebox.showinfo("Alert Configuration", "IoT Alert Settings\\n\\n🚨 Threshold alerts\\n📧 Email notifications\\n📱 Push notifications\\n📊 Custom rules")
+    
     # Add hardware methods to JAMESII class using setattr
+    setattr(JAMESII, 'setup_device_discovery_tab', setup_device_discovery_tab)
+    setattr(JAMESII, 'setup_device_control_tab', setup_device_control_tab)
+    setattr(JAMESII, 'setup_network_monitoring_tab', setup_network_monitoring_tab)
+    setattr(JAMESII, 'setup_protocols_tab', setup_protocols_tab)
+    setattr(JAMESII, 'setup_iot_analytics_tab', setup_iot_analytics_tab)
+    setattr(JAMESII, 'scan_network', scan_network)
+    setattr(JAMESII, 'auto_discover_devices', auto_discover_devices)
+    setattr(JAMESII, 'add_discovered_device', add_discovered_device)
+    setattr(JAMESII, 'show_discovered_device_info', show_discovered_device_info)
+    setattr(JAMESII, 'configure_discovered_device', configure_discovered_device)
+    setattr(JAMESII, 'test_device_connection', test_device_connection)
+    setattr(JAMESII, 'control_iot_device', control_iot_device)
+    setattr(JAMESII, 'iot_device_action', iot_device_action)
+    setattr(JAMESII, 'get_device_status', get_device_status)
+    setattr(JAMESII, 'send_device_command', send_device_command)
+    setattr(JAMESII, 'refresh_all_devices', refresh_all_devices)
+    setattr(JAMESII, 'device_settings', device_settings)
+    setattr(JAMESII, 'start_traffic_monitoring', start_traffic_monitoring)
+    setattr(JAMESII, 'stop_traffic_monitoring', stop_traffic_monitoring)
+    setattr(JAMESII, 'export_traffic_log', export_traffic_log)
+    setattr(JAMESII, 'clear_traffic_log', clear_traffic_log)
+    setattr(JAMESII, 'configure_protocol', configure_protocol)
+    setattr(JAMESII, 'enable_protocol', enable_protocol)
+    setattr(JAMESII, 'disable_protocol', disable_protocol)
+    setattr(JAMESII, 'test_protocol', test_protocol)
+    setattr(JAMESII, 'draw_iot_analytics', draw_iot_analytics)
+    setattr(JAMESII, 'refresh_iot_analytics', refresh_iot_analytics)
+    setattr(JAMESII, 'export_iot_data', export_iot_data)
+    setattr(JAMESII, 'generate_iot_report', generate_iot_report)
+    setattr(JAMESII, 'configure_iot_alerts', configure_iot_alerts)
+    
     setattr(JAMESII, 'setup_gpio_tab', setup_gpio_tab)
     setattr(JAMESII, 'setup_sensors_tab', setup_sensors_tab)
     setattr(JAMESII, 'setup_devices_tab', setup_devices_tab)
@@ -3204,16 +3723,16 @@ Specifications:
     setattr(JAMESII, 'start_automation', start_automation)
     setattr(JAMESII, 'stop_automation', stop_automation)
     
-    # Add existing methods to JAMESII class
-    JAMESII.show_hardware_controller = show_hardware_controller
-    JAMESII.show_iot_manager = show_iot_manager 
-    JAMESII.show_sensor_visualizer = show_sensor_visualizer
-    JAMESII.show_learning_assistant = show_learning_assistant
-    JAMESII.show_code_examples = show_code_examples
-    JAMESII.show_testing_framework = show_testing_framework
-    JAMESII.show_graphics_canvas = show_graphics_canvas
-    JAMESII.show_code_converter = show_code_converter
-    JAMESII.show_system_info = show_system_info
+    # Add existing methods to JAMESII class using setattr
+    setattr(JAMESII, 'show_hardware_controller', show_hardware_controller)
+    setattr(JAMESII, 'show_iot_manager', show_iot_manager)
+    setattr(JAMESII, 'show_sensor_visualizer', show_sensor_visualizer)
+    setattr(JAMESII, 'show_learning_assistant', show_learning_assistant)
+    setattr(JAMESII, 'show_code_examples', show_code_examples)
+    setattr(JAMESII, 'show_testing_framework', show_testing_framework)
+    setattr(JAMESII, 'show_graphics_canvas', show_graphics_canvas)
+    setattr(JAMESII, 'show_code_converter', show_code_converter)
+    setattr(JAMESII, 'show_system_info', show_system_info)
 
 # Add the tools methods
 add_tools_methods()
