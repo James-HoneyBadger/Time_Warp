@@ -1,0 +1,9 @@
+{
+  "name": "Code Formatter",
+  "version": "1.2.0",
+  "author": "JAMES Development Team",
+  "description": "Automatic code formatting and beautification for PILOT, BASIC, and Logo programs",
+  "entry_point": "plugin.py",
+  "api_version": "2.0",
+  "permissions": ["editor", "filesystem", "menu"]
+}

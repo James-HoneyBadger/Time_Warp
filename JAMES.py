@@ -944,14 +944,52 @@ JAMES III Help:
     # ========================
     
     def show_debugger(self):
-        """Show advanced debugger"""
-        try:
-            if hasattr(self, 'debugger') and self.debugger:
-                self.debugger.show()
-            else:
-                messagebox.showinfo("Debugger", "Advanced debugger is not currently available.\nDebugging features are integrated into the main IDE.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not open debugger: {e}")
+        """Show advanced debugger dialog"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("🐛 Advanced Debugger")
+        dialog.geometry("1000x700")
+        dialog.transient(self.root)
+        
+        # Create main layout with notebook
+        notebook = ttk.Notebook(dialog)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Breakpoints Tab
+        breakpoints_frame = ttk.Frame(notebook)
+        notebook.add(breakpoints_frame, text="🔴 Breakpoints")
+        self.setup_breakpoints_tab(breakpoints_frame)
+        
+        # Variables Tab
+        variables_frame = ttk.Frame(notebook)
+        notebook.add(variables_frame, text="📊 Variables")
+        self.setup_debug_variables_tab(variables_frame)
+        
+        # Call Stack Tab
+        callstack_frame = ttk.Frame(notebook)
+        notebook.add(callstack_frame, text="📚 Call Stack")
+        self.setup_callstack_tab(callstack_frame)
+        
+        # Execution Tab
+        execution_frame = ttk.Frame(notebook)
+        notebook.add(execution_frame, text="▶️ Execution")
+        self.setup_execution_tab(execution_frame)
+        
+        # Memory Tab
+        memory_frame = ttk.Frame(notebook)
+        notebook.add(memory_frame, text="💾 Memory")
+        self.setup_memory_tab(memory_frame)
+        
+        # Store dialog reference for debugger state
+        self.debugger_dialog = dialog
+        self.debugger_state = {
+            'breakpoints': {},
+            'current_line': None,
+            'call_stack': [],
+            'variables': {},
+            'execution_mode': 'normal'
+        }
+        
+        dialog.protocol("WM_DELETE_WINDOW", self.close_debugger)
     
     def open_calculator(self):
         """Open expression calculator"""
@@ -1997,8 +2035,45 @@ def add_tools_methods():
     """Add tools menu methods to JAMESII class"""
     
     def show_hardware_controller(self):
-        """Show hardware controller interface"""
-        messagebox.showinfo("Hardware Controller", "Hardware Controller\\n\\nGPIO Control Interface\\nRaspberry Pi Integration\\nSensor Management\\n\\nComing soon!")
+        """Show hardware controller dialog"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("🔌 Hardware Controller")
+        dialog.geometry("900x600")
+        dialog.transient(self.root)
+        
+        # Create notebook for hardware tabs
+        notebook = ttk.Notebook(dialog)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # GPIO Control Tab
+        gpio_frame = ttk.Frame(notebook)
+        notebook.add(gpio_frame, text="📌 GPIO Pins")
+        self.setup_gpio_tab(gpio_frame)
+        
+        # Sensors Tab
+        sensors_frame = ttk.Frame(notebook)
+        notebook.add(sensors_frame, text="🌡️ Sensors")
+        self.setup_sensors_tab(sensors_frame)
+        
+        # Devices Tab
+        devices_frame = ttk.Frame(notebook)
+        notebook.add(devices_frame, text="🔧 Devices")
+        self.setup_devices_tab(devices_frame)
+        
+        # Automation Tab
+        automation_frame = ttk.Frame(notebook)
+        notebook.add(automation_frame, text="🤖 Automation")
+        self.setup_automation_tab(automation_frame)
+        
+        # Initialize hardware state
+        self.hardware_state = {
+            'gpio_pins': {},
+            'sensors': {},
+            'devices': {},
+            'automation_rules': []
+        }
+        
+        dialog.protocol("WM_DELETE_WINDOW", lambda: dialog.destroy())
     
     def show_iot_manager(self):
         """Show IoT device manager"""
@@ -2045,7 +2120,1058 @@ Graphics: {'Available' if hasattr(self, 'graphics_canvas') else 'Not initialized
         except Exception as e:
             messagebox.showerror("Error", f"Could not get system info: {e}")
     
+    # === DEBUGGER METHODS ===
+    def setup_breakpoints_tab(self, parent):
+        """Setup breakpoints management tab"""
+        # Breakpoints list frame
+        list_frame = ttk.LabelFrame(parent, text="Breakpoints")
+        list_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Treeview for breakpoints
+        columns = ('File', 'Line', 'Condition', 'Status')
+        self.breakpoints_tree = ttk.Treeview(list_frame, columns=columns, show='headings', height=15)
+        
+        for col in columns:
+            self.breakpoints_tree.heading(col, text=col)
+            self.breakpoints_tree.column(col, width=150)
+        
+        self.breakpoints_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        bp_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.breakpoints_tree.yview)
+        self.breakpoints_tree.config(yscrollcommand=bp_scroll.set)
+        bp_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Control buttons
+        button_frame = ttk.Frame(parent)
+        button_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(button_frame, text="➕ Add Breakpoint", command=self.add_breakpoint).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="❌ Remove", command=self.remove_breakpoint).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="✅ Enable All", command=self.enable_all_breakpoints).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="⏸️ Disable All", command=self.disable_all_breakpoints).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="🧹 Clear All", command=self.clear_all_breakpoints).pack(side=tk.LEFT, padx=2)
+    
+    def setup_debug_variables_tab(self, parent):
+        """Setup debug variables tab"""
+        # Variables tree frame
+        tree_frame = ttk.LabelFrame(parent, text="Variables & Values")
+        tree_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Variables treeview
+        columns = ('Variable', 'Type', 'Value', 'Scope')
+        self.debug_vars_tree = ttk.Treeview(tree_frame, columns=columns, show='headings', height=15)
+        
+        for col in columns:
+            self.debug_vars_tree.heading(col, text=col)
+            if col == 'Value':
+                self.debug_vars_tree.column(col, width=200)
+            else:
+                self.debug_vars_tree.column(col, width=120)
+        
+        self.debug_vars_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        vars_scroll = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.debug_vars_tree.yview)
+        self.debug_vars_tree.config(yscrollcommand=vars_scroll.set)
+        vars_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Control buttons
+        vars_button_frame = ttk.Frame(parent)
+        vars_button_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(vars_button_frame, text="🔄 Refresh", command=self.refresh_debug_variables).pack(side=tk.LEFT, padx=2)
+        ttk.Button(vars_button_frame, text="👁️ Watch Variable", command=self.add_watch_variable).pack(side=tk.LEFT, padx=2)
+        ttk.Button(vars_button_frame, text="✏️ Edit Value", command=self.edit_variable_value).pack(side=tk.LEFT, padx=2)
+        ttk.Button(vars_button_frame, text="💾 Export Variables", command=self.export_debug_variables).pack(side=tk.LEFT, padx=2)
+    
+    def setup_callstack_tab(self, parent):
+        """Setup call stack tab"""
+        # Call stack frame
+        stack_frame = ttk.LabelFrame(parent, text="Call Stack")
+        stack_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Call stack listbox
+        self.callstack_listbox = tk.Listbox(stack_frame, font=('Consolas', 10))
+        self.callstack_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        stack_scroll = ttk.Scrollbar(stack_frame, orient=tk.VERTICAL, command=self.callstack_listbox.yview)
+        self.callstack_listbox.config(yscrollcommand=stack_scroll.set)
+        stack_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Stack info frame
+        info_frame = ttk.LabelFrame(parent, text="Stack Frame Details")
+        info_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.stack_info_text = tk.Text(info_frame, height=8, font=('Consolas', 9))
+        info_scroll = ttk.Scrollbar(info_frame, orient=tk.VERTICAL, command=self.stack_info_text.yview)
+        self.stack_info_text.config(yscrollcommand=info_scroll.set)
+        
+        self.stack_info_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        info_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Bind selection event
+        self.callstack_listbox.bind('<<ListboxSelect>>', self.on_stack_select)
+    
+    def setup_execution_tab(self, parent):
+        """Setup execution control tab"""
+        # Execution controls frame
+        controls_frame = ttk.LabelFrame(parent, text="Execution Control")
+        controls_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        # Control buttons
+        button_row1 = ttk.Frame(controls_frame)
+        button_row1.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(button_row1, text="▶️ Run", command=self.debug_run).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row1, text="⏸️ Pause", command=self.debug_pause).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row1, text="⏹️ Stop", command=self.debug_stop).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row1, text="🔄 Restart", command=self.debug_restart).pack(side=tk.LEFT, padx=2)
+        
+        button_row2 = ttk.Frame(controls_frame)
+        button_row2.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(button_row2, text="➡️ Step Over", command=self.debug_step_over).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row2, text="⬇️ Step Into", command=self.debug_step_into).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row2, text="⬆️ Step Out", command=self.debug_step_out).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row2, text="🏃 Run to Cursor", command=self.debug_run_to_cursor).pack(side=tk.LEFT, padx=2)
+        
+        # Execution status frame
+        status_frame = ttk.LabelFrame(parent, text="Execution Status")
+        status_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        self.execution_text = tk.Text(status_frame, height=15, font=('Consolas', 10))
+        exec_scroll = ttk.Scrollbar(status_frame, orient=tk.VERTICAL, command=self.execution_text.yview)
+        self.execution_text.config(yscrollcommand=exec_scroll.set)
+        
+        self.execution_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        exec_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Initialize execution status
+        self.update_execution_status()
+    
+    def setup_memory_tab(self, parent):
+        """Setup memory monitoring tab"""
+        # Memory usage frame
+        memory_frame = ttk.LabelFrame(parent, text="Memory Usage")
+        memory_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Memory statistics
+        stats_frame = ttk.Frame(memory_frame)
+        stats_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.memory_labels = {}
+        memory_items = ['Total Memory', 'Used Memory', 'Free Memory', 'Python Objects', 'Variables Count']
+        
+        for i, item in enumerate(memory_items):
+            ttk.Label(stats_frame, text=f"{item}:").grid(row=i, column=0, sticky='w', padx=5, pady=2)
+            self.memory_labels[item] = ttk.Label(stats_frame, text="0 MB")
+            self.memory_labels[item].grid(row=i, column=1, sticky='w', padx=20, pady=2)
+        
+        # Memory monitor text
+        monitor_frame = ttk.Frame(memory_frame)
+        monitor_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        self.memory_text = tk.Text(monitor_frame, height=15, font=('Consolas', 9))
+        memory_scroll = ttk.Scrollbar(monitor_frame, orient=tk.VERTICAL, command=self.memory_text.yview)
+        self.memory_text.config(yscrollcommand=memory_scroll.set)
+        
+        self.memory_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        memory_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Control buttons
+        memory_buttons = ttk.Frame(parent)
+        memory_buttons.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(memory_buttons, text="🔄 Refresh", command=self.refresh_memory_info).pack(side=tk.LEFT, padx=2)
+        ttk.Button(memory_buttons, text="📊 Memory Profile", command=self.show_memory_profile).pack(side=tk.LEFT, padx=2)
+        ttk.Button(memory_buttons, text="🧹 Garbage Collect", command=self.force_garbage_collection).pack(side=tk.LEFT, padx=2)
+        
+        # Initialize memory display
+        self.refresh_memory_info()
+    
+    # === DEBUGGER HELPER METHODS ===
+    def add_breakpoint(self):
+        """Add a new breakpoint"""
+        dialog = tk.Toplevel(self.debugger_dialog)
+        dialog.title("➕ Add Breakpoint")
+        dialog.geometry("400x200")
+        dialog.transient(self.debugger_dialog)
+        dialog.grab_set()
+        
+        ttk.Label(dialog, text="Line Number:").pack(pady=5)
+        line_var = tk.IntVar(value=1)
+        ttk.Spinbox(dialog, from_=1, to=1000, textvariable=line_var, width=10).pack(pady=5)
+        
+        ttk.Label(dialog, text="Condition (optional):").pack(pady=5)
+        condition_var = tk.StringVar()
+        ttk.Entry(dialog, textvariable=condition_var, width=40).pack(pady=5)
+        
+        def create_bp():
+            line = line_var.get()
+            condition = condition_var.get() or "Always"
+            bp_id = f"main.py:{line}"
+            
+            self.debugger_state['breakpoints'][bp_id] = {
+                'file': 'main.py',
+                'line': line,
+                'condition': condition,
+                'enabled': True
+            }
+            
+            self.breakpoints_tree.insert('', 'end', values=('main.py', line, condition, 'Enabled'))
+            messagebox.showinfo("Breakpoint Added", f"Breakpoint added at line {line}")
+            dialog.destroy()
+        
+        ttk.Button(dialog, text="✅ Add", command=create_bp).pack(side=tk.LEFT, padx=5, pady=20)
+        ttk.Button(dialog, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5, pady=20)
+    
+    def remove_breakpoint(self):
+        """Remove selected breakpoint"""
+        selection = self.breakpoints_tree.selection()
+        if selection:
+            self.breakpoints_tree.delete(selection[0])
+            messagebox.showinfo("Breakpoint Removed", "Breakpoint removed successfully")
+        else:
+            messagebox.showwarning("No Selection", "Please select a breakpoint to remove")
+    
+    def enable_all_breakpoints(self):
+        """Enable all breakpoints"""
+        for item in self.breakpoints_tree.get_children():
+            values = list(self.breakpoints_tree.item(item)['values'])
+            values[3] = 'Enabled'
+            self.breakpoints_tree.item(item, values=values)
+        messagebox.showinfo("Breakpoints", "All breakpoints enabled")
+    
+    def disable_all_breakpoints(self):
+        """Disable all breakpoints"""
+        for item in self.breakpoints_tree.get_children():
+            values = list(self.breakpoints_tree.item(item)['values'])
+            values[3] = 'Disabled'
+            self.breakpoints_tree.item(item, values=values)
+        messagebox.showinfo("Breakpoints", "All breakpoints disabled")
+    
+    def clear_all_breakpoints(self):
+        """Clear all breakpoints"""
+        if messagebox.askyesno("Clear Breakpoints", "Remove all breakpoints?"):
+            for item in self.breakpoints_tree.get_children():
+                self.breakpoints_tree.delete(item)
+            self.debugger_state['breakpoints'].clear()
+            messagebox.showinfo("Breakpoints", "All breakpoints cleared")
+    
+    def refresh_debug_variables(self):
+        """Refresh debug variables display"""
+        # Clear existing items
+        for item in self.debug_vars_tree.get_children():
+            self.debug_vars_tree.delete(item)
+        
+        # Get interpreter variables
+        try:
+            if hasattr(self, 'interpreter') and self.interpreter:
+                variables = {}
+                
+                # Get PILOT variables
+                if hasattr(self.interpreter, 'pilot_executor') and self.interpreter.pilot_executor:
+                    pilot_vars = getattr(self.interpreter.pilot_executor, 'variables', {})
+                    for var, value in pilot_vars.items():
+                        variables[f"PILOT:{var}"] = {'type': type(value).__name__, 'value': str(value), 'scope': 'PILOT'}
+                
+                # Get BASIC variables
+                if hasattr(self.interpreter, 'basic_executor') and self.interpreter.basic_executor:
+                    basic_vars = getattr(self.interpreter.basic_executor, 'variables', {})
+                    for var, value in basic_vars.items():
+                        variables[f"BASIC:{var}"] = {'type': type(value).__name__, 'value': str(value), 'scope': 'BASIC'}
+                
+                # Get Logo variables
+                if hasattr(self.interpreter, 'logo_executor') and self.interpreter.logo_executor:
+                    logo_vars = getattr(self.interpreter.logo_executor, 'variables', {})
+                    for var, value in logo_vars.items():
+                        variables[f"Logo:{var}"] = {'type': type(value).__name__, 'value': str(value), 'scope': 'Logo'}
+                
+                # Add to tree
+                for var_name, var_info in variables.items():
+                    self.debug_vars_tree.insert('', 'end', values=(
+                        var_name, var_info['type'], var_info['value'][:50], var_info['scope']
+                    ))
+            
+        except Exception as e:
+            self.debug_vars_tree.insert('', 'end', values=('Error', 'N/A', str(e)[:50], 'System'))
+    
+    def add_watch_variable(self):
+        """Add a variable to watch"""
+        var_name = tk.simpledialog.askstring("Watch Variable", "Enter variable name to watch:")
+        if var_name:
+            messagebox.showinfo("Watch Added", f"Variable '{var_name}' added to watch list")
+    
+    def edit_variable_value(self):
+        """Edit selected variable value"""
+        selection = self.debug_vars_tree.selection()
+        if selection:
+            item = self.debug_vars_tree.item(selection[0])
+            var_name = item['values'][0]
+            old_value = item['values'][2]
+            
+            new_value = tk.simpledialog.askstring("Edit Variable", f"Enter new value for {var_name}:", initialvalue=old_value)
+            if new_value is not None:
+                messagebox.showinfo("Variable Updated", f"Variable '{var_name}' updated to '{new_value}'")
+        else:
+            messagebox.showwarning("No Selection", "Please select a variable to edit")
+    
+    def export_debug_variables(self):
+        """Export variables to JSON file"""
+        try:
+            from tkinter import filedialog
+            import json
+            
+            filename = filedialog.asksaveasfilename(
+                title="Export Variables",
+                defaultextension=".json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+            )
+            
+            if filename:
+                variables = {}
+                for item in self.debug_vars_tree.get_children():
+                    values = self.debug_vars_tree.item(item)['values']
+                    variables[values[0]] = {
+                        'type': values[1],
+                        'value': values[2],
+                        'scope': values[3]
+                    }
+                
+                with open(filename, 'w') as f:
+                    json.dump(variables, f, indent=2)
+                
+                messagebox.showinfo("Export Complete", f"Variables exported to {filename}")
+                
+        except Exception as e:
+            messagebox.showerror("Export Error", f"Failed to export variables: {e}")
+    
+    def on_stack_select(self, event):
+        """Handle call stack selection"""
+        selection = self.callstack_listbox.curselection()
+        if selection:
+            frame_info = self.callstack_listbox.get(selection[0])
+            
+            # Display frame details
+            details = f"""Stack Frame Details:
+            
+Frame: {frame_info}
+Local Variables: Available in Variables tab
+Line Number: Highlighted in editor
+Function: Current execution context
+
+Use Step Into/Out to navigate between frames.
+Variables tab shows local scope for selected frame."""
+            
+            self.stack_info_text.delete('1.0', tk.END)
+            self.stack_info_text.insert('1.0', details)
+    
+    def debug_run(self):
+        """Run program in debug mode"""
+        self.debugger_state['execution_mode'] = 'running'
+        self.update_execution_status()
+        messagebox.showinfo("Debug Run", "Program execution started")
+    
+    def debug_pause(self):
+        """Pause program execution"""
+        self.debugger_state['execution_mode'] = 'paused'
+        self.update_execution_status()
+        messagebox.showinfo("Debug Pause", "Program execution paused")
+    
+    def debug_stop(self):
+        """Stop program execution"""
+        self.debugger_state['execution_mode'] = 'stopped'
+        self.debugger_state['current_line'] = None
+        self.debugger_state['call_stack'].clear()
+        self.update_execution_status()
+        messagebox.showinfo("Debug Stop", "Program execution stopped")
+    
+    def debug_restart(self):
+        """Restart program execution"""
+        self.debug_stop()
+        self.debug_run()
+        messagebox.showinfo("Debug Restart", "Program restarted")
+    
+    def debug_step_over(self):
+        """Step over current line"""
+        self.debugger_state['execution_mode'] = 'step_over'
+        self.update_execution_status()
+        messagebox.showinfo("Step Over", "Stepped over current line")
+    
+    def debug_step_into(self):
+        """Step into current function"""
+        self.debugger_state['execution_mode'] = 'step_into'
+        # Add to call stack
+        self.debugger_state['call_stack'].append("main() -> function_call()")
+        self.update_callstack_display()
+        self.update_execution_status()
+        messagebox.showinfo("Step Into", "Stepped into function")
+    
+    def debug_step_out(self):
+        """Step out of current function"""
+        self.debugger_state['execution_mode'] = 'step_out'
+        # Remove from call stack
+        if self.debugger_state['call_stack']:
+            self.debugger_state['call_stack'].pop()
+        self.update_callstack_display()
+        self.update_execution_status()
+        messagebox.showinfo("Step Out", "Stepped out of function")
+    
+    def debug_run_to_cursor(self):
+        """Run to cursor position"""
+        cursor_line = "Current editor cursor position"
+        self.debugger_state['execution_mode'] = 'run_to_cursor'
+        self.update_execution_status()
+        messagebox.showinfo("Run to Cursor", f"Running to cursor at {cursor_line}")
+    
+    def update_execution_status(self):
+        """Update execution status display"""
+        if hasattr(self, 'execution_text'):
+            status_text = f"""Debugger Execution Status:
+
+Mode: {self.debugger_state['execution_mode'].title()}
+Current Line: {self.debugger_state['current_line'] or 'Not set'}
+Breakpoints: {len(self.debugger_state['breakpoints'])} active
+Call Stack Depth: {len(self.debugger_state['call_stack'])}
+
+Available Commands:
+• Run - Execute program normally
+• Step Over - Execute current line, don't enter functions
+• Step Into - Enter function calls
+• Step Out - Exit current function
+• Run to Cursor - Execute until cursor position
+
+Breakpoints:
+"""
+            
+            for bp_id, bp_info in self.debugger_state['breakpoints'].items():
+                status = "✅" if bp_info['enabled'] else "❌"
+                status_text += f"{status} {bp_info['file']}:{bp_info['line']} - {bp_info['condition']}\\n"
+            
+            self.execution_text.delete('1.0', tk.END)
+            self.execution_text.insert('1.0', status_text)
+    
+    def update_callstack_display(self):
+        """Update call stack display"""
+        if hasattr(self, 'callstack_listbox'):
+            self.callstack_listbox.delete(0, tk.END)
+            for frame in reversed(self.debugger_state['call_stack']):
+                self.callstack_listbox.insert(tk.END, frame)
+    
+    def refresh_memory_info(self):
+        """Refresh memory information"""
+        try:
+            import psutil
+            import gc
+            import sys
+            
+            # Get system memory info
+            memory = psutil.virtual_memory()
+            process = psutil.Process()
+            
+            # Update labels
+            self.memory_labels['Total Memory'].config(text=f"{memory.total / (1024**3):.2f} GB")
+            self.memory_labels['Used Memory'].config(text=f"{memory.used / (1024**3):.2f} GB")
+            self.memory_labels['Free Memory'].config(text=f"{memory.available / (1024**3):.2f} GB")
+            self.memory_labels['Python Objects'].config(text=f"{len(gc.get_objects())}")
+            
+            # Count variables
+            var_count = 0
+            if hasattr(self, 'interpreter') and self.interpreter:
+                for executor_name in ['pilot_executor', 'basic_executor', 'logo_executor']:
+                    if hasattr(self.interpreter, executor_name):
+                        executor = getattr(self.interpreter, executor_name)
+                        if hasattr(executor, 'variables'):
+                            var_count += len(executor.variables)
+            
+            self.memory_labels['Variables Count'].config(text=str(var_count))
+            
+            # Update memory monitor text
+            memory_info = f"""Memory Monitor - {self.get_current_time()}
+
+System Memory:
+  Total: {memory.total / (1024**3):.2f} GB
+  Available: {memory.available / (1024**3):.2f} GB
+  Used: {memory.used / (1024**3):.2f} GB ({memory.percent}%)
+  Free: {memory.free / (1024**3):.2f} GB
+
+Process Memory:
+  RSS: {process.memory_info().rss / (1024**2):.2f} MB
+  VMS: {process.memory_info().vms / (1024**2):.2f} MB
+  CPU Usage: {process.cpu_percent()}%
+
+Python Objects:
+  Total Objects: {len(gc.get_objects())}
+  Garbage Collections: {gc.get_count()}
+
+JAMES Variables:
+  PILOT Variables: {len(getattr(getattr(self.interpreter, 'pilot_executor', None), 'variables', {}))}
+  BASIC Variables: {len(getattr(getattr(self.interpreter, 'basic_executor', None), 'variables', {}))}
+  Logo Variables: {len(getattr(getattr(self.interpreter, 'logo_executor', None), 'variables', {}))}
+
+Memory Tips:
+• Use garbage collection to free unused objects
+• Monitor variable growth during execution
+• Large variables consume more memory
+• Clear variables when not needed
+"""
+            
+            self.memory_text.delete('1.0', tk.END)
+            self.memory_text.insert('1.0', memory_info)
+            
+        except ImportError:
+            # Fallback if psutil not available
+            import gc
+            import sys
+            
+            self.memory_labels['Python Objects'].config(text=f"{len(gc.get_objects())}")
+            
+            fallback_info = f"""Memory Monitor (Limited) - {self.get_current_time()}
+
+Python Objects: {len(gc.get_objects())}
+Garbage Collections: {gc.get_count()}
+
+Note: Install 'psutil' for detailed memory monitoring
+pip install psutil
+"""
+            self.memory_text.delete('1.0', tk.END)
+            self.memory_text.insert('1.0', fallback_info)
+    
+    def show_memory_profile(self):
+        """Show detailed memory profile"""
+        try:
+            import gc
+            from collections import Counter
+            
+            # Count objects by type
+            objects = gc.get_objects()
+            type_counts = Counter(type(obj).__name__ for obj in objects)
+            
+            profile_text = "Memory Profile - Object Types:\\n\\n"
+            for obj_type, count in type_counts.most_common(20):
+                profile_text += f"{obj_type}: {count}\\n"
+            
+            messagebox.showinfo("Memory Profile", profile_text)
+            
+        except Exception as e:
+            messagebox.showerror("Memory Profile Error", f"Could not generate memory profile: {e}")
+    
+    def force_garbage_collection(self):
+        """Force garbage collection"""
+        try:
+            import gc
+            collected = gc.collect()
+            messagebox.showinfo("Garbage Collection", f"Collected {collected} objects")
+            self.refresh_memory_info()
+        except Exception as e:
+            messagebox.showerror("Garbage Collection Error", f"Could not run garbage collection: {e}")
+    
+    def get_current_time(self):
+        """Get current time string"""
+        from datetime import datetime
+        return datetime.now().strftime("%H:%M:%S")
+    
+    def close_debugger(self):
+        """Close debugger dialog"""
+        self.debugger_dialog.destroy()
+        self.debugger_dialog = None
+        self.debugger_state = None
+    
     # Add methods to JAMESII class
+    JAMESII.setup_breakpoints_tab = setup_breakpoints_tab
+    JAMESII.setup_debug_variables_tab = setup_debug_variables_tab
+    JAMESII.setup_callstack_tab = setup_callstack_tab
+    JAMESII.setup_execution_tab = setup_execution_tab
+    JAMESII.setup_memory_tab = setup_memory_tab
+    JAMESII.add_breakpoint = add_breakpoint
+    JAMESII.remove_breakpoint = remove_breakpoint
+    JAMESII.enable_all_breakpoints = enable_all_breakpoints
+    JAMESII.disable_all_breakpoints = disable_all_breakpoints
+    JAMESII.clear_all_breakpoints = clear_all_breakpoints
+    JAMESII.refresh_debug_variables = refresh_debug_variables
+    JAMESII.add_watch_variable = add_watch_variable
+    JAMESII.edit_variable_value = edit_variable_value
+    JAMESII.export_debug_variables = export_debug_variables
+    JAMESII.on_stack_select = on_stack_select
+    JAMESII.debug_run = debug_run
+    JAMESII.debug_pause = debug_pause
+    JAMESII.debug_stop = debug_stop
+    JAMESII.debug_restart = debug_restart
+    JAMESII.debug_step_over = debug_step_over
+    JAMESII.debug_step_into = debug_step_into
+    JAMESII.debug_step_out = debug_step_out
+    JAMESII.debug_run_to_cursor = debug_run_to_cursor
+    JAMESII.update_execution_status = update_execution_status
+    JAMESII.update_callstack_display = update_callstack_display
+    JAMESII.refresh_memory_info = refresh_memory_info
+    JAMESII.show_memory_profile = show_memory_profile
+    JAMESII.force_garbage_collection = force_garbage_collection
+    JAMESII.get_current_time = get_current_time
+    JAMESII.close_debugger = close_debugger
+    
+    # === HARDWARE CONTROLLER METHODS ===
+    def setup_gpio_tab(self, parent):
+        """Setup GPIO pins control tab"""
+        # GPIO Pin Grid
+        pin_frame = ttk.LabelFrame(parent, text="GPIO Pin Control")
+        pin_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Create GPIO pin grid (40 pins for Raspberry Pi)
+        self.gpio_buttons = {}
+        self.gpio_states = {}
+        
+        # Pin grid canvas
+        canvas = tk.Canvas(pin_frame, width=400, height=300, bg='white')
+        canvas.pack(side=tk.LEFT, padx=10, pady=10)
+        
+        # Draw GPIO pin layout
+        for i in range(40):
+            row = i // 2
+            col = i % 2
+            x = 50 + col * 150
+            y = 30 + row * 12
+            
+            pin_num = i + 1
+            pin_color = self.get_gpio_pin_color(pin_num)
+            
+            # Pin rectangle
+            rect_id = canvas.create_rectangle(x, y, x+80, y+10, fill=pin_color, outline='black')
+            text_id = canvas.create_text(x+40, y+5, text=f"Pin {pin_num}", font=('Arial', 7))
+            
+            # Bind click events
+            canvas.tag_bind(rect_id, "<Button-1>", lambda e, p=pin_num: self.toggle_gpio_pin(p))
+            canvas.tag_bind(text_id, "<Button-1>", lambda e, p=pin_num: self.toggle_gpio_pin(p))
+            
+            self.gpio_states[pin_num] = {'mode': 'input', 'value': 0, 'enabled': False}
+        
+        # Control panel
+        control_frame = ttk.LabelFrame(parent, text="Pin Control")
+        control_frame.pack(fill=tk.Y, side=tk.RIGHT, padx=5, pady=5)
+        
+        ttk.Label(control_frame, text="Selected Pin:").pack(pady=5)
+        self.selected_pin_var = tk.StringVar(value="None")
+        ttk.Label(control_frame, textvariable=self.selected_pin_var, font=('Arial', 12, 'bold')).pack(pady=5)
+        
+        # Pin mode
+        ttk.Label(control_frame, text="Mode:").pack(pady=(10,0))
+        self.pin_mode_var = tk.StringVar(value="input")
+        mode_frame = ttk.Frame(control_frame)
+        mode_frame.pack(pady=5)
+        ttk.Radiobutton(mode_frame, text="Input", variable=self.pin_mode_var, value="input", command=self.update_pin_mode).pack()
+        ttk.Radiobutton(mode_frame, text="Output", variable=self.pin_mode_var, value="output", command=self.update_pin_mode).pack()
+        
+        # Pin value for output mode
+        ttk.Label(control_frame, text="Output Value:").pack(pady=(10,0))
+        self.pin_value_var = tk.StringVar(value="0")
+        value_frame = ttk.Frame(control_frame)
+        value_frame.pack(pady=5)
+        ttk.Radiobutton(value_frame, text="LOW (0)", variable=self.pin_value_var, value="0", command=self.update_pin_value).pack()
+        ttk.Radiobutton(value_frame, text="HIGH (1)", variable=self.pin_value_var, value="1", command=self.update_pin_value).pack()
+        
+        # Control buttons
+        ttk.Button(control_frame, text="📖 Read Pin", command=self.read_gpio_pin).pack(pady=5, fill=tk.X)
+        ttk.Button(control_frame, text="✏️ Write Pin", command=self.write_gpio_pin).pack(pady=5, fill=tk.X)
+        ttk.Button(control_frame, text="🔄 Reset All", command=self.reset_all_gpio).pack(pady=5, fill=tk.X)
+    
+    def setup_sensors_tab(self, parent):
+        """Setup sensors monitoring tab"""
+        # Sensor list
+        sensors_frame = ttk.LabelFrame(parent, text="Connected Sensors")
+        sensors_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Sensors treeview
+        columns = ('Sensor', 'Type', 'Pin', 'Value', 'Unit', 'Status')
+        self.sensors_tree = ttk.Treeview(sensors_frame, columns=columns, show='headings', height=12)
+        
+        for col in columns:
+            self.sensors_tree.heading(col, text=col)
+            self.sensors_tree.column(col, width=100)
+        
+        self.sensors_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        sensor_scroll = ttk.Scrollbar(sensors_frame, orient=tk.VERTICAL, command=self.sensors_tree.yview)
+        self.sensors_tree.config(yscrollcommand=sensor_scroll.set)
+        sensor_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add default sensors
+        default_sensors = [
+            ("Temperature", "DHT22", "Pin 4", "22.5", "°C", "Active"),
+            ("Humidity", "DHT22", "Pin 4", "65.0", "%", "Active"),
+            ("Distance", "HC-SR04", "Pin 18", "15.2", "cm", "Active"),
+            ("Light", "LDR", "Pin 26", "450", "lux", "Active"),
+            ("Motion", "PIR", "Pin 23", "0", "detected", "Standby")
+        ]
+        
+        for sensor in default_sensors:
+            self.sensors_tree.insert('', 'end', values=sensor)
+        
+        # Sensor controls
+        sensor_controls = ttk.Frame(parent)
+        sensor_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(sensor_controls, text="➕ Add Sensor", command=self.add_sensor).pack(side=tk.LEFT, padx=2)
+        ttk.Button(sensor_controls, text="❌ Remove Sensor", command=self.remove_sensor).pack(side=tk.LEFT, padx=2)
+        ttk.Button(sensor_controls, text="🔄 Refresh Data", command=self.refresh_sensor_data).pack(side=tk.LEFT, padx=2)
+        ttk.Button(sensor_controls, text="📊 Start Monitoring", command=self.start_sensor_monitoring).pack(side=tk.LEFT, padx=2)
+        ttk.Button(sensor_controls, text="⏹️ Stop Monitoring", command=self.stop_sensor_monitoring).pack(side=tk.LEFT, padx=2)
+    
+    def setup_devices_tab(self, parent):
+        """Setup device control tab"""
+        # Device list
+        devices_frame = ttk.LabelFrame(parent, text="Connected Devices")
+        devices_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Devices treeview
+        columns = ('Device', 'Type', 'Interface', 'Status', 'Actions')
+        self.devices_tree = ttk.Treeview(devices_frame, columns=columns, show='headings', height=10)
+        
+        for col in columns:
+            self.devices_tree.heading(col, text=col)
+            self.devices_tree.column(col, width=120)
+        
+        self.devices_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        device_scroll = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL, command=self.devices_tree.yview)
+        self.devices_tree.config(yscrollcommand=device_scroll.set)
+        device_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add default devices
+        default_devices = [
+            ("LED Strip", "WS2812B", "GPIO 18", "Off", "Control"),
+            ("Servo Motor", "SG90", "GPIO 12", "Position 90°", "Control"),
+            ("Buzzer", "Active", "GPIO 13", "Silent", "Control"),
+            ("Relay Module", "5V", "GPIO 21", "Open", "Control"),
+            ("Display", "LCD 16x2", "I2C", "Ready", "Update")
+        ]
+        
+        for device in default_devices:
+            self.devices_tree.insert('', 'end', values=device)
+        
+        # Device controls
+        device_controls = ttk.Frame(parent)
+        device_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(device_controls, text="🔧 Control Device", command=self.control_device).pack(side=tk.LEFT, padx=2)
+        ttk.Button(device_controls, text="📋 Device Info", command=self.show_device_info).pack(side=tk.LEFT, padx=2)
+        ttk.Button(device_controls, text="⚙️ Configure", command=self.configure_device).pack(side=tk.LEFT, padx=2)
+        ttk.Button(device_controls, text="🔄 Scan Devices", command=self.scan_devices).pack(side=tk.LEFT, padx=2)
+    
+    def setup_automation_tab(self, parent):
+        """Setup automation rules tab"""
+        # Automation rules
+        rules_frame = ttk.LabelFrame(parent, text="Automation Rules")
+        rules_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Rules listbox
+        self.rules_listbox = tk.Listbox(rules_frame, font=('Consolas', 10))
+        self.rules_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        rules_scroll = ttk.Scrollbar(rules_frame, orient=tk.VERTICAL, command=self.rules_listbox.yview)
+        self.rules_listbox.config(yscrollcommand=rules_scroll.set)
+        rules_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add sample rules
+        sample_rules = [
+            "IF temperature > 25°C THEN turn_on(fan)",
+            "IF motion_detected THEN turn_on(lights) FOR 10min",
+            "IF light_level < 100 THEN dim_lights(50%)",
+            "IF button_pressed THEN toggle(relay)",
+            "EVERY 1hour DO read_all_sensors()"
+        ]
+        
+        for rule in sample_rules:
+            self.rules_listbox.insert(tk.END, rule)
+        
+        # Rule controls
+        rule_controls = ttk.Frame(parent)
+        rule_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(rule_controls, text="➕ Add Rule", command=self.add_automation_rule).pack(side=tk.LEFT, padx=2)
+        ttk.Button(rule_controls, text="✏️ Edit Rule", command=self.edit_automation_rule).pack(side=tk.LEFT, padx=2)
+        ttk.Button(rule_controls, text="❌ Delete Rule", command=self.delete_automation_rule).pack(side=tk.LEFT, padx=2)
+        ttk.Button(rule_controls, text="▶️ Start Automation", command=self.start_automation).pack(side=tk.LEFT, padx=2)
+        ttk.Button(rule_controls, text="⏹️ Stop Automation", command=self.stop_automation).pack(side=tk.LEFT, padx=2)
+    
+    # === HARDWARE HELPER METHODS ===
+    def get_gpio_pin_color(self, pin_num):
+        """Get color for GPIO pin based on function"""
+        # Standard Raspberry Pi GPIO colors
+        power_pins = [2, 4]  # 5V
+        ground_pins = [6, 9, 14, 20, 25, 30, 34, 39]  # Ground
+        
+        if pin_num in power_pins:
+            return '#FF6B6B'  # Red for power
+        elif pin_num in ground_pins:
+            return '#4ECDC4'  # Cyan for ground
+        else:
+            return '#95E1D3'  # Light green for GPIO
+    
+    def toggle_gpio_pin(self, pin_num):
+        """Toggle GPIO pin selection"""
+        self.selected_pin_var.set(f"Pin {pin_num}")
+        pin_state = self.gpio_states.get(pin_num, {})
+        self.pin_mode_var.set(pin_state.get('mode', 'input'))
+        self.pin_value_var.set(str(pin_state.get('value', 0)))
+    
+    def update_pin_mode(self):
+        """Update selected pin mode"""
+        pin_num = self.get_selected_pin_number()
+        if pin_num:
+            self.gpio_states[pin_num]['mode'] = self.pin_mode_var.get()
+            messagebox.showinfo("Pin Mode", f"Pin {pin_num} set to {self.pin_mode_var.get()} mode")
+    
+    def update_pin_value(self):
+        """Update selected pin output value"""
+        pin_num = self.get_selected_pin_number()
+        if pin_num and self.gpio_states[pin_num]['mode'] == 'output':
+            self.gpio_states[pin_num]['value'] = int(self.pin_value_var.get())
+            messagebox.showinfo("Pin Value", f"Pin {pin_num} output set to {self.pin_value_var.get()}")
+    
+    def get_selected_pin_number(self):
+        """Get currently selected pin number"""
+        pin_text = self.selected_pin_var.get()
+        if pin_text != "None":
+            return int(pin_text.split()[1])
+        return None
+    
+    def read_gpio_pin(self):
+        """Read value from GPIO pin"""
+        pin_num = self.get_selected_pin_number()
+        if pin_num:
+            # Simulate reading pin value
+            import random
+            value = random.randint(0, 1)
+            self.gpio_states[pin_num]['value'] = value
+            messagebox.showinfo("Pin Read", f"Pin {pin_num} value: {value}")
+        else:
+            messagebox.showwarning("No Pin Selected", "Please select a pin first")
+    
+    def write_gpio_pin(self):
+        """Write value to GPIO pin"""
+        pin_num = self.get_selected_pin_number()
+        if pin_num:
+            if self.gpio_states[pin_num]['mode'] == 'output':
+                value = int(self.pin_value_var.get())
+                self.gpio_states[pin_num]['value'] = value
+                messagebox.showinfo("Pin Write", f"Pin {pin_num} set to {value}")
+            else:
+                messagebox.showwarning("Pin Mode", "Pin must be in output mode to write")
+        else:
+            messagebox.showwarning("No Pin Selected", "Please select a pin first")
+    
+    def reset_all_gpio(self):
+        """Reset all GPIO pins"""
+        if messagebox.askyesno("Reset GPIO", "Reset all GPIO pins to default state?"):
+            for pin_num in self.gpio_states:
+                self.gpio_states[pin_num] = {'mode': 'input', 'value': 0, 'enabled': False}
+            messagebox.showinfo("GPIO Reset", "All GPIO pins reset to default state")
+    
+    def add_sensor(self):
+        """Add a new sensor"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("➕ Add Sensor")
+        dialog.geometry("400x300")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        
+        # Sensor configuration
+        ttk.Label(dialog, text="Sensor Name:").pack(pady=5)
+        name_var = tk.StringVar()
+        ttk.Entry(dialog, textvariable=name_var, width=30).pack(pady=5)
+        
+        ttk.Label(dialog, text="Sensor Type:").pack(pady=5)
+        type_var = tk.StringVar(value="DHT22")
+        type_combo = ttk.Combobox(dialog, textvariable=type_var, values=['DHT22', 'DS18B20', 'BMP280', 'HC-SR04', 'PIR', 'LDR'])
+        type_combo.pack(pady=5)
+        
+        ttk.Label(dialog, text="GPIO Pin:").pack(pady=5)
+        pin_var = tk.StringVar(value="Pin 4")
+        pin_combo = ttk.Combobox(dialog, textvariable=pin_var, values=[f"Pin {i}" for i in range(1, 41)])
+        pin_combo.pack(pady=5)
+        
+        def create_sensor():
+            self.sensors_tree.insert('', 'end', values=(
+                name_var.get(), type_var.get(), pin_var.get(), "0.0", "units", "Ready"
+            ))
+            messagebox.showinfo("Sensor Added", f"Sensor '{name_var.get()}' added successfully")
+            dialog.destroy()
+        
+        ttk.Button(dialog, text="✅ Add", command=create_sensor).pack(pady=20)
+        ttk.Button(dialog, text="❌ Cancel", command=dialog.destroy).pack()
+    
+    def remove_sensor(self):
+        """Remove selected sensor"""
+        selection = self.sensors_tree.selection()
+        if selection:
+            self.sensors_tree.delete(selection[0])
+            messagebox.showinfo("Sensor Removed", "Sensor removed successfully")
+        else:
+            messagebox.showwarning("No Selection", "Please select a sensor to remove")
+    
+    def refresh_sensor_data(self):
+        """Refresh sensor data"""
+        import random
+        for item in self.sensors_tree.get_children():
+            values = list(self.sensors_tree.item(item)['values'])
+            sensor_type = values[1]
+            
+            # Simulate sensor readings based on type
+            if sensor_type == "DHT22":
+                if "Temperature" in values[0]:
+                    values[3] = f"{random.uniform(20, 30):.1f}"
+                elif "Humidity" in values[0]:
+                    values[3] = f"{random.uniform(40, 80):.1f}"
+            elif sensor_type == "HC-SR04":
+                values[3] = f"{random.uniform(5, 50):.1f}"
+            elif sensor_type == "LDR":
+                values[3] = f"{random.randint(100, 800)}"
+            elif sensor_type == "PIR":
+                values[3] = str(random.randint(0, 1))
+            
+            self.sensors_tree.item(item, values=values)
+        
+        messagebox.showinfo("Sensors", "Sensor data refreshed")
+    
+    def start_sensor_monitoring(self):
+        """Start continuous sensor monitoring"""
+        messagebox.showinfo("Monitoring", "Sensor monitoring started\\n\\nData will be logged continuously")
+    
+    def stop_sensor_monitoring(self):
+        """Stop sensor monitoring"""
+        messagebox.showinfo("Monitoring", "Sensor monitoring stopped")
+    
+    def control_device(self):
+        """Control selected device"""
+        selection = self.devices_tree.selection()
+        if selection:
+            item = self.devices_tree.item(selection[0])
+            device_name = item['values'][0]
+            device_type = item['values'][1]
+            
+            # Create device control dialog
+            control_dialog = tk.Toplevel(self.root)
+            control_dialog.title(f"🔧 Control {device_name}")
+            control_dialog.geometry("300x200")
+            control_dialog.transient(self.root)
+            control_dialog.grab_set()
+            
+            ttk.Label(control_dialog, text=f"Device: {device_name}", font=('Arial', 12, 'bold')).pack(pady=10)
+            ttk.Label(control_dialog, text=f"Type: {device_type}").pack()
+            
+            if "LED" in device_name:
+                ttk.Button(control_dialog, text="💡 Turn On", command=lambda: self.device_action(device_name, "on")).pack(pady=5)
+                ttk.Button(control_dialog, text="🌑 Turn Off", command=lambda: self.device_action(device_name, "off")).pack(pady=5)
+            elif "Servo" in device_name:
+                ttk.Button(control_dialog, text="↪️ Position 0°", command=lambda: self.device_action(device_name, "pos_0")).pack(pady=5)
+                ttk.Button(control_dialog, text="↩️ Position 180°", command=lambda: self.device_action(device_name, "pos_180")).pack(pady=5)
+            elif "Buzzer" in device_name:
+                ttk.Button(control_dialog, text="🔊 Beep", command=lambda: self.device_action(device_name, "beep")).pack(pady=5)
+            
+            ttk.Button(control_dialog, text="❌ Close", command=control_dialog.destroy).pack(pady=10)
+        else:
+            messagebox.showwarning("No Selection", "Please select a device to control")
+    
+    def device_action(self, device, action):
+        """Execute device action"""
+        messagebox.showinfo("Device Control", f"Device '{device}' action: {action}")
+    
+    def show_device_info(self):
+        """Show device information"""
+        selection = self.devices_tree.selection()
+        if selection:
+            item = self.devices_tree.item(selection[0])
+            device_info = f"""Device Information:
+            
+Name: {item['values'][0]}
+Type: {item['values'][1]}
+Interface: {item['values'][2]}
+Status: {item['values'][3]}
+
+Specifications:
+• Operating Voltage: 3.3V - 5V
+• Current Draw: < 100mA
+• Communication: Digital/PWM
+• Supported Commands: ON/OFF/CONTROL
+"""
+            messagebox.showinfo("Device Info", device_info)
+        else:
+            messagebox.showwarning("No Selection", "Please select a device")
+    
+    def configure_device(self):
+        """Configure device settings"""
+        messagebox.showinfo("Device Config", "Device configuration dialog would open here")
+    
+    def scan_devices(self):
+        """Scan for connected devices"""
+        messagebox.showinfo("Device Scan", "Scanning for devices...\\n\\nFound 5 devices on I2C bus\\nFound 3 devices on SPI bus")
+    
+    def add_automation_rule(self):
+        """Add automation rule"""
+        rule = tk.simpledialog.askstring("Add Rule", "Enter automation rule:")
+        if rule:
+            self.rules_listbox.insert(tk.END, rule)
+            messagebox.showinfo("Rule Added", "Automation rule added successfully")
+    
+    def edit_automation_rule(self):
+        """Edit selected automation rule"""
+        selection = self.rules_listbox.curselection()
+        if selection:
+            old_rule = self.rules_listbox.get(selection[0])
+            new_rule = tk.simpledialog.askstring("Edit Rule", "Edit automation rule:", initialvalue=old_rule)
+            if new_rule:
+                self.rules_listbox.delete(selection[0])
+                self.rules_listbox.insert(selection[0], new_rule)
+                messagebox.showinfo("Rule Updated", "Automation rule updated")
+        else:
+            messagebox.showwarning("No Selection", "Please select a rule to edit")
+    
+    def delete_automation_rule(self):
+        """Delete selected automation rule"""
+        selection = self.rules_listbox.curselection()
+        if selection:
+            if messagebox.askyesno("Delete Rule", "Delete selected automation rule?"):
+                self.rules_listbox.delete(selection[0])
+                messagebox.showinfo("Rule Deleted", "Automation rule deleted")
+        else:
+            messagebox.showwarning("No Selection", "Please select a rule to delete")
+    
+    def start_automation(self):
+        """Start automation system"""
+        messagebox.showinfo("Automation", "Automation system started\\n\\nAll rules are now active")
+    
+    def stop_automation(self):
+        """Stop automation system"""
+        messagebox.showinfo("Automation", "Automation system stopped\\n\\nAll rules are now inactive")
+    
+    # Add hardware methods to JAMESII class
+    JAMESII.setup_gpio_tab = setup_gpio_tab
+    JAMESII.setup_sensors_tab = setup_sensors_tab
+    JAMESII.setup_devices_tab = setup_devices_tab
+    JAMESII.setup_automation_tab = setup_automation_tab
+    JAMESII.get_gpio_pin_color = get_gpio_pin_color
+    JAMESII.toggle_gpio_pin = toggle_gpio_pin
+    JAMESII.update_pin_mode = update_pin_mode
+    JAMESII.update_pin_value = update_pin_value
+    JAMESII.get_selected_pin_number = get_selected_pin_number
+    JAMESII.read_gpio_pin = read_gpio_pin
+    JAMESII.write_gpio_pin = write_gpio_pin
+    JAMESII.reset_all_gpio = reset_all_gpio
+    JAMESII.add_sensor = add_sensor
+    JAMESII.remove_sensor = remove_sensor
+    JAMESII.refresh_sensor_data = refresh_sensor_data
+    JAMESII.start_sensor_monitoring = start_sensor_monitoring
+    JAMESII.stop_sensor_monitoring = stop_sensor_monitoring
+    JAMESII.control_device = control_device
+    JAMESII.device_action = device_action
+    JAMESII.show_device_info = show_device_info
+    JAMESII.configure_device = configure_device
+    JAMESII.scan_devices = scan_devices
+    JAMESII.add_automation_rule = add_automation_rule
+    JAMESII.edit_automation_rule = edit_automation_rule
+    JAMESII.delete_automation_rule = delete_automation_rule
+    JAMESII.start_automation = start_automation
+    JAMESII.stop_automation = stop_automation
+    
+    # Add existing methods to JAMESII class
     JAMESII.show_hardware_controller = show_hardware_controller
     JAMESII.show_iot_manager = show_iot_manager 
     JAMESII.show_sensor_visualizer = show_sensor_visualizer

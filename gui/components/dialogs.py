@@ -447,69 +447,382 @@ class GameManagerDialog:
         
         ttk.Button(custom_frame, text="🎮 Run Custom Demo", command=self.run_custom_demo).pack(padx=5, pady=5, anchor=tk.W)
     
-    # Game management methods (simplified for space)
+    # Game management methods - Full Implementation
     def create_object(self):
         """Create a new game object"""
-        messagebox.showinfo("Create Object", "Game object creation dialog would appear here")
+        dialog = tk.Toplevel(self.window)
+        dialog.title("🎯 Create Game Object")
+        dialog.geometry("400x350")
+        dialog.transient(self.window)
+        dialog.grab_set()
+        
+        # Object properties
+        ttk.Label(dialog, text="Object Name:").pack(pady=5)
+        name_var = tk.StringVar(value="object_1")
+        ttk.Entry(dialog, textvariable=name_var, width=30).pack(pady=5)
+        
+        ttk.Label(dialog, text="Object Type:").pack(pady=5)
+        type_var = tk.StringVar(value="sprite")
+        type_combo = ttk.Combobox(dialog, textvariable=type_var, values=['sprite', 'platform', 'enemy', 'powerup', 'projectile'])
+        type_combo.pack(pady=5)
+        
+        # Position frame
+        pos_frame = ttk.LabelFrame(dialog, text="Position")
+        pos_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        x_var = tk.IntVar(value=100)
+        y_var = tk.IntVar(value=100)
+        
+        ttk.Label(pos_frame, text="X:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=800, textvariable=x_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Label(pos_frame, text="Y:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=600, textvariable=y_var, width=8).pack(side=tk.LEFT, padx=5)
+        
+        # Size frame
+        size_frame = ttk.LabelFrame(dialog, text="Size")
+        size_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        width_var = tk.IntVar(value=32)
+        height_var = tk.IntVar(value=32)
+        
+        ttk.Label(size_frame, text="Width:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=width_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Label(size_frame, text="Height:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=height_var, width=8).pack(side=tk.LEFT, padx=5)
+        
+        # Color
+        ttk.Label(dialog, text="Color:").pack(pady=5)
+        color_var = tk.StringVar(value="blue")
+        color_combo = ttk.Combobox(dialog, textvariable=color_var, values=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black', 'white'])
+        color_combo.pack(pady=5)
+        
+        # Buttons
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(pady=20)
+        
+        def create():
+            try:
+                game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+                if game_manager:
+                    success = game_manager.create_object(
+                        name_var.get(),
+                        type_var.get(),
+                        x_var.get(),
+                        y_var.get(),
+                        width_var.get(),
+                        height_var.get(),
+                        color_var.get()
+                    )
+                    if success:
+                        messagebox.showinfo("Success", f"Object '{name_var.get()}' created successfully!")
+                        self.refresh_objects()
+                        dialog.destroy()
+                    else:
+                        messagebox.showerror("Error", "Failed to create object")
+                else:
+                    messagebox.showerror("Error", "Game engine not available")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to create object: {e}")
+        
+        ttk.Button(button_frame, text="✅ Create", command=create).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
         
     def edit_object(self):
         """Edit selected object"""
-        messagebox.showinfo("Edit Object", "Object property editor would appear here")
+        selection = self.objects_tree.selection()
+        if not selection:
+            messagebox.showwarning("No Selection", "Please select an object to edit")
+            return
+            
+        item = self.objects_tree.item(selection[0])
+        obj_name = item['values'][0]
+        
+        # Get object from game manager  
+        game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+        if not game_manager:
+            messagebox.showerror("Error", "Game engine not available")
+            return
+            
+        obj = game_manager.get_object(obj_name)
+        if not obj:
+            messagebox.showerror("Error", f"Object '{obj_name}' not found")
+            return
+        
+        dialog = tk.Toplevel(self.window)
+        dialog.title(f"📝 Edit Object: {obj_name}")
+        dialog.geometry("400x300")
+        dialog.transient(self.window)
+        dialog.grab_set()
+        
+        # Position controls
+        pos_frame = ttk.LabelFrame(dialog, text="Position")
+        pos_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        x_var = tk.DoubleVar(value=obj.position.x)
+        y_var = tk.DoubleVar(value=obj.position.y)
+        
+        ttk.Label(pos_frame, text="X:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=800, textvariable=x_var, width=8, increment=1).pack(side=tk.LEFT, padx=5)
+        ttk.Label(pos_frame, text="Y:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=600, textvariable=y_var, width=8, increment=1).pack(side=tk.LEFT, padx=5)
+        
+        # Velocity controls
+        vel_frame = ttk.LabelFrame(dialog, text="Velocity")
+        vel_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        vx_var = tk.DoubleVar(value=obj.velocity.x)
+        vy_var = tk.DoubleVar(value=obj.velocity.y)
+        
+        ttk.Label(vel_frame, text="VX:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(vel_frame, from_=-500, to=500, textvariable=vx_var, width=8, increment=10).pack(side=tk.LEFT, padx=5)
+        ttk.Label(vel_frame, text="VY:").pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(vel_frame, from_=-500, to=500, textvariable=vy_var, width=8, increment=10).pack(side=tk.LEFT, padx=5)
+        
+        # Color
+        color_frame = ttk.LabelFrame(dialog, text="Appearance")
+        color_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        color_var = tk.StringVar(value=getattr(obj, 'color', 'blue'))
+        ttk.Label(color_frame, text="Color:").pack(side=tk.LEFT, padx=5)
+        color_combo = ttk.Combobox(color_frame, textvariable=color_var, values=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black', 'white'])
+        color_combo.pack(side=tk.LEFT, padx=5)
+        
+        # Buttons
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(pady=20)
+        
+        def apply_changes():
+            try:
+                # Update object properties
+                game_manager.move_object(obj_name, x_var.get(), y_var.get())
+                game_manager.set_object_velocity(obj_name, vx_var.get(), vy_var.get())
+                obj.color = color_var.get()
+                
+                messagebox.showinfo("Success", f"Object '{obj_name}' updated successfully!")
+                self.refresh_objects()
+                dialog.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to update object: {e}")
+        
+        ttk.Button(button_frame, text="✅ Apply", command=apply_changes).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
         
     def delete_object(self):
         """Delete selected object"""
-        messagebox.showinfo("Delete Object", "Selected object would be deleted")
+        selection = self.objects_tree.selection()
+        if not selection:
+            messagebox.showwarning("No Selection", "Please select an object to delete")
+            return
+            
+        item = self.objects_tree.item(selection[0])
+        obj_name = item['values'][0]
+        
+        if messagebox.askyesno("Confirm Delete", f"Delete object '{obj_name}'?"):
+            try:
+                game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+                if game_manager:
+                    game_manager.remove_object(obj_name)
+                    messagebox.showinfo("Success", f"Object '{obj_name}' deleted successfully!")
+                    self.refresh_objects()
+                else:
+                    messagebox.showerror("Error", "Game engine not available")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to delete object: {e}")
         
     def refresh_objects(self):
         """Refresh the objects list"""
-        # Clear and repopulate tree
+        # Clear existing items
         for item in self.objects_tree.get_children():
             self.objects_tree.delete(item)
             
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager and hasattr(game_manager, 'game_objects'):
+                for name, obj in game_manager.game_objects.items():
+                    obj_type = getattr(obj, 'obj_type', 'unknown')
+                    position = f"({obj.position.x:.1f}, {obj.position.y:.1f})"
+                    size = f"{obj.width}x{obj.height}"
+                    velocity = f"({obj.velocity.x:.1f}, {obj.velocity.y:.1f})"
+                    
+                    self.objects_tree.insert('', 'end', values=(name, obj_type, position, size, velocity))
+        except Exception as e:
+            print(f"Error refreshing objects: {e}")
+            
     def clear_all_objects(self):
         """Clear all game objects"""
-        if messagebox.askyesno("Confirm", "Clear all game objects?"):
-            self.refresh_objects()
+        if messagebox.askyesno("Confirm", "Clear all game objects? This cannot be undone."):
+            try:
+                game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+                if game_manager:
+                    game_manager.reset_world()
+                    messagebox.showinfo("Success", "All game objects cleared!")
+                    self.refresh_objects()
+                else:
+                    messagebox.showerror("Error", "Game engine not available")
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to clear objects: {e}")
             
     def apply_gravity(self):
         """Apply gravity setting"""
-        gravity = self.gravity_var.get()
-        messagebox.showinfo("Physics", f"Gravity set to {gravity:.1f}")
+        try:
+            gravity = self.gravity_var.get()
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager and hasattr(game_manager, 'physics'):
+                game_manager.physics.gravity = gravity
+                messagebox.showinfo("Physics", f"Gravity set to {gravity:.1f} m/s²")
+                self.update_physics_info()
+            else:
+                messagebox.showerror("Error", "Physics engine not available")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to set gravity: {e}")
         
     def start_physics(self):
         """Start physics simulation"""
-        messagebox.showinfo("Physics", "Physics simulation started")
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager:
+                game_manager.start_game_loop()
+                messagebox.showinfo("Physics", "Physics simulation started")
+                self.update_physics_info()
+            else:
+                messagebox.showerror("Error", "Game engine not available")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to start physics: {e}")
         
     def pause_physics(self):
         """Pause physics simulation"""
-        messagebox.showinfo("Physics", "Physics simulation paused")
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager:
+                game_manager.running = False
+                messagebox.showinfo("Physics", "Physics simulation paused")
+                self.update_physics_info()
+            else:
+                messagebox.showerror("Error", "Game engine not available")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to pause physics: {e}")
         
     def stop_physics(self):
         """Stop physics simulation"""
-        messagebox.showinfo("Physics", "Physics simulation stopped")
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager:
+                game_manager.stop_game_loop()
+                messagebox.showinfo("Physics", "Physics simulation stopped")
+                self.update_physics_info()
+            else:
+                messagebox.showerror("Error", "Game engine not available")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to stop physics: {e}")
         
     def step_physics(self):
         """Single step physics simulation"""
-        messagebox.showinfo("Physics", "Physics stepped one frame")
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager and hasattr(game_manager, 'physics'):
+                game_manager.physics.step(1.0/60.0)  # Single frame at 60 FPS
+                messagebox.showinfo("Physics", "Physics stepped one frame")
+                self.refresh_objects()
+                self.update_physics_info()
+            else:
+                messagebox.showerror("Error", "Physics engine not available")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to step physics: {e}")
         
     def update_physics_info(self):
         """Update physics information display"""
-        info_text = """Physics System Status:
-        
-Gravity: 9.8 m/s²
-Active Objects: 0
-Collisions: 0
-Frame Rate: 60 FPS
-Simulation: Stopped
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager:
+                gravity = getattr(game_manager.physics, 'gravity', 9.8) if hasattr(game_manager, 'physics') else 9.8
+                active_objects = len(game_manager.game_objects) if hasattr(game_manager, 'game_objects') else 0
+                frame_count = getattr(game_manager, 'frame_count', 0)
+                running = getattr(game_manager, 'running', False)
+                fps = getattr(game_manager, 'fps', 60)
+                
+                info_text = f"""Physics System Status:
+
+Gravity: {gravity:.1f} m/s²
+Active Objects: {active_objects}
+Frame Count: {frame_count}
+Frame Rate: {fps} FPS
+Simulation: {'Running' if running else 'Stopped'}
+Total Time: {getattr(game_manager, 'total_time', 0):.2f}s
+
+Physics Engine: {'Available' if hasattr(game_manager, 'physics') else 'Not Available'}
+Renderer: {'Available' if hasattr(game_manager, 'renderer') else 'Not Available'}
+Canvas: {'Connected' if getattr(game_manager, 'canvas', None) else 'Not Connected'}
+
+Controls:
+• Use Start/Stop to control simulation
+• Use Single Step for frame-by-frame analysis
+• Adjust gravity with the slider above
 """
-        self.physics_info.delete('1.0', tk.END)
-        self.physics_info.insert('1.0', info_text)
+            else:
+                info_text = """Physics System Status:
+
+⚠️ Game engine not initialized
+Please run a game-related command first to initialize the engine.
+
+Available Commands:
+• CREATE_OBJECT - Create game objects
+• START_PHYSICS - Initialize physics simulation
+• SET_GRAVITY - Configure gravity settings
+"""
+            
+            self.physics_info.delete('1.0', tk.END)
+            self.physics_info.insert('1.0', info_text)
+            
+        except Exception as e:
+            error_text = f"Error updating physics info: {e}"
+            self.physics_info.delete('1.0', tk.END)
+            self.physics_info.insert('1.0', error_text)
         
     def render_preview(self):
         """Render scene preview"""
-        self.preview_canvas.delete("all")
-        self.preview_canvas.create_text(300, 200, text="Scene Preview\n(Game objects would render here)", 
-                                       font=('Arial', 14), fill='gray')
+        try:
+            self.preview_canvas.delete("all")
+            
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if game_manager and hasattr(game_manager, 'game_objects'):
+                # Draw a basic representation of game objects
+                canvas_width = self.preview_canvas.winfo_width() or 600
+                canvas_height = self.preview_canvas.winfo_height() or 400
+                
+                if not game_manager.game_objects:
+                    self.preview_canvas.create_text(canvas_width//2, canvas_height//2, 
+                                                   text="No game objects to preview\nCreate objects in the Game Objects tab", 
+                                                   font=('Arial', 12), fill='gray', justify=tk.CENTER)
+                else:
+                    # Scale factor to fit objects in preview
+                    scale_x = canvas_width / 800  # Assuming game world is 800x600
+                    scale_y = canvas_height / 600
+                    
+                    for name, obj in game_manager.game_objects.items():
+                        x = obj.position.x * scale_x
+                        y = obj.position.y * scale_y
+                        w = obj.width * scale_x
+                        h = obj.height * scale_y
+                        
+                        # Choose color
+                        color = getattr(obj, 'color', 'blue')
+                        
+                        # Draw object
+                        self.preview_canvas.create_rectangle(x, y, x+w, y+h, fill=color, outline='black')
+                        self.preview_canvas.create_text(x+w//2, y+h//2, text=name, font=('Arial', 8), fill='white')
+                        
+                    # Draw physics info
+                    info_text = f"Objects: {len(game_manager.game_objects)}"
+                    if hasattr(game_manager, 'physics'):
+                        info_text += f" | Gravity: {getattr(game_manager.physics, 'gravity', 9.8):.1f}"
+                    self.preview_canvas.create_text(10, 10, text=info_text, anchor=tk.NW, font=('Arial', 10), fill='black')
+            else:
+                self.preview_canvas.create_text(300, 200, text="Game Engine Not Available\nInitialize game system first", 
+                                               font=('Arial', 14), fill='red', justify=tk.CENTER)
+                
+        except Exception as e:
+            self.preview_canvas.create_text(300, 200, text=f"Preview Error:\n{str(e)[:100]}", 
+                                           font=('Arial', 12), fill='red', justify=tk.CENTER)
         
     def toggle_auto_refresh(self):
         """Toggle auto-refresh of preview"""
@@ -517,23 +830,219 @@ Simulation: Stopped
         status = "enabled" if self.auto_refresh else "disabled"
         messagebox.showinfo("Auto Refresh", f"Auto-refresh {status}")
         
+        if self.auto_refresh:
+            self._auto_refresh_preview()
+    
+    def _auto_refresh_preview(self):
+        """Internal auto-refresh method"""
+        if self.auto_refresh and self.window:
+            self.render_preview()
+            self.window.after(1000, self._auto_refresh_preview)  # Refresh every second
+        
     def save_scene(self):
         """Save current scene"""
-        messagebox.showinfo("Save Scene", "Scene would be saved to file")
+        try:
+            from tkinter import filedialog
+            import json
+            
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if not game_manager or not hasattr(game_manager, 'game_objects'):
+                messagebox.showerror("Error", "No game objects to save")
+                return
+                
+            filename = filedialog.asksaveasfilename(
+                title="Save Scene",
+                defaultextension=".json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+            )
+            
+            if filename:
+                scene_data = {
+                    'objects': [],
+                    'physics': {
+                        'gravity': getattr(game_manager.physics, 'gravity', 9.8) if hasattr(game_manager, 'physics') else 9.8
+                    }
+                }
+                
+                for name, obj in game_manager.game_objects.items():
+                    obj_data = {
+                        'name': name,
+                        'type': getattr(obj, 'obj_type', 'sprite'),
+                        'position': {'x': obj.position.x, 'y': obj.position.y},
+                        'size': {'width': obj.width, 'height': obj.height},
+                        'velocity': {'x': obj.velocity.x, 'y': obj.velocity.y},
+                        'color': getattr(obj, 'color', 'blue')
+                    }
+                    scene_data['objects'].append(obj_data)
+                
+                with open(filename, 'w') as f:
+                    json.dump(scene_data, f, indent=2)
+                
+                messagebox.showinfo("Success", f"Scene saved to {filename}")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save scene: {e}")
         
     def load_scene(self):
         """Load scene from file"""
-        messagebox.showinfo("Load Scene", "Scene would be loaded from file")
+        try:
+            from tkinter import filedialog
+            import json
+            
+            filename = filedialog.askopenfilename(
+                title="Load Scene",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+            )
+            
+            if filename:
+                with open(filename, 'r') as f:
+                    scene_data = json.load(f)
+                
+                game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+                if not game_manager:
+                    messagebox.showerror("Error", "Game engine not available")
+                    return
+                
+                # Clear existing objects
+                game_manager.reset_world()
+                
+                # Set physics
+                if 'physics' in scene_data and hasattr(game_manager, 'physics'):
+                    game_manager.physics.gravity = scene_data['physics'].get('gravity', 9.8)
+                    self.gravity_var.set(game_manager.physics.gravity)
+                
+                # Load objects
+                for obj_data in scene_data.get('objects', []):
+                    game_manager.create_object(
+                        obj_data['name'],
+                        obj_data.get('type', 'sprite'),
+                        obj_data['position']['x'],
+                        obj_data['position']['y'],
+                        obj_data['size']['width'],
+                        obj_data['size']['height'],
+                        obj_data.get('color', 'blue')
+                    )
+                    
+                    # Set velocity
+                    if 'velocity' in obj_data:
+                        game_manager.set_object_velocity(
+                            obj_data['name'],
+                            obj_data['velocity']['x'],
+                            obj_data['velocity']['y']
+                        )
+                
+                messagebox.showinfo("Success", f"Scene loaded from {filename}")
+                self.refresh_objects()
+                self.render_preview()
+                self.update_physics_info()
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load scene: {e}")
         
     def run_demo(self, demo_type):
         """Run game demonstration"""
-        messagebox.showinfo("Demo", f"Running {demo_type} demo")
+        try:
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if not game_manager:
+                messagebox.showerror("Error", "Game engine not available")
+                return
+            
+            # Clear existing objects
+            game_manager.reset_world()
+            
+            if demo_type == "pong":
+                # Create Pong demo
+                game_manager.create_object("left_paddle", "paddle", 20, 250, 10, 60, "white")
+                game_manager.create_object("right_paddle", "paddle", 770, 250, 10, 60, "white")
+                game_manager.create_object("ball", "ball", 400, 300, 10, 10, "white")
+                game_manager.set_object_velocity("ball", 100, 50)
+                
+            elif demo_type == "physics":
+                # Create physics demo with falling objects
+                import random
+                for i in range(5):
+                    x = random.randint(50, 750)
+                    color = random.choice(['red', 'blue', 'green', 'yellow', 'purple'])
+                    game_manager.create_object(f"ball_{i}", "ball", x, 50 + i*30, 20, 20, color)
+                # Create platforms
+                game_manager.create_platform(100, 500, 200, 20)
+                game_manager.create_platform(400, 400, 200, 20)
+                game_manager.create_platform(600, 300, 150, 20)
+                
+            elif demo_type == "platformer":
+                # Create platformer demo
+                game_manager.create_object("player", "player", 50, 450, 20, 30, "blue")
+                # Create platforms
+                game_manager.create_platform(0, 580, 800, 20)  # Ground
+                game_manager.create_platform(200, 500, 150, 20)
+                game_manager.create_platform(400, 400, 150, 20)
+                game_manager.create_platform(600, 300, 150, 20)
+                # Create enemies
+                game_manager.create_object("enemy1", "enemy", 300, 470, 15, 15, "red")
+                game_manager.create_object("enemy2", "enemy", 500, 370, 15, 15, "red")
+                
+            elif demo_type == "snake":
+                # Create snake demo
+                game_manager.create_object("snake_head", "snake", 400, 300, 20, 20, "green")
+                game_manager.create_object("snake_body1", "snake", 380, 300, 20, 20, "darkgreen")
+                game_manager.create_object("snake_body2", "snake", 360, 300, 20, 20, "darkgreen")
+                game_manager.create_object("food", "food", 200, 200, 15, 15, "red")
+                game_manager.set_object_velocity("snake_head", 20, 0)
+            
+            messagebox.showinfo("Demo Started", f"{demo_type.title()} demo created successfully!\nUse Physics tab to start simulation.")
+            self.refresh_objects()
+            self.render_preview()
+            self.update_physics_info()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to run {demo_type} demo: {e}")
         
     def run_custom_demo(self):
         """Run custom demo with parameters"""
-        objects = self.demo_objects.get()
-        gravity = self.demo_gravity.get()
-        messagebox.showinfo("Custom Demo", f"Running demo with {objects} objects and gravity {gravity}")
+        try:
+            objects = self.demo_objects.get()
+            gravity = self.demo_gravity.get()
+            
+            game_manager = getattr(self.ide.interpreter, 'game_manager', None)
+            if not game_manager:
+                messagebox.showerror("Error", "Game engine not available")
+                return
+            
+            # Clear existing objects
+            game_manager.reset_world()
+            
+            # Set gravity
+            if hasattr(game_manager, 'physics'):
+                game_manager.physics.gravity = gravity
+                self.gravity_var.set(gravity)
+            
+            # Create random objects
+            import random
+            colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan']
+            
+            for i in range(objects):
+                x = random.randint(50, 750)
+                y = random.randint(50, 200)
+                size = random.randint(10, 40)
+                color = random.choice(colors)
+                vx = random.randint(-50, 50)
+                vy = random.randint(-20, 20)
+                
+                game_manager.create_object(f"obj_{i}", "sprite", x, y, size, size, color)
+                game_manager.set_object_velocity(f"obj_{i}", vx, vy)
+            
+            # Create some platforms
+            game_manager.create_platform(0, 580, 800, 20)  # Ground
+            game_manager.create_platform(200, 450, 150, 20)
+            game_manager.create_platform(450, 350, 150, 20)
+            
+            messagebox.showinfo("Custom Demo", f"Custom demo created with {objects} objects and gravity {gravity}!\nUse Physics tab to start simulation.")
+            self.refresh_objects()
+            self.render_preview()
+            self.update_physics_info()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to run custom demo: {e}")
     
     def close(self):
         """Close the dialog"""
