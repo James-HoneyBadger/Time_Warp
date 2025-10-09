@@ -6,6 +6,7 @@ Provides optimizations for memory usage, output handling, and system performance
 
 import sys
 import gc
+import re
 import time
 import threading
 from collections import deque
@@ -43,6 +44,11 @@ class OutputBuffer:
         """Check if content is repetitive (pattern detection)."""
         # Check for simple repetition patterns
         if new_line == last_line:
+            return True
+        
+        # Check for PILOT comment lines: "R: This is comment line N"
+        pilot_pattern = r'^R:\s*This is comment line \d+$'
+        if re.match(pilot_pattern, new_line.strip()) and re.match(pilot_pattern, last_line.strip()):
             return True
         
         # Check for numbered sequences (like "line N")

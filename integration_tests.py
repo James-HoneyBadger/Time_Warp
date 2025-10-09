@@ -116,13 +116,13 @@ class IntegrationTestRunner:
         
         # Test language engine
         engine = LanguageEngine()
-        pilot_completions = engine.get_completions("T:", "pilot")
+        pilot_completions = engine.get_completions("T:", 2)
         if len(pilot_completions) == 0:
             return False
         
         # Test syntax analyzer
-        analyzer = SyntaxAnalyzer()
-        pilot_errors = analyzer.check_syntax("T: Hello\nE:", "pilot")
+        analyzer = SyntaxAnalyzer(engine)
+        pilot_errors = analyzer.analyze_syntax("T: Hello\nE:", "pilot")
         if pilot_errors is None:
             return False
         
@@ -175,7 +175,7 @@ class IntegrationTestRunner:
                     
                     # Test compilation
                     result = compiler.compile_file(temp_file, lang)
-                    if result and result.get('success', False):
+                    if result and result.success:
                         success_count += 1
                         print(f"✅ {lang.upper()} sample program compiled successfully")
                     else:
@@ -230,7 +230,7 @@ class IntegrationTestRunner:
         
         try:
             # Test enhanced editor creation
-            editor = EnhancedCodeEditor(self.root, language="pilot")
+            editor = EnhancedCodeEditor(self.root, initial_language="pilot")
             
             # Test content operations
             test_code = "T: Hello, World!\nE:"
