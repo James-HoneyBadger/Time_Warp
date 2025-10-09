@@ -644,8 +644,11 @@ class GamificationSystem:
         if self.stats_update_callback:
             self.stats_update_callback(self.user_stats)
 
-    def calculate_level(self, experience: int) -> int:
+    def calculate_level(self, experience: Optional[int] = None) -> int:
         """Calculate user level based on experience points"""
+        if experience is None:
+            experience = self.user_stats.experience
+            
         # Level progression: 100 XP for level 2, then increases by 50 each level
         if experience < 100:
             return 1
@@ -747,6 +750,14 @@ class GamificationSystem:
         if self.user_stats.languages_used is None:
             self.user_stats.languages_used = {}
         self.user_stats.languages_used[language] = self.user_stats.languages_used.get(language, 0) + 1
+        self.save_user_stats()
+
+    def award_points_and_experience(self, points: int, experience: Optional[int] = None):
+        """Award points and experience to the user"""
+        self.user_stats.total_points += points
+        if experience is None:
+            experience = points  # Default: 1 point = 1 experience
+        self.user_stats.experience += experience
         self.save_user_stats()
 
     def complete_daily_challenge(self, challenge_id: str):
