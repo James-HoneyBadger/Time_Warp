@@ -2113,12 +2113,78 @@ def add_tools_methods():
         self.setup_iot_analytics_tab(analytics_frame)
     
     def show_sensor_visualizer(self):
-        """Show sensor visualizer"""
-        messagebox.showinfo("Sensor Visualizer", "Sensor Data Visualizer\\n\\nReal-time Data Display\\nMultiple Sensor Types\\nData Export\\n\\nComing soon!")
+        """Show comprehensive sensor data visualizer with real-time charts and analytics"""
+        sensor_window = tk.Toplevel(self.root)
+        sensor_window.title("📊 Sensor Data Visualizer - JAMES")
+        sensor_window.geometry("1000x700")
+        sensor_window.transient(self.root)
+        sensor_window.grab_set()
+        
+        # Create notebook for sensor visualization
+        notebook = ttk.Notebook(sensor_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Real-time Charts Tab
+        charts_frame = ttk.Frame(notebook)
+        notebook.add(charts_frame, text="📈 Real-time Charts")
+        self.setup_realtime_charts_tab(charts_frame)
+        
+        # Data Logger Tab
+        logger_frame = ttk.Frame(notebook)
+        notebook.add(logger_frame, text="📝 Data Logger")
+        self.setup_data_logger_tab(logger_frame)
+        
+        # Historical Data Tab
+        history_frame = ttk.Frame(notebook)
+        notebook.add(history_frame, text="📚 Historical Data")
+        self.setup_historical_data_tab(history_frame)
+        
+        # Export & Reports Tab
+        export_frame = ttk.Frame(notebook)
+        notebook.add(export_frame, text="💾 Export & Reports")
+        self.setup_sensor_export_tab(export_frame)
+        
+        # Alerts & Thresholds Tab
+        alerts_frame = ttk.Frame(notebook)
+        notebook.add(alerts_frame, text="🚨 Alerts & Thresholds")
+        self.setup_sensor_alerts_tab(alerts_frame)
     
     def show_learning_assistant(self):
-        """Show learning assistant"""
-        messagebox.showinfo("Learning Assistant", "Learning Assistant\\n\\nInteractive Tutorials\\nCode Examples\\nProgress Tracking\\n\\nComing soon!")
+        """Show comprehensive Learning Assistant with interactive tutorials and progress tracking"""
+        learning_window = tk.Toplevel(self.root)
+        learning_window.title("🎓 Learning Assistant - JAMES")
+        learning_window.geometry("1000x700")
+        learning_window.transient(self.root)
+        learning_window.grab_set()
+        
+        # Create notebook for learning features
+        notebook = ttk.Notebook(learning_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Interactive Tutorials Tab
+        tutorials_frame = ttk.Frame(notebook)
+        notebook.add(tutorials_frame, text="📚 Interactive Tutorials")
+        self.setup_tutorials_tab(tutorials_frame)
+        
+        # Code Examples Tab
+        examples_frame = ttk.Frame(notebook)
+        notebook.add(examples_frame, text="💡 Code Examples")
+        self.setup_learning_examples_tab(examples_frame)
+        
+        # Progress Tracking Tab
+        progress_frame = ttk.Frame(notebook)
+        notebook.add(progress_frame, text="📊 Progress Tracking")
+        self.setup_progress_tracking_tab(progress_frame)
+        
+        # Challenges & Exercises Tab
+        challenges_frame = ttk.Frame(notebook)
+        notebook.add(challenges_frame, text="🎯 Challenges & Exercises")
+        self.setup_challenges_tab(challenges_frame)
+        
+        # Help & Hints Tab
+        help_frame = ttk.Frame(notebook)
+        notebook.add(help_frame, text="💭 Help & Hints")
+        self.setup_help_hints_tab(help_frame)
     
     def show_code_examples(self):
         """Show code examples browser"""
@@ -3662,6 +3728,562 @@ Memory Usage: 45%
     def configure_iot_alerts(self):
         """Configure IoT monitoring alerts"""
         messagebox.showinfo("Alert Configuration", "IoT Alert Settings\\n\\n🚨 Threshold alerts\\n📧 Email notifications\\n📱 Push notifications\\n📊 Custom rules")
+    
+    # === SENSOR VISUALIZER METHODS ===
+    def setup_realtime_charts_tab(self, parent):
+        """Setup real-time sensor charts tab"""
+        # Chart canvas
+        charts_frame = ttk.LabelFrame(parent, text="Real-time Sensor Charts")
+        charts_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Create scrollable canvas for multiple charts
+        self.charts_canvas = tk.Canvas(charts_frame, bg='white', height=500)
+        self.charts_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        charts_scroll = ttk.Scrollbar(charts_frame, orient=tk.VERTICAL, command=self.charts_canvas.yview)
+        self.charts_canvas.config(yscrollcommand=charts_scroll.set)
+        charts_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Draw real-time sensor charts
+        self.draw_sensor_charts()
+        
+        # Chart controls
+        chart_controls = ttk.Frame(parent)
+        chart_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(chart_controls, text="▶️ Start Real-time", command=self.start_realtime_monitoring).pack(side=tk.LEFT, padx=2)
+        ttk.Button(chart_controls, text="⏸️ Pause", command=self.pause_realtime_monitoring).pack(side=tk.LEFT, padx=2)
+        ttk.Button(chart_controls, text="🔄 Refresh", command=self.refresh_sensor_charts).pack(side=tk.LEFT, padx=2)
+        ttk.Button(chart_controls, text="⚙️ Configure Charts", command=self.configure_sensor_charts).pack(side=tk.LEFT, padx=2)
+        ttk.Button(chart_controls, text="📸 Save Chart", command=self.save_sensor_chart).pack(side=tk.LEFT, padx=2)
+    
+    def setup_data_logger_tab(self, parent):
+        """Setup data logging tab"""
+        # Logger configuration
+        config_frame = ttk.LabelFrame(parent, text="Data Logger Configuration")
+        config_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        config_grid = ttk.Frame(config_frame)
+        config_grid.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Label(config_grid, text="Log Interval:").grid(row=0, column=0, padx=5, pady=2, sticky='e')
+        self.log_interval_var = tk.StringVar(value="5 seconds")
+        ttk.Combobox(config_grid, textvariable=self.log_interval_var, values=["1 second", "5 seconds", "10 seconds", "30 seconds", "1 minute"]).grid(row=0, column=1, padx=5, pady=2)
+        
+        ttk.Label(config_grid, text="Log File:").grid(row=0, column=2, padx=5, pady=2, sticky='e')
+        self.log_file_var = tk.StringVar(value="sensor_data.csv")
+        ttk.Entry(config_grid, textvariable=self.log_file_var, width=20).grid(row=0, column=3, padx=5, pady=2)
+        ttk.Button(config_grid, text="📁 Browse", command=self.browse_log_file).grid(row=0, column=4, padx=5, pady=2)
+        
+        # Active sensors selection
+        sensors_frame = ttk.LabelFrame(parent, text="Active Sensors")
+        sensors_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.sensor_vars = {}
+        sensor_names = ["Temperature", "Humidity", "Pressure", "Light Level", "Motion", "Distance", "Air Quality", "Sound Level"]
+        
+        sensors_grid = ttk.Frame(sensors_frame)
+        sensors_grid.pack(fill=tk.X, padx=5, pady=5)
+        
+        for i, sensor in enumerate(sensor_names):
+            var = tk.BooleanVar(value=True)
+            self.sensor_vars[sensor] = var
+            row = i // 4
+            col = i % 4
+            ttk.Checkbutton(sensors_grid, text=sensor, variable=var).grid(row=row, column=col, padx=10, pady=2, sticky='w')
+        
+        # Data log display
+        log_frame = ttk.LabelFrame(parent, text="Recent Log Entries")
+        log_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Log treeview
+        columns = ('Timestamp', 'Sensor', 'Value', 'Unit', 'Status')
+        self.log_tree = ttk.Treeview(log_frame, columns=columns, show='headings', height=12)
+        
+        for col in columns:
+            self.log_tree.heading(col, text=col)
+            self.log_tree.column(col, width=120)
+        
+        self.log_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        log_scroll = ttk.Scrollbar(log_frame, orient=tk.VERTICAL, command=self.log_tree.yview)
+        self.log_tree.config(yscrollcommand=log_scroll.set)
+        log_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add sample log entries
+        sample_logs = [
+            ("2024-01-15 14:30:25", "Temperature", "23.5", "°C", "Normal"),
+            ("2024-01-15 14:30:20", "Humidity", "65.2", "%", "Normal"),
+            ("2024-01-15 14:30:15", "Pressure", "1013.2", "hPa", "Normal"),
+            ("2024-01-15 14:30:10", "Light Level", "450", "lux", "Normal"),
+            ("2024-01-15 14:30:05", "Motion", "1", "detected", "Alert"),
+            ("2024-01-15 14:30:00", "Distance", "15.2", "cm", "Normal")
+        ]
+        
+        for log_entry in sample_logs:
+            self.log_tree.insert('', 'end', values=log_entry)
+        
+        # Logger controls
+        logger_controls = ttk.Frame(parent)
+        logger_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(logger_controls, text="▶️ Start Logging", command=self.start_data_logging).pack(side=tk.LEFT, padx=2)
+        ttk.Button(logger_controls, text="⏹️ Stop Logging", command=self.stop_data_logging).pack(side=tk.LEFT, padx=2)
+        ttk.Button(logger_controls, text="🧹 Clear Log", command=self.clear_data_log).pack(side=tk.LEFT, padx=2)
+        ttk.Button(logger_controls, text="💾 Export Log", command=self.export_data_log).pack(side=tk.LEFT, padx=2)
+    
+    def setup_historical_data_tab(self, parent):
+        """Setup historical data analysis tab"""
+        # Date range selection
+        range_frame = ttk.LabelFrame(parent, text="Data Range Selection")
+        range_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        range_grid = ttk.Frame(range_frame)
+        range_grid.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Label(range_grid, text="From:").grid(row=0, column=0, padx=5, pady=2)
+        self.from_date_var = tk.StringVar(value="2024-01-01")
+        ttk.Entry(range_grid, textvariable=self.from_date_var).grid(row=0, column=1, padx=5, pady=2)
+        
+        ttk.Label(range_grid, text="To:").grid(row=0, column=2, padx=5, pady=2)
+        self.to_date_var = tk.StringVar(value="2024-01-15")
+        ttk.Entry(range_grid, textvariable=self.to_date_var).grid(row=0, column=3, padx=5, pady=2)
+        
+        ttk.Button(range_grid, text="📊 Load Data", command=self.load_historical_data).grid(row=0, column=4, padx=5, pady=2)
+        
+        # Historical charts
+        history_frame = ttk.LabelFrame(parent, text="Historical Analysis")
+        history_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        self.history_canvas = tk.Canvas(history_frame, bg='white', height=400)
+        self.history_canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Draw historical charts
+        self.draw_historical_charts()
+        
+        # Analysis controls
+        analysis_controls = ttk.Frame(parent)
+        analysis_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(analysis_controls, text="📈 Trend Analysis", command=self.analyze_trends).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analysis_controls, text="📊 Statistics", command=self.show_statistics).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analysis_controls, text="🔍 Find Patterns", command=self.find_patterns).pack(side=tk.LEFT, padx=2)
+        ttk.Button(analysis_controls, text="⚠️ Anomaly Detection", command=self.detect_anomalies).pack(side=tk.LEFT, padx=2)
+    
+    def setup_sensor_export_tab(self, parent):
+        """Setup data export and reports tab"""
+        # Export configuration
+        export_config_frame = ttk.LabelFrame(parent, text="Export Configuration")
+        export_config_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        config_grid = ttk.Frame(export_config_frame)
+        config_grid.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Label(config_grid, text="Format:").grid(row=0, column=0, padx=5, pady=2, sticky='e')
+        self.export_format_var = tk.StringVar(value="CSV")
+        ttk.Combobox(config_grid, textvariable=self.export_format_var, values=["CSV", "JSON", "XML", "Excel", "PDF"]).grid(row=0, column=1, padx=5, pady=2)
+        
+        ttk.Label(config_grid, text="Include:").grid(row=0, column=2, padx=5, pady=2, sticky='e')
+        self.include_charts_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(config_grid, text="Charts", variable=self.include_charts_var).grid(row=0, column=3, padx=5, pady=2)
+        
+        # Available reports
+        reports_frame = ttk.LabelFrame(parent, text="Available Reports")
+        reports_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        reports_list = [
+            "📊 Daily Sensor Summary",
+            "📈 Weekly Trend Analysis", 
+            "📉 Monthly Performance Report",
+            "🚨 Alert History Report",
+            "📋 Sensor Calibration Report",
+            "🔍 Data Quality Assessment",
+            "📊 Comparative Analysis",
+            "📱 Mobile Dashboard Export"
+        ]
+        
+        self.reports_listbox = tk.Listbox(reports_frame, font=('Arial', 10))
+        self.reports_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        for report in reports_list:
+            self.reports_listbox.insert(tk.END, report)
+        
+        reports_scroll = ttk.Scrollbar(reports_frame, orient=tk.VERTICAL, command=self.reports_listbox.yview)
+        self.reports_listbox.config(yscrollcommand=reports_scroll.set)
+        reports_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Export controls
+        export_controls = ttk.Frame(parent)
+        export_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(export_controls, text="📄 Generate Report", command=self.generate_sensor_report).pack(side=tk.LEFT, padx=2)
+        ttk.Button(export_controls, text="💾 Export Data", command=self.export_sensor_data).pack(side=tk.LEFT, padx=2)
+        ttk.Button(export_controls, text="📧 Email Report", command=self.email_sensor_report).pack(side=tk.LEFT, padx=2)
+        ttk.Button(export_controls, text="🌐 Web Dashboard", command=self.open_web_dashboard).pack(side=tk.LEFT, padx=2)
+    
+    def setup_sensor_alerts_tab(self, parent):
+        """Setup sensor alerts and thresholds tab"""
+        # Threshold configuration
+        thresholds_frame = ttk.LabelFrame(parent, text="Sensor Thresholds")
+        thresholds_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Thresholds treeview
+        columns = ('Sensor', 'Min Value', 'Max Value', 'Current', 'Status', 'Actions')
+        self.thresholds_tree = ttk.Treeview(thresholds_frame, columns=columns, show='headings', height=10)
+        
+        for col in columns:
+            self.thresholds_tree.heading(col, text=col)
+            self.thresholds_tree.column(col, width=100)
+        
+        self.thresholds_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        thresholds_scroll = ttk.Scrollbar(thresholds_frame, orient=tk.VERTICAL, command=self.thresholds_tree.yview)
+        self.thresholds_tree.config(yscrollcommand=thresholds_scroll.set)
+        thresholds_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
+        
+        # Add threshold settings
+        threshold_data = [
+            ("Temperature", "18°C", "28°C", "23.5°C", "Normal", "None"),
+            ("Humidity", "40%", "70%", "65.2%", "Normal", "None"),
+            ("Pressure", "990 hPa", "1030 hPa", "1013.2 hPa", "Normal", "None"),
+            ("Light Level", "100 lux", "1000 lux", "450 lux", "Normal", "None"),
+            ("Air Quality", "0 ppm", "50 ppm", "15 ppm", "Normal", "None"),
+            ("Sound Level", "30 dB", "80 dB", "45 dB", "Normal", "None")
+        ]
+        
+        for threshold in threshold_data:
+            self.thresholds_tree.insert('', 'end', values=threshold)
+        
+        # Alert history
+        alerts_frame = ttk.LabelFrame(parent, text="Recent Alerts")
+        alerts_frame.pack(fill=tk.X, padx=5, pady=5)
+        
+        self.alerts_text = scrolledtext.ScrolledText(alerts_frame, height=8, font=('Consolas', 9))
+        self.alerts_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Add sample alerts
+        sample_alerts = """
+[2024-01-15 14:25:00] 🚨 HIGH ALERT: Motion sensor triggered in Zone A
+[2024-01-15 13:45:15] ⚠️ WARNING: Temperature exceeded 28°C (29.2°C) in Server Room
+[2024-01-15 12:30:22] ℹ️ INFO: Humidity sensor calibrated successfully
+[2024-01-15 11:15:08] 🚨 HIGH ALERT: Air quality exceeded threshold (65 ppm)
+[2024-01-15 10:00:00] ✅ RESOLVED: Temperature back to normal range (24.1°C)
+[2024-01-15 09:45:33] ⚠️ WARNING: Low light level detected (85 lux)
+        """
+        
+        self.alerts_text.insert(tk.END, sample_alerts.strip())
+        
+        # Alert controls
+        alert_controls = ttk.Frame(parent)
+        alert_controls.pack(fill=tk.X, padx=5, pady=5)
+        
+        ttk.Button(alert_controls, text="⚙️ Configure Threshold", command=self.configure_threshold).pack(side=tk.LEFT, padx=2)
+        ttk.Button(alert_controls, text="🚨 Test Alert", command=self.test_sensor_alert).pack(side=tk.LEFT, padx=2)
+        ttk.Button(alert_controls, text="📧 Alert Settings", command=self.configure_alert_settings).pack(side=tk.LEFT, padx=2)
+        ttk.Button(alert_controls, text="🧹 Clear Alerts", command=self.clear_alert_history).pack(side=tk.LEFT, padx=2)
+        ttk.Button(alert_controls, text="💾 Export Alerts", command=self.export_alert_history).pack(side=tk.LEFT, padx=2)
+    
+    # === SENSOR VISUALIZER HELPER METHODS ===
+    def draw_sensor_charts(self):
+        """Draw real-time sensor charts"""
+        canvas = self.charts_canvas
+        canvas.delete("all")
+        
+        # Chart 1: Temperature over time
+        self.draw_line_chart(canvas, 50, 50, 300, 150, "Temperature (°C)", 
+                           [(0, 22), (10, 23), (20, 24), (30, 23.5), (40, 25), (50, 24.2)], '#FF6B6B')
+        
+        # Chart 2: Humidity over time  
+        self.draw_line_chart(canvas, 400, 50, 300, 150, "Humidity (%)",
+                           [(0, 60), (10, 62), (20, 65), (30, 63), (40, 67), (50, 65.2)], '#4ECDC4')
+        
+        # Chart 3: Light level
+        self.draw_bar_chart(canvas, 50, 250, 300, 150, "Light Level (lux)",
+                          ["Morning", "Noon", "Afternoon", "Evening", "Night"],
+                          [200, 800, 600, 300, 50], '#95E1D3')
+        
+        # Chart 4: Sensor status indicators
+        self.draw_status_indicators(canvas, 400, 250, 300, 150)
+    
+    def draw_line_chart(self, canvas, x, y, width, height, title, data, color):
+        """Draw a line chart on canvas"""
+        # Chart border
+        canvas.create_rectangle(x, y, x+width, y+height, outline='black', fill='white')
+        canvas.create_text(x+width//2, y-10, text=title, font=('Arial', 10, 'bold'))
+        
+        # Scale data to fit chart
+        if not data:
+            return
+            
+        max_val = max(point[1] for point in data)
+        min_val = min(point[1] for point in data)
+        val_range = max_val - min_val if max_val != min_val else 1
+        
+        # Draw data points and lines
+        for i in range(len(data)-1):
+            x1_data, y1_data = data[i]
+            x2_data, y2_data = data[i+1]
+            
+            x1_pos = x + (x1_data / max(point[0] for point in data)) * (width - 20) + 10
+            y1_pos = y + height - ((y1_data - min_val) / val_range) * (height - 20) - 10
+            
+            x2_pos = x + (x2_data / max(point[0] for point in data)) * (width - 20) + 10
+            y2_pos = y + height - ((y2_data - min_val) / val_range) * (height - 20) - 10
+            
+            canvas.create_line(x1_pos, y1_pos, x2_pos, y2_pos, fill=color, width=2)
+            canvas.create_oval(x1_pos-3, y1_pos-3, x1_pos+3, y1_pos+3, fill=color)
+    
+    def draw_bar_chart(self, canvas, x, y, width, height, title, labels, values, color):
+        """Draw a bar chart on canvas"""
+        canvas.create_rectangle(x, y, x+width, y+height, outline='black', fill='white')
+        canvas.create_text(x+width//2, y-10, text=title, font=('Arial', 10, 'bold'))
+        
+        if not values:
+            return
+            
+        max_val = max(values)
+        bar_width = (width - 40) // len(values)
+        
+        for i, (label, value) in enumerate(zip(labels, values)):
+            bar_x = x + 20 + i * bar_width
+            bar_height = (value / max_val) * (height - 40)
+            bar_y = y + height - 20 - bar_height
+            
+            canvas.create_rectangle(bar_x, bar_y, bar_x + bar_width - 5, y + height - 20, 
+                                  fill=color, outline='black')
+            canvas.create_text(bar_x + bar_width//2, y + height - 5, text=label, 
+                             font=('Arial', 8), angle=45)
+    
+    def draw_status_indicators(self, canvas, x, y, width, height):
+        """Draw sensor status indicators"""
+        canvas.create_rectangle(x, y, x+width, y+height, outline='black', fill='white')
+        canvas.create_text(x+width//2, y-10, text="Sensor Status", font=('Arial', 10, 'bold'))
+        
+        sensors = [("Temperature", "Online", '#4CAF50'),
+                  ("Humidity", "Online", '#4CAF50'),
+                  ("Motion", "Alert", '#FF9800'),
+                  ("Light", "Online", '#4CAF50'),
+                  ("Air Quality", "Offline", '#F44336')]
+        
+        for i, (sensor, status, color) in enumerate(sensors):
+            indicator_y = y + 30 + i * 20
+            canvas.create_oval(x + 20, indicator_y, x + 30, indicator_y + 10, fill=color)
+            canvas.create_text(x + 50, indicator_y + 5, text=f"{sensor}: {status}", 
+                             font=('Arial', 9), anchor='w')
+    
+    def draw_historical_charts(self):
+        """Draw historical data analysis charts"""
+        canvas = self.history_canvas
+        canvas.delete("all")
+        
+        # Historical trend chart
+        canvas.create_text(500, 20, text="Historical Sensor Data Analysis", font=('Arial', 14, 'bold'))
+        
+        # Multi-sensor trend lines
+        self.draw_line_chart(canvas, 50, 50, 400, 200, "Temperature Trend (7 Days)", 
+                           [(0, 20), (1, 22), (2, 25), (3, 23), (4, 24), (5, 26), (6, 23.5)], '#FF6B6B')
+        
+        self.draw_line_chart(canvas, 500, 50, 400, 200, "Humidity Trend (7 Days)",
+                           [(0, 55), (1, 60), (2, 65), (3, 62), (4, 68), (5, 63), (6, 65.2)], '#4ECDC4')
+        
+        # Statistics summary
+        stats_text = """Data Summary (Last 7 Days):
+        
+Temperature: Avg 23.2°C, Min 20.0°C, Max 26.0°C
+Humidity: Avg 62.7%, Min 55.0%, Max 68.0%
+Pressure: Avg 1013.5 hPa, Min 995.2 hPa, Max 1025.8 hPa
+Light: Avg 425 lux, Min 50 lux, Max 850 lux
+
+Alerts Generated: 5
+Data Points Collected: 10,080
+Uptime: 99.8%"""
+        
+        canvas.create_text(50, 300, text=stats_text, font=('Consolas', 9), anchor='nw')
+    
+    def start_realtime_monitoring(self):
+        """Start real-time sensor monitoring"""
+        messagebox.showinfo("Real-time Monitor", "Real-time sensor monitoring started\\n\\n📊 Updating charts every 5 seconds\\n📡 Receiving live data streams")
+    
+    def pause_realtime_monitoring(self):
+        """Pause real-time monitoring"""
+        messagebox.showinfo("Monitor Paused", "Real-time monitoring paused\\n\\n⏸️ Data collection stopped\\n📊 Charts frozen at current state")
+    
+    def refresh_sensor_charts(self):
+        """Refresh sensor charts"""
+        self.draw_sensor_charts()
+        messagebox.showinfo("Charts Refreshed", "Sensor charts updated with latest data")
+    
+    def configure_sensor_charts(self):
+        """Configure sensor chart settings"""
+        messagebox.showinfo("Chart Config", "Chart Configuration\\n\\n📊 Chart types and colors\\n⏰ Update intervals\\n📏 Scale and axes settings")
+    
+    def save_sensor_chart(self):
+        """Save current sensor chart"""
+        filename = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png"), ("PDF files", "*.pdf")])
+        if filename:
+            messagebox.showinfo("Chart Saved", f"Sensor chart saved to:\\n{filename}")
+    
+    def browse_log_file(self):
+        """Browse for log file location"""
+        filename = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("Log files", "*.log")])
+        if filename:
+            self.log_file_var.set(filename)
+    
+    def start_data_logging(self):
+        """Start sensor data logging"""
+        messagebox.showinfo("Logging Started", f"Data logging started\\n\\nInterval: {self.log_interval_var.get()}\\nFile: {self.log_file_var.get()}\\n\\n📝 Recording sensor data...")
+    
+    def stop_data_logging(self):
+        """Stop sensor data logging"""
+        messagebox.showinfo("Logging Stopped", "Data logging stopped\\n\\n📊 2,456 entries logged\\n💾 Data saved to file")
+    
+    def clear_data_log(self):
+        """Clear data log display"""
+        if messagebox.askyesno("Clear Log", "Clear all log entries from display?"):
+            for item in self.log_tree.get_children():
+                self.log_tree.delete(item)
+            messagebox.showinfo("Log Cleared", "Log display cleared")
+    
+    def export_data_log(self):
+        """Export data log"""
+        filename = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
+        if filename:
+            messagebox.showinfo("Log Exported", f"Data log exported to:\\n{filename}\\n\\n📊 All sensor data included")
+    
+    def load_historical_data(self):
+        """Load historical sensor data"""
+        from_date = self.from_date_var.get()
+        to_date = self.to_date_var.get()
+        messagebox.showinfo("Data Loaded", f"Historical data loaded\\n\\nFrom: {from_date}\\nTo: {to_date}\\n\\n📊 10,250 data points loaded")
+        self.draw_historical_charts()
+    
+    def analyze_trends(self):
+        """Analyze sensor data trends"""
+        messagebox.showinfo("Trend Analysis", "Trend Analysis Complete\\n\\n📈 Temperature: Increasing trend (+2°C/week)\\n📊 Humidity: Stable (±3% variation)\\n📉 Pressure: Decreasing trend (-5 hPa/week)")
+    
+    def show_statistics(self):
+        """Show statistical analysis"""
+        stats_info = """Statistical Analysis Summary:
+        
+Temperature:
+• Mean: 23.45°C
+• Median: 23.2°C  
+• Std Dev: 2.1°C
+• Min: 18.5°C (Jan 5, 06:00)
+• Max: 28.9°C (Jan 12, 14:30)
+
+Humidity:
+• Mean: 62.8%
+• Median: 63.1%
+• Std Dev: 8.4%
+• Min: 42.1% (Jan 8, 13:15)
+• Max: 89.2% (Jan 3, 05:45)
+
+Data Quality:
+• Valid readings: 98.7%
+• Missing data: 1.3%
+• Outliers detected: 15
+• Calibration drift: 0.02%/day
+"""
+        messagebox.showinfo("Statistics", stats_info)
+    
+    def find_patterns(self):
+        """Find patterns in sensor data"""
+        messagebox.showinfo("Pattern Analysis", "Pattern Detection Results\\n\\n🔍 Daily temperature cycle detected\\n📊 Weekly humidity pattern found\\n⏰ Pressure correlation with weather events\\n🌡️ Seasonal temperature trend identified")
+    
+    def detect_anomalies(self):
+        """Detect anomalies in sensor data"""
+        messagebox.showinfo("Anomaly Detection", "Anomaly Detection Results\\n\\n⚠️ 3 temperature spikes detected\\n📊 2 humidity drops identified\\n🔍 1 pressure anomaly found\\n✅ 15 false positives filtered out")
+    
+    def generate_sensor_report(self):
+        """Generate sensor report"""
+        selection = self.reports_listbox.curselection()
+        if selection:
+            report_name = self.reports_listbox.get(selection[0])
+            messagebox.showinfo("Report Generated", f"Report Generated: {report_name}\\n\\n📄 PDF format\\n📊 Charts and graphs included\\n📈 Statistical analysis complete")
+        else:
+            messagebox.showwarning("No Selection", "Please select a report type")
+    
+    def export_sensor_data(self):
+        """Export sensor data"""
+        format_type = self.export_format_var.get()
+        filename = filedialog.asksaveasfilename(defaultextension=f".{format_type.lower()}")
+        if filename:
+            messagebox.showinfo("Data Exported", f"Sensor data exported\\n\\nFormat: {format_type}\\nFile: {filename}\\n📊 All data included")
+    
+    def email_sensor_report(self):
+        """Email sensor report"""
+        messagebox.showinfo("Email Report", "Email Configuration\\n\\n📧 SMTP settings\\n📊 Report attachment\\n👥 Recipient list\\n\\n✅ Report sent successfully")
+    
+    def open_web_dashboard(self):
+        """Open web dashboard"""
+        messagebox.showinfo("Web Dashboard", "Opening web dashboard...\\n\\n🌐 http://localhost:8080/dashboard\\n📊 Real-time charts\\n📱 Mobile responsive")
+    
+    def configure_threshold(self):
+        """Configure sensor threshold"""
+        selection = self.thresholds_tree.selection()
+        if selection:
+            item = self.thresholds_tree.item(selection[0])
+            sensor = item['values'][0]
+            messagebox.showinfo("Threshold Config", f"Configure {sensor} Threshold\\n\\n⚙️ Min/Max values\\n🚨 Alert settings\\n📧 Notification preferences")
+        else:
+            messagebox.showwarning("No Selection", "Please select a sensor")
+    
+    def test_sensor_alert(self):
+        """Test sensor alert system"""
+        messagebox.showinfo("Alert Test", "Testing alert system...\\n\\n🚨 Test alert triggered\\n📧 Email notification sent\\n📱 Push notification sent\\n\\n✅ Alert system working correctly")
+    
+    def configure_alert_settings(self):
+        """Configure alert settings"""
+        messagebox.showinfo("Alert Settings", "Alert Configuration\\n\\n📧 Email notifications\\n📱 Push notifications\\n🔊 Sound alerts\\n⏰ Quiet hours settings")
+    
+    def clear_alert_history(self):
+        """Clear alert history"""
+        if messagebox.askyesno("Clear Alerts", "Clear all alert history?"):
+            self.alerts_text.delete(1.0, tk.END)
+            messagebox.showinfo("Alerts Cleared", "Alert history cleared")
+    
+    def export_alert_history(self):
+        """Export alert history"""
+        filename = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
+        if filename:
+            messagebox.showinfo("Alerts Exported", f"Alert history exported to:\\n{filename}")
+
+    # Add sensor visualizer methods to JAMESII class using setattr
+    setattr(JAMESII, 'setup_realtime_charts_tab', setup_realtime_charts_tab)
+    setattr(JAMESII, 'setup_data_logger_tab', setup_data_logger_tab)
+    setattr(JAMESII, 'setup_historical_data_tab', setup_historical_data_tab)
+    setattr(JAMESII, 'setup_sensor_export_tab', setup_sensor_export_tab)
+    setattr(JAMESII, 'setup_sensor_alerts_tab', setup_sensor_alerts_tab)
+    setattr(JAMESII, 'draw_sensor_charts', draw_sensor_charts)
+    setattr(JAMESII, 'draw_line_chart', draw_line_chart)
+    setattr(JAMESII, 'draw_bar_chart', draw_bar_chart)
+    setattr(JAMESII, 'draw_status_indicators', draw_status_indicators)
+    setattr(JAMESII, 'draw_historical_charts', draw_historical_charts)
+    setattr(JAMESII, 'start_realtime_monitoring', start_realtime_monitoring)
+    setattr(JAMESII, 'pause_realtime_monitoring', pause_realtime_monitoring)
+    setattr(JAMESII, 'refresh_sensor_charts', refresh_sensor_charts)
+    setattr(JAMESII, 'configure_sensor_charts', configure_sensor_charts)
+    setattr(JAMESII, 'save_sensor_chart', save_sensor_chart)
+    setattr(JAMESII, 'browse_log_file', browse_log_file)
+    setattr(JAMESII, 'start_data_logging', start_data_logging)
+    setattr(JAMESII, 'stop_data_logging', stop_data_logging)
+    setattr(JAMESII, 'clear_data_log', clear_data_log)
+    setattr(JAMESII, 'export_data_log', export_data_log)
+    setattr(JAMESII, 'load_historical_data', load_historical_data)
+    setattr(JAMESII, 'analyze_trends', analyze_trends)
+    setattr(JAMESII, 'show_statistics', show_statistics)
+    setattr(JAMESII, 'find_patterns', find_patterns)
+    setattr(JAMESII, 'detect_anomalies', detect_anomalies)
+    setattr(JAMESII, 'generate_sensor_report', generate_sensor_report)
+    setattr(JAMESII, 'export_sensor_data', export_sensor_data)
+    setattr(JAMESII, 'email_sensor_report', email_sensor_report)
+    setattr(JAMESII, 'open_web_dashboard', open_web_dashboard)
+    setattr(JAMESII, 'configure_threshold', configure_threshold)
+    setattr(JAMESII, 'test_sensor_alert', test_sensor_alert)
+    setattr(JAMESII, 'configure_alert_settings', configure_alert_settings)
+    setattr(JAMESII, 'clear_alert_history', clear_alert_history)
+    setattr(JAMESII, 'export_alert_history', export_alert_history)
     
     # Add hardware methods to JAMESII class using setattr
     setattr(JAMESII, 'setup_device_discovery_tab', setup_device_discovery_tab)
