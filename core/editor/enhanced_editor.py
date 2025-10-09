@@ -149,30 +149,20 @@ class EnhancedCodeEditor:
         ).pack(side=tk.LEFT, padx=2)
     
     def create_editor_area(self):
-        """Create the main editor area"""
+        """Create the main editor area - clean editor without line numbers panel"""
         # Editor container
         editor_container = ttk.Frame(self.container)
         editor_container.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Line numbers frame
-        self.line_numbers_frame = tk.Frame(editor_container, width=50, bg='lightgray')
-        self.line_numbers_frame.pack(side=tk.LEFT, fill=tk.Y)
+        # Vertical scrollbar
+        v_scrollbar = ttk.Scrollbar(editor_container, orient=tk.VERTICAL)
+        v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Line numbers text widget
-        self.line_numbers = tk.Text(
-            self.line_numbers_frame, 
-            width=4, 
-            padx=3,
-            takefocus=0, 
-            border=0, 
-            state='disabled',
-            bg='lightgray', 
-            fg='black',
-            font=('Courier', 10)
-        )
-        self.line_numbers.pack(side=tk.TOP, fill=tk.Y)
+        # Horizontal scrollbar
+        h_scrollbar = ttk.Scrollbar(editor_container, orient=tk.HORIZONTAL)
+        h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
         
-        # Main text editor
+        # Main text editor - full width, no side panels
         self.text_editor = tk.Text(
             editor_container,
             font=('Courier', 10),
@@ -184,16 +174,12 @@ class EnhancedCodeEditor:
             selectbackground='lightblue',
             wrap=tk.NONE
         )
-        self.text_editor.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.text_editor.pack(fill=tk.BOTH, expand=True)
         
-        # Add scrollbars
-        v_scrollbar = ttk.Scrollbar(editor_container, orient=tk.VERTICAL, command=self.text_editor.yview)
-        v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.text_editor.configure(yscrollcommand=v_scrollbar.set)
-        
-        h_scrollbar = ttk.Scrollbar(editor_container, orient=tk.HORIZONTAL, command=self.text_editor.xview)
-        h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
-        self.text_editor.configure(xscrollcommand=h_scrollbar.set)
+        # Connect scrollbars to text editor
+        v_scrollbar.configure(command=self.text_editor.yview)
+        h_scrollbar.configure(command=self.text_editor.xview)
+        self.text_editor.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
         
         # Bind events
         self.text_editor.bind('<KeyPress>', self.on_key_press)
@@ -337,16 +323,8 @@ class EnhancedCodeEditor:
         self.update_cursor_position()
     
     def update_line_numbers(self):
-        """Update line numbers display"""
-        content = self.text_editor.get('1.0', tk.END)
-        lines = content.count('\n')
-        
-        line_numbers_content = '\n'.join(str(i) for i in range(1, lines + 1))
-        
-        self.line_numbers.config(state='normal')
-        self.line_numbers.delete('1.0', tk.END)
-        self.line_numbers.insert('1.0', line_numbers_content)
-        self.line_numbers.config(state='disabled')
+        """Line numbers removed - this method is now a no-op"""
+        pass
     
     def update_cursor_position(self):
         """Update cursor position in status bar"""

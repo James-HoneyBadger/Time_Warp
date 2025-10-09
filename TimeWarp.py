@@ -67,7 +67,7 @@ class IDETimeWarp:
             self.config = {}
 
     def setup_ui(self):
-        """Setup the main user interface"""
+        """Setup the main user interface with integrated graphics"""
         # Create main container
         self.main_container = tk.Frame(self.root)
         self.main_container.pack(fill=tk.BOTH, expand=True)
@@ -75,17 +75,18 @@ class IDETimeWarp:
         # Setup toolbar
         self.setup_toolbar()
         
-        # Create main layout - fixed layout without sliding panels
-        self.main_paned = ttk.PanedWindow(self.main_container, orient=tk.HORIZONTAL)
-        self.main_paned.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        # Create horizontal layout - NO paned windows or sliders
+        self.main_frame = tk.Frame(self.main_container)
+        self.main_frame.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
         
-        # Center panel for editor and console (main area) - fixed frame instead of paned window
-        self.center_panel = ttk.Frame(self.main_paned)
-        self.main_paned.add(self.center_panel, weight=3)
+        # Left side: Code editor and output (70% width)
+        self.left_section = tk.Frame(self.main_frame)
+        self.left_section.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        # Right panel for graphics
-        self.right_panel = ttk.Frame(self.main_paned)
-        self.main_paned.add(self.right_panel, weight=1)
+        # Right side: Graphics canvas (30% width, fixed)
+        self.right_section = tk.Frame(self.main_frame, width=350)
+        self.right_section.pack(side=tk.RIGHT, fill=tk.Y, padx=(8, 0))
+        self.right_section.pack_propagate(False)  # Maintain fixed width
         
         # Setup components
         self.setup_menu()
@@ -143,7 +144,7 @@ class IDETimeWarp:
     def setup_editor(self):
         """Setup clean code editor canvas"""
         # Editor section - clean canvas without toolbar
-        editor_frame = ttk.LabelFrame(self.center_panel, text="⏰ Time Warp Code Portal")
+        editor_frame = ttk.LabelFrame(self.left_section, text="⏰ Time Warp Code Portal")
         editor_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 4))
         
         # Initialize language variable for compatibility (used by other methods)
@@ -161,7 +162,7 @@ class IDETimeWarp:
 
     def setup_console(self):
         """Setup output console with fixed height"""
-        console_frame = ttk.LabelFrame(self.center_panel, text="⏰ Time Warp Output")
+        console_frame = ttk.LabelFrame(self.left_section, text="⏰ Time Warp Output")
         console_frame.pack(fill=tk.X, expand=False, pady=(4, 0))
         
         self.output_text = scrolledtext.ScrolledText(
@@ -173,30 +174,47 @@ class IDETimeWarp:
         self.output_text.pack(fill=tk.BOTH, expand=False, padx=5, pady=5)
 
     def setup_graphics(self):
-        """Setup simplified graphics canvas"""
-        graphics_frame = ttk.LabelFrame(self.right_panel, text="⏰ Time Graphics")
-        graphics_frame.pack(fill=tk.BOTH, expand=True, padx=(0,0), pady=(0,5))
+        """Setup integrated turtle graphics canvas"""
+        graphics_frame = ttk.LabelFrame(self.right_section, text="⏰ Turtle Graphics")
+        graphics_frame.pack(fill=tk.BOTH, expand=True)
         
         try:
+            # Create graphics canvas
             self.graphics_canvas = tk.Canvas(
                 graphics_frame, 
-                width=300, 
-                height=300, 
-                bg='white'
+                width=340, 
+                height=340, 
+                bg='white',
+                highlightthickness=1,
+                highlightbackground='#cccccc'
             )
             self.graphics_canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
             
             # Initialize turtle graphics
             screen = turtle.TurtleScreen(self.graphics_canvas)
-            screen.setup(280, 280)
+            screen.bgcolor('white')
+            screen.setworldcoordinates(-160, -160, 160, 160)
             self.turtle = turtle.RawTurtle(screen)
+            self.turtle.speed(5)
+            self.turtle.shape('turtle')
+            
+            # Connect turtle to interpreter
+            self.interpreter.ide_turtle_canvas = self.graphics_canvas
+            self.interpreter.ide_turtle_screen = screen
+            self.interpreter.ide_turtle = self.turtle
+                
+            print("🎨 Turtle graphics canvas initialized")
+            
         except Exception as e:
             print(f"Graphics setup error: {e}")
-
-    # Project explorer functionality moved to main toolbar
-    # Left panel removed for cleaner layout
-
-    # Status bar removed - no longer needed in streamlined UI
+            # Create placeholder if turtle graphics fails
+            placeholder = tk.Label(
+                graphics_frame, 
+                text="Graphics\nCanvas\n(Turtle graphics\nunavailable)",
+                bg='lightgray',
+                justify=tk.CENTER
+            )
+            placeholder.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def load_plugins(self):
         """Load essential plugins only"""
@@ -318,7 +336,7 @@ class IDETimeWarp:
             self.write_to_console(f"⏰ Time warping through {language.upper()} code...")
             
             # Use interpreter to execute
-            result = self.interpreter.execute(code)
+            result = self.interpreter.run_program(code)
             if result:
                 self.write_to_console(str(result))
                 
@@ -655,7 +673,7 @@ Warp through code like never before!
             
             # Apply to graphics canvas
             if hasattr(self, 'graphics_canvas'):
-                canvas_bg = colors.get('bg_tertiary', '#44475A') if 'dark' in self.current_theme or self.current_theme in ['dracula', 'monokai', 'ocean', 'solarized_dark'] else '#FFFFFF'
+                canvas_bg = colors.get('bg_tertiary', '#FFFFFF') if 'light' in self.current_theme or self.current_theme in ['spring', 'sunset', 'candy', 'forest'] else '#2F3349'
                 self.graphics_canvas.configure(bg=canvas_bg)
             
             # Apply to menu bar

@@ -1,8 +1,6 @@
 """
 Networking and Collaboration System
-"""
 Real-time collaborative programming features for TimeWarp.
-"""
 """
 
 import time
