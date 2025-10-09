@@ -1,5 +1,5 @@
 """
-JAMES Utilities Package
+TimeWarp Utilities Package
 Contains utility classes for audio, animation, timing, effects, and hardware.
 """
 
