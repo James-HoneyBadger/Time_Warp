@@ -1,5 +1,5 @@
 """
-JAMES III Plugin Manager
+JAMES IDE Plugin Manager
 Central management for the plugin system
 """
 

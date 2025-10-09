@@ -1,5 +1,5 @@
 """
-JAMES III Plugin Registry
+JAMES IDE Plugin Registry
 Central registry for managing loaded plugins
 """
 

@@ -1,5 +1,5 @@
 """
-Python Integration Handler for JAMES III
+Python Integration Handler for JAMES IDE
 Handles execution of Python code blocks within JAMES programs
 """
 

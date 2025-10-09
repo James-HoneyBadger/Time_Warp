@@ -1,6 +1,6 @@
 """
-JAMES III Language Lexer
-Tokenizes JAMES III source code for parsing
+JAMES IDE Language Lexer
+Tokenizes JAMES IDE source code for parsing
 """
 
 import re
@@ -123,7 +123,7 @@ class Token:
     column: int
 
 class JAMESLexer:
-    """Lexical analyzer for JAMES III language"""
+    """Lexical analyzer for JAMES IDE language"""
     
     def __init__(self):
         self.keywords = {
@@ -203,7 +203,7 @@ class JAMESLexer:
         }
         
     def tokenize(self, source_code: str) -> List[Token]:
-        """Tokenize JAMES III source code"""
+        """Tokenize JAMES IDE source code"""
         tokens = []
         lines = source_code.split('\n')
         

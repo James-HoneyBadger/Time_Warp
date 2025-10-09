@@ -1,5 +1,5 @@
 """
-JAMES III Runtime Engine
+JAMES IDE Runtime Engine
 Core execution environment and context management
 """
 
@@ -16,7 +16,7 @@ from ..errors.error_manager import (
 from ..stdlib.core import StandardLibrary
 
 class ExecutionMode(Enum):
-    """Execution modes for JAMES III"""
+    """Execution modes for JAMES IDE"""
     BASIC = "basic"
     PILOT = "pilot"  
     LOGO = "logo"

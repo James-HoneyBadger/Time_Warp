@@ -1,5 +1,5 @@
 """
-JAMES III Standard Library - Core Module
+JAMES IDE Standard Library - Core Module
 Provides essential built-in functions and constants
 """
 

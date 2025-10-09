@@ -1,6 +1,6 @@
 """
-JAMES III Language Parser
-Parses tokenized JAMES III source code into an Abstract Syntax Tree (AST)
+JAMES IDE Language Parser
+Parses tokenized JAMES IDE source code into an Abstract Syntax Tree (AST)
 """
 
 from typing import List, Optional, Union, Any
@@ -242,7 +242,7 @@ class ParseError(Exception):
     pass
 
 class JAMESParser:
-    """Parser for JAMES III language"""
+    """Parser for JAMES IDE language"""
     
     def __init__(self):
         self.tokens = []

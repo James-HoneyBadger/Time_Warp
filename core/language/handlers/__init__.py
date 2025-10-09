@@ -1,5 +1,5 @@
 """
-JAMES III Language Handlers Module
+JAMES IDE Language Handlers Module
 """
 
 from .pilot_handler import PilotHandler

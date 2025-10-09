@@ -1,5 +1,5 @@
 """
-JAMES III Plugin System
+JAMES IDE Plugin System
 Extensible architecture for adding new features and integrations
 """
 

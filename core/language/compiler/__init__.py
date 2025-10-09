@@ -1,5 +1,5 @@
 """
-JAMES III Compiler System
+JAMES IDE Compiler System
 Enhanced compilation with better error handling and optimization
 """
 

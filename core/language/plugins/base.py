@@ -1,5 +1,5 @@
 """
-JAMES III Plugin Base Classes
+JAMES IDE Plugin Base Classes
 Foundation for the plugin system
 """
 

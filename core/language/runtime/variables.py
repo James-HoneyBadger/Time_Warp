@@ -1,5 +1,5 @@
 """
-JAMES III Variable Management
+JAMES IDE Variable Management
 Runtime variable handling and scoping
 """
 

@@ -59,7 +59,7 @@ except ImportError:
         def PhotoImage(image=None, file=None): return None
 
 
-class JAMESII:
+class JAMES:
     """
     Main JAMES Application Class
     Modular architecture with comprehensive feature integration
@@ -113,7 +113,7 @@ class JAMESII:
         # Load plugins
         self.load_plugins()
         
-        # JAMES III Language support
+        # Interactive console support
         self.setup_james_iii_support()
         
         # Apply theme
@@ -424,7 +424,7 @@ class JAMESII:
             activebackground=colors.get('accent', '#FF79C6'),
             activeforeground='white'
         )
-        self.menubar.add_cascade(label="📁 File", menu=file_menu)
+        self.menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="🆕 New", accelerator="Ctrl+N", command=self.new_file)
         file_menu.add_command(label="📂 Open", accelerator="Ctrl+O", command=self.open_file)
         file_menu.add_command(label="💾 Save", accelerator="Ctrl+S", command=self.save_file)
@@ -441,7 +441,7 @@ class JAMESII:
             activebackground=colors.get('accent_secondary', '#8BE9FD'),
             activeforeground='white'
         )
-        self.menubar.add_cascade(label="✏️ Edit", menu=edit_menu)
+        self.menubar.add_cascade(label="Edit", menu=edit_menu)
         edit_menu.add_command(label="↶ Undo", accelerator="Ctrl+Z", command=self.undo)
         edit_menu.add_command(label="↷ Redo", accelerator="Ctrl+Y", command=self.redo)
         edit_menu.add_separator()
@@ -452,41 +452,8 @@ class JAMESII:
         edit_menu.add_command(label="🔍 Find", accelerator="Ctrl+F", command=self.find_text)
         edit_menu.add_command(label="🔄 Replace", accelerator="Ctrl+H", command=self.replace_text)
         
-        # Run menu with icons
-        run_menu = tk.Menu(
-            self.menubar, 
-            tearoff=0,
-            bg=colors.get('menu_bg', '#282A36'),
-            fg=colors.get('text_primary', '#F8F8F2'),
-            activebackground=colors.get('success', '#50FA7B'),
-            activeforeground='white'
-        )
-        self.menubar.add_cascade(label="▶️ Run", menu=run_menu)
-        run_menu.add_command(label="▶️ Run Program", accelerator="F5", command=self.run_code)
-        run_menu.add_command(label="⏹️ Stop", accelerator="F6", command=self.stop_execution)
-        run_menu.add_separator()
-        run_menu.add_command(label="🐛 Debug", command=self.debug_code)
-        
-        # Compilation submenu
-        self.compile_menu = tk.Menu(
-            run_menu,
-            tearoff=0,
-            bg=colors.get('menu_bg', '#282A36'),
-            fg=colors.get('text_primary', '#F8F8F2'),
-            activebackground=colors.get('accent', '#FF79C6'),
-            activeforeground='white'
-        )
-        run_menu.add_cascade(label="🔨 Compile", menu=self.compile_menu)
-        self.compile_menu.add_command(label="🔨 Compile PILOT", command=lambda: self.compile_language('pilot'))
-        self.compile_menu.add_command(label="🔨 Compile BASIC", command=lambda: self.compile_language('basic'))
-        self.compile_menu.add_command(label="🔨 Compile Logo", command=lambda: self.compile_language('logo'))
-        self.compile_menu.add_separator()
-        self.compile_menu.add_command(label="🚀 Compile & Run PILOT", command=lambda: self.compile_and_run_language('pilot'))
-        self.compile_menu.add_command(label="🚀 Compile & Run BASIC", command=lambda: self.compile_and_run_language('basic'))
-        self.compile_menu.add_command(label="🚀 Compile & Run Logo", command=lambda: self.compile_and_run_language('logo'))
-        
-        # View menu with icons  
-        view_menu = tk.Menu(
+        # Languages menu with consistent theming (moved up in order)
+        languages_menu = tk.Menu(
             self.menubar, 
             tearoff=0,
             bg=colors.get('menu_bg', '#282A36'),
@@ -494,54 +461,16 @@ class JAMESII:
             activebackground=colors.get('info', '#8BE9FD'),
             activeforeground='white'
         )
-        self.menubar.add_cascade(label="👁️ View", menu=view_menu)
-        # Dark/light toggle removed - each theme now has fixed brightness
+        self.menubar.add_cascade(label="Language", menu=languages_menu)
+        languages_menu.add_command(label="✈️ PILOT", command=self.set_pilot_mode)
+        languages_menu.add_command(label="📊 BASIC", command=self.set_basic_mode)
+        languages_menu.add_command(label="🐢 Logo", command=self.set_logo_mode)
+        languages_menu.add_separator()
+        languages_menu.add_command(label="🐍 Python", command=self.set_python_mode)
+        languages_menu.add_command(label="📜 Perl", command=self.set_perl_mode)
+        languages_menu.add_command(label="🟨 JavaScript", command=self.set_javascript_mode)
         
-        # Theme selection submenu
-        theme_submenu = tk.Menu(
-            view_menu,
-            tearoff=0,
-            bg=colors.get('menu_bg', '#282A36'),
-            fg=colors.get('text_primary', '#F8F8F2'),
-            activebackground=colors.get('accent', '#FF79C6'),
-            activeforeground='white'
-        )
-        view_menu.add_cascade(label="🎨 Color Theme", menu=theme_submenu)
-        theme_submenu.add_command(label="🦇 Dracula", command=lambda: self.set_theme('dracula'))
-        theme_submenu.add_command(label="🌙 Monokai", command=lambda: self.set_theme('monokai'))
-        theme_submenu.add_command(label="☀️ Solarized", command=lambda: self.set_theme('solarized'))
-        theme_submenu.add_command(label="🌊 Ocean", command=lambda: self.set_theme('ocean'))
-        theme_submenu.add_separator()
-        # Lighter themes
-        theme_submenu.add_command(label="🌸 Spring", command=lambda: self.set_theme('spring'))
-        theme_submenu.add_command(label="🌅 Sunset", command=lambda: self.set_theme('sunset'))
-        theme_submenu.add_command(label="🍭 Candy", command=lambda: self.set_theme('candy'))
-        theme_submenu.add_command(label="🌲 Forest", command=lambda: self.set_theme('forest'))
-        
-        view_menu.add_separator()
-        view_menu.add_command(label="� Project Explorer", command=self.show_project_explorer)
-        view_menu.add_command(label="🧹 Clear Output", command=self.clear_output)
-        view_menu.add_separator()
-        view_menu.add_command(label="�🔍+ Zoom In", accelerator="Ctrl++", command=self.zoom_in)
-        view_menu.add_command(label="🔍- Zoom Out", accelerator="Ctrl+-", command=self.zoom_out)
-        view_menu.add_command(label="🔍 Reset Zoom", accelerator="Ctrl+0", command=self.reset_zoom)
-        
-        # Help menu with icons
-        help_menu = tk.Menu(
-            self.menubar, 
-            tearoff=0,
-            bg=colors.get('menu_bg', '#282A36'),
-            fg=colors.get('text_primary', '#F8F8F2'),
-            activebackground=colors.get('warning', '#FFB86C'),
-            activeforeground='white'
-        )
-        self.menubar.add_cascade(label="❓ Help", menu=help_menu)
-        help_menu.add_command(label="📚 Documentation", command=self.show_help)
-        help_menu.add_command(label="🎓 Tutorials", command=self.show_tutorials)
-        help_menu.add_separator()
-        help_menu.add_command(label="ℹ️ About", command=self.show_about)
-        
-        # Tools menu with consistent theming
+        # Tools menu with consistent theming (moved up in order)
         tools_menu = tk.Menu(
             self.menubar, 
             tearoff=0,
@@ -550,7 +479,7 @@ class JAMESII:
             activebackground=colors.get('warning', '#FFB86C'),
             activeforeground='white'
         )
-        self.menubar.add_cascade(label="🔧 Tools", menu=tools_menu)
+        self.menubar.add_cascade(label="Tools", menu=tools_menu)
         
         # Development Tools
         tools_menu.add_command(label="🎮 Game Manager", command=self.show_game_manager)
@@ -587,39 +516,97 @@ class JAMESII:
         tools_menu.add_command(label="🔄 Code Converter", command=self.show_code_converter)
         tools_menu.add_command(label="⚙️ System Information", command=self.show_system_info)
         
-        # Languages menu with consistent theming
-        languages_menu = tk.Menu(
+        # Run menu with icons
+        run_menu = tk.Menu(
             self.menubar, 
             tearoff=0,
             bg=colors.get('menu_bg', '#282A36'),
             fg=colors.get('text_primary', '#F8F8F2'),
-            activebackground=colors.get('info', '#8BE9FD'),
+            activebackground=colors.get('success', '#50FA7B'),
             activeforeground='white'
         )
-        self.menubar.add_cascade(label="🌐 Languages", menu=languages_menu)
-        languages_menu.add_command(label="✈️ PILOT", command=self.set_pilot_mode)
-        languages_menu.add_command(label="📊 BASIC", command=self.set_basic_mode)
-        languages_menu.add_command(label="🐢 Logo", command=self.set_logo_mode)
-        languages_menu.add_separator()
-        languages_menu.add_command(label="🐍 Python", command=self.set_python_mode)
-        languages_menu.add_command(label="📜 Perl", command=self.set_perl_mode)
-        languages_menu.add_command(label="🟨 JavaScript", command=self.set_javascript_mode)
+        self.menubar.add_cascade(label="Run", menu=run_menu)
+        run_menu.add_command(label="▶️ Run Program", accelerator="F5", command=self.run_code)
+        run_menu.add_command(label="⏹️ Stop", accelerator="F6", command=self.stop_execution)
+        run_menu.add_separator()
+        run_menu.add_command(label="🐛 Debug", command=self.debug_code)
+        
+        # Compilation submenu
+        self.compile_menu = tk.Menu(
+            run_menu,
+            tearoff=0,
+            bg=colors.get('menu_bg', '#282A36'),
+            fg=colors.get('text_primary', '#F8F8F2'),
+            activebackground=colors.get('accent', '#FF79C6'),
+            activeforeground='white'
+        )
+        run_menu.add_cascade(label="🔨 Compile", menu=self.compile_menu)
+        self.compile_menu.add_command(label="🔨 Compile PILOT", command=lambda: self.compile_language('pilot'))
+        self.compile_menu.add_command(label="🔨 Compile BASIC", command=lambda: self.compile_language('basic'))
+        self.compile_menu.add_command(label="🔨 Compile Logo", command=lambda: self.compile_language('logo'))
+        self.compile_menu.add_separator()
+        self.compile_menu.add_command(label="🚀 Compile & Run PILOT", command=lambda: self.compile_and_run_language('pilot'))
+        self.compile_menu.add_command(label="🚀 Compile & Run BASIC", command=lambda: self.compile_and_run_language('basic'))
+        self.compile_menu.add_command(label="🚀 Compile & Run Logo", command=lambda: self.compile_and_run_language('logo'))
+        
+        # Help menu with icons (placed after Run menu)
+        help_menu = tk.Menu(
+            self.menubar, 
+            tearoff=0,
+            bg=colors.get('menu_bg', '#282A36'),
+            fg=colors.get('text_primary', '#F8F8F2'),
+            activebackground=colors.get('warning', '#FFB86C'),
+            activeforeground='white'
+        )
+        self.menubar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="📚 Documentation", command=self.show_help)
+        help_menu.add_command(label="🎓 Tutorials", command=self.show_tutorials)
+        help_menu.add_separator()
+        help_menu.add_command(label="ℹ️ About", command=self.show_about)
+
         
     def setup_toolbar(self):
-        """Setup toolbar"""
+        """Setup toolbar with language selection and organized buttons"""
+        # Main toolbar frame
         self.toolbar = ttk.Frame(self.root)
         self.toolbar.pack(fill=tk.X, padx=5, pady=(5,0))
         
-        # Run buttons
-        ttk.Button(self.toolbar, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
-        ttk.Button(self.toolbar, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
-        ttk.Button(self.toolbar, text="🗑 Clear", command=self.clear_output).pack(side=tk.LEFT, padx=2)
+        # First line: Language selection and file operations
+        toolbar_line1 = ttk.Frame(self.toolbar)
+        toolbar_line1.pack(fill=tk.X, pady=(0,2))
+        
+        # Language selection
+        ttk.Label(toolbar_line1, text="Language:").pack(side=tk.LEFT, padx=(0,5))
+        self.language_var = tk.StringVar(value="PILOT")
+        language_combo = ttk.Combobox(
+            toolbar_line1, 
+            textvariable=self.language_var,
+            values=["PILOT", "BASIC", "Logo", "Python", "JavaScript", "Perl"],
+            state="readonly",
+            width=12
+        )
+        language_combo.pack(side=tk.LEFT, padx=(0,10))
+        language_combo.bind("<<ComboboxSelected>>", self.on_language_changed)
         
         # File operations
-        ttk.Separator(self.toolbar, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
-        ttk.Button(self.toolbar, text="📁 New", command=self.new_file).pack(side=tk.LEFT, padx=2)
-        ttk.Button(self.toolbar, text="📂 Open", command=self.open_file).pack(side=tk.LEFT, padx=2)
-        ttk.Button(self.toolbar, text="💾 Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
+        ttk.Separator(toolbar_line1, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        ttk.Button(toolbar_line1, text="📁 New", command=self.new_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line1, text="📂 Open", command=self.open_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line1, text="� Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
+        
+        # Second line: Code editor buttons
+        toolbar_line2 = ttk.Frame(self.toolbar)
+        toolbar_line2.pack(fill=tk.X)
+        
+        # Run buttons
+        ttk.Button(toolbar_line2, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line2, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line2, text="� Clear", command=self.clear_output).pack(side=tk.LEFT, padx=2)
+        
+        # Editor features
+        ttk.Separator(toolbar_line2, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        ttk.Button(toolbar_line2, text="� Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line2, text="� Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
         
     def setup_editor(self):
         """Setup code editor with modern styling"""
@@ -836,7 +823,6 @@ class JAMESII:
         messagebox.showinfo("About JAMES", 
                           "JAMES - Joint Algorithm Model Environment System\n"
                           "Enhanced modular version with comprehensive features\n\n"
-                          "Version 2.0\n"
                           "Educational programming environment with advanced capabilities")
 
     def cleanup(self):
@@ -864,24 +850,24 @@ class JAMESII:
             self.cleanup()
             
     def setup_james_iii_support(self):
-        """Setup JAMES III language support"""
+        """Setup interactive console support"""
         try:
             from core.language.james_compiler import JAMESCompiler
             self.james_iii_compiler = JAMESCompiler()
             self.current_language_mode = "python"  # Default to Python
         except ImportError:
             self.james_iii_compiler = None
-            print("JAMES III compiler not available")
+            print("Interactive console compiler not available")
 
     def open_james_iii_console(self):
         """Open JAMES III interactive console"""
         if not self.james_iii_compiler:
-            messagebox.showerror("Error", "JAMES III compiler not available")
+            messagebox.showerror("Error", "Interactive console not available")
             return
             
         # Create new window for JAMES III console
         console_window = tk.Toplevel(self.root)
-        console_window.title("JAMES III Interactive Console")
+        console_window.title("JAMES Interactive Console")
         console_window.geometry("800x600")
         
         # Console text area
@@ -895,7 +881,7 @@ class JAMESII:
         input_frame = ttk.Frame(console_window)
         input_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
         
-        ttk.Label(input_frame, text="JAMES III >").pack(side=tk.LEFT)
+        ttk.Label(input_frame, text="JAMES >").pack(side=tk.LEFT)
         
         self.james_input = tk.Entry(input_frame)
         self.james_input.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(5, 0))
@@ -905,7 +891,7 @@ class JAMESII:
         ttk.Button(input_frame, text="Clear", command=self.clear_james_console).pack(side=tk.RIGHT)
         
         # Welcome message
-        self.james_console.insert(tk.END, "JAMES III Interactive Console\\n")
+        self.james_console.insert(tk.END, "JAMES Interactive Console\\n")
         self.james_console.insert(tk.END, "Type HELP for help, EXIT to close\\n")
         self.james_console.insert(tk.END, "=" * 50 + "\\n\\n")
         
@@ -1578,6 +1564,42 @@ JAMES III Help:
             self.interpreter.set_language_mode("javascript")
         messagebox.showinfo("Language Mode", "Editor set to JavaScript mode\\n\\nFeatures:\\n- Modern JavaScript programming\\n- Node.js execution")
 
+    def on_language_changed(self, event=None):
+        """Handle language selection from dropdown"""
+        selected = self.language_var.get()
+        language_map = {
+            "PILOT": self.set_pilot_mode,
+            "BASIC": self.set_basic_mode,
+            "Logo": self.set_logo_mode,
+            "Python": self.set_python_mode,
+            "JavaScript": self.set_javascript_mode,
+            "Perl": self.set_perl_mode
+        }
+        
+        if selected in language_map:
+            # Don't show the info dialog when changing via dropdown
+            self.current_language_mode = selected.lower()
+            if self.interpreter:
+                mode_name = selected.lower()
+                if mode_name in ["pilot", "basic", "logo"]:
+                    self.interpreter.set_language_mode(mode_name)
+                else:
+                    self.interpreter.set_language_mode(mode_name)
+            
+            # Update the enhanced code editor language if available
+            if hasattr(self, 'code_editor') and hasattr(self.code_editor, 'set_language'):
+                self.code_editor.set_language(selected.lower())
+
+    def update_status_from_editor(self, status_info):
+        """Update status from enhanced code editor"""
+        if hasattr(self, 'status_bar'):
+            self.status_bar.config(text=f"Line: {status_info.get('line', 1)}, Column: {status_info.get('column', 1)}")
+
+    def update_compiler_menu(self):
+        """Update compiler menu based on current language"""
+        # This could be used to enable/disable compilation options
+        pass
+
     # File operations
     def new_file(self):
         """Create a new file"""
@@ -1601,11 +1623,12 @@ JAMES III Help:
             filename = filedialog.askopenfilename(
                 title="Open File",
                 filetypes=[
-                    ("JAMES files", "*.james"),
                     ("BASIC files", "*.bas"),
                     ("PILOT files", "*.pilot"),
                     ("Logo files", "*.logo"),
                     ("Python files", "*.py"),
+                    ("JavaScript files", "*.js"),
+                    ("Perl files", "*.pl"),
                     ("Text files", "*.txt"),
                     ("All files", "*.*")
                 ]
@@ -1627,15 +1650,15 @@ JAMES III Help:
                 if ext in ['pilot']:
                     self.current_language_mode = "pilot"
                     if self.interpreter:
-                        self.interpreter.set_language_mode("james_iii")
+                        self.interpreter.set_language_mode("pilot")
                 elif ext in ['bas', 'basic']:
                     self.current_language_mode = "basic"
                     if self.interpreter:
-                        self.interpreter.set_language_mode("james_iii")
+                        self.interpreter.set_language_mode("basic")
                 elif ext in ['logo']:
                     self.current_language_mode = "logo"
                     if self.interpreter:
-                        self.interpreter.set_language_mode("james_iii")
+                        self.interpreter.set_language_mode("logo")
                 elif ext == 'py':
                     self.current_language_mode = "python"
                     if self.interpreter:
@@ -1648,6 +1671,11 @@ JAMES III Help:
                     self.current_language_mode = "javascript"
                     if self.interpreter:
                         self.interpreter.set_language_mode("javascript")
+                else:
+                    # Default to Python for miscellaneous files
+                    self.current_language_mode = "python"
+                    if self.interpreter:
+                        self.interpreter.set_language_mode("python")
                 
                 messagebox.showinfo("File Opened", f"Successfully opened: {filename}")
                 
@@ -1674,13 +1702,14 @@ JAMES III Help:
         try:
             filename = filedialog.asksaveasfilename(
                 title="Save File As",
-                defaultextension=".james",
+                defaultextension=".py",
                 filetypes=[
-                    ("JAMES files", "*.james"),
                     ("BASIC files", "*.bas"),
                     ("PILOT files", "*.pilot"),
                     ("Logo files", "*.logo"),
                     ("Python files", "*.py"),
+                    ("JavaScript files", "*.js"),
+                    ("Perl files", "*.pl"),
                     ("Text files", "*.txt"),
                     ("All files", "*.*")
                 ]
@@ -2047,7 +2076,7 @@ def main():
     """Main entry point"""
     try:
         # Create and run JAMES application
-        app = JAMESII()
+        app = JAMES()
         app.run()
         
     except Exception as e:
@@ -2058,9 +2087,9 @@ def main():
         sys.exit(1)
 
 
-# Additional Tools Menu Methods - extending JAMESII class
+# Additional Tools Menu Methods - extending JAMES class
 def add_tools_methods():
-    """Add tools menu methods to JAMESII class"""
+    """Add tools menu methods to JAMES class"""
     
     def show_hardware_controller(self):
         """Show hardware controller dialog"""
@@ -2836,37 +2865,37 @@ pip install psutil
         self.debugger_dialog = None
         self.debugger_state = None
     
-    # Add methods to JAMESII class
-    JAMESII.setup_breakpoints_tab = setup_breakpoints_tab
-    JAMESII.setup_debug_variables_tab = setup_debug_variables_tab
-    JAMESII.setup_callstack_tab = setup_callstack_tab
-    JAMESII.setup_execution_tab = setup_execution_tab
-    JAMESII.setup_memory_tab = setup_memory_tab
-    JAMESII.add_breakpoint = add_breakpoint
-    JAMESII.remove_breakpoint = remove_breakpoint
-    JAMESII.enable_all_breakpoints = enable_all_breakpoints
-    JAMESII.disable_all_breakpoints = disable_all_breakpoints
-    JAMESII.clear_all_breakpoints = clear_all_breakpoints
-    JAMESII.refresh_debug_variables = refresh_debug_variables
-    JAMESII.add_watch_variable = add_watch_variable
-    JAMESII.edit_variable_value = edit_variable_value
-    JAMESII.export_debug_variables = export_debug_variables
-    JAMESII.on_stack_select = on_stack_select
-    JAMESII.debug_run = debug_run
-    JAMESII.debug_pause = debug_pause
-    JAMESII.debug_stop = debug_stop
-    JAMESII.debug_restart = debug_restart
-    JAMESII.debug_step_over = debug_step_over
-    JAMESII.debug_step_into = debug_step_into
-    JAMESII.debug_step_out = debug_step_out
-    JAMESII.debug_run_to_cursor = debug_run_to_cursor
-    JAMESII.update_execution_status = update_execution_status
-    JAMESII.update_callstack_display = update_callstack_display
-    JAMESII.refresh_memory_info = refresh_memory_info
-    JAMESII.show_memory_profile = show_memory_profile
-    JAMESII.force_garbage_collection = force_garbage_collection
-    JAMESII.get_current_time = get_current_time
-    JAMESII.close_debugger = close_debugger
+    # Add methods to JAMES class
+    JAMES.setup_breakpoints_tab = setup_breakpoints_tab
+    JAMES.setup_debug_variables_tab = setup_debug_variables_tab
+    JAMES.setup_callstack_tab = setup_callstack_tab
+    JAMES.setup_execution_tab = setup_execution_tab
+    JAMES.setup_memory_tab = setup_memory_tab
+    JAMES.add_breakpoint = add_breakpoint
+    JAMES.remove_breakpoint = remove_breakpoint
+    JAMES.enable_all_breakpoints = enable_all_breakpoints
+    JAMES.disable_all_breakpoints = disable_all_breakpoints
+    JAMES.clear_all_breakpoints = clear_all_breakpoints
+    JAMES.refresh_debug_variables = refresh_debug_variables
+    JAMES.add_watch_variable = add_watch_variable
+    JAMES.edit_variable_value = edit_variable_value
+    JAMES.export_debug_variables = export_debug_variables
+    JAMES.on_stack_select = on_stack_select
+    JAMES.debug_run = debug_run
+    JAMES.debug_pause = debug_pause
+    JAMES.debug_stop = debug_stop
+    JAMES.debug_restart = debug_restart
+    JAMES.debug_step_over = debug_step_over
+    JAMES.debug_step_into = debug_step_into
+    JAMES.debug_step_out = debug_step_out
+    JAMES.debug_run_to_cursor = debug_run_to_cursor
+    JAMES.update_execution_status = update_execution_status
+    JAMES.update_callstack_display = update_callstack_display
+    JAMES.refresh_memory_info = refresh_memory_info
+    JAMES.show_memory_profile = show_memory_profile
+    JAMES.force_garbage_collection = force_garbage_collection
+    JAMES.get_current_time = get_current_time
+    JAMES.close_debugger = close_debugger
     
     # === HARDWARE CONTROLLER METHODS ===
     def setup_gpio_tab(self, parent):
@@ -5240,53 +5269,53 @@ J:END
         """Get technical support"""
         messagebox.showinfo("Technical Support", "JAMES Technical Support\\n\\n📧 Email: support@james-ide.com\\n💬 Live chat available\\n📞 Phone: 1-800-JAMES-1\\n🎫 Submit support ticket")
 
-    # Add learning assistant methods to JAMESII class using setattr
-    setattr(JAMESII, 'setup_tutorials_tab', setup_tutorials_tab)
-    setattr(JAMESII, 'setup_learning_examples_tab', setup_learning_examples_tab)
-    setattr(JAMESII, 'setup_progress_tracking_tab', setup_progress_tracking_tab)
-    setattr(JAMESII, 'setup_challenges_tab', setup_challenges_tab)
-    setattr(JAMESII, 'setup_help_hints_tab', setup_help_hints_tab)
-    setattr(JAMESII, 'load_tutorials', load_tutorials)
-    setattr(JAMESII, 'on_tutorial_category_change', on_tutorial_category_change)
-    setattr(JAMESII, 'on_tutorial_select', on_tutorial_select)
-    setattr(JAMESII, 'load_tutorial_content', load_tutorial_content)
-    setattr(JAMESII, 'load_learning_examples', load_learning_examples)
-    setattr(JAMESII, 'on_example_category_change', on_example_category_change)
-    setattr(JAMESII, 'on_example_select', on_example_select)
-    setattr(JAMESII, 'load_example_code', load_example_code)
-    setattr(JAMESII, 'load_challenges', load_challenges)
-    setattr(JAMESII, 'on_challenge_select', on_challenge_select)
-    setattr(JAMESII, 'load_challenge_description', load_challenge_description)
-    setattr(JAMESII, 'draw_achievement_badges', draw_achievement_badges)
-    setattr(JAMESII, 'on_help_topic_select', on_help_topic_select)
-    setattr(JAMESII, 'load_help_content', load_help_content)
-    setattr(JAMESII, 'refresh_tutorials', refresh_tutorials)
-    setattr(JAMESII, 'start_tutorial', start_tutorial)
-    setattr(JAMESII, 'next_tutorial_step', next_tutorial_step)
-    setattr(JAMESII, 'prev_tutorial_step', prev_tutorial_step)
-    setattr(JAMESII, 'copy_tutorial_code', copy_tutorial_code)
-    setattr(JAMESII, 'run_tutorial_example', run_tutorial_example)
-    setattr(JAMESII, 'search_examples', search_examples)
-    setattr(JAMESII, 'copy_example_code', copy_example_code)
-    setattr(JAMESII, 'insert_example_code', insert_example_code)
-    setattr(JAMESII, 'run_example_code', run_example_code)
-    setattr(JAMESII, 'explain_example_code', explain_example_code)
-    setattr(JAMESII, 'modify_example_code', modify_example_code)
-    setattr(JAMESII, 'show_detailed_progress', show_detailed_progress)
-    setattr(JAMESII, 'set_learning_goals', set_learning_goals)
-    setattr(JAMESII, 'export_progress_report', export_progress_report)
-    setattr(JAMESII, 'sync_progress', sync_progress)
-    setattr(JAMESII, 'start_challenge', start_challenge)
-    setattr(JAMESII, 'test_challenge_solution', test_challenge_solution)
-    setattr(JAMESII, 'submit_challenge_solution', submit_challenge_solution)
-    setattr(JAMESII, 'get_challenge_hint', get_challenge_hint)
-    setattr(JAMESII, 'show_challenge_solution', show_challenge_solution)
-    setattr(JAMESII, 'refresh_help_context', refresh_help_context)
-    setattr(JAMESII, 'search_help', search_help)
-    setattr(JAMESII, 'open_manual', open_manual)
-    setattr(JAMESII, 'open_video_tutorials', open_video_tutorials)
-    setattr(JAMESII, 'open_community_forum', open_community_forum)
-    setattr(JAMESII, 'get_support', get_support)
+    # Add learning assistant methods to JAMES class using setattr
+    setattr(JAMES, 'setup_tutorials_tab', setup_tutorials_tab)
+    setattr(JAMES, 'setup_learning_examples_tab', setup_learning_examples_tab)
+    setattr(JAMES, 'setup_progress_tracking_tab', setup_progress_tracking_tab)
+    setattr(JAMES, 'setup_challenges_tab', setup_challenges_tab)
+    setattr(JAMES, 'setup_help_hints_tab', setup_help_hints_tab)
+    setattr(JAMES, 'load_tutorials', load_tutorials)
+    setattr(JAMES, 'on_tutorial_category_change', on_tutorial_category_change)
+    setattr(JAMES, 'on_tutorial_select', on_tutorial_select)
+    setattr(JAMES, 'load_tutorial_content', load_tutorial_content)
+    setattr(JAMES, 'load_learning_examples', load_learning_examples)
+    setattr(JAMES, 'on_example_category_change', on_example_category_change)
+    setattr(JAMES, 'on_example_select', on_example_select)
+    setattr(JAMES, 'load_example_code', load_example_code)
+    setattr(JAMES, 'load_challenges', load_challenges)
+    setattr(JAMES, 'on_challenge_select', on_challenge_select)
+    setattr(JAMES, 'load_challenge_description', load_challenge_description)
+    setattr(JAMES, 'draw_achievement_badges', draw_achievement_badges)
+    setattr(JAMES, 'on_help_topic_select', on_help_topic_select)
+    setattr(JAMES, 'load_help_content', load_help_content)
+    setattr(JAMES, 'refresh_tutorials', refresh_tutorials)
+    setattr(JAMES, 'start_tutorial', start_tutorial)
+    setattr(JAMES, 'next_tutorial_step', next_tutorial_step)
+    setattr(JAMES, 'prev_tutorial_step', prev_tutorial_step)
+    setattr(JAMES, 'copy_tutorial_code', copy_tutorial_code)
+    setattr(JAMES, 'run_tutorial_example', run_tutorial_example)
+    setattr(JAMES, 'search_examples', search_examples)
+    setattr(JAMES, 'copy_example_code', copy_example_code)
+    setattr(JAMES, 'insert_example_code', insert_example_code)
+    setattr(JAMES, 'run_example_code', run_example_code)
+    setattr(JAMES, 'explain_example_code', explain_example_code)
+    setattr(JAMES, 'modify_example_code', modify_example_code)
+    setattr(JAMES, 'show_detailed_progress', show_detailed_progress)
+    setattr(JAMES, 'set_learning_goals', set_learning_goals)
+    setattr(JAMES, 'export_progress_report', export_progress_report)
+    setattr(JAMES, 'sync_progress', sync_progress)
+    setattr(JAMES, 'start_challenge', start_challenge)
+    setattr(JAMES, 'test_challenge_solution', test_challenge_solution)
+    setattr(JAMES, 'submit_challenge_solution', submit_challenge_solution)
+    setattr(JAMES, 'get_challenge_hint', get_challenge_hint)
+    setattr(JAMES, 'show_challenge_solution', show_challenge_solution)
+    setattr(JAMES, 'refresh_help_context', refresh_help_context)
+    setattr(JAMES, 'search_help', search_help)
+    setattr(JAMES, 'open_manual', open_manual)
+    setattr(JAMES, 'open_video_tutorials', open_video_tutorials)
+    setattr(JAMES, 'open_community_forum', open_community_forum)
+    setattr(JAMES, 'get_support', get_support)
     
     # === CODE EXAMPLES LIBRARY METHODS ===
     def setup_browse_examples_tab(self, parent):
@@ -5622,12 +5651,12 @@ J:END
         ttk.Button(categories_actions_frame, text="📊 Category Stats", command=self.show_category_stats).pack(side=tk.LEFT, padx=2)
         ttk.Button(categories_actions_frame, text="🔄 Reorganize", command=self.reorganize_categories).pack(side=tk.LEFT, padx=2)
 
-    # Add code examples library methods to JAMESII class using setattr
-    setattr(JAMESII, 'setup_browse_examples_tab', setup_browse_examples_tab)
-    setattr(JAMESII, 'setup_search_examples_tab', setup_search_examples_tab)
-    setattr(JAMESII, 'setup_favorites_examples_tab', setup_favorites_examples_tab)
-    setattr(JAMESII, 'setup_create_examples_tab', setup_create_examples_tab)
-    setattr(JAMESII, 'setup_categories_examples_tab', setup_categories_examples_tab)
+    # Add code examples library methods to JAMES class using setattr
+    setattr(JAMES, 'setup_browse_examples_tab', setup_browse_examples_tab)
+    setattr(JAMES, 'setup_search_examples_tab', setup_search_examples_tab)
+    setattr(JAMES, 'setup_favorites_examples_tab', setup_favorites_examples_tab)
+    setattr(JAMES, 'setup_create_examples_tab', setup_create_examples_tab)
+    setattr(JAMES, 'setup_categories_examples_tab', setup_categories_examples_tab)
     
     # === CODE EXAMPLES HELPER METHODS ===
     def load_browse_examples(self):
@@ -6078,151 +6107,151 @@ Example Distribution:
         messagebox.showinfo("Reorganize Categories", "Category Reorganization\\n\\n📁 Drag and drop to reorder\\n🏷️ Merge similar categories\\n📊 Auto-organize by popularity\\n✅ Changes saved automatically")
 
     # Add all code examples helper methods
-    setattr(JAMESII, 'load_browse_examples', load_browse_examples)
-    setattr(JAMESII, 'on_browse_example_select', on_browse_example_select)
-    setattr(JAMESII, 'load_browse_example_code', load_browse_example_code)
-    setattr(JAMESII, 'apply_browse_filters', apply_browse_filters)
-    setattr(JAMESII, 'copy_browse_code', copy_browse_code)
-    setattr(JAMESII, 'insert_browse_code', insert_browse_code)
-    setattr(JAMESII, 'run_browse_example', run_browse_example)
-    setattr(JAMESII, 'add_to_favorites', add_to_favorites)
-    setattr(JAMESII, 'share_example', share_example)
-    setattr(JAMESII, 'rate_example', rate_example)
-    setattr(JAMESII, 'search_examples_action', search_examples_action)
-    setattr(JAMESII, 'load_search_results', load_search_results)
-    setattr(JAMESII, 'clear_search', clear_search)
-    setattr(JAMESII, 'apply_advanced_filters', apply_advanced_filters)
-    setattr(JAMESII, 'on_search_result_select', on_search_result_select)
-    setattr(JAMESII, 'copy_search_result', copy_search_result)
-    setattr(JAMESII, 'insert_search_result', insert_search_result)
-    setattr(JAMESII, 'save_search_query', save_search_query)
-    setattr(JAMESII, 'show_search_stats', show_search_stats)
-    setattr(JAMESII, 'load_favorites', load_favorites)
-    setattr(JAMESII, 'on_favorite_select', on_favorite_select)
-    setattr(JAMESII, 'edit_favorite_notes', edit_favorite_notes)
-    setattr(JAMESII, 'remove_favorite', remove_favorite)
-    setattr(JAMESII, 'create_collection', create_collection)
-    setattr(JAMESII, 'export_favorites', export_favorites)
-    setattr(JAMESII, 'import_favorites', import_favorites)
-    setattr(JAMESII, 'test_create_code', test_create_code)
-    setattr(JAMESII, 'save_create_example', save_create_example)
-    setattr(JAMESII, 'share_create_example', share_create_example)
-    setattr(JAMESII, 'clear_create_form', clear_create_form)
-    setattr(JAMESII, 'load_create_template', load_create_template)
-    setattr(JAMESII, 'load_categories', load_categories)
-    setattr(JAMESII, 'on_category_select', on_category_select)
-    setattr(JAMESII, 'add_category', add_category)
-    setattr(JAMESII, 'edit_category', edit_category)
-    setattr(JAMESII, 'delete_category', delete_category)
-    setattr(JAMESII, 'show_category_stats', show_category_stats)
-    setattr(JAMESII, 'reorganize_categories', reorganize_categories)
+    setattr(JAMES, 'load_browse_examples', load_browse_examples)
+    setattr(JAMES, 'on_browse_example_select', on_browse_example_select)
+    setattr(JAMES, 'load_browse_example_code', load_browse_example_code)
+    setattr(JAMES, 'apply_browse_filters', apply_browse_filters)
+    setattr(JAMES, 'copy_browse_code', copy_browse_code)
+    setattr(JAMES, 'insert_browse_code', insert_browse_code)
+    setattr(JAMES, 'run_browse_example', run_browse_example)
+    setattr(JAMES, 'add_to_favorites', add_to_favorites)
+    setattr(JAMES, 'share_example', share_example)
+    setattr(JAMES, 'rate_example', rate_example)
+    setattr(JAMES, 'search_examples_action', search_examples_action)
+    setattr(JAMES, 'load_search_results', load_search_results)
+    setattr(JAMES, 'clear_search', clear_search)
+    setattr(JAMES, 'apply_advanced_filters', apply_advanced_filters)
+    setattr(JAMES, 'on_search_result_select', on_search_result_select)
+    setattr(JAMES, 'copy_search_result', copy_search_result)
+    setattr(JAMES, 'insert_search_result', insert_search_result)
+    setattr(JAMES, 'save_search_query', save_search_query)
+    setattr(JAMES, 'show_search_stats', show_search_stats)
+    setattr(JAMES, 'load_favorites', load_favorites)
+    setattr(JAMES, 'on_favorite_select', on_favorite_select)
+    setattr(JAMES, 'edit_favorite_notes', edit_favorite_notes)
+    setattr(JAMES, 'remove_favorite', remove_favorite)
+    setattr(JAMES, 'create_collection', create_collection)
+    setattr(JAMES, 'export_favorites', export_favorites)
+    setattr(JAMES, 'import_favorites', import_favorites)
+    setattr(JAMES, 'test_create_code', test_create_code)
+    setattr(JAMES, 'save_create_example', save_create_example)
+    setattr(JAMES, 'share_create_example', share_create_example)
+    setattr(JAMES, 'clear_create_form', clear_create_form)
+    setattr(JAMES, 'load_create_template', load_create_template)
+    setattr(JAMES, 'load_categories', load_categories)
+    setattr(JAMES, 'on_category_select', on_category_select)
+    setattr(JAMES, 'add_category', add_category)
+    setattr(JAMES, 'edit_category', edit_category)
+    setattr(JAMES, 'delete_category', delete_category)
+    setattr(JAMES, 'show_category_stats', show_category_stats)
+    setattr(JAMES, 'reorganize_categories', reorganize_categories)
     
-    # Add sensor visualizer methods to JAMESII class using setattr
-    setattr(JAMESII, 'setup_realtime_charts_tab', setup_realtime_charts_tab)
-    setattr(JAMESII, 'setup_data_logger_tab', setup_data_logger_tab)
-    setattr(JAMESII, 'setup_historical_data_tab', setup_historical_data_tab)
-    setattr(JAMESII, 'setup_sensor_export_tab', setup_sensor_export_tab)
-    setattr(JAMESII, 'setup_sensor_alerts_tab', setup_sensor_alerts_tab)
-    setattr(JAMESII, 'draw_sensor_charts', draw_sensor_charts)
-    setattr(JAMESII, 'draw_line_chart', draw_line_chart)
-    setattr(JAMESII, 'draw_bar_chart', draw_bar_chart)
-    setattr(JAMESII, 'draw_status_indicators', draw_status_indicators)
-    setattr(JAMESII, 'draw_historical_charts', draw_historical_charts)
-    setattr(JAMESII, 'start_realtime_monitoring', start_realtime_monitoring)
-    setattr(JAMESII, 'pause_realtime_monitoring', pause_realtime_monitoring)
-    setattr(JAMESII, 'refresh_sensor_charts', refresh_sensor_charts)
-    setattr(JAMESII, 'configure_sensor_charts', configure_sensor_charts)
-    setattr(JAMESII, 'save_sensor_chart', save_sensor_chart)
-    setattr(JAMESII, 'browse_log_file', browse_log_file)
-    setattr(JAMESII, 'start_data_logging', start_data_logging)
-    setattr(JAMESII, 'stop_data_logging', stop_data_logging)
-    setattr(JAMESII, 'clear_data_log', clear_data_log)
-    setattr(JAMESII, 'export_data_log', export_data_log)
-    setattr(JAMESII, 'load_historical_data', load_historical_data)
-    setattr(JAMESII, 'analyze_trends', analyze_trends)
-    setattr(JAMESII, 'show_statistics', show_statistics)
-    setattr(JAMESII, 'find_patterns', find_patterns)
-    setattr(JAMESII, 'detect_anomalies', detect_anomalies)
-    setattr(JAMESII, 'generate_sensor_report', generate_sensor_report)
-    setattr(JAMESII, 'export_sensor_data', export_sensor_data)
-    setattr(JAMESII, 'email_sensor_report', email_sensor_report)
-    setattr(JAMESII, 'open_web_dashboard', open_web_dashboard)
-    setattr(JAMESII, 'configure_threshold', configure_threshold)
-    setattr(JAMESII, 'test_sensor_alert', test_sensor_alert)
-    setattr(JAMESII, 'configure_alert_settings', configure_alert_settings)
-    setattr(JAMESII, 'clear_alert_history', clear_alert_history)
-    setattr(JAMESII, 'export_alert_history', export_alert_history)
+    # Add sensor visualizer methods to JAMES class using setattr
+    setattr(JAMES, 'setup_realtime_charts_tab', setup_realtime_charts_tab)
+    setattr(JAMES, 'setup_data_logger_tab', setup_data_logger_tab)
+    setattr(JAMES, 'setup_historical_data_tab', setup_historical_data_tab)
+    setattr(JAMES, 'setup_sensor_export_tab', setup_sensor_export_tab)
+    setattr(JAMES, 'setup_sensor_alerts_tab', setup_sensor_alerts_tab)
+    setattr(JAMES, 'draw_sensor_charts', draw_sensor_charts)
+    setattr(JAMES, 'draw_line_chart', draw_line_chart)
+    setattr(JAMES, 'draw_bar_chart', draw_bar_chart)
+    setattr(JAMES, 'draw_status_indicators', draw_status_indicators)
+    setattr(JAMES, 'draw_historical_charts', draw_historical_charts)
+    setattr(JAMES, 'start_realtime_monitoring', start_realtime_monitoring)
+    setattr(JAMES, 'pause_realtime_monitoring', pause_realtime_monitoring)
+    setattr(JAMES, 'refresh_sensor_charts', refresh_sensor_charts)
+    setattr(JAMES, 'configure_sensor_charts', configure_sensor_charts)
+    setattr(JAMES, 'save_sensor_chart', save_sensor_chart)
+    setattr(JAMES, 'browse_log_file', browse_log_file)
+    setattr(JAMES, 'start_data_logging', start_data_logging)
+    setattr(JAMES, 'stop_data_logging', stop_data_logging)
+    setattr(JAMES, 'clear_data_log', clear_data_log)
+    setattr(JAMES, 'export_data_log', export_data_log)
+    setattr(JAMES, 'load_historical_data', load_historical_data)
+    setattr(JAMES, 'analyze_trends', analyze_trends)
+    setattr(JAMES, 'show_statistics', show_statistics)
+    setattr(JAMES, 'find_patterns', find_patterns)
+    setattr(JAMES, 'detect_anomalies', detect_anomalies)
+    setattr(JAMES, 'generate_sensor_report', generate_sensor_report)
+    setattr(JAMES, 'export_sensor_data', export_sensor_data)
+    setattr(JAMES, 'email_sensor_report', email_sensor_report)
+    setattr(JAMES, 'open_web_dashboard', open_web_dashboard)
+    setattr(JAMES, 'configure_threshold', configure_threshold)
+    setattr(JAMES, 'test_sensor_alert', test_sensor_alert)
+    setattr(JAMES, 'configure_alert_settings', configure_alert_settings)
+    setattr(JAMES, 'clear_alert_history', clear_alert_history)
+    setattr(JAMES, 'export_alert_history', export_alert_history)
     
-    # Add hardware methods to JAMESII class using setattr
-    setattr(JAMESII, 'setup_device_discovery_tab', setup_device_discovery_tab)
-    setattr(JAMESII, 'setup_device_control_tab', setup_device_control_tab)
-    setattr(JAMESII, 'setup_network_monitoring_tab', setup_network_monitoring_tab)
-    setattr(JAMESII, 'setup_protocols_tab', setup_protocols_tab)
-    setattr(JAMESII, 'setup_iot_analytics_tab', setup_iot_analytics_tab)
-    setattr(JAMESII, 'scan_network', scan_network)
-    setattr(JAMESII, 'auto_discover_devices', auto_discover_devices)
-    setattr(JAMESII, 'add_discovered_device', add_discovered_device)
-    setattr(JAMESII, 'show_discovered_device_info', show_discovered_device_info)
-    setattr(JAMESII, 'configure_discovered_device', configure_discovered_device)
-    setattr(JAMESII, 'test_device_connection', test_device_connection)
-    setattr(JAMESII, 'control_iot_device', control_iot_device)
-    setattr(JAMESII, 'iot_device_action', iot_device_action)
-    setattr(JAMESII, 'get_device_status', get_device_status)
-    setattr(JAMESII, 'send_device_command', send_device_command)
-    setattr(JAMESII, 'refresh_all_devices', refresh_all_devices)
-    setattr(JAMESII, 'device_settings', device_settings)
-    setattr(JAMESII, 'start_traffic_monitoring', start_traffic_monitoring)
-    setattr(JAMESII, 'stop_traffic_monitoring', stop_traffic_monitoring)
-    setattr(JAMESII, 'export_traffic_log', export_traffic_log)
-    setattr(JAMESII, 'clear_traffic_log', clear_traffic_log)
-    setattr(JAMESII, 'configure_protocol', configure_protocol)
-    setattr(JAMESII, 'enable_protocol', enable_protocol)
-    setattr(JAMESII, 'disable_protocol', disable_protocol)
-    setattr(JAMESII, 'test_protocol', test_protocol)
-    setattr(JAMESII, 'draw_iot_analytics', draw_iot_analytics)
-    setattr(JAMESII, 'refresh_iot_analytics', refresh_iot_analytics)
-    setattr(JAMESII, 'export_iot_data', export_iot_data)
-    setattr(JAMESII, 'generate_iot_report', generate_iot_report)
-    setattr(JAMESII, 'configure_iot_alerts', configure_iot_alerts)
+    # Add hardware methods to JAMES class using setattr
+    setattr(JAMES, 'setup_device_discovery_tab', setup_device_discovery_tab)
+    setattr(JAMES, 'setup_device_control_tab', setup_device_control_tab)
+    setattr(JAMES, 'setup_network_monitoring_tab', setup_network_monitoring_tab)
+    setattr(JAMES, 'setup_protocols_tab', setup_protocols_tab)
+    setattr(JAMES, 'setup_iot_analytics_tab', setup_iot_analytics_tab)
+    setattr(JAMES, 'scan_network', scan_network)
+    setattr(JAMES, 'auto_discover_devices', auto_discover_devices)
+    setattr(JAMES, 'add_discovered_device', add_discovered_device)
+    setattr(JAMES, 'show_discovered_device_info', show_discovered_device_info)
+    setattr(JAMES, 'configure_discovered_device', configure_discovered_device)
+    setattr(JAMES, 'test_device_connection', test_device_connection)
+    setattr(JAMES, 'control_iot_device', control_iot_device)
+    setattr(JAMES, 'iot_device_action', iot_device_action)
+    setattr(JAMES, 'get_device_status', get_device_status)
+    setattr(JAMES, 'send_device_command', send_device_command)
+    setattr(JAMES, 'refresh_all_devices', refresh_all_devices)
+    setattr(JAMES, 'device_settings', device_settings)
+    setattr(JAMES, 'start_traffic_monitoring', start_traffic_monitoring)
+    setattr(JAMES, 'stop_traffic_monitoring', stop_traffic_monitoring)
+    setattr(JAMES, 'export_traffic_log', export_traffic_log)
+    setattr(JAMES, 'clear_traffic_log', clear_traffic_log)
+    setattr(JAMES, 'configure_protocol', configure_protocol)
+    setattr(JAMES, 'enable_protocol', enable_protocol)
+    setattr(JAMES, 'disable_protocol', disable_protocol)
+    setattr(JAMES, 'test_protocol', test_protocol)
+    setattr(JAMES, 'draw_iot_analytics', draw_iot_analytics)
+    setattr(JAMES, 'refresh_iot_analytics', refresh_iot_analytics)
+    setattr(JAMES, 'export_iot_data', export_iot_data)
+    setattr(JAMES, 'generate_iot_report', generate_iot_report)
+    setattr(JAMES, 'configure_iot_alerts', configure_iot_alerts)
     
-    setattr(JAMESII, 'setup_gpio_tab', setup_gpio_tab)
-    setattr(JAMESII, 'setup_sensors_tab', setup_sensors_tab)
-    setattr(JAMESII, 'setup_devices_tab', setup_devices_tab)
-    setattr(JAMESII, 'setup_automation_tab', setup_automation_tab)
-    setattr(JAMESII, 'get_gpio_pin_color', get_gpio_pin_color)
-    setattr(JAMESII, 'toggle_gpio_pin', toggle_gpio_pin)
-    setattr(JAMESII, 'update_pin_mode', update_pin_mode)
-    setattr(JAMESII, 'update_pin_value', update_pin_value)
-    setattr(JAMESII, 'get_selected_pin_number', get_selected_pin_number)
-    setattr(JAMESII, 'read_gpio_pin', read_gpio_pin)
-    setattr(JAMESII, 'write_gpio_pin', write_gpio_pin)
-    setattr(JAMESII, 'reset_all_gpio', reset_all_gpio)
-    setattr(JAMESII, 'add_sensor', add_sensor)
-    setattr(JAMESII, 'remove_sensor', remove_sensor)
-    setattr(JAMESII, 'refresh_sensor_data', refresh_sensor_data)
-    setattr(JAMESII, 'start_sensor_monitoring', start_sensor_monitoring)
-    setattr(JAMESII, 'stop_sensor_monitoring', stop_sensor_monitoring)
-    setattr(JAMESII, 'control_device', control_device)
-    setattr(JAMESII, 'device_action', device_action)
-    setattr(JAMESII, 'show_device_info', show_device_info)
-    setattr(JAMESII, 'configure_device', configure_device)
-    setattr(JAMESII, 'scan_devices', scan_devices)
-    setattr(JAMESII, 'add_automation_rule', add_automation_rule)
-    setattr(JAMESII, 'edit_automation_rule', edit_automation_rule)
-    setattr(JAMESII, 'delete_automation_rule', delete_automation_rule)
-    setattr(JAMESII, 'start_automation', start_automation)
-    setattr(JAMESII, 'stop_automation', stop_automation)
+    setattr(JAMES, 'setup_gpio_tab', setup_gpio_tab)
+    setattr(JAMES, 'setup_sensors_tab', setup_sensors_tab)
+    setattr(JAMES, 'setup_devices_tab', setup_devices_tab)
+    setattr(JAMES, 'setup_automation_tab', setup_automation_tab)
+    setattr(JAMES, 'get_gpio_pin_color', get_gpio_pin_color)
+    setattr(JAMES, 'toggle_gpio_pin', toggle_gpio_pin)
+    setattr(JAMES, 'update_pin_mode', update_pin_mode)
+    setattr(JAMES, 'update_pin_value', update_pin_value)
+    setattr(JAMES, 'get_selected_pin_number', get_selected_pin_number)
+    setattr(JAMES, 'read_gpio_pin', read_gpio_pin)
+    setattr(JAMES, 'write_gpio_pin', write_gpio_pin)
+    setattr(JAMES, 'reset_all_gpio', reset_all_gpio)
+    setattr(JAMES, 'add_sensor', add_sensor)
+    setattr(JAMES, 'remove_sensor', remove_sensor)
+    setattr(JAMES, 'refresh_sensor_data', refresh_sensor_data)
+    setattr(JAMES, 'start_sensor_monitoring', start_sensor_monitoring)
+    setattr(JAMES, 'stop_sensor_monitoring', stop_sensor_monitoring)
+    setattr(JAMES, 'control_device', control_device)
+    setattr(JAMES, 'device_action', device_action)
+    setattr(JAMES, 'show_device_info', show_device_info)
+    setattr(JAMES, 'configure_device', configure_device)
+    setattr(JAMES, 'scan_devices', scan_devices)
+    setattr(JAMES, 'add_automation_rule', add_automation_rule)
+    setattr(JAMES, 'edit_automation_rule', edit_automation_rule)
+    setattr(JAMES, 'delete_automation_rule', delete_automation_rule)
+    setattr(JAMES, 'start_automation', start_automation)
+    setattr(JAMES, 'stop_automation', stop_automation)
     
-    # Add existing methods to JAMESII class using setattr
-    setattr(JAMESII, 'show_hardware_controller', show_hardware_controller)
-    setattr(JAMESII, 'show_iot_manager', show_iot_manager)
-    setattr(JAMESII, 'show_sensor_visualizer', show_sensor_visualizer)
-    setattr(JAMESII, 'show_learning_assistant', show_learning_assistant)
-    setattr(JAMESII, 'show_code_examples', show_code_examples)
-    setattr(JAMESII, 'show_testing_framework', show_testing_framework)
-    setattr(JAMESII, 'show_graphics_canvas', show_graphics_canvas)
-    setattr(JAMESII, 'show_code_converter', show_code_converter)
-    setattr(JAMESII, 'show_system_info', show_system_info)
+    # Add existing methods to JAMES class using setattr
+    setattr(JAMES, 'show_hardware_controller', show_hardware_controller)
+    setattr(JAMES, 'show_iot_manager', show_iot_manager)
+    setattr(JAMES, 'show_sensor_visualizer', show_sensor_visualizer)
+    setattr(JAMES, 'show_learning_assistant', show_learning_assistant)
+    setattr(JAMES, 'show_code_examples', show_code_examples)
+    setattr(JAMES, 'show_testing_framework', show_testing_framework)
+    setattr(JAMES, 'show_graphics_canvas', show_graphics_canvas)
+    setattr(JAMES, 'show_code_converter', show_code_converter)
+    setattr(JAMES, 'show_system_info', show_system_info)
 
 # Enhanced Code Editor Integration Methods
 def update_status_from_editor(self, message: str):
@@ -6256,11 +6285,11 @@ def compile_and_run_language(self, language: str):
     else:
         self.write_to_console(f"❌ Editor not available for compilation")
 
-# Add enhanced editor methods to JAMESII class
-setattr(JAMESII, 'update_status_from_editor', update_status_from_editor)
-setattr(JAMESII, 'update_compiler_menu', update_compiler_menu)
-setattr(JAMESII, 'compile_language', compile_language)
-setattr(JAMESII, 'compile_and_run_language', compile_and_run_language)
+# Add enhanced editor methods to JAMES class
+setattr(JAMES, 'update_status_from_editor', update_status_from_editor)
+setattr(JAMES, 'update_compiler_menu', update_compiler_menu)
+setattr(JAMES, 'compile_language', compile_language)
+setattr(JAMES, 'compile_and_run_language', compile_and_run_language)
 
 # Add the tools methods
 add_tools_methods()

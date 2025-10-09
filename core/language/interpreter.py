@@ -1,6 +1,6 @@
 """
-JAMES III Runtime Engine
-Executes JAMES III programs by interpreting the Abstract Syntax Tree
+JAMES IDE Runtime Engine
+Executes JAMES IDE programs by interpreting the Abstract Syntax Tree
 """
 
 import sys
@@ -109,7 +109,7 @@ class JAMESFunction:
         return None  # No explicit return
 
 class JAMESInterpreter:
-    """Main interpreter for JAMES III programs"""
+    """Main interpreter for JAMES IDE programs"""
     
     def __init__(self):
         self.globals = Environment()

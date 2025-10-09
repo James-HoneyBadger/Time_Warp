@@ -1,5 +1,5 @@
 """
-JAMES III Code Generator
+JAMES IDE Code Generator
 Generates executable code from AST
 """
 

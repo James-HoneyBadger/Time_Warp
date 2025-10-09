@@ -1,5 +1,5 @@
 """
-Logo Turtle Graphics Handler for JAMES III
+Logo Turtle Graphics Handler for JAMES IDE
 Implements Logo-style turtle graphics and geometric programming
 """
 

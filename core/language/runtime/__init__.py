@@ -1,5 +1,5 @@
 """
-JAMES III Runtime System
+JAMES IDE Runtime System
 Core execution engine and runtime environment
 """
 

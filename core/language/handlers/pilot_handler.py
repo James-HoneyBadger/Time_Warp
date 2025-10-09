@@ -1,5 +1,5 @@
 """
-PILOT Language Handler for JAMES III
+PILOT Language Handler for JAMES IDE
 Implements PILOT-style text processing and pattern matching
 """
 

@@ -1,5 +1,5 @@
 """
-JAMES III Enhanced Parser
+JAMES IDE Enhanced Parser
 Improved AST generation with better error handling
 """
 

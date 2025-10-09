@@ -1,5 +1,5 @@
 """
-JAMES III Mode Handling
+JAMES IDE Mode Handling
 Execution mode management and switching
 """
 

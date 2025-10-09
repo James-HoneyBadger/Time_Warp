@@ -346,7 +346,7 @@ class JAMESInterpreter:
     
     def set_language_mode(self, mode):
         """Set the current language mode for script execution"""
-        valid_modes = ["james_iii", "python", "javascript", "perl"]
+        valid_modes = ["pilot", "basic", "logo", "python", "javascript", "perl"]
         if mode in valid_modes:
             self.current_language_mode = mode
             self.log_output(f"Language mode set to: {mode}")

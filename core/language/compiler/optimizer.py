@@ -1,5 +1,5 @@
 """
-JAMES III Code Optimizer
+JAMES IDE Code Optimizer
 AST optimization for better performance
 """
 

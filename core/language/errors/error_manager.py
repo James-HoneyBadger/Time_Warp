@@ -1,5 +1,5 @@
 """
-JAMES III Error Handling System
+JAMES IDE Error Handling System
 Centralized error management for better debugging and user experience
 """
 

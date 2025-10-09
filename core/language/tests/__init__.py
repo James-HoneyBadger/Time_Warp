@@ -1,5 +1,5 @@
 """
-JAMES III Test Suite
+JAMES IDE Test Suite
 Comprehensive testing for the refactored architecture
 """
 

@@ -1,5 +1,5 @@
 """
-JAMES III Errors Module
+JAMES IDE Errors Module
 """
 
 from .error_manager import (

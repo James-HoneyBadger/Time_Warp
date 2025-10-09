@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JAMES III Test Runner
-Run all tests for the refactored system
+JAMES IDE Test Runner
+Tests the enhanced JAMES IDE system
 """
 
 import sys
@@ -14,7 +14,7 @@ sys.path.insert(0, project_root)
 
 def discover_and_run_tests():
     """Discover and run all tests"""
-    print("🧪 Running JAMES III Test Suite")
+    print("🧪 Running JAMES IDE Test Suite")
     print("=" * 50)
     
     # Discover tests in the tests directory
@@ -46,7 +46,7 @@ def main():
     
     if success:
         print("✅ All tests passed!")
-        print("\\n🎉 JAMES III Refactoring Complete!")
+        print("\\n🎉 JAMES IDE Enhancement Complete!")
         print("\\nRefactoring Summary:")
         print("  ✅ Modular directory structure created")
         print("  ✅ Centralized error handling implemented")
@@ -66,7 +66,7 @@ def main():
     else:
         print(f"❌ Tests failed: {failures} failures, {errors} errors")
         print("\\nSome tests failed, but refactoring structure is complete.")
-        print("The new architecture provides a solid foundation for JAMES III.")
+        print("The enhanced architecture provides a solid foundation for JAMES IDE.")
         return 1
 
 if __name__ == '__main__':
