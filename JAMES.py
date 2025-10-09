@@ -634,12 +634,7 @@ class JAMES:
         ttk.Button(editor_toolbar_bottom, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
         ttk.Button(editor_toolbar_bottom, text="🗑 Clear Output", command=self.clear_output).pack(side=tk.LEFT, padx=2)
         
-        # Separator before find/replace
-        ttk.Separator(editor_toolbar_bottom, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
-        
-        # Find and Replace buttons
-        ttk.Button(editor_toolbar_bottom, text="🔍 Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar_bottom, text="🔄 Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
+
         
         # Create enhanced code editor with language-specific features
         self.code_editor = EnhancedCodeEditor(editor_frame, initial_language="pilot")

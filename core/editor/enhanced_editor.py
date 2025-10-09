@@ -49,8 +49,8 @@ class EnhancedCodeEditor:
         self.container = ttk.Frame(self.parent)
         self.container.pack(fill=tk.BOTH, expand=True)
         
-        # Create toolbar
-        self.create_enhanced_toolbar()
+        # Toolbar disabled - controlled by main JAMES interface
+        # self.create_enhanced_toolbar()
         
         # Create main editor area
         self.create_editor_area()
@@ -528,7 +528,11 @@ class EnhancedCodeEditor:
             # This would integrate with the main JAMES interpreter
     
     def update_compilation_buttons(self):
-        """Update compilation button states"""                
+        """Update compilation button states"""   
+        # Check if buttons exist (they may not if toolbar is disabled)
+        if not hasattr(self, 'compile_button') or not hasattr(self, 'compile_run_button'):
+            return
+            
         if self.compiler_manager.supports_language(self.current_language):
             self.compile_button.config(state='normal')
             self.compile_run_button.config(state='normal')
