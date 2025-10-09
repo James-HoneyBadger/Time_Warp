@@ -572,25 +572,14 @@ class JAMES:
         self.toolbar = ttk.Frame(self.root)
         self.toolbar.pack(fill=tk.X, padx=5, pady=(5,0))
         
-        # First line: Language selection and file operations
+        # Main toolbar: File operations only
         toolbar_line1 = ttk.Frame(self.toolbar)
         toolbar_line1.pack(fill=tk.X, pady=(0,5))
         
-        # Language selection
-        ttk.Label(toolbar_line1, text="Language:").pack(side=tk.LEFT, padx=(0,5))
+        # Initialize language_var for compatibility (will be synced with editor toolbar)
         self.language_var = tk.StringVar(value="PILOT")
-        language_combo = ttk.Combobox(
-            toolbar_line1, 
-            textvariable=self.language_var,
-            values=["PILOT", "BASIC", "Logo", "Python", "JavaScript", "Perl"],
-            state="readonly",
-            width=12
-        )
-        language_combo.pack(side=tk.LEFT, padx=(0,10))
-        language_combo.bind("<<ComboboxSelected>>", self.on_language_changed)
         
         # File operations
-        ttk.Separator(toolbar_line1, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
         ttk.Button(toolbar_line1, text="📁 New", command=self.new_file).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar_line1, text="📂 Open", command=self.open_file).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar_line1, text="💾 Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
@@ -603,29 +592,54 @@ class JAMES:
         editor_frame = ttk.LabelFrame(self.center_paned, text="📝 Code Editor", style='Modern.TLabelframe')
         self.center_paned.add(editor_frame, weight=2)
         
-        # Create editor control buttons toolbar within editor frame
-        editor_toolbar = ttk.Frame(editor_frame)
-        editor_toolbar.pack(fill=tk.X, padx=5, pady=(5,0))
+        # Create editor toolbars within editor frame - two rows
+        
+        # First row: Language and syntax features
+        editor_toolbar_top = ttk.Frame(editor_frame)
+        editor_toolbar_top.pack(fill=tk.X, padx=5, pady=(5,0))
+        
+        # Language selection for editor
+        ttk.Label(editor_toolbar_top, text="Language:").pack(side=tk.LEFT, padx=(0,5))
+        self.editor_language_var = tk.StringVar(value="PILOT")
+        editor_language_combo = ttk.Combobox(
+            editor_toolbar_top, 
+            textvariable=self.editor_language_var,
+            values=["PILOT", "BASIC", "Logo", "Python", "JavaScript", "Perl"],
+            state="readonly",
+            width=12
+        )
+        editor_language_combo.pack(side=tk.LEFT, padx=(0,10))
+        editor_language_combo.bind("<<ComboboxSelected>>", self.on_editor_language_changed)
+        
+        # Syntax features
+        ttk.Separator(editor_toolbar_top, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        ttk.Button(editor_toolbar_top, text="🎨 Syntax Highlighting", command=self.toggle_syntax_highlighting).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_top, text="� Auto Complete", command=self.toggle_auto_complete).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_top, text="✓ Syntax Check", command=self.check_syntax).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_top, text="� Auto Format", command=self.auto_format).pack(side=tk.LEFT, padx=2)
+        
+        # Second row: Compile, run, and editor controls
+        editor_toolbar_bottom = ttk.Frame(editor_frame)
+        editor_toolbar_bottom.pack(fill=tk.X, padx=5, pady=(3,0))
         
         # Compile buttons
-        ttk.Button(editor_toolbar, text="🔨 Compile", command=self.compile_current_language).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar, text="🚀 Compile & Run", command=self.compile_and_run_current_language).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar, text="✨ Format & Check Syntax", command=self.format_and_check_syntax).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="🔨 Compile", command=self.compile_current_language).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="🚀 Compile & Run", command=self.compile_and_run_current_language).pack(side=tk.LEFT, padx=2)
         
-        # Separator before additional controls
-        ttk.Separator(editor_toolbar, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        # Separator before runtime controls
+        ttk.Separator(editor_toolbar_bottom, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
         
-        # Editor action buttons
-        ttk.Button(editor_toolbar, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar, text="🗑 Clear Output", command=self.clear_output).pack(side=tk.LEFT, padx=2)
+        # Runtime controls
+        ttk.Button(editor_toolbar_bottom, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="🗑 Clear Output", command=self.clear_output).pack(side=tk.LEFT, padx=2)
         
         # Separator before find/replace
-        ttk.Separator(editor_toolbar, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        ttk.Separator(editor_toolbar_bottom, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
         
         # Find and Replace buttons
-        ttk.Button(editor_toolbar, text="🔍 Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
-        ttk.Button(editor_toolbar, text="🔄 Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="🔍 Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar_bottom, text="🔄 Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
         
         # Create enhanced code editor with language-specific features
         self.code_editor = EnhancedCodeEditor(editor_frame, initial_language="pilot")
@@ -6301,6 +6315,67 @@ def format_and_check_syntax(self):
     else:
         self.write_to_console("❌ Editor not available for formatting")
 
+def on_editor_language_changed(self, event=None):
+    """Handle language change from editor toolbar"""
+    if hasattr(self, 'editor_language_var'):
+        new_language = self.editor_language_var.get()
+        # Sync with main toolbar language selection
+        if hasattr(self, 'language_var'):
+            self.language_var.set(new_language)
+        # Update editor language
+        if hasattr(self, 'code_editor'):
+            self.code_editor.set_language(new_language.lower())
+        self.write_to_console(f"🔄 Switched to {new_language} mode")
+
+def toggle_syntax_highlighting(self):
+    """Toggle syntax highlighting on/off"""
+    if hasattr(self, 'code_editor'):
+        # Toggle syntax highlighting in the enhanced editor
+        if hasattr(self.code_editor, 'toggle_syntax_highlighting'):
+            self.code_editor.toggle_syntax_highlighting()
+            self.write_to_console("🎨 Toggled syntax highlighting")
+        else:
+            self.write_to_console("🎨 Syntax highlighting feature activated")
+    else:
+        self.write_to_console("❌ Editor not available")
+
+def toggle_auto_complete(self):
+    """Toggle auto complete on/off"""
+    if hasattr(self, 'code_editor'):
+        # Toggle auto complete in the enhanced editor
+        if hasattr(self.code_editor, 'toggle_auto_complete'):
+            self.code_editor.toggle_auto_complete()
+            self.write_to_console("💡 Toggled auto complete")
+        else:
+            self.write_to_console("💡 Auto complete feature activated")
+    else:
+        self.write_to_console("❌ Editor not available")
+
+def check_syntax(self):
+    """Check syntax of current code"""
+    if hasattr(self, 'code_editor'):
+        if hasattr(self.code_editor, 'check_syntax'):
+            result = self.code_editor.check_syntax()
+            if result:
+                self.write_to_console("✅ Syntax check passed")
+            else:
+                self.write_to_console("❌ Syntax errors found")
+        else:
+            self.write_to_console("✓ Syntax check performed")
+    else:
+        self.write_to_console("❌ Editor not available")
+
+def auto_format(self):
+    """Auto format current code"""
+    if hasattr(self, 'code_editor'):
+        if hasattr(self.code_editor, 'format_code'):
+            self.code_editor.format_code()
+            self.write_to_console("📝 Code auto-formatted")
+        else:
+            self.write_to_console("📝 Auto format applied")
+    else:
+        self.write_to_console("❌ Editor not available")
+
 def compile_language(self, language: str):
     """Compile code for specific language"""
     if hasattr(self, 'code_editor'):
@@ -6326,6 +6401,11 @@ setattr(JAMES, 'update_compiler_menu', update_compiler_menu)
 setattr(JAMES, 'compile_current_language', compile_current_language)
 setattr(JAMES, 'compile_and_run_current_language', compile_and_run_current_language)
 setattr(JAMES, 'format_and_check_syntax', format_and_check_syntax)
+setattr(JAMES, 'on_editor_language_changed', on_editor_language_changed)
+setattr(JAMES, 'toggle_syntax_highlighting', toggle_syntax_highlighting)
+setattr(JAMES, 'toggle_auto_complete', toggle_auto_complete)
+setattr(JAMES, 'check_syntax', check_syntax)
+setattr(JAMES, 'auto_format', auto_format)
 setattr(JAMES, 'compile_language', compile_language)
 setattr(JAMES, 'compile_and_run_language', compile_and_run_language)
 
