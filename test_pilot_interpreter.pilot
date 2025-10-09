@@ -1,0 +1,9 @@
+T:Testing PILOT Interpreter
+T:This tests basic PILOT functionality
+A:NAME
+T:Hello *NAME*!
+U:AGE=25  
+T:Your age is *AGE*
+C:RESULT=10+5
+T:10 + 5 = *RESULT*
+END

@@ -1,0 +1,81 @@
+; Comprehensive Logo Language Test
+; Tests all major Logo commands and turtle graphics features
+
+; Clear the screen and start fresh
+CLEARSCREEN
+HOME
+
+; Basic movement commands
+FORWARD 50
+RIGHT 90
+BACK 25
+LEFT 45
+FORWARD 30
+
+; Pen control
+PENUP
+FORWARD 20
+PENDOWN
+FORWARD 20
+
+; Position and orientation info
+POSITION
+HEADING
+
+; Color and pen settings
+SETCOLOR 2
+SETPENSIZE 3
+FORWARD 40
+
+; Drawing shapes
+CIRCLE 30
+DOT 10
+
+; Position setting
+SETXY 100 100
+CIRCLE 20
+
+; Turtle visibility
+HIDETURTLE
+SHOWTURTLE
+
+; Complex pattern with REPEAT
+HOME
+REPEAT 6 [
+  FORWARD 60
+  RIGHT 60
+  SETCOLOR 3
+  CIRCLE 15
+  SETCOLOR 4
+]
+
+; More advanced patterns
+HOME
+SETCOLOR 5
+REPEAT 12 [
+  FORWARD 80
+  RIGHT 30
+  DOT 8
+]
+
+; Final test - spiral
+HOME
+SETCOLOR 1
+REPEAT 36 [
+  FORWARD 100
+  RIGHT 89
+  SETPENSIZE 1
+]
+
+; Test position changes
+SETXY 200 200
+SETCOLOR 6
+REPEAT 8 [
+  FORWARD 40
+  RIGHT 45
+]
+
+; Final message
+HOME
+POSITION
+HEADING

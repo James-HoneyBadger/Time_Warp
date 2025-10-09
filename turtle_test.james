@@ -1,0 +1,9 @@
+// Simple turtle graphics test in JAMES
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+// Draw a square

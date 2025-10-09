@@ -1,0 +1,10 @@
+REM Simple graphics test
+10 GAMESCREEN 400, 300, "Graphics Test"
+20 GAMEBG 0, 0, 100
+30 GAMECOLOR 255, 255, 0
+40 GAMERECT 50, 50, 100, 50, 1
+50 GAMECOLOR 255, 0, 0
+60 GAMEPOINT 200, 150
+70 GAMETEXT 100, 200, "Hello Graphics!"
+80 PRINT "Graphics test complete"
+90 END

@@ -1,0 +1,316 @@
+REM ============================================
+REM GALAGA-STYLE SPACE SHOOTER GAME
+REM Written in JAMES BASIC
+REM ============================================
+
+REM Initialize game variables
+10 REM Game Setup
+20 LET SCREEN_WIDTH = 800
+30 LET SCREEN_HEIGHT = 600
+40 LET PLAYER_X = 400
+50 LET PLAYER_Y = 550
+60 LET PLAYER_SPEED = 5
+70 LET BULLET_SPEED = 7
+80 LET ENEMY_SPEED = 2
+90 LET SCORE = 0
+100 LET LIVES = 3
+110 LET GAME_OVER = 0
+120 LET LEVEL = 1
+
+REM Initialize arrays for game objects
+130 DIM BULLETS(20, 4)  REM x, y, active, speed
+140 DIM ENEMIES(30, 6)  REM x, y, active, type, speed, direction
+150 DIM ENEMY_BULLETS(15, 4)  REM x, y, active, speed
+160 DIM EXPLOSIONS(10, 4)  REM x, y, active, timer
+
+REM Initialize bullet array
+170 FOR I = 0 TO 19
+180 LET BULLETS(I, 2) = 0  REM inactive
+190 NEXT I
+
+REM Initialize enemy bullet array
+200 FOR I = 0 TO 14
+210 LET ENEMY_BULLETS(I, 2) = 0  REM inactive
+220 NEXT I
+
+REM Initialize explosion array
+230 FOR I = 0 TO 9
+240 LET EXPLOSIONS(I, 2) = 0  REM inactive
+250 NEXT I
+
+REM Game initialization
+260 PRINT "GALAGA SPACE SHOOTER"
+270 PRINT "==================="
+280 PRINT "Use A/D to move, SPACE to shoot"
+290 PRINT "Destroy all enemies to advance!"
+300 PRINT "Press any key to start..."
+310 INPUT DUMMY$
+
+REM Initialize game graphics
+320 GAMESCREEN 800, 600, "Galaga Space Shooter"
+330 GAMEBG 0, 0, 50  REM Dark blue background
+
+REM Create initial enemy formation
+340 GOSUB 2000  REM Create enemies subroutine
+
+REM Main game loop
+350 REM *** MAIN GAME LOOP ***
+360 IF GAME_OVER = 1 THEN GOTO 1800
+370 GAMECLEAR
+
+REM Draw stars background
+380 FOR I = 1 TO 50
+390 LET STAR_X = RND(800)
+400 LET STAR_Y = RND(600)
+410 GAMECOLOR 255, 255, 255
+420 GAMEPOINT STAR_X, STAR_Y
+430 NEXT I
+
+REM Handle player input
+440 GOSUB 1000  REM Input handling subroutine
+
+REM Update player
+450 REM Keep player on screen
+460 IF PLAYER_X < 20 THEN LET PLAYER_X = 20
+470 IF PLAYER_X > 780 THEN LET PLAYER_X = 780
+
+REM Update bullets
+480 GOSUB 1100  REM Update bullets subroutine
+
+REM Update enemies
+490 GOSUB 1200  REM Update enemies subroutine
+
+REM Update enemy bullets
+500 GOSUB 1300  REM Update enemy bullets subroutine
+
+REM Update explosions
+510 GOSUB 1400  REM Update explosions subroutine
+
+REM Check collisions
+520 GOSUB 1500  REM Check collisions subroutine
+
+REM Draw player
+530 GAMECOLOR 0, 255, 0  REM Green player
+540 GAMERECT PLAYER_X - 15, PLAYER_Y - 10, 30, 20, 1
+
+REM Draw player gun
+550 GAMECOLOR 255, 255, 0  REM Yellow gun
+560 GAMERECT PLAYER_X - 2, PLAYER_Y - 15, 4, 8, 1
+
+REM Draw bullets
+570 GOSUB 1600  REM Draw bullets subroutine
+
+REM Draw enemies
+580 GOSUB 1700  REM Draw enemies subroutine
+
+REM Draw UI
+590 GAMECOLOR 255, 255, 255
+600 GAMETEXT 10, 20, "Score: " + STR$(SCORE)
+610 GAMETEXT 10, 40, "Lives: " + STR$(LIVES)
+620 GAMETEXT 10, 60, "Level: " + STR$(LEVEL)
+
+REM Check level completion
+630 LET ENEMIES_LEFT = 0
+640 FOR I = 0 TO 29
+650 IF ENEMIES(I, 2) = 1 THEN LET ENEMIES_LEFT = ENEMIES_LEFT + 1
+660 NEXT I
+670 IF ENEMIES_LEFT = 0 THEN GOSUB 2100  REM Next level
+
+REM Update display and delay
+680 GAMEUPDATE
+690 GAMEDELAY 30  REM ~33 FPS
+700 GOTO 350  REM Loop back to main game loop
+
+REM Game over screen
+1800 REM *** GAME OVER ***
+1810 GAMECLEAR
+1820 GAMECOLOR 255, 0, 0
+1825 GAMETEXT 300, 250, "GAME OVER"
+1830 GAMECOLOR 255, 255, 255
+1840 GAMETEXT 280, 300, "Final Score: " + STR$(SCORE)
+1850 GAMETEXT 280, 330, "Press R to restart or Q to quit"
+1860 GAMEUPDATE
+1870 INPUT CHOICE$
+1880 IF CHOICE$ = "R" OR CHOICE$ = "r" THEN GOTO 80  REM Restart
+1890 IF CHOICE$ = "Q" OR CHOICE$ = "q" THEN END
+1900 GOTO 1870
+
+REM ============================================
+REM SUBROUTINES
+REM ============================================
+
+REM Input handling subroutine
+1000 REM *** INPUT HANDLING ***
+1010 LET KEY$ = GAMEKEY()
+1020 IF KEY$ = "A" OR KEY$ = "a" THEN LET PLAYER_X = PLAYER_X - PLAYER_SPEED
+1030 IF KEY$ = "D" OR KEY$ = "d" THEN LET PLAYER_X = PLAYER_X + PLAYER_SPEED
+1040 IF KEY$ = " " THEN GOSUB 1050  REM Fire bullet
+1045 RETURN
+1050 REM Fire bullet subroutine
+1055 FOR I = 0 TO 19
+1060 IF BULLETS(I, 2) = 0 THEN GOTO 1070
+1065 NEXT I
+1067 RETURN  REM No available bullets
+1070 LET BULLETS(I, 0) = PLAYER_X  REM x position
+1075 LET BULLETS(I, 1) = PLAYER_Y - 20  REM y position
+1080 LET BULLETS(I, 2) = 1  REM active
+1085 LET BULLETS(I, 3) = BULLET_SPEED  REM speed
+1090 RETURN
+
+REM Update bullets subroutine
+1100 REM *** UPDATE BULLETS ***
+1110 FOR I = 0 TO 19
+1120 IF BULLETS(I, 2) = 0 THEN GOTO 1170  REM Skip inactive bullets
+1130 LET BULLETS(I, 1) = BULLETS(I, 1) - BULLETS(I, 3)  REM Move up
+1140 IF BULLETS(I, 1) < 0 THEN LET BULLETS(I, 2) = 0  REM Deactivate if off screen
+1170 NEXT I
+1180 RETURN
+
+REM Update enemies subroutine
+1200 REM *** UPDATE ENEMIES ***
+1210 FOR I = 0 TO 29
+1220 IF ENEMIES(I, 2) = 0 THEN GOTO 1280  REM Skip inactive enemies
+1230 REM Move enemies in formation
+1240 LET ENEMIES(I, 0) = ENEMIES(I, 0) + ENEMIES(I, 5) * ENEMY_SPEED
+1250 REM Bounce off screen edges
+1260 IF ENEMIES(I, 0) < 50 OR ENEMIES(I, 0) > 750 THEN LET ENEMIES(I, 5) = -ENEMIES(I, 5)
+1270 REM Occasionally fire bullets
+1275 IF RND(200) = 1 THEN GOSUB 1285  REM Enemy fires
+1280 NEXT I
+1285 RETURN
+1286 REM Enemy fire subroutine
+1287 FOR J = 0 TO 14
+1288 IF ENEMY_BULLETS(J, 2) = 0 THEN GOTO 1289
+1289 NEXT J : RETURN  REM No available enemy bullets
+1290 LET ENEMY_BULLETS(J, 0) = ENEMIES(I, 0)  REM x position
+1291 LET ENEMY_BULLETS(J, 1) = ENEMIES(I, 1)  REM y position
+1292 LET ENEMY_BULLETS(J, 2) = 1  REM active
+1293 LET ENEMY_BULLETS(J, 3) = 3  REM speed
+1294 RETURN
+
+REM Update enemy bullets subroutine
+1300 REM *** UPDATE ENEMY BULLETS ***
+1310 FOR I = 0 TO 14
+1320 IF ENEMY_BULLETS(I, 2) = 0 THEN GOTO 1370
+1330 LET ENEMY_BULLETS(I, 1) = ENEMY_BULLETS(I, 1) + ENEMY_BULLETS(I, 3)  REM Move down
+1340 IF ENEMY_BULLETS(I, 1) > 600 THEN LET ENEMY_BULLETS(I, 2) = 0  REM Deactivate
+1370 NEXT I
+1380 RETURN
+
+REM Update explosions subroutine
+1400 REM *** UPDATE EXPLOSIONS ***
+1410 FOR I = 0 TO 9
+1420 IF EXPLOSIONS(I, 2) = 0 THEN GOTO 1470
+1430 LET EXPLOSIONS(I, 3) = EXPLOSIONS(I, 3) - 1  REM Decrease timer
+1440 IF EXPLOSIONS(I, 3) <= 0 THEN LET EXPLOSIONS(I, 2) = 0  REM Deactivate
+1470 NEXT I
+1480 RETURN
+
+REM Check collisions subroutine
+1500 REM *** COLLISION DETECTION ***
+1510 REM Check bullet-enemy collisions
+1520 FOR I = 0 TO 19  REM For each bullet
+1530 IF BULLETS(I, 2) = 0 THEN GOTO 1590
+1540 FOR J = 0 TO 29  REM For each enemy
+1550 IF ENEMIES(J, 2) = 0 THEN GOTO 1580
+1560 REM Check collision
+1565 IF ABS(BULLETS(I, 0) - ENEMIES(J, 0)) < 25 AND ABS(BULLETS(I, 1) - ENEMIES(J, 1)) < 25 THEN GOTO 1570
+1568 GOTO 1580
+1570 REM Collision detected
+1572 LET BULLETS(I, 2) = 0  REM Remove bullet
+1574 LET ENEMIES(J, 2) = 0  REM Remove enemy
+1576 LET SCORE = SCORE + 100  REM Increase score
+1577 GOSUB 1595  REM Create explosion
+1580 NEXT J
+1590 NEXT I
+
+1592 REM Check enemy bullet-player collisions
+1593 FOR I = 0 TO 14
+1594 IF ENEMY_BULLETS(I, 2) = 0 THEN GOTO 1598
+1596 IF ABS(ENEMY_BULLETS(I, 0) - PLAYER_X) < 20 AND ABS(ENEMY_BULLETS(I, 1) - PLAYER_Y) < 15 THEN GOSUB 1599
+1598 NEXT I
+1599 RETURN
+1600 REM Player hit subroutine
+1601 LET ENEMY_BULLETS(I, 2) = 0  REM Remove bullet
+1602 LET LIVES = LIVES - 1
+1603 IF LIVES <= 0 THEN LET GAME_OVER = 1
+1604 RETURN
+
+1595 REM Create explosion subroutine
+1596 FOR K = 0 TO 9
+1597 IF EXPLOSIONS(K, 2) = 0 THEN GOTO 1598
+1599 NEXT K : RETURN
+1598 LET EXPLOSIONS(K, 0) = ENEMIES(J, 0)  REM x position
+1600 LET EXPLOSIONS(K, 1) = ENEMIES(J, 1)  REM y position
+1601 LET EXPLOSIONS(K, 2) = 1  REM active
+1602 LET EXPLOSIONS(K, 3) = 10  REM timer
+1603 RETURN
+
+REM Draw bullets subroutine
+1600 REM *** DRAW BULLETS ***
+1610 GAMECOLOR 255, 255, 0  REM Yellow bullets
+1620 FOR I = 0 TO 19
+1630 IF BULLETS(I, 2) = 1 THEN GAMERECT BULLETS(I, 0) - 2, BULLETS(I, 1) - 4, 4, 8, 1
+1640 NEXT I
+1650 REM Draw enemy bullets
+1660 GAMECOLOR 255, 0, 0  REM Red enemy bullets
+1670 FOR I = 0 TO 14
+1680 IF ENEMY_BULLETS(I, 2) = 1 THEN GAMERECT ENEMY_BULLETS(I, 0) - 2, ENEMY_BULLETS(I, 1) - 4, 4, 8, 1
+1690 NEXT I
+1695 RETURN
+
+REM Draw enemies subroutine
+1700 REM *** DRAW ENEMIES ***
+1710 FOR I = 0 TO 29
+1720 IF ENEMIES(I, 2) = 0 THEN GOTO 1780  REM Skip inactive enemies
+1730 REM Draw different enemy types with different colors
+1740 IF ENEMIES(I, 3) = 1 THEN GAMECOLOR 255, 0, 255  REM Magenta
+1750 IF ENEMIES(I, 3) = 2 THEN GAMECOLOR 0, 255, 255  REM Cyan
+1760 IF ENEMIES(I, 3) = 3 THEN GAMECOLOR 255, 128, 0  REM Orange
+1770 GAMERECT ENEMIES(I, 0) - 12, ENEMIES(I, 1) - 10, 24, 20, 1
+1780 NEXT I
+1785 REM Draw explosions
+1786 GAMECOLOR 255, 255, 0  REM Yellow explosions
+1787 FOR I = 0 TO 9
+1788 IF EXPLOSIONS(I, 2) = 1 THEN GAMECIRCLE EXPLOSIONS(I, 0), EXPLOSIONS(I, 1), EXPLOSIONS(I, 3) * 2, 1
+1789 NEXT I
+1790 RETURN
+
+REM Create enemies subroutine
+2000 REM *** CREATE ENEMY FORMATION ***
+2010 LET ENEMY_COUNT = 0
+2020 FOR ROW = 0 TO 4  REM 5 rows
+2030 FOR COL = 0 TO 5  REM 6 columns
+2040 IF ENEMY_COUNT >= 30 THEN GOTO 2090
+2050 LET ENEMIES(ENEMY_COUNT, 0) = 150 + COL * 80  REM x position
+2060 LET ENEMIES(ENEMY_COUNT, 1) = 100 + ROW * 40  REM y position
+2070 LET ENEMIES(ENEMY_COUNT, 2) = 1  REM active
+2080 LET ENEMIES(ENEMY_COUNT, 3) = (ROW MOD 3) + 1  REM enemy type
+2085 LET ENEMIES(ENEMY_COUNT, 4) = ENEMY_SPEED  REM speed
+2086 LET ENEMIES(ENEMY_COUNT, 5) = 1  REM direction (1 = right, -1 = left)
+2087 LET ENEMY_COUNT = ENEMY_COUNT + 1
+2088 NEXT COL
+2089 NEXT ROW
+2090 RETURN
+
+REM Next level subroutine  
+2100 REM *** NEXT LEVEL ***
+2110 LET LEVEL = LEVEL + 1
+2120 LET ENEMY_SPEED = ENEMY_SPEED + 0.5  REM Increase difficulty
+2130 IF BULLET_SPEED < 10 THEN LET BULLET_SPEED = BULLET_SPEED + 0.5
+2140 GOSUB 2000  REM Create new enemy formation
+2150 REM Bonus points for completing level
+2160 LET SCORE = SCORE + LEVEL * 500
+2170 REM Display level complete message
+2180 GAMECLEAR
+2190 GAMECOLOR 0, 255, 0
+2200 GAMETEXT 300, 300, "LEVEL " + STR$(LEVEL - 1) + " COMPLETE!"
+2210 GAMECOLOR 255, 255, 255
+2220 GAMETEXT 280, 330, "Bonus: " + STR$(LEVEL * 500) + " points"
+2230 GAMETEXT 300, 360, "Press any key to continue..."
+2240 GAMEUPDATE
+2250 INPUT DUMMY$
+2260 RETURN
+
+REM End of program
+9999 END

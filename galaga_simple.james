@@ -1,0 +1,217 @@
+REM ============================================
+REM GALAGA-STYLE SPACE SHOOTER GAME
+REM Text-based version for JAMES BASIC
+REM ============================================
+
+10 REM Initialize game variables
+20 LET SCREEN_WIDTH = 40
+30 LET SCREEN_HEIGHT = 20
+40 LET PLAYER_X = 20
+50 LET PLAYER_Y = 18
+60 LET SCORE = 0
+70 LET LIVES = 3
+80 LET GAME_OVER = 0
+90 LET LEVEL = 1
+100 LET BULLET_X = 0
+110 LET BULLET_Y = 0
+120 LET BULLET_ACTIVE = 0
+
+130 REM Initialize enemy array (simple 2D array simulation)
+140 DIM ENEMIES(10)  REM Enemy X positions
+150 DIM ENEMY_Y(10)  REM Enemy Y positions  
+160 DIM ENEMY_ACTIVE(10)  REM Enemy active status
+
+170 REM Create initial enemies
+180 FOR I = 1 TO 8
+190 LET ENEMIES(I) = I * 4 + 5
+200 LET ENEMY_Y(I) = 3
+210 LET ENEMY_ACTIVE(I) = 1
+220 NEXT I
+
+230 REM Game introduction
+240 PRINT "GALAGA SPACE SHOOTER"
+250 PRINT "==================="
+260 PRINT "Controls:"
+270 PRINT "A - Move Left    D - Move Right"
+280 PRINT "S - Shoot        Q - Quit"
+290 PRINT ""
+300 PRINT "Destroy all enemies to advance!"
+310 PRINT "You have " + STR$(LIVES) + " lives."
+320 PRINT ""
+330 PRINT "Press ENTER to start..."
+340 INPUT DUMMY$
+
+350 REM Main game loop
+360 IF GAME_OVER = 1 THEN GOTO 1000
+370 REM Clear screen (simulate)
+380 FOR I = 1 TO 5
+390 PRINT ""
+400 NEXT I
+
+410 PRINT "LEVEL " + STR$(LEVEL) + " | SCORE: " + STR$(SCORE) + " | LIVES: " + STR$(LIVES)
+420 PRINT STRING$(SCREEN_WIDTH, "=")
+
+430 REM Draw game field
+440 FOR Y = 1 TO SCREEN_HEIGHT
+450 LET LINE$ = ""
+460 FOR X = 1 TO SCREEN_WIDTH
+470 LET CHAR$ = " "
+
+480 REM Check for enemies at this position
+490 FOR E = 1 TO 8
+500 IF ENEMY_ACTIVE(E) = 1 AND ENEMIES(E) = X AND ENEMY_Y(E) = Y THEN LET CHAR$ = "W"
+510 NEXT E
+
+520 REM Check for player at this position
+530 IF X = PLAYER_X AND Y = PLAYER_Y THEN LET CHAR$ = "A"
+
+540 REM Check for bullet at this position
+550 IF BULLET_ACTIVE = 1 AND X = BULLET_X AND Y = BULLET_Y THEN LET CHAR$ = "|"
+
+560 LET LINE$ = LINE$ + CHAR$
+570 NEXT X
+580 PRINT LINE$
+590 NEXT Y
+
+600 PRINT STRING$(SCREEN_WIDTH, "=")
+
+610 REM Get player input
+620 PRINT "Command (A/D/S/Q): ";
+630 INPUT COMMAND$
+
+640 REM Process player input
+650 IF COMMAND$ = "A" OR COMMAND$ = "a" THEN GOSUB 2000  REM Move left
+660 IF COMMAND$ = "D" OR COMMAND$ = "d" THEN GOSUB 2100  REM Move right  
+670 IF COMMAND$ = "S" OR COMMAND$ = "s" THEN GOSUB 2200  REM Shoot
+680 IF COMMAND$ = "Q" OR COMMAND$ = "q" THEN LET GAME_OVER = 1
+
+690 REM Update bullet
+700 IF BULLET_ACTIVE = 1 THEN GOSUB 2300
+
+710 REM Update enemies
+720 GOSUB 2400
+
+730 REM Check collisions
+740 GOSUB 2500
+
+750 REM Check level completion
+760 LET ENEMIES_LEFT = 0
+770 FOR I = 1 TO 8
+780 IF ENEMY_ACTIVE(I) = 1 THEN LET ENEMIES_LEFT = ENEMIES_LEFT + 1
+790 NEXT I
+800 IF ENEMIES_LEFT = 0 THEN GOSUB 2600  REM Next level
+
+810 REM Random enemy attack
+820 IF RND(5) = 1 THEN GOSUB 2700
+
+830 GOTO 360  REM Loop back to main game
+
+1000 REM Game over screen
+1010 PRINT ""
+1020 PRINT "GAME OVER!"
+1030 PRINT "=========="
+1040 PRINT "Final Score: " + STR$(SCORE)
+1050 PRINT "Level Reached: " + STR$(LEVEL)
+1060 PRINT ""
+1070 PRINT "Thanks for playing!"
+1080 END
+
+REM ============================================
+REM SUBROUTINES
+REM ============================================
+
+2000 REM Move player left
+2010 IF PLAYER_X > 1 THEN LET PLAYER_X = PLAYER_X - 1
+2020 RETURN
+
+2100 REM Move player right
+2110 IF PLAYER_X < SCREEN_WIDTH THEN LET PLAYER_X = PLAYER_X + 1
+2120 RETURN
+
+2200 REM Player shoot
+2210 IF BULLET_ACTIVE = 0 THEN GOTO 2220
+2215 RETURN  REM Bullet already active
+2220 LET BULLET_X = PLAYER_X
+2230 LET BULLET_Y = PLAYER_Y - 1
+2240 LET BULLET_ACTIVE = 1
+2250 RETURN
+
+2300 REM Update bullet
+2310 LET BULLET_Y = BULLET_Y - 1
+2320 IF BULLET_Y < 1 THEN LET BULLET_ACTIVE = 0  REM Bullet off screen
+2330 RETURN
+
+2400 REM Update enemies (simple movement)
+2410 LET MOVE_DOWN = 0
+2420 FOR I = 1 TO 8
+2430 IF ENEMY_ACTIVE(I) = 0 THEN GOTO 2480
+2440 REM Check if any enemy hits screen edge
+2450 IF ENEMIES(I) <= 1 OR ENEMIES(I) >= SCREEN_WIDTH THEN LET MOVE_DOWN = 1
+2480 NEXT I
+
+2490 REM Move enemies
+2500 FOR I = 1 TO 8
+2510 IF ENEMY_ACTIVE(I) = 0 THEN GOTO 2540
+2520 IF MOVE_DOWN = 1 THEN LET ENEMY_Y(I) = ENEMY_Y(I) + 1
+2525 IF MOVE_DOWN = 1 THEN LET ENEMIES(I) = SCREEN_WIDTH + 1 - ENEMIES(I)  REM Reverse direction
+2530 IF MOVE_DOWN = 0 THEN LET ENEMIES(I) = ENEMIES(I) + 1  REM Normal movement
+2540 NEXT I
+2550 RETURN
+
+2500 REM Check collisions
+2510 REM Check bullet-enemy collision
+2520 IF BULLET_ACTIVE = 0 THEN GOTO 2580
+2530 FOR I = 1 TO 8
+2540 IF ENEMY_ACTIVE(I) = 0 THEN GOTO 2570
+2550 IF BULLET_X = ENEMIES(I) AND BULLET_Y = ENEMY_Y(I) THEN GOTO 2555
+2552 GOTO 2570
+2555 REM Collision detected
+2556 LET ENEMY_ACTIVE(I) = 0  REM Destroy enemy
+2557 LET BULLET_ACTIVE = 0    REM Destroy bullet
+2558 LET SCORE = SCORE + 100  REM Add score
+2559 PRINT "HIT! Enemy destroyed!"
+2570 NEXT I
+
+2580 REM Check enemy-player collision
+2590 FOR I = 1 TO 8
+2600 IF ENEMY_ACTIVE(I) = 0 THEN GOTO 2630
+2610 IF ENEMIES(I) = PLAYER_X AND ENEMY_Y(I) = PLAYER_Y THEN GOTO 2615
+2612 GOTO 2630
+2615 REM Player hit
+2616 LET LIVES = LIVES - 1
+2617 PRINT "YOU'VE BEEN HIT! Lives remaining: " + STR$(LIVES)
+2618 IF LIVES <= 0 THEN LET GAME_OVER = 1
+2619 LET ENEMY_ACTIVE(I) = 0  REM Remove enemy that hit player
+2630 NEXT I
+2640 RETURN
+
+2600 REM Next level
+2610 LET LEVEL = LEVEL + 1
+2620 LET SCORE = SCORE + LEVEL * 200  REM Level bonus
+2630 PRINT "LEVEL " + STR$(LEVEL - 1) + " COMPLETE!"
+2640 PRINT "Bonus: " + STR$(LEVEL * 200) + " points"
+2650 PRINT "Press ENTER for next level..."
+2660 INPUT DUMMY$
+
+2670 REM Reset enemies for new level
+2680 FOR I = 1 TO 8
+2690 LET ENEMIES(I) = I * 4 + 5
+2700 LET ENEMY_Y(I) = 3
+2710 LET ENEMY_ACTIVE(I) = 1
+2720 NEXT I
+2730 RETURN
+
+2700 REM Random enemy movement (make game more interesting)
+2710 LET RANDOM_ENEMY = RND(8) + 1
+2720 IF ENEMY_ACTIVE(RANDOM_ENEMY) = 1 THEN LET ENEMY_Y(RANDOM_ENEMY) = ENEMY_Y(RANDOM_ENEMY) + 1
+2730 REM Check if enemy reached bottom
+2740 IF ENEMY_Y(RANDOM_ENEMY) >= PLAYER_Y THEN GOSUB 2750
+2745 RETURN
+2750 REM Enemy reached player level
+2755 PRINT "Enemy broke through! Lose a life!"
+2760 LET LIVES = LIVES - 1
+2770 LET ENEMY_ACTIVE(RANDOM_ENEMY) = 0
+2780 IF LIVES <= 0 THEN LET GAME_OVER = 1
+2790 RETURN
+
+9999 END

@@ -1,0 +1,118 @@
+T:=== EDGE CASE TESTING PROGRAM ===
+T:
+
+T:Testing variable resolution edge cases...
+
+T:1. Empty variable test:
+U:EMPTY=
+T:Empty variable value: '*EMPTY*'
+
+T:2. Undefined variable test:
+T:Undefined variable: '*UNDEFINED_VAR*'
+
+T:3. Nested variable patterns:
+U:VAR1=Hello
+U:VAR2=VAR1
+T:Nested: '*VAR2*' should be 'VAR1', not 'Hello'
+
+T:4. Variable with special characters in value:
+U:SPECIAL=Hello "World" & More!
+T:Special chars: '*SPECIAL*'
+
+T:5. Very long variable name:
+U:VERY_LONG_VARIABLE_NAME_THAT_IS_QUITE_EXTENSIVE=LongValue
+T:Long name: '*VERY_LONG_VARIABLE_NAME_THAT_IS_QUITE_EXTENSIVE*'
+
+T:
+T:Testing command argument parsing edge cases...
+
+T:6. Testing F: commands with edge cases:
+F:WRITE "test_file.txt" ""
+F:READ "test_file.txt" RESULT
+T:Empty file content: '*RESULT*'
+
+T:7. Testing unmatched quotes:
+U:TEST="Unmatched quote
+T:Unmatched quote test: '*TEST*'
+
+T:8. Testing empty string arguments:
+S:LENGTH "" LEN_RESULT
+T:Empty string length: '*LEN_RESULT*'
+
+T:9. Testing strings with escaped quotes:
+U:ESCAPED_QUOTES=He said \"Hello World\"
+T:Escaped quotes: '*ESCAPED_QUOTES*'
+
+T:
+T:Testing BASIC PRINT edge cases...
+
+PRINT
+PRINT ""
+PRINT "Hello"; "World"
+PRINT "Number: "; 42
+PRINT "Mixed: "; "text"; 123; " more"
+
+T:
+T:Testing expression evaluation edge cases...
+
+U:ZERO=0
+U:NEGATIVE=-5
+U:DECIMAL=3.14
+
+PRINT "Division by zero test: "
+U:RESULT=10/*ZERO*
+T:Result should handle division by zero: '*RESULT*'
+
+PRINT "Complex expression: "
+U:COMPLEX=(*NEGATIVE* + 10) * *DECIMAL*
+T:Complex result: '*COMPLEX*'
+
+T:
+T:Testing file operations with edge cases...
+
+T:10. Testing non-existent file:
+F:READ "non_existent_file.txt" FILE_RESULT
+T:Non-existent file result: '*FILE_RESULT*'
+
+T:11. Testing file with special characters in name:
+F:WRITE "test file with spaces.txt" "content"
+F:READ "test file with spaces.txt" SPACE_RESULT
+T:File with spaces: '*SPACE_RESULT*'
+
+T:
+T:Testing string operations edge cases...
+
+T:12. Testing FIND with empty strings:
+S:FIND "" "text" FIND_RESULT
+T:Find empty in text: '*FIND_RESULT*'
+
+S:FIND "text" "" FIND_RESULT2
+T:Find text in empty: '*FIND_RESULT2*'
+
+T:13. Testing REPLACE with edge cases:
+S:REPLACE "" "old" "new" REPLACE_RESULT
+T:Replace in empty string: '*REPLACE_RESULT*'
+
+S:REPLACE "hello world" "" "X" REPLACE_RESULT2
+T:Replace empty string: '*REPLACE_RESULT2*'
+
+T:
+T:Testing datetime edge cases...
+
+T:14. Testing invalid date parsing:
+DT:PARSE "invalid date" "YYYY-MM-DD" INVALID_DATE
+T:Invalid date result: '*INVALID_DATE*'
+
+T:
+T:Testing web operations edge cases...
+
+T:15. Testing URL encoding of special characters:
+W:ENCODE "Hello World & More!" ENCODED_URL
+T:Encoded URL: '*ENCODED_URL*'
+
+W:DECODE "*ENCODED_URL*" DECODED_URL
+T:Decoded URL: '*DECODED_URL*'
+
+T:
+T:=== END OF EDGE CASE TESTS ===
+END

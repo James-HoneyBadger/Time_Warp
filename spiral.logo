@@ -1,0 +1,9 @@
+; Colorful spiral pattern
+REPEAT 36 [
+  FORWARD 50
+  RIGHT 10
+  SETCOLOR 2
+  FORWARD 30
+  RIGHT 15
+  SETCOLOR 4
+]
