@@ -1,0 +1,38 @@
+{
+  "total_tests": 6,
+  "passed": 4,
+  "failed": 2,
+  "skipped": 2,
+  "details": [
+    {
+      "test": "Enhanced Editor Integration",
+      "status": "FAILED",
+      "message": "Test returned False"
+    },
+    {
+      "test": "Learning Assistant Integration",
+      "status": "PASSED",
+      "message": "Test completed successfully"
+    },
+    {
+      "test": "Sample Programs Compilation",
+      "status": "PASSED",
+      "message": "Test completed successfully"
+    },
+    {
+      "test": "File Operations",
+      "status": "PASSED",
+      "message": "Test completed successfully"
+    },
+    {
+      "test": "UI Components",
+      "status": "PASSED",
+      "message": "Test completed successfully"
+    },
+    {
+      "test": "Plugin Lifecycle",
+      "status": "FAILED",
+      "message": "Test returned False"
+    }
+  ]
+}

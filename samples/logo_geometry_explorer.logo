@@ -1,0 +1,297 @@
+; Logo Educational Geometry Explorer
+; This program teaches geometry concepts through turtle graphics
+; Demonstrates mathematical concepts with visual programming
+
+; Basic shape procedures
+TO SQUARE :SIZE
+  REPEAT 4 [
+    FORWARD :SIZE
+    RIGHT 90
+  ]
+END
+
+TO TRIANGLE :SIZE
+  REPEAT 3 [
+    FORWARD :SIZE
+    RIGHT 120
+  ]
+END
+
+TO HEXAGON :SIZE
+  REPEAT 6 [
+    FORWARD :SIZE
+    RIGHT 60
+  ]
+END
+
+TO OCTAGON :SIZE
+  REPEAT 8 [
+    FORWARD :SIZE
+    RIGHT 45
+  ]
+END
+
+; Regular polygon procedure
+TO POLYGON :SIDES :SIZE
+  REPEAT :SIDES [
+    FORWARD :SIZE
+    RIGHT 360 / :SIDES
+  ]
+END
+
+; Star patterns
+TO STAR :SIZE
+  REPEAT 5 [
+    FORWARD :SIZE
+    RIGHT 144
+  ]
+END
+
+TO SIXSTAR :SIZE
+  REPEAT 6 [
+    FORWARD :SIZE
+    RIGHT 60
+    FORWARD :SIZE
+    LEFT 120
+  ]
+END
+
+; Spiral procedures
+TO SPIRAL :SIZE :ANGLE
+  IF :SIZE > 100 [STOP]
+  FORWARD :SIZE
+  RIGHT :ANGLE
+  SPIRAL :SIZE + 2 :ANGLE
+END
+
+TO COLORSPIREL :SIZE :ANGLE
+  IF :SIZE > 150 [STOP]
+  SETPENCOLOR (RANDOM 16)
+  FORWARD :SIZE
+  RIGHT :ANGLE
+  COLORSPIREL :SIZE + 1 :ANGLE
+END
+
+; Flower patterns
+TO PETAL :SIZE
+  REPEAT 2 [
+    FORWARD :SIZE
+    RIGHT 45
+    FORWARD :SIZE / 2
+    RIGHT 45
+    FORWARD :SIZE / 2
+    RIGHT 90
+  ]
+END
+
+TO FLOWER :PETALS :SIZE
+  REPEAT :PETALS [
+    PETAL :SIZE
+    RIGHT 360 / :PETALS
+  ]
+END
+
+; Fractal tree
+TO TREE :SIZE :ANGLE
+  IF :SIZE < 10 [STOP]
+  FORWARD :SIZE
+  RIGHT :ANGLE
+  TREE :SIZE * 0.7 :ANGLE
+  LEFT :ANGLE * 2
+  TREE :SIZE * 0.7 :ANGLE
+  RIGHT :ANGLE
+  BACK :SIZE
+END
+
+; Mandala creation
+TO MANDALA :LAYERS :SIZE
+  REPEAT :LAYERS [
+    REPEAT 12 [
+      FLOWER 8 :SIZE
+      RIGHT 30
+    ]
+    PENUP
+    FORWARD 15
+    PENDOWN
+  ]
+END
+
+; Geometric art composition
+TO GEOMETRIC_ART
+  ; Draw colorful background pattern
+  REPEAT 36 [
+    SETPENCOLOR (RANDOM 16)
+    FORWARD 100
+    RIGHT 170
+  ]
+  
+  ; Add central mandala
+  HOME
+  SETPENCOLOR "RED"
+  MANDALA 3 20
+  
+  ; Add corner decorations
+  PENUP
+  SETXY -150 150
+  PENDOWN
+  SETPENCOLOR "BLUE"
+  STAR 30
+  
+  PENUP
+  SETXY 150 150
+  PENDOWN
+  SETPENCOLOR "GREEN"
+  HEXAGON 25
+  
+  PENUP
+  SETXY -150 -150
+  PENDOWN
+  SETPENCOLOR "YELLOW"
+  OCTAGON 20
+  
+  PENUP
+  SETXY 150 -150
+  PENDOWN
+  SETPENCOLOR "PURPLE"
+  TRIANGLE 40
+END
+
+; Interactive lesson on angles
+TO ANGLE_LESSON :SIDES
+  CLEARSCREEN
+  HOME
+  PRINT (WORD "Drawing a " :SIDES "-sided polygon")
+  PRINT (WORD "Each angle is " (360 / :SIDES) " degrees")
+  
+  SETPENCOLOR "RED"
+  POLYGON :SIDES 50
+  
+  ; Show the angle measurement
+  PENUP
+  FORWARD 60
+  PENDOWN
+  SETPENCOLOR "BLUE"
+  
+  ; Draw angle arc
+  REPEAT (360 / :SIDES) [
+    FORWARD 1
+    RIGHT 1
+  ]
+END
+
+; Symmetry exploration
+TO SYMMETRY_DEMO :FOLD_LINES
+  CLEARSCREEN
+  HOME
+  
+  ; Draw the fold lines
+  SETPENCOLOR "GRAY"
+  REPEAT :FOLD_LINES [
+    FORWARD 100
+    BACK 100
+    RIGHT 360 / :FOLD_LINES
+  ]
+  
+  ; Draw symmetric pattern
+  SETPENCOLOR "RED"
+  REPEAT :FOLD_LINES [
+    FORWARD 50
+    RIGHT 45
+    FORWARD 30
+    BACK 30
+    LEFT 45
+    BACK 50
+    RIGHT 360 / :FOLD_LINES
+  ]
+END
+
+; Main educational program
+TO GEOMETRY_EXPLORER
+  CLEARSCREEN
+  HOME
+  
+  PRINT "Logo Geometry Explorer"
+  PRINT "====================="
+  PRINT "This program demonstrates geometric concepts"
+  PRINT "Watch as we create mathematical art!"
+  PRINT ""
+  PRINT "Press SPACE to continue through each demonstration..."
+  
+  ; Demonstration sequence
+  WAIT 60  ; Wait for 3 seconds
+  
+  PRINT "1. Basic Shapes"
+  CLEARSCREEN
+  HOME
+  SETPENCOLOR "BLUE"
+  SQUARE 60
+  PENUP
+  FORWARD 100
+  PENDOWN
+  SETPENCOLOR "RED"
+  TRIANGLE 60
+  PENUP
+  RIGHT 90
+  FORWARD 80
+  LEFT 90
+  PENDOWN
+  SETPENCOLOR "GREEN"
+  HEXAGON 40
+  
+  WAIT 60
+  
+  PRINT "2. Star Patterns"
+  CLEARSCREEN
+  HOME
+  SETPENCOLOR "GOLD"
+  STAR 80
+  PENUP
+  RIGHT 90
+  FORWARD 120
+  LEFT 90
+  PENDOWN
+  SETPENCOLOR "SILVER"
+  SIXSTAR 40
+  
+  WAIT 60
+  
+  PRINT "3. Spiral Mathematics"
+  CLEARSCREEN
+  HOME
+  COLORSPIREL 1 91
+  
+  WAIT 60
+  
+  PRINT "4. Flower Geometry"
+  CLEARSCREEN
+  HOME
+  SETPENCOLOR "PINK"
+  FLOWER 8 40
+  
+  WAIT 60
+  
+  PRINT "5. Symmetry Patterns"
+  SYMMETRY_DEMO 8
+  
+  WAIT 60
+  
+  PRINT "6. Complete Geometric Art"
+  GEOMETRIC_ART
+  
+  PRINT ""
+  PRINT "Geometry exploration complete!"
+  PRINT "Try modifying the procedures to create your own art!"
+END
+
+; Start the geometry explorer
+PRINT "Welcome to Logo Geometry Explorer!"
+PRINT "Type GEOMETRY_EXPLORER to begin the interactive lesson"
+PRINT "Or try individual procedures like:"
+PRINT "- STAR 50"
+PRINT "- FLOWER 6 30"
+PRINT "- SPIRAL 1 89"
+PRINT "- MANDALA 4 25"
+PRINT "- ANGLE_LESSON 7"
+PRINT "- SYMMETRY_DEMO 6"
+PRINT ""
+PRINT "Have fun exploring mathematics through art!"
