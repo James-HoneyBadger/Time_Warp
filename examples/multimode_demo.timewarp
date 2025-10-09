@@ -1,7 +1,7 @@
-REM JAMES III Multi-Mode Example
+REM TimeWarp III Multi-Mode Example
 REM Demonstrates all language modes working together
 
-PRINT "JAMES III Multi-Mode Demonstration"
+PRINT "TimeWarp III Multi-Mode Demonstration"
 PRINT "=================================="
 
 REM Initialize with BASIC
@@ -37,8 +37,8 @@ PYTHON:
 import math
 import statistics
 
-name = JAMES.GET("NAME$")
-fav_num = JAMES.GET("FAVORITE_NUM")
+name = TimeWarp.GET("NAME$")
+fav_num = TimeWarp.GET("FAVORITE_NUM")
 
 # Generate sequence based on favorite number
 sequence = []
@@ -54,11 +54,11 @@ if sequence:
 else:
     mean_val = median_val = total = 0
 
-# Store results back in JAMES
-JAMES.SET("DIVISORS", str(sequence))
-JAMES.SET("MEAN_VAL", mean_val)
-JAMES.SET("MEDIAN_VAL", median_val)  
-JAMES.SET("TOTAL", total)
+# Store results back in TimeWarp
+TimeWarp.SET("DIVISORS", str(sequence))
+TimeWarp.SET("MEAN_VAL", mean_val)
+TimeWarp.SET("MEDIAN_VAL", median_val)  
+TimeWarp.SET("TOTAL", total)
 
 print(f"Analysis for {name}'s favorite number {fav_num}:")
 print(f"Divisors: {sequence}")
@@ -110,7 +110,7 @@ PRINT "Final heading:", HEADING, "degrees"
 REM Use PILOT for final interaction
 PRINT ""
 T: === Session Summary ===
-T: Thank you for using JAMES III, #USERNAME!
+T: Thank you for using TimeWarp III, #USERNAME!
 T: Your favorite number #FAVNUMBER generated interesting patterns.
 T: The mathematical analysis and visual representation are complete.
 T: 
@@ -119,7 +119,7 @@ A: #RESPONSE
 
 M: #RESPONSE = "^[Yy]"
 J: SHOW_SUMMARY
-T: Thank you for using JAMES III!
+T: Thank you for using TimeWarp III!
 J: END_PROGRAM
 
 SHOW_SUMMARY:
@@ -135,10 +135,10 @@ T: Final turtle position and heading recorded
 END_PROGRAM:
 PRINT ""
 PRINT "Multi-mode demonstration complete!"
-PRINT "JAMES III successfully combined:"
+PRINT "TimeWarp III successfully combined:"
 PRINT "- BASIC programming (variables, loops, conditionals)"
 PRINT "- PILOT text processing (input, output, pattern matching)"
 PRINT "- Logo graphics (turtle drawing)"  
 PRINT "- Python integration (advanced math, data processing)"
 PRINT ""
-PRINT "Goodbye from JAMES III!"
+PRINT "Goodbye from TimeWarp III!"

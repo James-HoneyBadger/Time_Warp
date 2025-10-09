@@ -1,6 +1,6 @@
 """
-Theme configuration management for JAMES IDE
-Handles saving and loading of UI theme preferences
+Theme configuration management for IDE Time Warp
+Handles saving and loading of UI theme preferences across time
 """
 
 import json
@@ -8,9 +8,9 @@ import os
 from pathlib import Path
 
 def get_config_dir():
-    """Get the configuration directory for JAMES"""
+    """Get the configuration directory for Time Warp"""
     home_dir = Path.home()
-    config_dir = home_dir / ".james"
+    config_dir = home_dir / ".timewarp"
     config_dir.mkdir(exist_ok=True)
     return config_dir
 
@@ -335,7 +335,7 @@ def restore_config_from_backup():
 
 
 class ThemeManager:
-    """Enhanced theme manager for JAMES IDE with modern styling"""
+    """Enhanced theme manager for IDE Time Warp with time-traveling styling"""
     
     def __init__(self):
         """Initialize theme manager"""

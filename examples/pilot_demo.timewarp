@@ -1,4 +1,4 @@
-REM JAMES III PILOT Text Processing Example
+REM TimeWarp III PILOT Text Processing Example
 REM Demonstrates PILOT-style commands
 
 PRINT "PILOT Text Processing Demo"
@@ -6,7 +6,7 @@ PRINT "=========================="
 
 REM Type text
 T: Welcome to PILOT mode!
-T: This is text processing in JAMES III
+T: This is text processing in TimeWarp III
 
 REM Accept input
 T: What is your name?

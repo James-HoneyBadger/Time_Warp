@@ -1,6 +1,6 @@
-# JAMES IDE - Joint Algorithm Model Environment System
+# ⏰ IDE Time Warp - Journey Through Code
 
-JAMES is a comprehensive educational programming environment designed to support multiple programming languages and provide an intuitive learning experience for students and educators.
+IDE Time Warp is a revolutionary time-traveling programming environment that lets you journey through different coding eras while supporting multiple programming languages across time and space.
 
 ## Features
 
@@ -12,8 +12,8 @@ JAMES is a comprehensive educational programming environment designed to support
 - **Perl**: Text processing and scripting
 - **JavaScript**: Web programming language
 
-### Advanced Theme System
-JAMES features 8 beautiful themes with consistent styling across all UI components:
+### Time Era Theme System
+IDE Time Warp features 8 stunning time era themes that transport you through coding history:
 
 **Dark Themes:**
 - **Dracula**: Purple and pink accents on dark background
@@ -49,8 +49,8 @@ JAMES features 8 beautiful themes with consistent styling across all UI componen
 ### Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/JAMES-IDE.git
-   cd JAMES-IDE
+   git clone https://github.com/yourusername/TimeWarp-IDE.git
+   cd TimeWarp-IDE
    ```
 
 2. Install dependencies:
@@ -58,15 +58,15 @@ JAMES features 8 beautiful themes with consistent styling across all UI componen
    pip install -r requirements.txt
    ```
 
-3. Run JAMES:
+3. Launch Time Warp:
    ```bash
-   python JAMES.py
+   python TimeWarp.py
    ```
 
 ## Usage
 
 ### Getting Started
-1. Launch JAMES by running `python JAMES.py`
+1. Launch Time Warp by running `python TimeWarp.py`
 2. Select your preferred programming language from the Language menu
 3. Choose a theme from the Theme menu
 4. Start coding in the editor panel
@@ -100,14 +100,14 @@ JAMES features 8 beautiful themes with consistent styling across all UI componen
 
 ### Customization
 - Themes are automatically saved and restored between sessions
-- Configuration stored in `~/.james/config.json`
+- Configuration stored in `~/.timewarp/config.json`
 - Customizable through the preferences system
 
 ## Project Structure
 
 ```
-JAMES-IDE/
-├── JAMES.py                 # Main application
+TimeWarp-IDE/
+├── TimeWarp.py              # Main time-traveling application
 ├── tools/
 │   ├── theme.py            # Theme management system
 │   ├── pilot_interpreter.py # PILOT language interpreter
@@ -121,7 +121,7 @@ JAMES-IDE/
 
 ## Contributing
 
-We welcome contributions to JAMES! Please:
+We welcome contributions to IDE Time Warp! Please:
 
 1. Fork the repository
 2. Create a feature branch
@@ -131,7 +131,7 @@ We welcome contributions to JAMES! Please:
 
 ## Educational Context
 
-JAMES was designed as an educational tool to help students learn programming concepts across multiple languages. It provides:
+IDE Time Warp was designed as a revolutionary time-traveling tool to help students journey through programming concepts across multiple languages and eras. It provides:
 
 - **Visual Feedback**: Turtle graphics make programming concepts tangible
 - **Multi-Language Learning**: Compare syntax and concepts across languages
@@ -162,4 +162,4 @@ For questions, issues, or contributions, please visit our GitHub repository or c
 
 ---
 
-**JAMES IDE** - Making programming education accessible, visual, and enjoyable for learners of all levels.
+**⏰ IDE Time Warp** - Making programming education a time-traveling adventure across coding eras for learners of all levels.

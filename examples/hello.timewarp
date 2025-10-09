@@ -1,7 +1,7 @@
-REM JAMES III Hello World Example
-REM Demonstrates basic JAMES III syntax
+REM TimeWarp III Hello World Example
+REM Demonstrates basic TimeWarp III syntax
 
-PRINT "Hello, World from JAMES III!"
+PRINT "Hello, World from TimeWarp III!"
 PRINT "============================="
 
 REM Variables and arithmetic
@@ -13,7 +13,7 @@ PRINT "Y =", Y
 PRINT "X + Y =", RESULT
 
 REM String operations
-LET NAME$ = "JAMES III"
+LET NAME$ = "TimeWarp III"
 PRINT "Programming language:", NAME$
 PRINT "Length of name:", LEN(NAME$)
 

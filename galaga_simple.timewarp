@@ -1,6 +1,6 @@
 REM ============================================
 REM GALAGA-STYLE SPACE SHOOTER GAME
-REM Text-based version for JAMES BASIC
+REM Text-based version for TimeWarp BASIC
 REM ============================================
 
 10 REM Initialize game variables

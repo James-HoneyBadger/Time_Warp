@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JAMES Interpreter - Core interpreter for JAMES IDE
-Extracted from monolithic JAMES.py for better code organization
+Time Warp Interpreter - Core interpreter for IDE Time Warp
+Journey through code across time and space
 """
 
 import sys
@@ -249,7 +249,7 @@ except ImportError:
             self.y = y
 
 
-class JAMESInterpreter:
+class TimeWarpInterpreter:
     def __init__(self, output_widget=None):
         self.output_widget = output_widget
         self.variables = {}
@@ -1184,7 +1184,7 @@ class JAMESInterpreter:
 def create_demo_program():
     """Create a demo JAMES program"""
     return '''L:START
-T:Welcome to JAMES Interpreter Demo!
+T:Welcome to Time Warp Interpreter Demo!
 A:NAME
 T:Hello *NAME*! Let's do some math.
 U:X=10
@@ -1203,13 +1203,13 @@ U:COUNT=*COUNT*+1
 J:LOOP
 L:END_LOOP
 T:
-T:Program completed. Thanks for using JAMES!
+T:Program completed. Thanks for using Time Warp!
 END'''
 
 
 if __name__ == "__main__":
     # Simple test when run directly
-    interpreter = JAMESInterpreter()
+    interpreter = TimeWarpInterpreter()
     demo_program = create_demo_program()
-    print("Running JAMES interpreter demo...")
+    print("Running Time Warp interpreter demo...")
     interpreter.run_program(demo_program)

@@ -1,19 +1,19 @@
-REM JAMES III Python Integration Example
-REM Demonstrates Python code within JAMES programs
+REM Time Warp Python Integration Example
+REM Demonstrates Python code warping through time
 
 PRINT "Python Integration Demo"
 PRINT "======================"
 
-REM Set up some JAMES variables
+REM Set up some TimeWarp variables
 LET X = 10
 LET Y = 20
-PRINT "JAMES variables: X =", X, "Y =", Y
+PRINT "TimeWarp variables: X =", X, "Y =", Y
 
-REM Python block that uses JAMES variables
+REM Python block that uses TimeWarp variables
 PYTHON:
-# Get JAMES variables
-x_val = JAMES.GET("X")
-y_val = JAMES.GET("Y")
+# Get TimeWarp variables
+x_val = TimeWarp.GET("X")
+y_val = TimeWarp.GET("Y")
 
 print(f"Python received: X = {x_val}, Y = {y_val}")
 
@@ -22,22 +22,22 @@ import math
 result = math.sqrt(x_val**2 + y_val**2)
 factorial_x = math.factorial(x_val)
 
-# Set JAMES variables from Python
-JAMES.SET("DISTANCE", result)
-JAMES.SET("FACTORIAL", factorial_x)
+# Set TimeWarp variables from Python
+TimeWarp.SET("DISTANCE", result)
+TimeWarp.SET("FACTORIAL", factorial_x)
 
 # Generate some data
 import random
 numbers = [random.randint(1, 100) for _ in range(5)]
-JAMES.SET("RANDOM_LIST", str(numbers))
+TimeWarp.SET("RANDOM_LIST", str(numbers))
 
 print(f"Distance = {result}")
 print(f"Factorial of {x_val} = {factorial_x}")
 print(f"Random numbers: {numbers}")
 END_PYTHON
 
-REM Use Python results in JAMES
-PRINT "Back in JAMES:"
+REM Use Python results in TimeWarp
+PRINT "Back in TimeWarp:"
 PRINT "Distance from origin:", DISTANCE
 PRINT "Factorial of", X, "=", FACTORIAL
 PRINT "Random numbers:", RANDOM_LIST
@@ -51,8 +51,8 @@ import time
 current_time = time.strftime("%Y-%m-%d %H:%M:%S")
 working_dir = os.getcwd()
 
-JAMES.SET("CURRENT_TIME", current_time)
-JAMES.SET("WORKING_DIR", working_dir)
+TimeWarp.SET("CURRENT_TIME", current_time)
+TimeWarp.SET("WORKING_DIR", working_dir)
 
 # Create a simple text analysis
 text = "The quick brown fox jumps over the lazy dog"
@@ -60,10 +60,10 @@ word_count = len(text.split())
 char_count = len(text)
 vowels = sum(1 for c in text.lower() if c in 'aeiou')
 
-JAMES.SET("SAMPLE_TEXT", text)
-JAMES.SET("WORD_COUNT", word_count)
-JAMES.SET("CHAR_COUNT", char_count)  
-JAMES.SET("VOWEL_COUNT", vowels)
+TimeWarp.SET("SAMPLE_TEXT", text)
+TimeWarp.SET("WORD_COUNT", word_count)
+TimeWarp.SET("CHAR_COUNT", char_count)  
+TimeWarp.SET("VOWEL_COUNT", vowels)
 
 print("Text analysis complete")
 END_PYTHON
@@ -81,7 +81,7 @@ PRINT "Words:", WORD_COUNT
 PRINT "Characters:", CHAR_COUNT
 PRINT "Vowels:", VOWEL_COUNT
 
-REM Call Python function from JAMES
+REM Call Python function from TimeWarp
 PYTHON:
 def greet_user(name, language="English"):
     greetings = {
@@ -92,17 +92,17 @@ def greet_user(name, language="English"):
     }
     return greetings.get(language, f"Hello, {name}!")
 
-# Make function available to JAMES
-JAMES.SET("GREET_FUNCTION", greet_user)
+# Make function available to TimeWarp
+TimeWarp.SET("GREET_FUNCTION", greet_user)
 END_PYTHON
 
-REM Demonstrate calling Python from JAMES
+REM Demonstrate calling Python from TimeWarp
 LET NAME$ = "World"
 PRINT ""
 PRINT "Multilingual greetings:"
 PYTHON:
-greet_func = JAMES.GET("GREET_FUNCTION") 
-name = JAMES.GET("NAME$")
+greet_func = TimeWarp.GET("GREET_FUNCTION") 
+name = TimeWarp.GET("NAME$")
 
 for lang in ["English", "Spanish", "French", "German"]:
     greeting = greet_func(name, lang)
