@@ -532,10 +532,41 @@ class JAMESII:
             activeforeground='white'
         )
         self.menubar.add_cascade(label="🔧 Tools", menu=tools_menu)
+        
+        # Development Tools
         tools_menu.add_command(label="🎮 Game Manager", command=self.show_game_manager)
         tools_menu.add_command(label="🔌 Plugin Manager", command=self.show_plugin_manager)
+        tools_menu.add_command(label="🐛 Advanced Debugger", command=self.show_debugger)
         tools_menu.add_separator()
+        
+        # Interactive Tools
         tools_menu.add_command(label="💻 Interactive Console", command=self.open_james_iii_console)
+        tools_menu.add_command(label="🧮 Expression Calculator", command=self.open_calculator)
+        tools_menu.add_command(label="📊 Variable Inspector", command=self.show_variable_inspector)
+        tools_menu.add_separator()
+        
+        # Analysis & Performance
+        tools_menu.add_command(label="⚡ Performance Profiler", command=self.show_performance_profiler)
+        tools_menu.add_command(label="📈 Code Metrics", command=self.show_code_metrics) 
+        tools_menu.add_command(label="🔍 Code Analyzer", command=self.show_code_analyzer)
+        tools_menu.add_separator()
+        
+        # Hardware & IoT
+        tools_menu.add_command(label="🔌 Hardware Controller", command=self.show_hardware_controller)
+        tools_menu.add_command(label="📡 IoT Device Manager", command=self.show_iot_manager)
+        tools_menu.add_command(label="📊 Sensor Visualizer", command=self.show_sensor_visualizer)
+        tools_menu.add_separator()
+        
+        # Educational & Learning
+        tools_menu.add_command(label="🎓 Learning Assistant", command=self.show_learning_assistant)
+        tools_menu.add_command(label="📚 Code Examples", command=self.show_code_examples)
+        tools_menu.add_command(label="🧪 Testing Framework", command=self.show_testing_framework)
+        tools_menu.add_separator()
+        
+        # Utilities
+        tools_menu.add_command(label="🎨 Graphics Canvas", command=self.show_graphics_canvas)
+        tools_menu.add_command(label="🔄 Code Converter", command=self.show_code_converter)
+        tools_menu.add_command(label="⚙️ System Information", command=self.show_system_info)
         
         # Languages menu with consistent theming
         languages_menu = tk.Menu(
