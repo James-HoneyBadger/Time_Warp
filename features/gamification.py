@@ -766,79 +766,85 @@ class GamificationSystem:
             if achievement.unlocked:
                 continue
 
-            # Check requirements
+            # Check requirements and update progress
             requirements_met = True
 
             for req_type, req_value in achievement.requirements.items():
+                current_progress = 0.0
+                
                 if req_type == "programs_written":
+                    current_progress = min(self.user_stats.programs_written / req_value, 1.0)
                     if self.user_stats.programs_written < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.programs_written / req_value
 
                 elif req_type == "tutorials_completed":
+                    current_progress = min(self.user_stats.tutorials_finished / req_value, 1.0)
                     if self.user_stats.tutorials_finished < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.tutorials_finished / req_value
 
                 elif req_type == "streak_days":
+                    current_progress = min(self.user_stats.current_streak / req_value, 1.0)
                     if self.user_stats.current_streak < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.current_streak / req_value
 
                 elif req_type == "languages_used":
                     languages_count = len(self.user_stats.languages_used) if self.user_stats.languages_used else 0
+                    current_progress = min(languages_count / req_value, 1.0)
                     if languages_count < req_value:
                         requirements_met = False
-                        achievement.progress = languages_count / req_value
 
                 elif req_type == "themes_used":
                     themes_count = len(self.user_stats.themes_used) if self.user_stats.themes_used else 0
+                    current_progress = min(themes_count / req_value, 1.0)
                     if themes_count < req_value:
                         requirements_met = False
-                        achievement.progress = themes_count / req_value
 
                 elif req_type == "perfect_programs":
+                    current_progress = min(self.user_stats.perfect_programs / req_value, 1.0)
                     if self.user_stats.perfect_programs < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.perfect_programs / req_value
 
                 elif req_type == "daily_challenges":
+                    current_progress = min(self.user_stats.daily_challenges_completed / req_value, 1.0)
                     if self.user_stats.daily_challenges_completed < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.daily_challenges_completed / req_value
 
                 elif req_type == "session_time":
+                    current_progress = min(self.user_stats.total_session_time / req_value, 1.0)
                     if self.user_stats.total_session_time < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.total_session_time / req_value
 
                 elif req_type == "features_discovered":
                     features_count = len(self.user_stats.features_discovered) if self.user_stats.features_discovered else 0
+                    current_progress = min(features_count / req_value, 1.0)
                     if features_count < req_value:
                         requirements_met = False
-                        achievement.progress = features_count / req_value
 
                 elif req_type == "long_program":
+                    current_progress = min(self.user_stats.lines_of_code / req_value, 1.0)
                     if self.user_stats.lines_of_code < req_value:
                         requirements_met = False
-                        achievement.progress = min(self.user_stats.lines_of_code / req_value, 1.0)
 
                 # Language-specific program counts
                 elif req_type in ["basic_programs", "logo_programs", "python_programs", "pilot_programs"]:
                     language = req_type.split("_")[0]
                     count = self.user_stats.languages_used.get(language, 0) if self.user_stats.languages_used else 0
+                    current_progress = min(count / req_value, 1.0)
                     if count < req_value:
                         requirements_met = False
-                        achievement.progress = count / req_value
 
                 elif req_type == "error_free_programs":
+                    current_progress = min(self.user_stats.perfect_programs / req_value, 1.0)
                     if self.user_stats.perfect_programs < req_value:
                         requirements_met = False
-                        achievement.progress = self.user_stats.perfect_programs / req_value
 
                 elif req_type == "challenge_attempts":
                     # This would need additional tracking, for now assume it's met
-                    pass
+                    current_progress = 1.0
+
+                # Update achievement progress to the minimum progress across all requirements
+                if current_progress < achievement.progress or achievement.progress == 0.0:
+                    achievement.progress = current_progress
 
             if requirements_met:
                 achievement.unlocked = True
