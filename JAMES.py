@@ -132,9 +132,10 @@ class JAMES:
         self.main_container = tk.Frame(self.root)
         self.main_container.pack(fill=tk.BOTH, expand=True)
         
-        # Toolbar removed for cleaner UI - functionality available in menu bar
+        # Setup toolbar with two-line layout
+        self.setup_toolbar()
         
-        # Create main paned window with enhanced styling (no toolbar, so padding from top)
+        # Create main paned window with enhanced styling
         self.main_paned = ttk.PanedWindow(self.main_container, orient=tk.HORIZONTAL, style='Modern.TPanedwindow')
         self.main_paned.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
         
@@ -573,7 +574,7 @@ class JAMES:
         
         # First line: Language selection and file operations
         toolbar_line1 = ttk.Frame(self.toolbar)
-        toolbar_line1.pack(fill=tk.X, pady=(0,2))
+        toolbar_line1.pack(fill=tk.X, pady=(0,5))
         
         # Language selection
         ttk.Label(toolbar_line1, text="Language:").pack(side=tk.LEFT, padx=(0,5))
@@ -592,27 +593,39 @@ class JAMES:
         ttk.Separator(toolbar_line1, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
         ttk.Button(toolbar_line1, text="📁 New", command=self.new_file).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar_line1, text="📂 Open", command=self.open_file).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_line1, text="� Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar_line1, text="💾 Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
         
-        # Second line: Code editor buttons
-        toolbar_line2 = ttk.Frame(self.toolbar)
-        toolbar_line2.pack(fill=tk.X)
-        
-        # Run buttons
-        ttk.Button(toolbar_line2, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_line2, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_line2, text="� Clear", command=self.clear_output).pack(side=tk.LEFT, padx=2)
-        
-        # Editor features
-        ttk.Separator(toolbar_line2, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
-        ttk.Button(toolbar_line2, text="� Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_line2, text="� Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
+
         
     def setup_editor(self):
         """Setup code editor with modern styling"""
         # Editor section in center panel
         editor_frame = ttk.LabelFrame(self.center_paned, text="📝 Code Editor", style='Modern.TLabelframe')
         self.center_paned.add(editor_frame, weight=2)
+        
+        # Create editor control buttons toolbar within editor frame
+        editor_toolbar = ttk.Frame(editor_frame)
+        editor_toolbar.pack(fill=tk.X, padx=5, pady=(5,0))
+        
+        # Compile buttons
+        ttk.Button(editor_toolbar, text="🔨 Compile", command=self.compile_current_language).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar, text="🚀 Compile & Run", command=self.compile_and_run_current_language).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar, text="✨ Format & Check Syntax", command=self.format_and_check_syntax).pack(side=tk.LEFT, padx=2)
+        
+        # Separator before additional controls
+        ttk.Separator(editor_toolbar, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        
+        # Editor action buttons
+        ttk.Button(editor_toolbar, text="▶ Run", command=self.run_code).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar, text="⏹ Stop", command=self.stop_execution).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar, text="🗑 Clear Output", command=self.clear_output).pack(side=tk.LEFT, padx=2)
+        
+        # Separator before find/replace
+        ttk.Separator(editor_toolbar, orient='vertical').pack(side=tk.LEFT, padx=5, fill=tk.Y)
+        
+        # Find and Replace buttons
+        ttk.Button(editor_toolbar, text="🔍 Find", command=self.find_text).pack(side=tk.LEFT, padx=2)
+        ttk.Button(editor_toolbar, text="🔄 Replace", command=self.replace_text).pack(side=tk.LEFT, padx=2)
         
         # Create enhanced code editor with language-specific features
         self.code_editor = EnhancedCodeEditor(editor_frame, initial_language="pilot")
@@ -6266,6 +6279,28 @@ def update_compiler_menu(self):
         # Update menu based on current language capabilities
         print(f"Updating compiler menu for {current_lang}")
 
+def compile_current_language(self):
+    """Compile code for current selected language"""
+    current_lang = self.language_var.get().lower()
+    self.compile_language(current_lang)
+
+def compile_and_run_current_language(self):
+    """Compile and run code for current selected language"""
+    current_lang = self.language_var.get().lower()
+    self.compile_and_run_language(current_lang)
+
+def format_and_check_syntax(self):
+    """Format code and check syntax for current language"""
+    if hasattr(self, 'code_editor'):
+        current_lang = self.code_editor.get_current_language()
+        # Format the code
+        self.code_editor.format_code()
+        # Check syntax
+        self.code_editor.check_syntax()
+        self.write_to_console(f"✨ Formatted and checked syntax for {current_lang.upper()} code")
+    else:
+        self.write_to_console("❌ Editor not available for formatting")
+
 def compile_language(self, language: str):
     """Compile code for specific language"""
     if hasattr(self, 'code_editor'):
@@ -6288,6 +6323,9 @@ def compile_and_run_language(self, language: str):
 # Add enhanced editor methods to JAMES class
 setattr(JAMES, 'update_status_from_editor', update_status_from_editor)
 setattr(JAMES, 'update_compiler_menu', update_compiler_menu)
+setattr(JAMES, 'compile_current_language', compile_current_language)
+setattr(JAMES, 'compile_and_run_current_language', compile_and_run_current_language)
+setattr(JAMES, 'format_and_check_syntax', format_and_check_syntax)
 setattr(JAMES, 'compile_language', compile_language)
 setattr(JAMES, 'compile_and_run_language', compile_and_run_language)
 
