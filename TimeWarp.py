@@ -22,6 +22,11 @@ from core.editor.enhanced_editor import EnhancedCodeEditor
 from tools.theme import ThemeManager
 from plugins import PluginManager
 
+# Feature modules
+from features.tutorial_system import TutorialSystem
+from features.ai_assistant import AICodeAssistant
+from features.gamification import GamificationSystem
+
 
 class IDETimeWarp:
     """
@@ -48,6 +53,18 @@ class IDETimeWarp:
         # Core components
         self.interpreter = TimeWarpInterpreter()
         self.current_file = None
+        
+        # Feature systems
+        self.tutorial_system = TutorialSystem()
+        self.ai_assistant = AICodeAssistant()
+        self.gamification = GamificationSystem()
+        
+        # Set up gamification callbacks
+        self.gamification.set_callbacks(
+            achievement_cb=self.show_achievement_notification,
+            level_up_cb=self.show_level_up_notification,
+            stats_cb=self.update_stats_display
+        )
         
         # Setup UI
         self.setup_ui()
@@ -135,6 +152,13 @@ class IDETimeWarp:
         self.menubar.add_cascade(label="Tools", menu=tools_menu)
         tools_menu.add_command(label="🎨 Theme Selector", command=self.show_theme_selector)
         tools_menu.add_command(label="⚙️ Settings", command=self.show_settings)
+        
+        # Features menu
+        features_menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar.add_cascade(label="Features", menu=features_menu)
+        features_menu.add_command(label="📚 Tutorial System", command=self.show_tutorial_system)
+        features_menu.add_command(label="🤖 AI Code Assistant", command=self.show_ai_assistant)
+        features_menu.add_command(label="🎮 Gamification Dashboard", command=self.show_gamification_dashboard)
         
         # Help menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
@@ -339,6 +363,10 @@ class IDETimeWarp:
             result = self.interpreter.run_program(code)
             if result:
                 self.write_to_console(str(result))
+                
+            # Record successful program execution for gamification
+            lines_count = len([line for line in code.split('\n') if line.strip()])
+            self.record_program_execution(language, code, lines_count)
                 
         except Exception as e:
             self.write_to_console(f"❌ Execution error: {e}")
@@ -715,6 +743,420 @@ Warp through code like never before!
             import traceback
             traceback.print_exc()
             self.write_to_console(f"❌ Error applying theme: {e}")
+
+    # Gamification System Callback Methods
+    def show_achievement_notification(self, achievement):
+        """Show achievement unlock notification"""
+        try:
+            from tkinter import messagebox
+            message = f"🏆 Achievement Unlocked!\n\n{achievement.icon} {achievement.name}\n{achievement.description}\n\n+{achievement.points} points!"
+            messagebox.showinfo("Achievement Unlocked!", message)
+            self.write_to_console(f"🏆 Achievement unlocked: {achievement.name} (+{achievement.points} points)")
+        except Exception as e:
+            print(f"Error showing achievement notification: {e}")
+
+    def show_level_up_notification(self, old_level, new_level):
+        """Show level up notification"""
+        try:
+            from tkinter import messagebox
+            message = f"🎉 Level Up!\n\nYou've reached Level {new_level}!\n\nKeep coding to unlock more features and challenges!"
+            messagebox.showinfo("Level Up!", message)
+            self.write_to_console(f"🎉 Level up! You're now level {new_level} (was {old_level})")
+        except Exception as e:
+            print(f"Error showing level up notification: {e}")
+
+    def update_stats_display(self, stats):
+        """Update stats display in the console"""
+        try:
+            self.write_to_console(f"📊 Stats Update - Level {stats.level}, {stats.total_points} points, {stats.programs_written} programs written")
+        except Exception as e:
+            print(f"Error updating stats display: {e}")
+
+    def record_program_execution(self, language, code, lines_count):
+        """Record program execution for gamification"""
+        try:
+            self.gamification.record_activity("program_written", {
+                "language": language.lower(),
+                "lines": lines_count,
+                "points": max(5, lines_count // 2)  # Base points plus line bonus
+            })
+        except Exception as e:
+            print(f"Error recording program execution: {e}")
+
+    def show_gamification_dashboard(self):
+        """Show gamification dashboard window"""
+        try:
+            dashboard_data = self.gamification.get_user_dashboard()
+            
+            # Create dashboard window
+            dashboard_window = tk.Toplevel(self.root)
+            dashboard_window.title("🎮 Gamification Dashboard")
+            dashboard_window.geometry("800x600")
+            dashboard_window.transient(self.root)
+            dashboard_window.grab_set()
+            
+            # Create notebook for different sections
+            notebook = ttk.Notebook(dashboard_window)
+            notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Stats tab
+            stats_frame = ttk.Frame(notebook)
+            notebook.add(stats_frame, text="📊 Stats")
+            
+            stats_text = tk.Text(stats_frame, wrap=tk.WORD, height=20)
+            stats_scrollbar = tk.Scrollbar(stats_frame, orient=tk.VERTICAL, command=stats_text.yview)
+            stats_text.configure(yscrollcommand=stats_scrollbar.set)
+            
+            stats_content = f"""🎮 Gamification Dashboard
+
+📊 Your Statistics:
+• Level: {dashboard_data['level']}
+• Total Points: {dashboard_data['stats']['total_points']}
+• Experience: {dashboard_data['stats']['experience']} XP
+• XP to Next Level: {dashboard_data['xp_to_next_level']} XP
+• Programs Written: {dashboard_data['stats']['programs_written']}
+• Lines of Code: {dashboard_data['stats']['lines_of_code']}
+• Current Streak: {dashboard_data['stats']['current_streak']} days
+• Longest Streak: {dashboard_data['stats']['longest_streak']} days
+
+🏆 Achievements:
+• Unlocked: {dashboard_data['achievements']['unlocked']}/{dashboard_data['achievements']['total']}
+
+🎯 Challenges:
+• Completed: {dashboard_data['challenges']['completed']}/{dashboard_data['challenges']['total']}
+
+🌟 Recent Achievements:"""
+            
+            for achievement in dashboard_data['achievements']['recent']:
+                stats_content += f"\n• {achievement.icon} {achievement.name} - {achievement.points} pts"
+            
+            stats_text.insert(tk.END, stats_content)
+            stats_text.config(state=tk.DISABLED)
+            
+            stats_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            stats_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Achievements tab
+            achievements_frame = ttk.Frame(notebook)
+            notebook.add(achievements_frame, text="🏆 Achievements")
+            
+            achievements_text = tk.Text(achievements_frame, wrap=tk.WORD, height=20)
+            achievements_scrollbar = tk.Scrollbar(achievements_frame, orient=tk.VERTICAL, command=achievements_text.yview)
+            achievements_text.configure(yscrollcommand=achievements_scrollbar.set)
+            
+            achievements_content = "🏆 All Achievements:\n\n"
+            
+            for achievement in self.gamification.achievements.values():
+                status = "✅" if achievement.unlocked else f"🔒 ({achievement.progress:.0%})"
+                achievements_content += f"{status} {achievement.icon} {achievement.name}\n"
+                achievements_content += f"   {achievement.description}\n"
+                achievements_content += f"   Rarity: {achievement.rarity.value.title()} | Points: {achievement.points}\n\n"
+            
+            achievements_text.insert(tk.END, achievements_content)
+            achievements_text.config(state=tk.DISABLED)
+            
+            achievements_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            achievements_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Challenges tab
+            challenges_frame = ttk.Frame(notebook)
+            notebook.add(challenges_frame, text="🎯 Challenges")
+            
+            challenges_text = tk.Text(challenges_frame, wrap=tk.WORD, height=20)
+            challenges_scrollbar = tk.Scrollbar(challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview)
+            challenges_text.configure(yscrollcommand=challenges_scrollbar.set)
+            
+            challenges_content = "🎯 Available Challenges:\n\n"
+            
+            for challenge in self.gamification.challenges.values():
+                status = "✅ Completed" if challenge.completed else "📋 Available"
+                challenges_content += f"{status} - {challenge.title}\n"
+                challenges_content += f"   Language: {challenge.language.upper()}\n"
+                challenges_content += f"   Difficulty: {challenge.difficulty.title()}\n"
+                challenges_content += f"   Category: {challenge.category.title()}\n"
+                challenges_content += f"   Points: {challenge.points}\n"
+                challenges_content += f"   Description: {challenge.description}\n\n"
+            
+            challenges_text.insert(tk.END, challenges_content)
+            challenges_text.config(state=tk.DISABLED)
+            
+            challenges_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            challenges_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+        except Exception as e:
+            print(f"Error showing gamification dashboard: {e}")
+            messagebox.showerror("Error", f"Could not open gamification dashboard: {e}")
+
+    def show_tutorial_system(self):
+        """Show tutorial system window"""
+        try:
+            # Create tutorial window
+            tutorial_window = tk.Toplevel(self.root)
+            tutorial_window.title("📚 Interactive Tutorial System")
+            tutorial_window.geometry("900x700")
+            tutorial_window.transient(self.root)
+            tutorial_window.grab_set()
+            
+            # Create main frame
+            main_frame = tk.Frame(tutorial_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Tutorial selection
+            selection_frame = tk.Frame(main_frame)
+            selection_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            tk.Label(selection_frame, text="Select a Tutorial:").pack(side=tk.LEFT)
+            
+            tutorial_var = tk.StringVar()
+            tutorials = ["PILOT Basics", "BASIC Programming", "Logo Graphics", "Python Fundamentals"]
+            tutorial_combo = ttk.Combobox(selection_frame, textvariable=tutorial_var, values=tutorials, state="readonly")
+            tutorial_combo.pack(side=tk.LEFT, padx=(10, 0))
+            tutorial_combo.set(tutorials[0])
+            
+            # Tutorial content area
+            content_frame = tk.Frame(main_frame)
+            content_frame.pack(fill=tk.BOTH, expand=True)
+            
+            tutorial_text = tk.Text(content_frame, wrap=tk.WORD, height=25, width=80)
+            tutorial_scrollbar = tk.Scrollbar(content_frame, orient=tk.VERTICAL, command=tutorial_text.yview)
+            tutorial_text.configure(yscrollcommand=tutorial_scrollbar.set)
+            
+            tutorial_content = """📚 Interactive Tutorial System
+
+Welcome to the TimeWarp IDE Tutorial System! 
+
+🎯 Available Tutorials:
+
+1. PILOT Basics
+   - Learn the fundamentals of PILOT programming
+   - Text output with T: commands
+   - User input with A: commands
+   - Variables with U: commands
+   - Conditional logic with Y:, N:, J: commands
+
+2. BASIC Programming  
+   - Classic line-numbered programming
+   - PRINT statements for output
+   - INPUT for user interaction
+   - Variables and calculations
+   - FOR loops and conditional statements
+
+3. Logo Graphics
+   - Turtle graphics programming
+   - Movement commands: FORWARD, BACK
+   - Turning commands: LEFT, RIGHT  
+   - Drawing shapes and patterns
+   - Loops with REPEAT
+
+4. Python Fundamentals
+   - Modern programming concepts
+   - Variables and data types
+   - Functions and control structures
+   - Object-oriented programming basics
+
+💡 Tutorial Features:
+• Step-by-step guided lessons
+• Interactive code examples
+• Progress tracking
+• Achievement integration
+• Hands-on exercises
+
+🚀 Getting Started:
+1. Select a tutorial from the dropdown above
+2. Follow the step-by-step instructions
+3. Try the example code in the main editor
+4. Complete exercises to earn achievements
+
+Happy learning! Your journey through programming history begins here! ⏰"""
+            
+            tutorial_text.insert(tk.END, tutorial_content)
+            tutorial_text.config(state=tk.DISABLED)
+            
+            tutorial_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            tutorial_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Button frame
+            button_frame = tk.Frame(main_frame)
+            button_frame.pack(fill=tk.X, pady=(10, 0))
+            
+            start_button = tk.Button(button_frame, text="▶️ Start Tutorial", 
+                                   command=lambda: self.start_tutorial(tutorial_var.get()))
+            start_button.pack(side=tk.LEFT)
+            
+            close_button = tk.Button(button_frame, text="❌ Close", command=tutorial_window.destroy)
+            close_button.pack(side=tk.RIGHT)
+            
+        except Exception as e:
+            print(f"Error showing tutorial system: {e}")
+            messagebox.showerror("Error", f"Could not open tutorial system: {e}")
+
+    def start_tutorial(self, tutorial_name):
+        """Start a specific tutorial"""
+        try:
+            tutorial_mapping = {
+                "PILOT Basics": "pilot_basics",
+                "BASIC Programming": "basic_fundamentals", 
+                "Logo Graphics": "logo_graphics",
+                "Python Fundamentals": "python_basics"
+            }
+            
+            tutorial_id = tutorial_mapping.get(tutorial_name)
+            if tutorial_id:
+                # For now, just show tutorial started message
+                self.write_to_console(f"📚 Starting tutorial: {tutorial_name}")
+                self.write_to_console(f"� Tutorial system loaded. Follow the interactive lessons in the tutorial window.")
+                # Record tutorial activity
+                self.gamification.record_activity("tutorial_started", {"tutorial": tutorial_id})
+            else:
+                self.write_to_console(f"❌ Unknown tutorial: {tutorial_name}")
+                
+        except Exception as e:
+            print(f"Error starting tutorial: {e}")
+
+    def show_ai_assistant(self):
+        """Show AI code assistant window"""
+        try:
+            # Create AI assistant window
+            ai_window = tk.Toplevel(self.root)
+            ai_window.title("🤖 AI Code Assistant")
+            ai_window.geometry("800x600")
+            ai_window.transient(self.root)
+            ai_window.grab_set()
+            
+            # Create main frame
+            main_frame = tk.Frame(ai_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Code input area
+            input_frame = tk.LabelFrame(main_frame, text="📝 Code to Analyze")
+            input_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+            
+            code_text = tk.Text(input_frame, height=15, wrap=tk.WORD)
+            code_scrollbar = tk.Scrollbar(input_frame, orient=tk.VERTICAL, command=code_text.yview)
+            code_text.configure(yscrollcommand=code_scrollbar.set)
+            
+            # Get current code from editor
+            current_code = self.code_editor.get_content()
+            if current_code.strip():
+                code_text.insert(tk.END, current_code)
+            else:
+                code_text.insert(tk.END, "# Paste your code here for AI analysis\nT:Hello, AI Assistant!\nEND")
+            
+            code_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            code_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Analysis options
+            options_frame = tk.Frame(main_frame)
+            options_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            language_var = tk.StringVar(value="PILOT")
+            tk.Label(options_frame, text="Language:").pack(side=tk.LEFT)
+            lang_combo = ttk.Combobox(options_frame, textvariable=language_var, 
+                                    values=["PILOT", "BASIC", "Logo", "Python"], state="readonly")
+            lang_combo.pack(side=tk.LEFT, padx=(5, 15))
+            
+            analyze_button = tk.Button(options_frame, text="🧠 Analyze Code", 
+                                     command=lambda: self.analyze_code_with_ai(code_text.get(1.0, tk.END), language_var.get()))
+            analyze_button.pack(side=tk.LEFT)
+            
+            # Analysis results area  
+            results_frame = tk.LabelFrame(main_frame, text="🎯 AI Analysis Results")
+            results_frame.pack(fill=tk.BOTH, expand=True)
+            
+            results_text = tk.Text(results_frame, height=15, wrap=tk.WORD, state=tk.DISABLED)
+            results_scrollbar = tk.Scrollbar(results_frame, orient=tk.VERTICAL, command=results_text.yview)
+            results_text.configure(yscrollcommand=results_scrollbar.set)
+            
+            # Store reference for updating
+            self.ai_results_text = results_text
+            
+            # Initial welcome message
+            results_text.config(state=tk.NORMAL)
+            results_text.insert(tk.END, """🤖 AI Code Assistant Ready!
+
+Welcome to the intelligent code analysis system! 
+
+🎯 What I can do:
+• Analyze code structure and syntax
+• Suggest improvements and optimizations  
+• Explain complex programming concepts
+• Identify potential issues and bugs
+• Provide learning recommendations
+• Generate code examples and templates
+
+📝 How to use:
+1. Paste or type your code in the input area above
+2. Select the programming language
+3. Click 'Analyze Code' to get AI insights
+4. Review suggestions and apply improvements
+
+🚀 Ready to make your code better? Let's analyze some code!""")
+            results_text.config(state=tk.DISABLED)
+            
+            results_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            results_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Button frame
+            button_frame = tk.Frame(main_frame)
+            button_frame.pack(fill=tk.X, pady=(10, 0))
+            
+            close_button = tk.Button(button_frame, text="❌ Close", command=ai_window.destroy)
+            close_button.pack(side=tk.RIGHT)
+            
+        except Exception as e:
+            print(f"Error showing AI assistant: {e}")
+            messagebox.showerror("Error", f"Could not open AI assistant: {e}")
+
+    def analyze_code_with_ai(self, code, language):
+        """Analyze code using AI assistant"""
+        try:
+            issues = self.ai_assistant.analyze_code(code, language.lower())
+            
+            # Update results display
+            if hasattr(self, 'ai_results_text'):
+                self.ai_results_text.config(state=tk.NORMAL)
+                self.ai_results_text.delete(1.0, tk.END)
+                
+                results = f"🤖 AI Analysis Results for {language}\n\n"
+                
+                if issues:
+                    results += "📊 Code Issues Found:\n"
+                    for i, issue in enumerate(issues, 1):
+                        results += f"\n{i}. {issue.severity.upper()}: {issue.message}\n"
+                        if issue.line_number:
+                            results += f"   Line: {issue.line_number}\n"
+                        if issue.suggestion:
+                            results += f"   💡 Suggestion: {issue.suggestion}\n"
+                    
+                    # Quality assessment
+                    error_count = len([i for i in issues if i.severity == "error"])
+                    warning_count = len([i for i in issues if i.severity == "warning"])
+                    info_count = len([i for i in issues if i.severity == "info"])
+                    
+                    quality_score = max(0, 10 - (error_count * 3) - (warning_count * 1) - (info_count * 0.5))
+                    results += f"\n🎯 Code Quality Score: {quality_score:.1f}/10\n"
+                    
+                    if error_count == 0 and warning_count == 0:
+                        results += "\n✅ Great job! Your code looks clean and follows good practices!\n"
+                    elif error_count == 0:
+                        results += "\n� Good code! Just a few minor suggestions for improvement.\n"
+                    else:
+                        results += "\n⚠️ There are some issues to address. Fix the errors first, then consider the suggestions.\n"
+                else:
+                    results += "✅ No issues found! Your code looks great!\n\n🎯 Code Quality Score: 10/10\n\n🌟 Excellent work! Your code follows good practices."
+                
+                self.ai_results_text.insert(tk.END, results)
+                self.ai_results_text.config(state=tk.DISABLED)
+                
+            self.write_to_console(f"🤖 AI analysis completed for {language} code")
+            
+        except Exception as e:
+            print(f"Error analyzing code with AI: {e}")
+            if hasattr(self, 'ai_results_text'):
+                self.ai_results_text.config(state=tk.NORMAL)
+                self.ai_results_text.delete(1.0, tk.END)
+                self.ai_results_text.insert(tk.END, f"❌ Error analyzing code: {e}")
+                self.ai_results_text.config(state=tk.DISABLED)
 
     def quit_app(self):
         """Exit the time warp"""

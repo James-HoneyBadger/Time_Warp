@@ -34,6 +34,12 @@ class EnhancedCodeEditor:
         # Set initial language
         self.language_engine.set_language(self.current_language)
         
+        # Initialize editor variables (needed even when toolbar is disabled)
+        self.syntax_highlight_var = tk.BooleanVar(value=True)
+        self.auto_complete_var = tk.BooleanVar(value=True)
+        self.syntax_check_var = tk.BooleanVar(value=True)
+        self.auto_format_var = tk.BooleanVar(value=True)
+        
         # Setup UI
         self.setup_editor()
         self.setup_advanced_features()
