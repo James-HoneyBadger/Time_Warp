@@ -101,8 +101,8 @@ class ToolPlugin(ABC):
     def __init__(self, ide_instance, framework):
         self.ide = ide_instance
         self.framework = framework
-        self.event_manager = framework.event_manager
-        self.registry = framework.registry
+        self.event_manager = framework.event_manager if framework else None
+        self.registry = framework.registry if framework else None
         
         # Tool metadata
         self.name = "Base Tool"
@@ -224,12 +224,14 @@ class ToolPlugin(ABC):
     
     def subscribe_event(self, event_name: str, callback: Callable) -> None:
         """Subscribe to framework events"""
-        self.event_manager.subscribe(event_name, callback)
+        if self.event_manager:
+            self.event_manager.subscribe(event_name, callback)
         self._event_callbacks[event_name] = callback
     
     def emit_event(self, event_name: str, *args, **kwargs) -> None:
         """Emit a framework event"""
-        self.event_manager.emit(event_name, *args, **kwargs)
+        if self.event_manager:
+            self.event_manager.emit(event_name, *args, **kwargs)
     
     def register_component(self, name: str, component: Any) -> None:
         """Register a component with the framework"""

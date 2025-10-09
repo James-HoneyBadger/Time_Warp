@@ -35,6 +35,7 @@ class EnhancedCodeEditor:
         self.language_engine.set_language(self.current_language)
         
         # Initialize editor variables (needed even when toolbar is disabled)
+        self.language_var = tk.StringVar(value=self.current_language.upper())
         self.syntax_highlight_var = tk.BooleanVar(value=True)
         self.auto_complete_var = tk.BooleanVar(value=True)
         self.syntax_check_var = tk.BooleanVar(value=True)
@@ -72,7 +73,6 @@ class EnhancedCodeEditor:
         # Language selection
         ttk.Label(toolbar, text="Language:").pack(side=tk.LEFT, padx=(0, 5))
         
-        self.language_var = tk.StringVar(value=self.current_language.upper())
         language_combo = ttk.Combobox(
             toolbar, 
             textvariable=self.language_var,
