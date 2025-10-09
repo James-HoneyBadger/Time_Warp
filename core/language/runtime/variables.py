@@ -1,5 +1,5 @@
 """
-JAMES IDE Variable Management
+TimeWarp IDE Variable Management
 Runtime variable handling and scoping
 """
 

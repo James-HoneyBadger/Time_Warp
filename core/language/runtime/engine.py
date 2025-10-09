@@ -1,5 +1,5 @@
 """
-JAMES IDE Runtime Engine
+TimeWarp IDE Runtime Engine
 Core execution environment and context management
 """
 
@@ -16,7 +16,7 @@ from ..errors.error_manager import (
 from ..stdlib.core import StandardLibrary
 
 class ExecutionMode(Enum):
-    """Execution modes for JAMES IDE"""
+    """Execution modes for TimeWarp IDE"""
     BASIC = "basic"
     PILOT = "pilot"  
     LOGO = "logo"

@@ -1,6 +1,6 @@
 """
 Language Engine System
-Provides language-specific editing features for JAMES IDE
+Provides language-specific editing features for TimeWarp IDE
 """
 
 import re

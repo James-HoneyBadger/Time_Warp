@@ -1,6 +1,6 @@
 """
-JAMES IDE Runtime Engine
-Executes JAMES IDE programs by interpreting the Abstract Syntax Tree
+TimeWarp IDE Runtime Engine
+Executes TimeWarp IDE programs by interpreting the Abstract Syntax Tree
 """
 
 import sys
@@ -109,7 +109,7 @@ class JAMESFunction:
         return None  # No explicit return
 
 class JAMESInterpreter:
-    """Main interpreter for JAMES IDE programs"""
+    """Main interpreter for TimeWarp IDE programs"""
     
     def __init__(self):
         self.globals = Environment()

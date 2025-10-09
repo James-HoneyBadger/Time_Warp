@@ -1,5 +1,5 @@
 """
-JAMES IDE Mode Handling
+TimeWarp IDE Mode Handling
 Execution mode management and switching
 """
 

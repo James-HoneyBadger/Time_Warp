@@ -1,5 +1,5 @@
 """
-JAMES IDE Plugin Manager
+TimeWarp IDE Plugin Manager
 Central management for the plugin system
 """
 

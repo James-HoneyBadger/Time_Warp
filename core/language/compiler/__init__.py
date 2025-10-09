@@ -1,5 +1,5 @@
 """
-JAMES IDE Compiler System
+TimeWarp IDE Compiler System
 Enhanced compilation with better error handling and optimization
 """
 

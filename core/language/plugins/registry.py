@@ -1,5 +1,5 @@
 """
-JAMES IDE Plugin Registry
+TimeWarp IDE Plugin Registry
 Central registry for managing loaded plugins
 """
 

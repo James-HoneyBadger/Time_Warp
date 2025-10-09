@@ -1,5 +1,5 @@
 """
-Particle system utilities for JAMES
+Particle system utilities for TimeWarp
 Handles particle effects and visual effects.
 """
 

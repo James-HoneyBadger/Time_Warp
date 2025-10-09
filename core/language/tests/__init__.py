@@ -1,5 +1,5 @@
 """
-JAMES IDE Test Suite
+TimeWarp IDE Test Suite
 Comprehensive testing for the refactored architecture
 """
 

@@ -1,5 +1,5 @@
 """
-JAMES IDE Enhanced Lexer
+TimeWarp IDE Enhanced Lexer
 Improved tokenization with better error handling and performance
 """
 
@@ -15,7 +15,7 @@ from ..errors.error_manager import (
 )
 
 class TokenType(Enum):
-    """Enhanced token types for JAMES IDE"""
+    """Enhanced token types for TimeWarp IDE"""
     # Literals
     NUMBER = auto()
     STRING = auto()

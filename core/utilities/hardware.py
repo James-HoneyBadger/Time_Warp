@@ -1,5 +1,5 @@
 """
-Hardware integration utilities for JAMES
+Hardware integration utilities for TimeWarp
 Handles Arduino, GPIO, and sensor interfacing.
 """
 

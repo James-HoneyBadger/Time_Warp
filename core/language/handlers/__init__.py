@@ -1,5 +1,5 @@
 """
-JAMES IDE Language Handlers Module
+TimeWarp IDE Language Handlers Module
 """
 
 from .pilot_handler import PilotHandler

@@ -1,5 +1,5 @@
 """
-Audio utilities for JAMES
+Audio utilities for TimeWarp
 Handles sound mixing and playback functionality.
 """
 

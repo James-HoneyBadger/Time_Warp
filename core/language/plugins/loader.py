@@ -1,5 +1,5 @@
 """
-JAMES IDE Plugin Loader
+TimeWarp IDE Plugin Loader
 Dynamic plugin loading from files and directories
 """
 
@@ -227,7 +227,7 @@ class PluginLoader:
     def create_plugin_template(self, filepath: str, plugin_type: PluginType = PluginType.FUNCTION_LIBRARY):
         """Create a plugin template file"""
         template = f'''"""
-Example JAMES IDE Plugin
+Example TimeWarp IDE Plugin
 Generated plugin template
 """
 
@@ -244,7 +244,7 @@ class ExamplePlugin(FunctionLibraryPlugin):
         metadata = PluginMetadata(
             name="Example Plugin",
             version="1.0.0",
-            description="An example plugin for JAMES IDE",
+            description="An example plugin for TimeWarp IDE",
             author="Your Name",
             plugin_type=PluginType.{plugin_type.name}
         )

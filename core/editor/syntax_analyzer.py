@@ -1,5 +1,5 @@
 """
-Syntax Analyzer for JAMES IDE
+Syntax Analyzer for TimeWarp IDE
 Provides real-time syntax checking and error reporting
 """
 

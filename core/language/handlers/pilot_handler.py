@@ -1,5 +1,5 @@
 """
-PILOT Language Handler for JAMES IDE
+PILOT Language Handler for TimeWarp IDE
 Implements PILOT-style text processing and pattern matching
 """
 

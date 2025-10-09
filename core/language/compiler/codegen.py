@@ -1,5 +1,5 @@
 """
-JAMES IDE Code Generator
+TimeWarp IDE Code Generator
 Generates executable code from AST
 """
 

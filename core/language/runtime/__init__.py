@@ -1,5 +1,5 @@
 """
-JAMES IDE Runtime System
+TimeWarp IDE Runtime System
 Core execution engine and runtime environment
 """
 

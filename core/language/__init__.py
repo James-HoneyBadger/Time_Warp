@@ -1,5 +1,5 @@
 """
-JAMES IDE Language Module
+TimeWarp IDE Language Module
 Unified programming language combining PILOT, BASIC, Logo, and Python
 """
 

@@ -107,7 +107,7 @@ class ToolPlugin(ABC):
         # Tool metadata
         self.name = "Base Tool"
         self.version = "1.0.0"
-        self.author = "JAMES IDE"
+        self.author = "TimeWarp IDE"
         self.description = "Base tool plugin"
         self.category = "general"
         
@@ -278,7 +278,7 @@ class ToolPlugin(ABC):
 
 
 class JAMESFramework:
-    """Core framework for JAMES IDE - manages tools, events, and components"""
+    """Core framework for TimeWarp IDE - manages tools, events, and components"""
     
     def __init__(self, ide_instance):
         self.ide = ide_instance

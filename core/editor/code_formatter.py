@@ -1,5 +1,5 @@
 """
-Code Formatter for JAMES IDE
+Code Formatter for TimeWarp IDE
 Provides language-specific code formatting capabilities
 """
 

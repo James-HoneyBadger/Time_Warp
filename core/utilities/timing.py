@@ -1,5 +1,5 @@
 """
-Timing utilities for JAMES
+Timing utilities for TimeWarp
 Handles delays, timers, and time-based events.
 """
 

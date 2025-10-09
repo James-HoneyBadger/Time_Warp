@@ -1,5 +1,5 @@
 """
-JAMES IDE Standard Library - Core Module
+TimeWarp IDE Standard Library - Core Module
 Provides essential built-in functions and constants
 """
 

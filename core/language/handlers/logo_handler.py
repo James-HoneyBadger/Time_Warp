@@ -1,5 +1,5 @@
 """
-Logo Turtle Graphics Handler for JAMES IDE
+Logo Turtle Graphics Handler for TimeWarp IDE
 Implements Logo-style turtle graphics and geometric programming
 """
 

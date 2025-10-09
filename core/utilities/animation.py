@@ -1,5 +1,5 @@
 """
-Animation utilities for JAMES
+Animation utilities for TimeWarp
 Handles tweening and smooth transitions.
 """
 

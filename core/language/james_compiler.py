@@ -1,6 +1,6 @@
 """
-JAMES IDE Compiler/Interpreter
-Main interface for compiling and executing JAMES IDE programs
+TimeWarp IDE Compiler/Interpreter
+Main interface for compiling and executing TimeWarp IDE programs
 """
 
 import os
@@ -14,7 +14,7 @@ from .handlers.logo_handler import LogoHandler
 from .handlers.python_handler import PythonHandler, BasicHandler
 
 class JAMESCompiler:
-    """Main JAMES IDE compiler/interpreter"""
+    """Main TimeWarp IDE compiler/interpreter"""
     
     def __init__(self):
         self.lexer = JAMESLexer()
@@ -122,7 +122,7 @@ class JAMESCompiler:
     
     def interactive_mode(self):
         """Start interactive JAMES interpreter"""
-        print("JAMES IDE Interactive Interpreter")
+        print("TimeWarp IDE Interactive Interpreter")
         print("Type 'EXIT' to quit, 'HELP' for help")
         print()
         
@@ -217,13 +217,13 @@ class JAMESCompiler:
     def _print_help(self):
         """Print help for interactive mode"""
         print("""
-JAMES IDE Interactive Help:
+TimeWarp IDE Interactive Help:
 - EXIT: Quit the interpreter
 - HELP: Show this help
 - VARS: Show all variables
 - CLEAR: Clear all variables and reset state
 
-JAMES IDE supports:
+TimeWarp IDE supports:
 - BASIC: LET X = 10, PRINT X, IF...THEN...ELSE, FOR...NEXT, WHILE...WEND
 - PILOT: T: Type text, A: Accept input, M: Match patterns
 - Logo: FORWARD 100, RIGHT 90, PENUP, PENDOWN, HOME
@@ -253,10 +253,10 @@ Examples:
         print("Environment cleared")
 
 def main():
-    """Main entry point for JAMES IDE"""
+    """Main entry point for TimeWarp IDE"""
     import argparse
     
-    parser = argparse.ArgumentParser(description="JAMES IDE Programming Language")
+    parser = argparse.ArgumentParser(description="TimeWarp IDE Programming Language")
     parser.add_argument('file', nargs='?', help='JAMES file to execute')
     parser.add_argument('-i', '--interactive', action='store_true', help='Start interactive mode')
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')

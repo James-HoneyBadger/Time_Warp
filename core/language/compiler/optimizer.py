@@ -1,5 +1,5 @@
 """
-JAMES IDE Code Optimizer
+TimeWarp IDE Code Optimizer
 AST optimization for better performance
 """
 

@@ -1,5 +1,5 @@
 """
-Python Integration Handler for JAMES IDE
+Python Integration Handler for TimeWarp IDE
 Handles execution of Python code blocks within JAMES programs
 """
 

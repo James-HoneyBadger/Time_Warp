@@ -1,6 +1,6 @@
 """
-JAMES IDE Language Lexer
-Tokenizes JAMES IDE source code for parsing
+TimeWarp IDE Language Lexer
+Tokenizes TimeWarp IDE source code for parsing
 """
 
 import re
@@ -123,7 +123,7 @@ class Token:
     column: int
 
 class JAMESLexer:
-    """Lexical analyzer for JAMES IDE language"""
+    """Lexical analyzer for TimeWarp IDE language"""
     
     def __init__(self):
         self.keywords = {
@@ -203,7 +203,7 @@ class JAMESLexer:
         }
         
     def tokenize(self, source_code: str) -> List[Token]:
-        """Tokenize JAMES IDE source code"""
+        """Tokenize TimeWarp IDE source code"""
         tokens = []
         lines = source_code.split('\n')
         

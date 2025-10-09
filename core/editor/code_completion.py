@@ -1,5 +1,5 @@
 """
-Code Completion Engine for JAMES IDE
+Code Completion Engine for TimeWarp IDE
 Provides intelligent code completion based on language context
 """
 

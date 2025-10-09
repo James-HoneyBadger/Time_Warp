@@ -1,5 +1,5 @@
 """
-JAMES IDE Plugin System
+TimeWarp IDE Plugin System
 Extensible architecture for adding new features and integrations
 """
 

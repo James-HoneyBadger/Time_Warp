@@ -1,6 +1,6 @@
 """
 IoT Device Management System
-Smart home and IoT device integration for JAMES.
+Smart home and IoT device integration for TimeWarp.
 """
 
 import time

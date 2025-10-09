@@ -1,5 +1,5 @@
 """
-JAMES IDE Plugin Base Classes
+TimeWarp IDE Plugin Base Classes
 Foundation for the plugin system
 """
 
