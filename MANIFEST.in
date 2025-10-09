@@ -1,0 +1,87 @@
+include README.md
+include LICENSE
+include requirements.txt
+include CONTRIBUTING.md
+include .pre-commit-config.yaml
+include pytest.ini
+
+# Include example programs
+recursive-include examples *.pilot
+recursive-include examples *.bas
+recursive-include examples *.logo
+recursive-include examples *.py
+recursive-include examples *.js
+recursive-include examples *.pl
+recursive-include examples *.timewarp
+
+# Include sample programs
+recursive-include samples *.pilot
+recursive-include samples *.bas
+recursive-include samples *.logo
+recursive-include samples *.py
+recursive-include samples *.js
+recursive-include samples *.pl
+recursive-include samples *.timewarp
+
+# Include documentation
+recursive-include docs *.md
+recursive-include docs *.txt
+recursive-include docs *.rst
+
+# Include test files (for development)
+recursive-include tests *.py
+recursive-include test_* *.py
+recursive-include test_* *.pilot
+recursive-include test_* *.bas
+recursive-include test_* *.logo
+recursive-include test_* *.py
+
+# Include game files
+recursive-include games *.py
+recursive-include games *.json
+
+# Include plugin files
+recursive-include plugins *.py
+recursive-include plugins *.json
+
+# Include feature files
+recursive-include features *.py
+
+# Include tool files
+recursive-include tools *.py
+
+# Include data files
+recursive-include data *.desktop
+recursive-include data *.png
+recursive-include data *.svg
+recursive-include data *.ico
+
+# Exclude development files
+exclude .gitignore
+exclude .gitattributes
+exclude .pre-commit-config.yaml
+exclude pytest.ini
+exclude run_tests.py
+exclude run_tests_production.py
+exclude integration_tests.py
+exclude benchmark_*.py
+exclude debug_*.py
+exclude test_*.py
+exclude *_test.py
+exclude performance_bench.py
+exclude install_dependencies.py
+exclude setup_dev.sh
+
+# Exclude cache and temporary files
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude .pytest_cache
+global-exclude *.log
+global-exclude debug_output.txt
+global-exclude benchmark_results.json
+global-exclude integration_test_report.json
+
+# Exclude compiled outputs
+global-exclude *_compiled
+global-exclude *.ppm
+global-exclude *.db

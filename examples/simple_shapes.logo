@@ -1,0 +1,53 @@
+; Simple Shapes Demo
+; Demonstrates basic turtle movement and geometric shapes
+; This example shows how to draw basic shapes using Logo commands
+
+CLEARSCREEN
+SETHEADING 0
+
+; Draw a square
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+
+; Move to new position without drawing
+PENUP
+FORWARD 150
+PENDOWN
+
+; Draw a triangle
+FORWARD 100
+RIGHT 120
+FORWARD 100
+RIGHT 120
+FORWARD 100
+RIGHT 120
+
+; Move to another position
+PENUP
+LEFT 90
+FORWARD 150
+RIGHT 90
+PENDOWN
+
+; Draw a pentagon
+REPEAT 5 [
+  FORWARD 80
+  RIGHT 72
+]
+
+; Move to final position
+PENUP
+FORWARD 150
+PENDOWN
+
+; Draw a hexagon
+REPEAT 6 [
+  FORWARD 60
+  RIGHT 60
+]
