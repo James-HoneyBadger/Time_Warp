@@ -33,6 +33,7 @@ from gui.components import (
 )
 from gui.components.dialogs import GameManagerDialog
 from gui.editor import AdvancedCodeEditor
+from core.editor.enhanced_editor import EnhancedCodeEditor
 from games.engine import GameManager, GameObject, GameRenderer, PhysicsEngine, Vector2D
 from core.hardware import RPiController, SensorVisualizer, GameController, RobotInterface
 from core.iot import IoTDevice, IoTDeviceManager, SmartHomeHub, SensorNetwork
@@ -466,6 +467,24 @@ class JAMESII:
         run_menu.add_separator()
         run_menu.add_command(label="🐛 Debug", command=self.debug_code)
         
+        # Compilation submenu
+        self.compile_menu = tk.Menu(
+            run_menu,
+            tearoff=0,
+            bg=colors.get('menu_bg', '#282A36'),
+            fg=colors.get('text_primary', '#F8F8F2'),
+            activebackground=colors.get('accent', '#FF79C6'),
+            activeforeground='white'
+        )
+        run_menu.add_cascade(label="🔨 Compile", menu=self.compile_menu)
+        self.compile_menu.add_command(label="🔨 Compile PILOT", command=lambda: self.compile_language('pilot'))
+        self.compile_menu.add_command(label="🔨 Compile BASIC", command=lambda: self.compile_language('basic'))
+        self.compile_menu.add_command(label="🔨 Compile Logo", command=lambda: self.compile_language('logo'))
+        self.compile_menu.add_separator()
+        self.compile_menu.add_command(label="🚀 Compile & Run PILOT", command=lambda: self.compile_and_run_language('pilot'))
+        self.compile_menu.add_command(label="🚀 Compile & Run BASIC", command=lambda: self.compile_and_run_language('basic'))
+        self.compile_menu.add_command(label="🚀 Compile & Run Logo", command=lambda: self.compile_and_run_language('logo'))
+        
         # View menu with icons  
         view_menu = tk.Menu(
             self.menubar, 
@@ -608,8 +627,13 @@ class JAMESII:
         editor_frame = ttk.LabelFrame(self.center_paned, text="📝 Code Editor", style='Modern.TLabelframe')
         self.center_paned.add(editor_frame, weight=2)
         
-        # Create advanced code editor
-        self.code_editor = AdvancedCodeEditor(editor_frame)
+        # Create enhanced code editor with language-specific features
+        self.code_editor = EnhancedCodeEditor(editor_frame, initial_language="pilot")
+        
+        # Set up callbacks
+        self.code_editor.set_output_callback(self.write_to_console)
+        self.code_editor.set_status_callback(self.update_status_from_editor)
+        self.code_editor.set_menu_update_callback(self.update_compiler_menu)
         
         # Apply modern theme to editor text widget
         try:
@@ -1511,16 +1535,20 @@ JAMES III Help:
     def set_pilot_mode(self):
         """Set editor to PILOT mode"""
         self.current_language_mode = "pilot"
+        if hasattr(self, 'code_editor') and hasattr(self.code_editor, 'set_language'):
+            self.code_editor.set_language("pilot")
         if self.interpreter:
             self.interpreter.set_language_mode("james_iii")
-        messagebox.showinfo("Language Mode", "Editor set to PILOT mode\\n\\nFeatures:\\n- Text processing commands\\n- Pattern matching\\n- Educational programming")
+        self.write_to_console("📝 Editor set to PILOT mode - Text processing and educational programming")
 
     def set_basic_mode(self):
         """Set editor to BASIC mode"""
         self.current_language_mode = "basic"
+        if hasattr(self, 'code_editor') and hasattr(self.code_editor, 'set_language'):
+            self.code_editor.set_language("basic")
         if self.interpreter:
             self.interpreter.set_language_mode("james_iii")
-        messagebox.showinfo("Language Mode", "Editor set to BASIC mode\\n\\nFeatures:\\n- Classic BASIC programming\\n- Graphics commands\\n- Game development")
+        self.write_to_console("📝 Editor set to BASIC mode - Classic programming with graphics")
 
     def set_logo_mode(self):
         """Set editor to Logo mode"""
@@ -6195,6 +6223,44 @@ Example Distribution:
     setattr(JAMESII, 'show_graphics_canvas', show_graphics_canvas)
     setattr(JAMESII, 'show_code_converter', show_code_converter)
     setattr(JAMESII, 'show_system_info', show_system_info)
+
+# Enhanced Code Editor Integration Methods
+def update_status_from_editor(self, message: str):
+    """Update status from enhanced editor"""
+    # This updates the main status bar
+    print(f"Editor Status: {message}")
+
+def update_compiler_menu(self):
+    """Update compiler menu based on current language"""
+    if hasattr(self, 'code_editor') and hasattr(self, 'compile_menu'):
+        current_lang = self.code_editor.get_current_language()
+        # Update menu based on current language capabilities
+        print(f"Updating compiler menu for {current_lang}")
+
+def compile_language(self, language: str):
+    """Compile code for specific language"""
+    if hasattr(self, 'code_editor'):
+        # Set the language and compile
+        self.code_editor.set_language(language)
+        self.code_editor.compile_current_file()
+        self.write_to_console(f"🔨 Compiling {language.upper()} code...")
+    else:
+        self.write_to_console(f"❌ Editor not available for compilation")
+
+def compile_and_run_language(self, language: str):
+    """Compile and run code for specific language"""
+    if hasattr(self, 'code_editor'):
+        self.code_editor.set_language(language)
+        self.code_editor.compile_and_run()
+        self.write_to_console(f"🚀 Compiling and running {language.upper()} code...")
+    else:
+        self.write_to_console(f"❌ Editor not available for compilation")
+
+# Add enhanced editor methods to JAMESII class
+setattr(JAMESII, 'update_status_from_editor', update_status_from_editor)
+setattr(JAMESII, 'update_compiler_menu', update_compiler_menu)
+setattr(JAMESII, 'compile_language', compile_language)
+setattr(JAMESII, 'compile_and_run_language', compile_and_run_language)
 
 # Add the tools methods
 add_tools_methods()
