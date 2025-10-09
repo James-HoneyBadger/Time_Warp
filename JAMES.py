@@ -939,6 +939,537 @@ JAMES III Help:
         self.james_console.insert(tk.END, "JAMES III Interactive Console\\n")
         self.james_console.insert(tk.END, "=" * 50 + "\\n\\n")
 
+    # ========================
+    # TOOLS MENU IMPLEMENTATIONS
+    # ========================
+    
+    def show_debugger(self):
+        """Show advanced debugger"""
+        try:
+            if hasattr(self, 'debugger') and self.debugger:
+                self.debugger.show()
+            else:
+                messagebox.showinfo("Debugger", "Advanced debugger is not currently available.\nDebugging features are integrated into the main IDE.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Could not open debugger: {e}")
+    
+    def open_calculator(self):
+        """Open expression calculator"""
+        calc_window = tk.Toplevel(self.root)
+        calc_window.title("🧮 Expression Calculator")
+        calc_window.geometry("500x400")
+        calc_window.resizable(True, True)
+        
+        # Configure style
+        colors = self.theme_manager.get_colors()
+        calc_window.configure(bg=colors.get('bg_primary', '#282A36'))
+        
+        # Main frame
+        main_frame = ttk.Frame(calc_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Expression entry
+        ttk.Label(main_frame, text="Expression:").pack(anchor=tk.W)
+        calc_entry = tk.Entry(main_frame, font=("Consolas", 12))
+        calc_entry.pack(fill=tk.X, pady=(0, 10))
+        
+        # Result display
+        ttk.Label(main_frame, text="Result:").pack(anchor=tk.W)
+        result_text = scrolledtext.ScrolledText(main_frame, height=15, font=("Consolas", 11))
+        result_text.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Button frame
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        def calculate():
+            try:
+                expression = calc_entry.get().strip()
+                if not expression:
+                    return
+                    
+                # Use the interpreter's expression evaluator
+                if self.interpreter:
+                    result = self.interpreter.evaluate_expression(expression)
+                    result_text.insert(tk.END, f">>> {expression}\n{result}\n\n")
+                else:
+                    # Fallback to Python eval (safe expressions only)
+                    import ast
+                    import operator
+                    
+                    # Safe evaluation for basic math
+                    operators = {
+                        ast.Add: operator.add, ast.Sub: operator.sub,
+                        ast.Mult: operator.mul, ast.Div: operator.truediv,
+                        ast.Pow: operator.pow, ast.Mod: operator.mod,
+                        ast.USub: operator.neg, ast.UAdd: operator.pos,
+                    }
+                    
+                    def eval_expr(node):
+                        if isinstance(node, ast.Constant):
+                            return node.value
+                        elif isinstance(node, ast.BinOp):
+                            return operators[type(node.op)](eval_expr(node.left), eval_expr(node.right))
+                        elif isinstance(node, ast.UnaryOp):
+                            return operators[type(node.op)](eval_expr(node.operand))
+                        else:
+                            raise TypeError(f"Unsupported operation: {type(node)}")
+                    
+                    tree = ast.parse(expression, mode='eval')
+                    result = eval_expr(tree.body)
+                    result_text.insert(tk.END, f">>> {expression}\n{result}\n\n")
+                    
+                result_text.see(tk.END)
+                calc_entry.delete(0, tk.END)
+                
+            except Exception as e:
+                result_text.insert(tk.END, f">>> {expression}\nError: {e}\n\n")
+                result_text.see(tk.END)
+        
+        def clear_results():
+            result_text.delete(1.0, tk.END)
+        
+        ttk.Button(button_frame, text="Calculate", command=calculate).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Clear", command=clear_results).pack(side=tk.LEFT)
+        
+        calc_entry.bind("<Return>", lambda e: calculate())
+        calc_entry.focus()
+        
+        # Add some examples
+        examples = [
+            "2 + 3 * 4",
+            "10 ** 2",
+            "(5 + 3) * 2",
+            "100 / 3",
+            "2 ** 8 - 1"
+        ]
+        
+        result_text.insert(tk.END, "Expression Calculator\n")
+        result_text.insert(tk.END, "=" * 30 + "\n")
+        result_text.insert(tk.END, "Examples:\n")
+        for example in examples:
+            result_text.insert(tk.END, f"  {example}\n")
+        result_text.insert(tk.END, "\nEnter your expression above and press Calculate or Enter.\n\n")
+    
+    def show_variable_inspector(self):
+        """Show variable inspector"""
+        inspector_window = tk.Toplevel(self.root)
+        inspector_window.title("📊 Variable Inspector")
+        inspector_window.geometry("600x500")
+        
+        # Configure style
+        colors = self.theme_manager.get_colors()
+        inspector_window.configure(bg=colors.get('bg_primary', '#282A36'))
+        
+        # Main frame
+        main_frame = ttk.Frame(inspector_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Variables display
+        ttk.Label(main_frame, text="Current Variables:").pack(anchor=tk.W)
+        
+        # Treeview for variables
+        columns = ('Variable', 'Value', 'Type')
+        tree = ttk.Treeview(main_frame, columns=columns, show='headings', height=15)
+        
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=150)
+        
+        tree.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Scrollbar for treeview
+        scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Button frame
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        def refresh_variables():
+            # Clear existing items
+            for item in tree.get_children():
+                tree.delete(item)
+            
+            if self.interpreter and hasattr(self.interpreter, 'variables'):
+                variables = self.interpreter.variables
+                for name, value in variables.items():
+                    value_str = str(value)[:100]  # Truncate long values
+                    if len(str(value)) > 100:
+                        value_str += "..."
+                    
+                    value_type = type(value).__name__
+                    tree.insert('', tk.END, values=(name, value_str, value_type))
+            else:
+                tree.insert('', tk.END, values=("No interpreter", "N/A", "N/A"))
+        
+        def export_variables():
+            try:
+                import json
+                from tkinter import filedialog
+                
+                filename = filedialog.asksaveasfilename(
+                    defaultextension=".json",
+                    filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+                )
+                
+                if filename:
+                    if self.interpreter and hasattr(self.interpreter, 'variables'):
+                        # Convert variables to JSON-serializable format
+                        export_data = {}
+                        for name, value in self.interpreter.variables.items():
+                            try:
+                                json.dumps(value)  # Test if serializable
+                                export_data[name] = value
+                            except:
+                                export_data[name] = str(value)
+                        
+                        with open(filename, 'w') as f:
+                            json.dump(export_data, f, indent=2)
+                        
+                        messagebox.showinfo("Success", f"Variables exported to {filename}")
+                    else:
+                        messagebox.showwarning("Warning", "No variables to export")
+                        
+            except Exception as e:
+                messagebox.showerror("Error", f"Could not export variables: {e}")
+        
+        ttk.Button(button_frame, text="Refresh", command=refresh_variables).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Export", command=export_variables).pack(side=tk.LEFT)
+        
+        # Initial refresh
+        refresh_variables()
+    
+    def show_performance_profiler(self):
+        """Show performance profiler"""
+        profiler_window = tk.Toplevel(self.root)
+        profiler_window.title("⚡ Performance Profiler")
+        profiler_window.geometry("700x600")
+        
+        # Configure style
+        colors = self.theme_manager.get_colors()
+        profiler_window.configure(bg=colors.get('bg_primary', '#282A36'))
+        
+        # Main frame
+        main_frame = ttk.Frame(profiler_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Info display
+        info_text = scrolledtext.ScrolledText(main_frame, height=20, font=("Consolas", 10), wrap=tk.WORD)
+        info_text.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Button frame
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        def run_performance_test():
+            info_text.delete(1.0, tk.END)
+            info_text.insert(tk.END, "Running performance tests...\n\n")
+            info_text.update()
+            
+            try:
+                import time
+                import psutil
+                import os
+                
+                # System info
+                info_text.insert(tk.END, "=== SYSTEM PERFORMANCE ===\n")
+                info_text.insert(tk.END, f"CPU Usage: {psutil.cpu_percent(interval=1)}%\n")
+                info_text.insert(tk.END, f"Memory Usage: {psutil.virtual_memory().percent}%\n")
+                info_text.insert(tk.END, f"Disk Usage: {psutil.disk_usage('/').percent}%\n\n")
+                
+                # Language performance tests
+                info_text.insert(tk.END, "=== LANGUAGE PERFORMANCE TESTS ===\n")
+                
+                if self.interpreter:
+                    # Test PILOT performance
+                    start_time = time.time()
+                    test_pilot = "T:Performance test\nU:X=1\nC:X=*X*+1\nT:Done"
+                    self.interpreter.run_program(test_pilot)
+                    pilot_time = time.time() - start_time
+                    info_text.insert(tk.END, f"PILOT execution time: {pilot_time:.4f}s\n")
+                    
+                    # Test BASIC performance
+                    start_time = time.time()
+                    test_basic = "10 LET X = 1\n20 FOR I = 1 TO 100\n30 LET X = X + 1\n40 NEXT I\n50 END"
+                    self.interpreter.run_program(test_basic)
+                    basic_time = time.time() - start_time
+                    info_text.insert(tk.END, f"BASIC execution time: {basic_time:.4f}s\n")
+                    
+                    # Test Logo performance
+                    start_time = time.time()
+                    test_logo = "CLEARSCREEN\nFORWARD 50\nRIGHT 90\nFORWARD 50"
+                    self.interpreter.run_program(test_logo)
+                    logo_time = time.time() - start_time
+                    info_text.insert(tk.END, f"Logo execution time: {logo_time:.4f}s\n")
+                    
+                info_text.insert(tk.END, "\n=== RECOMMENDATIONS ===\n")
+                if psutil.cpu_percent() > 80:
+                    info_text.insert(tk.END, "⚠️ High CPU usage detected\n")
+                if psutil.virtual_memory().percent > 80:
+                    info_text.insert(tk.END, "⚠️ High memory usage detected\n")
+                
+                info_text.insert(tk.END, "✅ Performance analysis complete\n")
+                
+            except Exception as e:
+                info_text.insert(tk.END, f"Error during performance test: {e}\n")
+            
+            info_text.see(tk.END)
+        
+        def clear_results():
+            info_text.delete(1.0, tk.END)
+        
+        ttk.Button(button_frame, text="Run Performance Test", command=run_performance_test).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Clear", command=clear_results).pack(side=tk.LEFT)
+        
+        # Initial info
+        info_text.insert(tk.END, "Performance Profiler\n")
+        info_text.insert(tk.END, "=" * 30 + "\n\n")
+        info_text.insert(tk.END, "Click 'Run Performance Test' to analyze system and language performance.\n\n")
+    
+    def show_code_metrics(self):
+        """Show code metrics analyzer"""
+        metrics_window = tk.Toplevel(self.root)
+        metrics_window.title("📈 Code Metrics")
+        metrics_window.geometry("650x550")
+        
+        # Configure style
+        colors = self.theme_manager.get_colors()
+        metrics_window.configure(bg=colors.get('bg_primary', '#282A36'))
+        
+        # Main frame
+        main_frame = ttk.Frame(metrics_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Metrics display
+        metrics_text = scrolledtext.ScrolledText(main_frame, height=20, font=("Consolas", 10), wrap=tk.WORD)
+        metrics_text.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Button frame
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        def analyze_current_code():
+            metrics_text.delete(1.0, tk.END)
+            
+            try:
+                # Get current code from editor
+                code = self.text_editor.get(1.0, tk.END).strip()
+                if not code:
+                    metrics_text.insert(tk.END, "No code to analyze. Please open or write some code first.\n")
+                    return
+                
+                lines = code.split('\n')
+                
+                metrics_text.insert(tk.END, "=== CODE METRICS ANALYSIS ===\n\n")
+                
+                # Basic metrics
+                total_lines = len(lines)
+                non_empty_lines = len([line for line in lines if line.strip()])
+                comment_lines = len([line for line in lines if line.strip().startswith(('#', ';', 'REM', '//'))])
+                code_lines = non_empty_lines - comment_lines
+                
+                metrics_text.insert(tk.END, f"📊 BASIC METRICS:\n")
+                metrics_text.insert(tk.END, f"  Total lines: {total_lines}\n")
+                metrics_text.insert(tk.END, f"  Non-empty lines: {non_empty_lines}\n")
+                metrics_text.insert(tk.END, f"  Code lines: {code_lines}\n")
+                metrics_text.insert(tk.END, f"  Comment lines: {comment_lines}\n")
+                metrics_text.insert(tk.END, f"  Comment ratio: {(comment_lines/non_empty_lines*100):.1f}%\n\n")
+                
+                # Language detection
+                pilot_commands = len([line for line in lines if any(line.strip().startswith(cmd) for cmd in ['T:', 'U:', 'Y:', 'N:', 'J:', 'L:', 'C:', 'A:'])])
+                basic_commands = len([line for line in lines if any(cmd in line.upper() for cmd in ['PRINT', 'LET', 'FOR', 'IF', 'GOTO'])])
+                logo_commands = len([line for line in lines if any(cmd in line.upper() for cmd in ['FORWARD', 'BACK', 'LEFT', 'RIGHT', 'PENUP', 'PENDOWN'])])
+                
+                metrics_text.insert(tk.END, f"🔍 LANGUAGE ANALYSIS:\n")
+                metrics_text.insert(tk.END, f"  PILOT commands: {pilot_commands}\n")
+                metrics_text.insert(tk.END, f"  BASIC commands: {basic_commands}\n")
+                metrics_text.insert(tk.END, f"  Logo commands: {logo_commands}\n\n")
+                
+                # Determine primary language
+                if pilot_commands > basic_commands and pilot_commands > logo_commands:
+                    primary_lang = "PILOT"
+                elif basic_commands > logo_commands:
+                    primary_lang = "BASIC"
+                elif logo_commands > 0:
+                    primary_lang = "Logo"
+                else:
+                    primary_lang = "Unknown/Mixed"
+                
+                metrics_text.insert(tk.END, f"  Primary language: {primary_lang}\n\n")
+                
+                # Complexity analysis
+                control_structures = len([line for line in lines if any(keyword in line.upper() for keyword in ['FOR', 'WHILE', 'IF', 'Y:', 'N:', 'J:', 'REPEAT', 'GOTO'])])
+                variables = len(set([word for line in lines for word in line.split() if word.startswith('*') or 'LET' in line.upper()]))
+                
+                metrics_text.insert(tk.END, f"🧮 COMPLEXITY ANALYSIS:\n")
+                metrics_text.insert(tk.END, f"  Control structures: {control_structures}\n")
+                metrics_text.insert(tk.END, f"  Estimated variables: {variables}\n")
+                
+                complexity_score = (control_structures * 2 + variables + code_lines / 10)
+                if complexity_score < 10:
+                    complexity_level = "Low"
+                elif complexity_score < 25:
+                    complexity_level = "Medium"
+                else:
+                    complexity_level = "High"
+                
+                metrics_text.insert(tk.END, f"  Complexity score: {complexity_score:.1f}\n")
+                metrics_text.insert(tk.END, f"  Complexity level: {complexity_level}\n\n")
+                
+                # Recommendations
+                metrics_text.insert(tk.END, f"💡 RECOMMENDATIONS:\n")
+                if comment_lines / non_empty_lines < 0.1:
+                    metrics_text.insert(tk.END, f"  • Add more comments for better documentation\n")
+                if complexity_score > 30:
+                    metrics_text.insert(tk.END, f"  • Consider breaking code into smaller functions\n")
+                if code_lines > 100:
+                    metrics_text.insert(tk.END, f"  • Large program - consider modular design\n")
+                
+                metrics_text.insert(tk.END, f"  ✅ Analysis complete!\n")
+                
+            except Exception as e:
+                metrics_text.insert(tk.END, f"Error analyzing code: {e}\n")
+            
+            metrics_text.see(tk.END)
+        
+        def clear_metrics():
+            metrics_text.delete(1.0, tk.END)
+        
+        ttk.Button(button_frame, text="Analyze Current Code", command=analyze_current_code).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Clear", command=clear_metrics).pack(side=tk.LEFT)
+        
+        # Initial info
+        metrics_text.insert(tk.END, "Code Metrics Analyzer\n")
+        metrics_text.insert(tk.END, "=" * 30 + "\n\n")
+        metrics_text.insert(tk.END, "Analyzes your code for:\n")
+        metrics_text.insert(tk.END, "• Line counts and ratios\n")
+        metrics_text.insert(tk.END, "• Language detection\n")
+        metrics_text.insert(tk.END, "• Complexity analysis\n")
+        metrics_text.insert(tk.END, "• Improvement recommendations\n\n")
+        metrics_text.insert(tk.END, "Click 'Analyze Current Code' to start.\n")
+    
+    def show_code_analyzer(self):
+        """Show code static analyzer"""
+        analyzer_window = tk.Toplevel(self.root)
+        analyzer_window.title("🔍 Code Analyzer")
+        analyzer_window.geometry("700x600")
+        
+        # Configure style  
+        colors = self.theme_manager.get_colors()
+        analyzer_window.configure(bg=colors.get('bg_primary', '#282A36'))
+        
+        # Main frame
+        main_frame = ttk.Frame(analyzer_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Analysis display
+        analysis_text = scrolledtext.ScrolledText(main_frame, height=20, font=("Consolas", 10), wrap=tk.WORD)
+        analysis_text.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        # Button frame
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X)
+        
+        def analyze_code():
+            analysis_text.delete(1.0, tk.END)
+            
+            try:
+                # Get current code
+                code = self.text_editor.get(1.0, tk.END).strip()
+                if not code:
+                    analysis_text.insert(tk.END, "No code to analyze.\n")
+                    return
+                
+                lines = code.split('\n')
+                analysis_text.insert(tk.END, "=== STATIC CODE ANALYSIS ===\n\n")
+                
+                issues = []
+                warnings = []
+                suggestions = []
+                
+                # Analyze each line
+                for i, line in enumerate(lines, 1):
+                    line_stripped = line.strip()
+                    if not line_stripped:
+                        continue
+                    
+                    # Check for common issues
+                    if line_stripped.startswith('GOTO') and 'GOTO' in line_stripped:
+                        warnings.append(f"Line {i}: Excessive use of GOTO can make code hard to follow")
+                    
+                    if '*' in line_stripped and line_stripped.count('*') % 2 != 0:
+                        issues.append(f"Line {i}: Possible unmatched variable delimiter (*)")
+                    
+                    if line_stripped.upper().startswith('REM') and len(line_stripped) > 50:
+                        suggestions.append(f"Line {i}: Long comment - consider breaking into multiple lines")
+                    
+                    if '=' in line_stripped and line_stripped.count('=') > 2:
+                        warnings.append(f"Line {i}: Multiple assignments in one line - consider splitting")
+                    
+                    # Check for unreferenced labels
+                    if line_stripped.startswith('L:'):
+                        label = line_stripped[2:].strip()
+                        if label and not any(label in other_line for other_line in lines if other_line != line):
+                            warnings.append(f"Line {i}: Label '{label}' appears to be unused")
+                
+                # Check for undefined jumps
+                for i, line in enumerate(lines, 1):
+                    if line.strip().startswith('J:'):
+                        target = line.strip()[2:].strip()
+                        if target and not any(f'L:{target}' in other_line for other_line in lines):
+                            issues.append(f"Line {i}: Jump to undefined label '{target}'")
+                
+                # Display results
+                if issues:
+                    analysis_text.insert(tk.END, "🚨 ISSUES FOUND:\n")
+                    for issue in issues:
+                        analysis_text.insert(tk.END, f"  {issue}\n")
+                    analysis_text.insert(tk.END, "\n")
+                
+                if warnings:
+                    analysis_text.insert(tk.END, "⚠️ WARNINGS:\n")
+                    for warning in warnings:
+                        analysis_text.insert(tk.END, f"  {warning}\n")
+                    analysis_text.insert(tk.END, "\n")
+                
+                if suggestions:
+                    analysis_text.insert(tk.END, "💡 SUGGESTIONS:\n")
+                    for suggestion in suggestions:
+                        analysis_text.insert(tk.END, f"  {suggestion}\n")
+                    analysis_text.insert(tk.END, "\n")
+                
+                if not issues and not warnings and not suggestions:
+                    analysis_text.insert(tk.END, "✅ No issues found! Your code looks good.\n\n")
+                
+                # Summary
+                analysis_text.insert(tk.END, "=== ANALYSIS SUMMARY ===\n")
+                analysis_text.insert(tk.END, f"Issues: {len(issues)}\n")
+                analysis_text.insert(tk.END, f"Warnings: {len(warnings)}\n")
+                analysis_text.insert(tk.END, f"Suggestions: {len(suggestions)}\n")
+                
+            except Exception as e:
+                analysis_text.insert(tk.END, f"Error during analysis: {e}\n")
+            
+            analysis_text.see(tk.END)
+        
+        def clear_analysis():
+            analysis_text.delete(1.0, tk.END)
+        
+        ttk.Button(button_frame, text="Analyze Code", command=analyze_code).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Clear", command=clear_analysis).pack(side=tk.LEFT)
+        
+        # Initial info
+        analysis_text.insert(tk.END, "Static Code Analyzer\n")
+        analysis_text.insert(tk.END, "=" * 30 + "\n\n")
+        analysis_text.insert(tk.END, "Performs static analysis to find:\n")
+        analysis_text.insert(tk.END, "• Syntax errors and issues\n")
+        analysis_text.insert(tk.END, "• Code quality warnings\n")
+        analysis_text.insert(tk.END, "• Improvement suggestions\n")
+        analysis_text.insert(tk.END, "• Undefined references\n\n")
+        analysis_text.insert(tk.END, "Load your code and click 'Analyze Code'.\n")
+
     def set_pilot_mode(self):
         """Set editor to PILOT mode"""
         self.current_language_mode = "pilot"
