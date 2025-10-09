@@ -1,6 +1,6 @@
 """
-BASIC Language Executor for JAMES IDE
-====================================
+BASIC Language Executor for TimeWarp IDE
+========================================
 
 BASIC (Beginner's All-purpose Symbolic Instruction Code) is a family of general-purpose,
 high-level programming languages designed for ease of use.
@@ -420,7 +420,7 @@ class BasicExecutor:
                 try:
                     width = int(parts[1].rstrip(','))
                     height = int(parts[2].rstrip(','))
-                    title = ' '.join(parts[3:]).strip('"') if len(parts) > 3 else "JAMES Game Window"
+                    title = ' '.join(parts[3:]).strip('"') if len(parts) > 3 else "TimeWarp Game Window"
                     self.interpreter.log_output(f"🎮 Game screen initialized: {width}x{height} - {title}")
                     
                     # Initialize graphics - either IDE canvas or standalone pygame

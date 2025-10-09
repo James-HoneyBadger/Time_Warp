@@ -1,6 +1,6 @@
 """
-JAMES Language Support Modules
-==============================
+TimeWarp Language Support Modules
+=================================
 
 Contains implementations for supported programming languages:
 - BASIC interpreter

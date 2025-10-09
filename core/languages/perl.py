@@ -1,10 +1,10 @@
 """
-Perl Language Executor for JAMES IDE
-===================================
+Perl Language Executor for TimeWarp IDE
+=======================================
 
 Perl is a high-level, general-purpose, interpreted, dynamic programming language.
 
-This module handles Perl script execution for the JAMES IDE.
+This module handles Perl script execution for the TimeWarp IDE.
 """
 
 import subprocess

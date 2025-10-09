@@ -1,6 +1,6 @@
 """
-PILOT Language Executor for JAMES IDE
-=====================================
+PILOT Language Executor for TimeWarp IDE
+========================================
 
 PILOT (Programmed Inquiry, Learning, Or Teaching) is an educational programming language
 designed for teaching and learning programming concepts.

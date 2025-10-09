@@ -1182,7 +1182,7 @@ class TimeWarpInterpreter:
 
 
 def create_demo_program():
-    """Create a demo JAMES program"""
+    """Create a demo TimeWarp program"""
     return '''L:START
 T:Welcome to Time Warp Interpreter Demo!
 A:NAME

@@ -1,5 +1,5 @@
 """
-Compiler Manager for JAMES IDE
+Compiler Manager for TimeWarp IDE
 Handles compilation of different languages and execution of compiled programs
 """
 

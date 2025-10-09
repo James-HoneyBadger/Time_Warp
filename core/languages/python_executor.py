@@ -1,10 +1,10 @@
 """
-Python Language Executor for JAMES IDE
-=====================================
+Python Language Executor for TimeWarp IDE
+==========================================
 
 Python is a high-level, general-purpose programming language.
 
-This module handles Python script execution for the JAMES IDE.
+This module handles Python script execution for the TimeWarp IDE.
 """
 
 import subprocess
@@ -19,7 +19,7 @@ class PythonExecutor:
     def __init__(self, interpreter):
         """Initialize with reference to main interpreter"""
         self.interpreter = interpreter
-        self.python_executable = sys.executable  # Use the same Python as JAMES
+        self.python_executable = sys.executable  # Use the same Python as TimeWarp
         
     def execute_command(self, command):
         """Execute a Python command or script"""

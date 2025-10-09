@@ -1,5 +1,5 @@
 """
-JAMES IDE Advanced Code Editor System
+TimeWarp IDE Advanced Code Editor System
 Provides language-specific editing features with compilation support
 """
 

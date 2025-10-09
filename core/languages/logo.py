@@ -1,6 +1,6 @@
 """
-Logo Language Executor for JAMES IDE
-====================================
+Logo Language Executor for TimeWarp IDE
+=======================================
 
 Logo is an educational programming language known for its turtle graphics capabilities.
 It was designed to teach programming concepts to children through visual feedback.
