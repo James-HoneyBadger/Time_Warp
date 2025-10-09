@@ -1,0 +1,74 @@
+{
+    "folders": [
+        {
+            "name": "JAMES IDE",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "python.defaultInterpreterPath": "./james_env/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "files.associations": {
+            "*.james": "python",
+            "*.pilot": "plaintext",
+            "*.bas": "basic",
+            "*.logo": "lisp",
+            "*.jtc": "json"
+        },
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "files.exclude": {
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "**/james_env": true,
+            "**/.pytest_cache": true,
+            "**/debug_*.py": true,
+            "**/test_*.py": true,
+            "**/*_backup.py": true,
+            "**/*_corrupted*.py": true
+        },
+        "python.testing.pytestEnabled": true,
+        "explorer.fileNesting.enabled": true,
+        "explorer.fileNesting.patterns": {
+            "*.py": "${capture}_test.py,${capture}_backup.py",
+            "README.md": "*.md"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.pylint",
+            "ms-python.black-formatter",
+            "ms-vscode.vscode-json",
+            "github.vscode-github-actions",
+            "github.copilot",
+            "eamodio.gitlens"
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Launch JAMES IDE",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "JAMES.py",
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}"
+                }
+            },
+            {
+                "name": "Run Tests",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "run_tests.py",
+                "console": "integratedTerminal"
+            }
+        ]
+    }
+}

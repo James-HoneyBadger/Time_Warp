@@ -56,6 +56,35 @@ temp/
 
 # Config files (user-specific)
 .james/
+config.json
 
 # Cache directories
 .cache/
+
+# Test and temporary files
+test_*.py
+*_test.py
+debug_*.py
+benchmark_*.py
+stress_test_*.py
+*_backup.py
+*_corrupted*.py
+temp_*.py
+edge_case_*.py
+diagnose_*.py
+
+# Documentation files (will be generated)
+*_SUMMARY.md
+*_REPORT.md
+*_GUIDE.md
+*_COMPLETE.md
+
+# Game and demo files (examples only)
+demo_*.py
+run_*_direct.py
+
+# File system test files
+"test
+"test_file.txt"
+test file with spaces.txt
+unicode_test.txt

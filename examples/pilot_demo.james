@@ -1,0 +1,43 @@
+REM JAMES III PILOT Text Processing Example
+REM Demonstrates PILOT-style commands
+
+PRINT "PILOT Text Processing Demo"
+PRINT "=========================="
+
+REM Type text
+T: Welcome to PILOT mode!
+T: This is text processing in JAMES III
+
+REM Accept input
+T: What is your name?
+A: #NAME
+
+REM Use variable in output
+T: Hello, #NAME! Nice to meet you.
+
+REM Match patterns
+T: Tell me about yourself (just press Enter for default):
+A: #INFO
+M: #INFO = ""
+J: DEFAULT_INFO
+T: You said: #INFO
+J: CONTINUE
+
+DEFAULT_INFO:
+T: You didn't say much, #NAME!
+
+CONTINUE:
+T: 
+T: Let's try some pattern matching...
+T: Enter a number:
+A: #NUMBER
+M: #NUMBER = "^[0-9]+$"
+J: VALID_NUMBER
+T: That's not a valid number!
+J: END
+
+VALID_NUMBER:
+T: Good! #NUMBER is a valid number.
+
+END:
+T: PILOT demo complete!

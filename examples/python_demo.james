@@ -1,0 +1,113 @@
+REM JAMES III Python Integration Example
+REM Demonstrates Python code within JAMES programs
+
+PRINT "Python Integration Demo"
+PRINT "======================"
+
+REM Set up some JAMES variables
+LET X = 10
+LET Y = 20
+PRINT "JAMES variables: X =", X, "Y =", Y
+
+REM Python block that uses JAMES variables
+PYTHON:
+# Get JAMES variables
+x_val = JAMES.GET("X")
+y_val = JAMES.GET("Y")
+
+print(f"Python received: X = {x_val}, Y = {y_val}")
+
+# Do some Python calculations
+import math
+result = math.sqrt(x_val**2 + y_val**2)
+factorial_x = math.factorial(x_val)
+
+# Set JAMES variables from Python
+JAMES.SET("DISTANCE", result)
+JAMES.SET("FACTORIAL", factorial_x)
+
+# Generate some data
+import random
+numbers = [random.randint(1, 100) for _ in range(5)]
+JAMES.SET("RANDOM_LIST", str(numbers))
+
+print(f"Distance = {result}")
+print(f"Factorial of {x_val} = {factorial_x}")
+print(f"Random numbers: {numbers}")
+END_PYTHON
+
+REM Use Python results in JAMES
+PRINT "Back in JAMES:"
+PRINT "Distance from origin:", DISTANCE
+PRINT "Factorial of", X, "=", FACTORIAL
+PRINT "Random numbers:", RANDOM_LIST
+
+REM Another Python block with file operations
+PYTHON:
+import os
+import time
+
+# Get system info
+current_time = time.strftime("%Y-%m-%d %H:%M:%S")
+working_dir = os.getcwd()
+
+JAMES.SET("CURRENT_TIME", current_time)
+JAMES.SET("WORKING_DIR", working_dir)
+
+# Create a simple text analysis
+text = "The quick brown fox jumps over the lazy dog"
+word_count = len(text.split())
+char_count = len(text)
+vowels = sum(1 for c in text.lower() if c in 'aeiou')
+
+JAMES.SET("SAMPLE_TEXT", text)
+JAMES.SET("WORD_COUNT", word_count)
+JAMES.SET("CHAR_COUNT", char_count)  
+JAMES.SET("VOWEL_COUNT", vowels)
+
+print("Text analysis complete")
+END_PYTHON
+
+REM Display Python results
+PRINT ""
+PRINT "System Information:"
+PRINT "Current time:", CURRENT_TIME
+PRINT "Working directory:", WORKING_DIR
+
+PRINT ""
+PRINT "Text Analysis:"
+PRINT "Text:", SAMPLE_TEXT
+PRINT "Words:", WORD_COUNT
+PRINT "Characters:", CHAR_COUNT
+PRINT "Vowels:", VOWEL_COUNT
+
+REM Call Python function from JAMES
+PYTHON:
+def greet_user(name, language="English"):
+    greetings = {
+        "English": f"Hello, {name}!",
+        "Spanish": f"¡Hola, {name}!",
+        "French": f"Bonjour, {name}!",
+        "German": f"Guten Tag, {name}!"
+    }
+    return greetings.get(language, f"Hello, {name}!")
+
+# Make function available to JAMES
+JAMES.SET("GREET_FUNCTION", greet_user)
+END_PYTHON
+
+REM Demonstrate calling Python from JAMES
+LET NAME$ = "World"
+PRINT ""
+PRINT "Multilingual greetings:"
+PYTHON:
+greet_func = JAMES.GET("GREET_FUNCTION") 
+name = JAMES.GET("NAME$")
+
+for lang in ["English", "Spanish", "French", "German"]:
+    greeting = greet_func(name, lang)
+    print(f"{lang}: {greeting}")
+END_PYTHON
+
+PRINT ""
+PRINT "Python integration demo complete!"

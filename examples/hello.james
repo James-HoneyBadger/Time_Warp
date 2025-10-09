@@ -1,0 +1,33 @@
+REM JAMES III Hello World Example
+REM Demonstrates basic JAMES III syntax
+
+PRINT "Hello, World from JAMES III!"
+PRINT "============================="
+
+REM Variables and arithmetic
+LET X = 10
+LET Y = 20
+LET RESULT = X + Y
+PRINT "X =", X
+PRINT "Y =", Y  
+PRINT "X + Y =", RESULT
+
+REM String operations
+LET NAME$ = "JAMES III"
+PRINT "Programming language:", NAME$
+PRINT "Length of name:", LEN(NAME$)
+
+REM Control flow
+IF X > Y THEN
+    PRINT X, "is greater than", Y
+ELSE
+    PRINT Y, "is greater than or equal to", X
+ENDIF
+
+REM Loop
+PRINT "Counting from 1 to 5:"
+FOR I = 1 TO 5
+    PRINT "Count:", I
+NEXT I
+
+PRINT "Program complete!"

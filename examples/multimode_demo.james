@@ -1,0 +1,144 @@
+REM JAMES III Multi-Mode Example
+REM Demonstrates all language modes working together
+
+PRINT "JAMES III Multi-Mode Demonstration"
+PRINT "=================================="
+
+REM Initialize with BASIC
+LET PROGRAM_NAME$ = "Multi-Mode Demo"  
+LET VERSION = 1.0
+PRINT "Program:", PROGRAM_NAME$, "v" + STR$(VERSION)
+
+REM Get user information with PILOT
+PRINT ""
+T: === User Information Collection ===
+T: What is your name?
+A: #USERNAME
+T: What is your favorite number?
+A: #FAVNUMBER
+
+REM Validate input with BASIC
+LET NAME$ = USERNAME
+LET FAVORITE_NUM = VAL(FAVNUMBER)
+
+IF LEN(NAME$) = 0 THEN
+    LET NAME$ = "Anonymous"
+ENDIF
+
+IF FAVORITE_NUM <= 0 THEN
+    LET FAVORITE_NUM = 42
+ENDIF
+
+PRINT ""
+PRINT "Hello,", NAME$, "! Your favorite number is", FAVORITE_NUM
+
+REM Use Python for complex calculations
+PYTHON:
+import math
+import statistics
+
+name = JAMES.GET("NAME$")
+fav_num = JAMES.GET("FAVORITE_NUM")
+
+# Generate sequence based on favorite number
+sequence = []
+for i in range(1, int(fav_num) + 1):
+    if fav_num % i == 0:
+        sequence.append(i)
+
+# Calculate statistics
+if sequence:
+    mean_val = statistics.mean(sequence)
+    median_val = statistics.median(sequence) 
+    total = sum(sequence)
+else:
+    mean_val = median_val = total = 0
+
+# Store results back in JAMES
+JAMES.SET("DIVISORS", str(sequence))
+JAMES.SET("MEAN_VAL", mean_val)
+JAMES.SET("MEDIAN_VAL", median_val)  
+JAMES.SET("TOTAL", total)
+
+print(f"Analysis for {name}'s favorite number {fav_num}:")
+print(f"Divisors: {sequence}")
+print(f"Sum of divisors: {total}")
+print(f"Mean: {mean_val:.2f}")
+print(f"Median: {median_val}")
+END_PYTHON
+
+REM Display results with BASIC
+PRINT ""
+PRINT "Mathematical Analysis Results:"
+PRINT "Divisors of", FAVORITE_NUM, ":", DIVISORS
+PRINT "Sum:", TOTAL
+PRINT "Mean:", MEAN_VAL
+PRINT "Median:", MEDIAN_VAL
+
+REM Create visual representation with Logo
+PRINT ""
+PRINT "Creating visual representation..."
+
+REM Logo graphics based on the favorite number
+CLEARSCREEN
+HOME
+PENDOWN
+
+REM Draw pattern based on number of divisors
+LET NUM_DIVISORS = LEN(DIVISORS) / 2  REM Rough approximation
+FOR I = 1 TO NUM_DIVISORS
+    FORWARD FAVORITE_NUM / 2
+    RIGHT 360 / NUM_DIVISORS
+NEXT I
+
+REM Draw connecting lines
+PENUP
+HOME  
+PENDOWN
+FOR I = 1 TO 8
+    FORWARD FAVORITE_NUM
+    BACKWARD FAVORITE_NUM
+    RIGHT 45
+NEXT I
+
+REM Report final turtle position
+PENUP
+PRINT "Logo drawing complete"
+PRINT "Final turtle position: (", XCOR, ",", YCOR, ")"
+PRINT "Final heading:", HEADING, "degrees"
+
+REM Use PILOT for final interaction
+PRINT ""
+T: === Session Summary ===
+T: Thank you for using JAMES III, #USERNAME!
+T: Your favorite number #FAVNUMBER generated interesting patterns.
+T: The mathematical analysis and visual representation are complete.
+T: 
+T: Would you like to see the results again? (y/n)
+A: #RESPONSE
+
+M: #RESPONSE = "^[Yy]"
+J: SHOW_SUMMARY
+T: Thank you for using JAMES III!
+J: END_PROGRAM
+
+SHOW_SUMMARY:
+T: === Summary for #USERNAME ===
+T: Favorite Number: #FAVNUMBER
+PRINT "Divisors:", DIVISORS
+PRINT "Sum of divisors:", TOTAL
+PRINT "Mean:", MEAN_VAL
+PRINT "Median:", MEDIAN_VAL
+T: Visual pattern created with Logo turtle graphics
+T: Final turtle position and heading recorded
+
+END_PROGRAM:
+PRINT ""
+PRINT "Multi-mode demonstration complete!"
+PRINT "JAMES III successfully combined:"
+PRINT "- BASIC programming (variables, loops, conditionals)"
+PRINT "- PILOT text processing (input, output, pattern matching)"
+PRINT "- Logo graphics (turtle drawing)"  
+PRINT "- Python integration (advanced math, data processing)"
+PRINT ""
+PRINT "Goodbye from JAMES III!"
