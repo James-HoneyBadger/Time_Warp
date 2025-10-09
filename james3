@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""
+JAMES III Command Line Interface
+Standalone tool for running JAMES III programs
+"""
+
+import os
+import sys
+import argparse
+from pathlib import Path
+
+# Add the JAMES directory to the path so we can import modules
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from core.language.james_compiler import JAMESCompiler
+
+def create_sample_program():
+    """Create a sample JAMES III program"""
+    sample_code = '''REM JAMES III Sample Program
+REM Demonstrates multiple language modes
+
+PRINT "Welcome to JAMES III!"
+PRINT "==================="
+
+REM BASIC Mode
+LET X = 10
+LET Y = 20
+PRINT "BASIC: X + Y =", X + Y
+
+FOR I = 1 TO 3
+    PRINT "Count:", I
+NEXT I
+
+REM PILOT Mode
+T: Enter your name:
+A: #NAME
+T: Hello, #NAME!
+
+REM Logo Mode
+PRINT "Drawing a square..."
+LOGO:
+REPEAT 4
+    FORWARD 50
+    RIGHT 90
+
+REM Python Integration
+PYTHON:
+import random
+num = random.randint(1, 100)
+JAMES.SET("RANDOM_NUM", num)
+print(f"Python generated: {num}")
+END_PYTHON
+
+PRINT "Random number from Python:", RANDOM_NUM
+PRINT "Program complete!"
+'''
+    return sample_code
+
+def main():
+    """Main CLI entry point"""
+    parser = argparse.ArgumentParser(
+        description="JAMES III Programming Language Interpreter",
+        epilog="""
+Examples:
+  james3 program.james          # Run a JAMES file
+  james3 -i                     # Start interactive mode
+  james3 -c "PRINT 'Hello'"     # Execute code string
+  james3 --sample > hello.james # Generate a sample program
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    # Input options
+    parser.add_argument('file', nargs='?', help='JAMES file to execute')
+    parser.add_argument('-c', '--code', help='Execute code string directly')
+    parser.add_argument('-i', '--interactive', action='store_true', 
+                       help='Start interactive mode')
+    
+    # Output options
+    parser.add_argument('--sample', action='store_true', 
+                       help='Generate sample JAMES III program')
+    parser.add_argument('-o', '--output', help='Output file for compiled code')
+    
+    # Debug options
+    parser.add_argument('-d', '--debug', action='store_true', 
+                       help='Enable debug mode (show tokens and AST)')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                       help='Verbose output')
+    parser.add_argument('--tokens', action='store_true',
+                       help='Show tokens only (implies debug)')
+    parser.add_argument('--ast', action='store_true',
+                       help='Show AST only (implies debug)')
+    
+    # Optimization options
+    parser.add_argument('-O', '--optimize', action='store_true',
+                       help='Enable optimization')
+    
+    # Version
+    parser.add_argument('--version', action='version', version='JAMES III 1.0.0')
+    
+    args = parser.parse_args()
+    
+    # Handle sample generation
+    if args.sample:
+        print(create_sample_program())
+        return 0
+    
+    # Create compiler instance
+    compiler = JAMESCompiler()
+    
+    # Set options
+    if args.debug or args.tokens or args.ast:
+        compiler.set_debug_mode(True)
+    
+    if args.optimize:
+        compiler.set_optimization(True)
+    
+    try:
+        # Determine execution mode
+        if args.code:
+            # Execute code string
+            if args.verbose:
+                print(f"Executing: {args.code}")
+            
+            output = compiler.execute_string(args.code)
+            for line in output:
+                print(line)
+                
+        elif args.file:
+            # Execute file
+            if not os.path.exists(args.file):
+                print(f"Error: File '{args.file}' not found", file=sys.stderr)
+                return 1
+            
+            if args.verbose:
+                print(f"Executing file: {args.file}")
+            
+            output = compiler.execute_file(args.file)
+            for line in output:
+                print(line)
+                
+        elif args.interactive:
+            # Interactive mode
+            compiler.interactive_mode()
+            
+        else:
+            # No input specified, start interactive mode
+            print("No input specified. Starting interactive mode.")
+            print("Use --help for more options.")
+            print()
+            compiler.interactive_mode()
+    
+    except KeyboardInterrupt:
+        print("\\nInterrupted by user")
+        return 130
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        if args.debug:
+            import traceback
+            traceback.print_exc()
+        return 1
+    
+    return 0
+
+def repl():
+    """Start a simple REPL"""
+    print("JAMES III REPL")
+    print("Type 'exit' to quit")
+    
+    compiler = JAMESCompiler()
+    
+    while True:
+        try:
+            line = input(">>> ").strip()
+            if line.lower() in ['exit', 'quit']:
+                break
+            if not line:
+                continue
+                
+            output = compiler.execute_string(line)
+            for result in output:
+                print(result)
+                
+        except KeyboardInterrupt:
+            print("\\nUse 'exit' to quit")
+        except Exception as e:
+            print(f"Error: {e}")
+
+if __name__ == '__main__':
+    sys.exit(main())

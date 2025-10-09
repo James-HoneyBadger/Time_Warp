@@ -261,8 +261,8 @@ class BasicExecutor:
                     else:
                         result_parts.append(str(part))
         
-        # Join with spaces for BASIC comma-separated output
-        result = " ".join(result_parts) if parts else ""
+        # Join parts without extra spaces for cleaner output
+        result = "".join(result_parts) if parts else ""
         self.interpreter.log_output(result)
         return "continue"
     
