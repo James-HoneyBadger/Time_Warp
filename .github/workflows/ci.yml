@@ -1,4 +1,4 @@
-name: JAMES IDE CI/CD
+name: TimeWarp IDE CI/CD
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9, '3.10', '3.11']
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     
@@ -35,36 +35,31 @@ jobs:
       run: |
         xvfb-run -a python run_tests.py
         
-    - name: Test JAMES IDE startup
+    - name: Test TimeWarp IDE startup
       run: |
-        # Test that JAMES can import without GUI
-        python -c "import sys; sys.path.append('.'); from core.interpreter import JAMESInterpreter; print('✅ JAMES core imports successfully')"
+        # Test that TimeWarp can import without GUI
+        python -c "import sys; sys.path.append('.'); from core.interpreter import TimeWarpInterpreter; print('✅ TimeWarp core imports successfully')"
 
   lint:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint black isort
         pip install -r requirements.txt
         
     - name: Run Black formatter check
       run: |
         black --check --diff .
         
-    - name: Run isort import sorting check
+    - name: Run Flake8 linting
       run: |
-        isort --check-only --diff .
-        
-    - name: Run Pylint
-      run: |
-        pylint JAMES.py core/ tools/ gui/ --exit-zero
+        flake8 TimeWarp.py core/ tools/ gui/ --max-line-length=88 --extend-ignore=E203,W503

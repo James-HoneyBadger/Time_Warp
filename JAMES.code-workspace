@@ -1,17 +1,19 @@
 {
     "folders": [
         {
-            "name": "JAMES IDE",
+            "name": "TimeWarp IDE",
             "path": "."
         }
     ],
     "settings": {
-        "python.defaultInterpreterPath": "./james_env/bin/python",
+        "python.defaultInterpreterPath": "./.Time_Warp/bin/python",
         "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.pylintEnabled": false,
         "python.formatting.provider": "black",
+        "python.analysis.typeCheckingMode": "basic",
         "files.associations": {
-            "*.james": "python",
+            "*.timewarp": "python",
             "*.pilot": "plaintext",
             "*.bas": "basic",
             "*.logo": "lisp",
@@ -52,10 +54,10 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Launch JAMES IDE",
+                "name": "Launch TimeWarp IDE",
                 "type": "debugpy",
                 "request": "launch",
-                "program": "JAMES.py",
+                "program": "TimeWarp.py",
                 "console": "integratedTerminal",
                 "cwd": "${workspaceFolder}",
                 "env": {

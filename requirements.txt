@@ -1,14 +1,23 @@
-# JAMES IDE Requirements
+# TimeWarp IDE Requirements
 # Core dependencies for the Joint Algorithm Model Environment System
 
-# No external dependencies required for basic functionality
-# JAMES IDE runs on standard Python libraries:
-# - tkinter (included with Python)
-# - json (included with Python)
-# - os (included with Python)
-# - sys (included with Python)
-# - threading (included with Python)
-# - subprocess (included with Python)
+# Runtime dependencies (all included with Python standard library)
+# - tkinter (GUI framework)
+# - json (configuration management)
+# - os, sys (system interface)
+# - threading (concurrent execution)
+# - subprocess (process management)
+# - turtle (graphics engine)
+# - pathlib (file system operations)
 
-# Optional dependencies for enhanced features:
-# aiml>=0.9.2  # For AI/ML integration features (if using ml tools)
+# Development dependencies
+pytest>=7.0.0          # Testing framework
+black>=22.0.0           # Code formatting
+flake8>=4.0.0          # Linting
+mypy>=0.910            # Type checking
+pre-commit>=2.15.0     # Git hooks for code quality
+
+# Optional runtime dependencies for enhanced features
+# pygame>=2.0.0        # Advanced graphics (uncomment if needed)
+# PIL>=8.0.0           # Image processing (uncomment if needed)
+# numpy>=1.20.0        # Mathematical operations (uncomment if needed)
