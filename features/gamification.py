@@ -79,7 +79,7 @@ class Challenge:
 @dataclass
 class DailyChallenge:
     """Represents a daily coding challenge"""
-    
+
     challenge_id: str
     date: str
     title: str
@@ -286,7 +286,7 @@ class GamificationSystem:
         )
 
         # New Enhanced Achievements
-        
+
         # Creativity & Exploration
         self.achievements["theme_explorer"] = Achievement(
             achievement_id="theme_explorer",
@@ -297,7 +297,7 @@ class GamificationSystem:
             points=25,
             requirements={"themes_used": 5},
         )
-        
+
         self.achievements["code_architect"] = Achievement(
             achievement_id="code_architect",
             name="Code Architect",
@@ -307,7 +307,7 @@ class GamificationSystem:
             points=150,
             requirements={"long_program": 100},
         )
-        
+
         self.achievements["daily_warrior"] = Achievement(
             achievement_id="daily_warrior",
             name="Daily Warrior",
@@ -317,7 +317,7 @@ class GamificationSystem:
             points=200,
             requirements={"daily_challenges": 7},
         )
-        
+
         # Persistence & Perfectionism
         self.achievements["never_give_up"] = Achievement(
             achievement_id="never_give_up",
@@ -328,7 +328,7 @@ class GamificationSystem:
             points=60,
             requirements={"challenge_attempts": 5},
         )
-        
+
         self.achievements["perfectionist"] = Achievement(
             achievement_id="perfectionist",
             name="Perfectionist",
@@ -338,7 +338,7 @@ class GamificationSystem:
             points=120,
             requirements={"perfect_programs": 5},
         )
-        
+
         # Social & Exploration
         self.achievements["feature_explorer"] = Achievement(
             achievement_id="feature_explorer",
@@ -349,7 +349,7 @@ class GamificationSystem:
             points=180,
             requirements={"features_discovered": 6},  # Tutorial, AI, Gamification, Themes, Settings, etc.
         )
-        
+
         self.achievements["time_traveler"] = Achievement(
             achievement_id="time_traveler",
             name="Time Traveler",
@@ -359,7 +359,7 @@ class GamificationSystem:
             points=500,
             requirements={"session_time": 600},  # 10 hours in minutes
         )
-        
+
         # Language-specific achievements
         self.achievements["basic_master"] = Achievement(
             achievement_id="basic_master",
@@ -370,7 +370,7 @@ class GamificationSystem:
             points=100,
             requirements={"basic_programs": 25},
         )
-        
+
         self.achievements["logo_artist"] = Achievement(
             achievement_id="logo_artist",
             name="Logo Artist",
@@ -380,7 +380,7 @@ class GamificationSystem:
             points=120,
             requirements={"logo_programs": 15},
         )
-        
+
         self.achievements["python_pro"] = Achievement(
             achievement_id="python_pro",
             name="Python Pro",
@@ -394,7 +394,7 @@ class GamificationSystem:
     def initialize_daily_challenges(self):
         """Initialize rotating daily challenges"""
         import random
-        
+
         # Pool of daily challenges that rotate
         daily_challenge_pool = [
             {
@@ -404,7 +404,7 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "easy",
                 "code_template": "# Write any program before noon to complete this challenge\n",
-                "solution_hint": "Any working program counts - try a simple hello world or calculation!"
+                "solution_hint": "Any working program counts - try a simple hello world or calculation!",
             },
             {
                 "title": "Quick Fix",
@@ -413,7 +413,7 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "medium",
                 "code_template": "# Load a program with errors and fix it quickly\n",
-                "solution_hint": "Look for common syntax errors like missing quotes or parentheses"
+                "solution_hint": "Look for common syntax errors like missing quotes or parentheses",
             },
             {
                 "title": "Creative Explorer",
@@ -422,7 +422,7 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "easy",
                 "code_template": "# Choose a new language and write a simple program\n",
-                "solution_hint": "Try PILOT, BASIC, Logo, Python, or JavaScript - each has unique features!"
+                "solution_hint": "Try PILOT, BASIC, Logo, Python, or JavaScript - each has unique features!",
             },
             {
                 "title": "Graphics Artist",
@@ -431,7 +431,7 @@ class GamificationSystem:
                 "language": "logo",
                 "difficulty": "medium",
                 "code_template": "# Create a drawing program\nFORWARD 50\nRIGHT 90\n",
-                "solution_hint": "Use Logo turtle graphics commands like FORWARD, BACK, LEFT, RIGHT"
+                "solution_hint": "Use Logo turtle graphics commands like FORWARD, BACK, LEFT, RIGHT",
             },
             {
                 "title": "Error Hunter",
@@ -440,7 +440,7 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "medium",
                 "code_template": "# Write clean, error-free code\n",
-                "solution_hint": "Test each program before moving to the next. Syntax checking is your friend!"
+                "solution_hint": "Test each program before moving to the next. Syntax checking is your friend!",
             },
             {
                 "title": "Mini Marathon",
@@ -449,7 +449,7 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "hard",
                 "code_template": "# Start coding and keep going for 30 minutes\n",
-                "solution_hint": "Set a timer and work on a project or series of small programs"
+                "solution_hint": "Set a timer and work on a project or series of small programs",
             },
             {
                 "title": "Helper Bot",
@@ -458,20 +458,20 @@ class GamificationSystem:
                 "language": "any",
                 "difficulty": "easy",
                 "code_template": "# Ask the AI assistant for help with your code\n",
-                "solution_hint": "Click the AI Assistant button and ask for help with any coding question"
+                "solution_hint": "Click the AI Assistant button and ask for help with any coding question",
             },
         ]
-        
+
         # Get today's challenge (deterministic based on date)
         today = datetime.now().date()
         random.seed(today.toordinal())  # Consistent daily challenge
         today_challenge = random.choice(daily_challenge_pool)
-        
+
         # Create today's daily challenge
         challenge_id = f"daily_{today.strftime('%Y%m%d')}"
         self.daily_challenges[challenge_id] = DailyChallenge(
             challenge_id=challenge_id,
-            date=today.strftime('%Y-%m-%d'),
+            date=today.strftime("%Y-%m-%d"),
             title=today_challenge["title"],
             description=today_challenge["description"],
             language=today_challenge["language"],
@@ -479,7 +479,7 @@ class GamificationSystem:
             code_template=today_challenge["code_template"],
             solution_hint=today_challenge["solution_hint"],
             points=today_challenge["points"],
-            completed=False
+            completed=False,
         )
 
     def initialize_challenges(self):
@@ -648,7 +648,7 @@ class GamificationSystem:
         """Calculate user level based on experience points"""
         if experience is None:
             experience = self.user_stats.experience
-            
+
         # Level progression: 100 XP for level 2, then increases by 50 each level
         if experience < 100:
             return 1
@@ -683,11 +683,11 @@ class GamificationSystem:
         """Save user statistics to file"""
         try:
             import os
-            
+
             # Create directory if it doesn't exist
             stats_dir = os.path.expanduser("~/.timewarp")
             os.makedirs(stats_dir, exist_ok=True)
-            
+
             # Save stats to JSON file
             stats_file = os.path.join(stats_dir, "user_stats.json")
             stats_dict = {
@@ -709,8 +709,8 @@ class GamificationSystem:
                 "themes_used": self.user_stats.themes_used,
                 "features_discovered": self.user_stats.features_discovered,
             }
-            
-            with open(stats_file, 'w', encoding='utf-8') as f:
+
+            with open(stats_file, "w", encoding="utf-8") as f:
                 json.dump(stats_dict, f, indent=2)
         except OSError as e:
             print(f"Warning: Could not save user stats: {e}")
@@ -782,7 +782,7 @@ class GamificationSystem:
 
             for req_type, req_value in achievement.requirements.items():
                 current_progress = 0.0
-                
+
                 if req_type == "programs_written":
                     current_progress = min(self.user_stats.programs_written / req_value, 1.0)
                     if self.user_stats.programs_written < req_value:
@@ -826,7 +826,9 @@ class GamificationSystem:
                         requirements_met = False
 
                 elif req_type == "features_discovered":
-                    features_count = len(self.user_stats.features_discovered) if self.user_stats.features_discovered else 0
+                    features_count = (
+                        len(self.user_stats.features_discovered) if self.user_stats.features_discovered else 0
+                    )
                     current_progress = min(features_count / req_value, 1.0)
                     if features_count < req_value:
                         requirements_met = False
@@ -1031,7 +1033,7 @@ class GamificationSystem:
 
     def get_today_daily_challenge(self) -> Optional[DailyChallenge]:
         """Get today's daily challenge"""
-        today = datetime.now().strftime('%Y%m%d')
+        today = datetime.now().strftime("%Y%m%d")
         challenge_id = f"daily_{today}"
         return self.daily_challenges.get(challenge_id)
 
@@ -1039,55 +1041,53 @@ class GamificationSystem:
         """Get a summary of achievement progress"""
         total_achievements = len(self.achievements)
         unlocked_achievements = sum(1 for a in self.achievements.values() if a.unlocked)
-        
-        rarity_counts = {
-            "common": 0,
-            "uncommon": 0,
-            "rare": 0,
-            "epic": 0,
-            "legendary": 0
-        }
-        
+
+        rarity_counts = {"common": 0, "uncommon": 0, "rare": 0, "epic": 0, "legendary": 0}
+
         for achievement in self.achievements.values():
             if achievement.unlocked:
                 rarity_counts[achievement.rarity.value] += 1
-        
+
         return {
             "total_achievements": total_achievements,
             "unlocked_achievements": unlocked_achievements,
-            "completion_percentage": (unlocked_achievements / total_achievements * 100) if total_achievements > 0 else 0,
+            "completion_percentage": (
+                (unlocked_achievements / total_achievements * 100) if total_achievements > 0 else 0
+            ),
             "rarity_counts": rarity_counts,
             "total_points": self.user_stats.total_points,
             "level": self.user_stats.level,
             "current_streak": self.user_stats.current_streak,
-            "daily_challenges_completed": self.user_stats.daily_challenges_completed
+            "daily_challenges_completed": self.user_stats.daily_challenges_completed,
         }
 
     def get_progress_insights(self) -> List[str]:
         """Get personalized progress insights and tips"""
         insights = []
-        
+
         # Progress insights based on stats
         if self.user_stats.programs_written < 5:
             insights.append("💡 Try writing a few more programs to unlock your first achievements!")
-        
+
         if self.user_stats.current_streak == 0:
             insights.append("🔥 Start a coding streak! Code daily to build momentum.")
         elif self.user_stats.current_streak < 7:
             insights.append(f"🔥 Great streak of {self.user_stats.current_streak} days! Can you make it to 7?")
-        
+
         if not self.user_stats.languages_used or len(self.user_stats.languages_used) == 1:
             insights.append("🌍 Try exploring different programming languages to unlock the Polyglot achievement!")
-        
+
         if self.user_stats.daily_challenges_completed == 0:
             insights.append("⚔️ Take on today's daily challenge for bonus points!")
-        
+
         if self.user_stats.perfect_programs == 0:
             insights.append("💎 Aim for perfection! Write a program with no errors on the first try.")
-        
+
         # Check if close to unlocking achievements
         for achievement in self.achievements.values():
             if not achievement.unlocked and achievement.progress > 0.7:
-                insights.append(f"🎯 You're close to unlocking '{achievement.name}' - {achievement.progress:.0%} complete!")
-        
+                insights.append(
+                    f"🎯 You're close to unlocking '{achievement.name}' - {achievement.progress:.0%} complete!"
+                )
+
         return insights[:3]  # Return top 3 insights

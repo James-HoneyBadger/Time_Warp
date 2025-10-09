@@ -203,7 +203,7 @@ class BasicAnalyzer:
             parts = line.split(None, 1)
             if parts and parts[0].isdigit():
                 line_number = int(parts[0])
-                
+
                 # Check for duplicate line numbers
                 if line_number in line_numbers:
                     issues.append(
