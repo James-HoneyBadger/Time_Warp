@@ -50,6 +50,21 @@ except ImportError:
 # Import language executors
 from .languages import PilotExecutor, BasicExecutor, LogoExecutor, PerlExecutor, PythonExecutor, JavaScriptExecutor
 
+# Import performance optimizations
+try:
+    from .optimizations.performance_optimizer import OptimizedInterpreterMixin, performance_optimizer, optimize_for_production
+    PERFORMANCE_OPTIMIZATIONS_AVAILABLE = True
+except ImportError:
+    # Create dummy mixin if optimizations not available
+    class OptimizedInterpreterMixin:
+        def optimized_output(self, text): return text
+        def cleanup_resources(self): return {}
+        def get_performance_stats(self): return {}
+    
+    def optimize_for_production(): return {}
+    performance_optimizer = None
+    PERFORMANCE_OPTIMIZATIONS_AVAILABLE = False
+
 # Import supporting classes (will need to be extracted to their own modules later)
 try:
     # Try to import from actual modules first

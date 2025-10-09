@@ -192,7 +192,7 @@ class BasicAnalyzer:
         """Analyze BASIC code for issues"""
         issues = []
         lines = code.split("\n")
-        line_numbers = set()
+        line_numbers = []
 
         for line_num, line in enumerate(lines, 1):
             line = line.strip()
@@ -203,10 +203,9 @@ class BasicAnalyzer:
             parts = line.split(None, 1)
             if parts and parts[0].isdigit():
                 line_number = int(parts[0])
-                line_numbers.add(line_number)
-
+                
                 # Check for duplicate line numbers
-                if line_numbers.count(line_number) > 1:
+                if line_number in line_numbers:
                     issues.append(
                         CodeIssue(
                             issue_type="syntax",
@@ -216,6 +215,7 @@ class BasicAnalyzer:
                             column=0,
                         )
                     )
+                line_numbers.append(line_number)
             else:
                 issues.append(
                     CodeIssue(
