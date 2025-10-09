@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Advanced Debugger Plugin for JAMES IDE
+Advanced Debugger Plugin for TimeWarp IDE
 Professional-grade debugging tool with breakpoints, variable inspection, 
 call stack analysis, execution control, and memory monitoring
 """
@@ -29,7 +29,7 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Advanced Debugger"
         self.version = "1.0.0"
-        self.author = "JAMES IDE Team"
+        self.author = "TimeWarp IDE Team"
         self.description = "Professional-grade debugging tool with breakpoints, variable inspection, call stack analysis, execution control, and memory monitoring"
         self.category = "debugging"
         
@@ -723,4 +723,4 @@ Top Memory Consumers:
 
 
 # Plugin entry point - this will be imported by the plugin system
-JAMESPlugin = AdvancedDebuggerPlugin
+TimeWarpPlugin = AdvancedDebuggerPlugin

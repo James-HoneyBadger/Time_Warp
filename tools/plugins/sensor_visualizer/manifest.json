@@ -1,7 +1,7 @@
 {
     "name": "Sensor Visualizer",
     "version": "1.0.0",
-    "author": "JAMES IDE Team",
+    "author": "TimeWarp IDE Team",
     "description": "Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities",
     "category": "sensors",
     "type": "tool",

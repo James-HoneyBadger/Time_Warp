@@ -1,7 +1,7 @@
 {
   "name": "Learning Assistant",
   "version": "1.0.0",
-  "description": "Educational plugin providing tutorials, code analysis, progress tracking, and adaptive learning assistance for JAMES IDE",
+  "description": "Educational plugin providing tutorials, code analysis, progress tracking, and adaptive learning assistance for TimeWarp IDE",
   "author": "JAMES Development Team",
   "category": "educational",
   "icon": "🎓",

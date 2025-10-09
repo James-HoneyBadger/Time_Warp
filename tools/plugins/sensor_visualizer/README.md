@@ -1,6 +1,6 @@
 # Sensor Visualizer Plugin
 
-A comprehensive sensor data visualization plugin for JAMES IDE that provides real-time charts, data logging, historical analysis, and alert management.
+A comprehensive sensor data visualization plugin for TimeWarp IDE that provides real-time charts, data logging, historical analysis, and alert management.
 
 ## Features
 
@@ -52,7 +52,7 @@ A comprehensive sensor data visualization plugin for JAMES IDE that provides rea
 
 ## Installation
 
-This plugin is part of the JAMES IDE modular architecture and is automatically discovered by the Tool Manager.
+This plugin is part of the TimeWarp IDE modular architecture and is automatically discovered by the Tool Manager.
 
 ## Usage
 
@@ -147,7 +147,7 @@ This plugin is part of the JAMES IDE modular architecture and is automatically d
 
 - Python 3.7+
 - tkinter (included with Python)
-- JAMES Core Framework
+- TimeWarp Core Framework
 
 ### Events
 
@@ -266,8 +266,8 @@ Enable debug logging in the plugin settings to troubleshoot issues.
 
 ## License
 
-This plugin is part of the JAMES IDE project and follows the same licensing terms.
+This plugin is part of the TimeWarp IDE project and follows the same licensing terms.
 
 ## Support
 
-For support and bug reports, please use the JAMES IDE issue tracker or contact the development team.
+For support and bug reports, please use the TimeWarp IDE issue tracker or contact the development team.

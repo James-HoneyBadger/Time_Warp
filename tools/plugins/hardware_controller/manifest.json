@@ -1,7 +1,7 @@
 {
   "name": "Hardware Controller",
   "version": "1.0.0",
-  "author": "JAMES IDE Team",
+  "author": "TimeWarp IDE Team",
   "description": "Professional hardware interface tool with GPIO control, sensor management, device automation, and Raspberry Pi integration",
   "category": "hardware",
   "entry_point": "plugin.py",

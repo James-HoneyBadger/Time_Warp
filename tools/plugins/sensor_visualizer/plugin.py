@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sensor Visualizer Plugin for JAMES IDE
+Sensor Visualizer Plugin for TimeWarp IDE
 Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities
 """
 
@@ -26,7 +26,7 @@ class SensorVisualizerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Sensor Visualizer"
         self.version = "1.0.0"
-        self.author = "JAMES IDE Team"
+        self.author = "TimeWarp IDE Team"
         self.description = "Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities"
         self.category = "sensors"
         
@@ -762,4 +762,4 @@ Uptime: 99.8%"""
 
 
 # Plugin entry point - this will be imported by the plugin system
-JAMESPlugin = SensorVisualizerPlugin
+TimeWarpPlugin = SensorVisualizerPlugin

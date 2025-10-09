@@ -1,5 +1,5 @@
 """
-Learning Assistant Plugin for JAMES IDE
+Learning Assistant Plugin for TimeWarp IDE
 Provides educational features including tutorials, code analysis, and progress tracking
 """
 

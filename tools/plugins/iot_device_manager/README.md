@@ -1,6 +1,6 @@
 # IoT Device Manager Plugin
 
-A comprehensive IoT device management plugin for JAMES IDE that provides device discovery, control, network monitoring, protocol support, and data analytics.
+A comprehensive IoT device management plugin for TimeWarp IDE that provides device discovery, control, network monitoring, protocol support, and data analytics.
 
 ## Features
 
@@ -43,7 +43,7 @@ A comprehensive IoT device management plugin for JAMES IDE that provides device 
 
 ## Installation
 
-This plugin is part of the JAMES IDE modular architecture. It should be automatically discovered and loaded by the Tool Manager.
+This plugin is part of the TimeWarp IDE modular architecture. It should be automatically discovered and loaded by the Tool Manager.
 
 ## Usage
 
@@ -93,10 +93,10 @@ This plugin is part of the JAMES IDE modular architecture. It should be automati
 ### Dependencies
 - Python 3.7+
 - tkinter (included with Python)
-- JAMES Core Framework
+- TimeWarp Core Framework
 
 ### Events
-The plugin emits various events for integration with the JAMES framework:
+The plugin emits various events for integration with the TimeWarp framework:
 - `network_scan_completed`
 - `device_discovered`
 - `device_added`
@@ -164,8 +164,8 @@ Enable debug output by setting the plugin logging level to debug.
 
 ## License
 
-This plugin is part of the JAMES IDE project and follows the same licensing terms.
+This plugin is part of the TimeWarp IDE project and follows the same licensing terms.
 
 ## Support
 
-For support and bug reports, please use the JAMES IDE issue tracker or contact the development team.
+For support and bug reports, please use the TimeWarp IDE issue tracker or contact the development team.

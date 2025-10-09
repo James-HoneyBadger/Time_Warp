@@ -1,7 +1,7 @@
 {
   "name": "IoT Device Manager",
   "version": "1.0.0",
-  "author": "JAMES IDE Team",
+  "author": "TimeWarp IDE Team",
   "description": "Comprehensive IoT device management with discovery, control, network monitoring, protocol support, and data analytics",
   "category": "iot",
   "entry_point": "plugin.py",

@@ -1,6 +1,6 @@
 # Advanced Debugger Plugin
 
-Professional-grade debugging tool for JAMES IDE with comprehensive debugging capabilities.
+Professional-grade debugging tool for TimeWarp IDE with comprehensive debugging capabilities.
 
 ## Features
 
@@ -62,7 +62,7 @@ The Advanced Debugger integrates with:
 
 ## Development
 
-The plugin follows the JAMES ToolPlugin architecture with:
+The plugin follows the TimeWarp ToolPlugin architecture with:
 - Proper lifecycle management (initialize, activate, deactivate, destroy)
 - Event-driven updates
 - Comprehensive error handling

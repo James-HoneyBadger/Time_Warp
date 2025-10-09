@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Hardware Controller Plugin for JAMES IDE
+Hardware Controller Plugin for TimeWarp IDE
 Professional hardware interface tool with GPIO control, sensor management, 
 device automation, and Raspberry Pi integration
 """
@@ -26,7 +26,7 @@ class HardwareControllerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Hardware Controller"
         self.version = "1.0.0"
-        self.author = "JAMES IDE Team"
+        self.author = "TimeWarp IDE Team"
         self.description = "Professional hardware interface tool with GPIO control, sensor management, device automation, and Raspberry Pi integration"
         self.category = "hardware"
         
@@ -617,4 +617,4 @@ Technical Details:
 
 
 # Plugin entry point - this will be imported by the plugin system
-JAMESPlugin = HardwareControllerPlugin
+TimeWarpPlugin = HardwareControllerPlugin

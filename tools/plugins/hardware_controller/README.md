@@ -1,6 +1,6 @@
 # Hardware Controller Plugin
 
-Professional hardware interface tool for JAMES IDE with comprehensive hardware management capabilities.
+Professional hardware interface tool for TimeWarp IDE with comprehensive hardware management capabilities.
 
 ## Features
 
@@ -79,7 +79,7 @@ The Hardware Controller integrates with:
 
 ## Development
 
-The plugin follows the JAMES ToolPlugin architecture with:
+The plugin follows the TimeWarp ToolPlugin architecture with:
 
 - Proper lifecycle management (initialize, activate, deactivate, destroy)
 - Event-driven hardware monitoring

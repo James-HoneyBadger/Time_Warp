@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-IoT Device Manager Plugin for JAMES IDE
+IoT Device Manager Plugin for TimeWarp IDE
 Comprehensive IoT device management with discovery, control, network monitoring, 
 protocol support, and data analytics
 """
@@ -27,7 +27,7 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "IoT Device Manager"
         self.version = "1.0.0"
-        self.author = "JAMES IDE Team"
+        self.author = "TimeWarp IDE Team"
         self.description = "Comprehensive IoT device management with discovery, control, network monitoring, protocol support, and data analytics"
         self.category = "iot"
         
@@ -719,4 +719,4 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
 
 
 # Plugin entry point - this will be imported by the plugin system
-JAMESPlugin = IoTDeviceManagerPlugin
+TimeWarpPlugin = IoTDeviceManagerPlugin
