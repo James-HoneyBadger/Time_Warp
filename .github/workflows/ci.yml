@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
@@ -50,6 +50,11 @@ jobs:
         export SDL_VIDEODRIVER=dummy
         export SDL_AUDIODRIVER=dummy
         export PYGAME_HIDE_SUPPORT_PROMPT=1
+        # Verify test file exists
+        if [ ! -f "scripts/run_tests_minimal.py" ]; then
+          echo "❌ Test file not found!"
+          exit 1
+        fi
         xvfb-run -a python scripts/run_tests_minimal.py
         
     - name: Test Time_Warp IDE startup (fallback)
@@ -67,7 +72,7 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         
