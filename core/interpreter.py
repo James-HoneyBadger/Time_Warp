@@ -317,7 +317,7 @@ class TimeWarpInterpreter:
         # Default pen style
         self.default_pen_style = 'solid'
         
-        # Templecode systems
+        # TimeWarp animation and media systems
         self.mixer = Mixer()
         self.tweens = []
         self.timers = []
@@ -604,7 +604,7 @@ class TimeWarpInterpreter:
         self._last_match_set = False
         self.running = False
         
-        # Reset templecode systems
+        # Reset TimeWarp animation and media systems
         self.tweens = []
         self.timers = []
         self.particles = []
@@ -1015,7 +1015,7 @@ class TimeWarpInterpreter:
         self._last_match_set = False
         self.running = False
         
-        # Reset templecode systems but preserve variables
+        # Reset TimeWarp animation and media systems but preserve variables
         self.tweens = []
         self.timers = []
         self.particles = []
