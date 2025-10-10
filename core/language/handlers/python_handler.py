@@ -21,7 +21,9 @@ class PythonHandler:
     def setup_python_environment(self):
         """Setup Python execution environment with TimeWarp interface"""
         # Standard Python builtins
-        self.python_globals.update(__builtins__ if isinstance(__builtins__, dict) else __builtins__.__dict__)
+        self.python_globals.update(
+            __builtins__ if isinstance(__builtins__, dict) else __builtins__.__dict__
+        )
 
         # Common modules
         self.python_globals.update(
@@ -51,7 +53,9 @@ class PythonHandler:
 
             # Return the local variables created/modified in this block
             new_vars = {
-                k: v for k, v in local_scope.items() if k not in self.python_locals or self.python_locals[k] != v
+                k: v
+                for k, v in local_scope.items()
+                if k not in self.python_locals or self.python_locals[k] != v
             }
 
             return new_vars
@@ -146,7 +150,9 @@ class TimeWarpPythonInterface:
 
             return self.interpreter.execute(expr_node)
         except Exception as e:
-            raise RuntimeError(f"Error evaluating TimeWarp expression '{timewarp_expression}': {e}")
+            raise RuntimeError(
+                f"Error evaluating TimeWarp expression '{timewarp_expression}': {e}"
+            )
 
     def RUN(self, timewarp_code: str):
         """Execute TimeWarp code from Python"""

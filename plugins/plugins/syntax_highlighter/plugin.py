@@ -30,7 +30,12 @@ except ImportError:
             pass
 
         def get_info(self):
-            return {"name": self.name, "version": self.version, "author": self.author, "description": self.description}
+            return {
+                "name": self.name,
+                "version": self.version,
+                "author": self.author,
+                "description": self.description,
+            }
 
 
 class TimeWarpPlugin(BaseTimeWarpPlugin):
@@ -61,7 +66,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
             self.add_menu_items()
             self.enable_syntax_highlighting()
             if hasattr(self.ide, "status_label"):
-                self.ide.status_label.config(text="Syntax Highlighter plugin activated!")
+                self.ide.status_label.config(
+                    text="Syntax Highlighter plugin activated!"
+                )
             print(f"✅ {self.name} activated successfully")
         except Exception as e:
             print(f"❌ Error activating {self.name}: {e}")
@@ -72,7 +79,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
             self.remove_menu_items()
             self.disable_syntax_highlighting()
             if hasattr(self.ide, "status_label"):
-                self.ide.status_label.config(text="Syntax Highlighter plugin deactivated")
+                self.ide.status_label.config(
+                    text="Syntax Highlighter plugin deactivated"
+                )
             print(f"🔌 {self.name} deactivated")
         except Exception as e:
             print(f"❌ Error deactivating {self.name}: {e}")
@@ -87,7 +96,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                 for i in range(self.ide.menubar.index("end") + 1):
                     try:
                         if self.ide.menubar.entryconfig(i, "label")[4][1] == "View":
-                            view_menu = self.ide.menubar.nametowidget(self.ide.menubar.entryconfig(i, "menu")[4][1])
+                            view_menu = self.ide.menubar.nametowidget(
+                                self.ide.menubar.entryconfig(i, "menu")[4][1]
+                            )
                             break
                     except Exception:
                         continue
@@ -97,9 +108,17 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                     view_menu.add_separator()
 
                     # Add highlighting options
-                    view_menu.add_command(label="🎨 Toggle Syntax Highlighting", command=self.toggle_highlighting)
-                    view_menu.add_command(label="🌈 Customize Colors", command=self.customize_colors)
-                    view_menu.add_command(label="🔄 Refresh Highlighting", command=self.refresh_highlighting)
+                    view_menu.add_command(
+                        label="🎨 Toggle Syntax Highlighting",
+                        command=self.toggle_highlighting,
+                    )
+                    view_menu.add_command(
+                        label="🌈 Customize Colors", command=self.customize_colors
+                    )
+                    view_menu.add_command(
+                        label="🔄 Refresh Highlighting",
+                        command=self.refresh_highlighting,
+                    )
 
                     self.menu_items = [
                         "🎨 Toggle Syntax Highlighting",
@@ -139,7 +158,15 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         try:
             if hasattr(self.ide, "editor"):
                 # Remove all syntax tags
-                for tag in ["pilot_cmd", "basic_kw", "logo_cmd", "string", "comment", "number", "variable"]:
+                for tag in [
+                    "pilot_cmd",
+                    "basic_kw",
+                    "logo_cmd",
+                    "string",
+                    "comment",
+                    "number",
+                    "variable",
+                ]:
                     self.ide.editor.tag_delete(tag)
 
                 # Unbind events
@@ -157,20 +184,34 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         try:
             # Configure tags with colors
             self.ide.editor.tag_config(
-                "pilot_cmd", foreground=self.highlight_colors["pilot_commands"], font=("Consolas", 10, "bold")
+                "pilot_cmd",
+                foreground=self.highlight_colors["pilot_commands"],
+                font=("Consolas", 10, "bold"),
             )
             self.ide.editor.tag_config(
-                "basic_kw", foreground=self.highlight_colors["basic_keywords"], font=("Consolas", 10, "bold")
+                "basic_kw",
+                foreground=self.highlight_colors["basic_keywords"],
+                font=("Consolas", 10, "bold"),
             )
             self.ide.editor.tag_config(
-                "logo_cmd", foreground=self.highlight_colors["logo_commands"], font=("Consolas", 10, "bold")
+                "logo_cmd",
+                foreground=self.highlight_colors["logo_commands"],
+                font=("Consolas", 10, "bold"),
             )
-            self.ide.editor.tag_config("string", foreground=self.highlight_colors["strings"])
             self.ide.editor.tag_config(
-                "comment", foreground=self.highlight_colors["comments"], font=("Consolas", 10, "italic")
+                "string", foreground=self.highlight_colors["strings"]
             )
-            self.ide.editor.tag_config("number", foreground=self.highlight_colors["numbers"])
-            self.ide.editor.tag_config("variable", foreground=self.highlight_colors["variables"])
+            self.ide.editor.tag_config(
+                "comment",
+                foreground=self.highlight_colors["comments"],
+                font=("Consolas", 10, "italic"),
+            )
+            self.ide.editor.tag_config(
+                "number", foreground=self.highlight_colors["numbers"]
+            )
+            self.ide.editor.tag_config(
+                "variable", foreground=self.highlight_colors["variables"]
+            )
 
         except Exception as e:
             print(f"Error configuring syntax tags: {e}")
@@ -184,7 +225,15 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
             content = self.ide.editor.get("1.0", tk.END)
 
             # Clear existing tags
-            for tag in ["pilot_cmd", "basic_kw", "logo_cmd", "string", "comment", "number", "variable"]:
+            for tag in [
+                "pilot_cmd",
+                "basic_kw",
+                "logo_cmd",
+                "string",
+                "comment",
+                "number",
+                "variable",
+            ]:
                 self.ide.editor.tag_remove(tag, "1.0", tk.END)
 
             lines = content.split("\n")
@@ -193,7 +242,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                 line_start = f"{line_num}.0"
 
                 # Highlight PILOT commands
-                if line.strip().startswith(("T:", "A:", "Y:", "N:", "J:", "M:", "C:", "U:", "E:")):
+                if line.strip().startswith(
+                    ("T:", "A:", "Y:", "N:", "J:", "M:", "C:", "U:", "E:")
+                ):
                     cmd_end = f"{line_num}.2"
                     self.ide.editor.tag_add("pilot_cmd", line_start, cmd_end)
 
@@ -291,10 +342,14 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                 tags = self.ide.editor.tag_names()
                 if "pilot_cmd" in tags:
                     self.disable_syntax_highlighting()
-                    messagebox.showinfo("Syntax Highlighting", "Syntax highlighting disabled")
+                    messagebox.showinfo(
+                        "Syntax Highlighting", "Syntax highlighting disabled"
+                    )
                 else:
                     self.enable_syntax_highlighting()
-                    messagebox.showinfo("Syntax Highlighting", "Syntax highlighting enabled")
+                    messagebox.showinfo(
+                        "Syntax Highlighting", "Syntax highlighting enabled"
+                    )
 
         except Exception as e:
             messagebox.showerror("Error", f"Could not toggle syntax highlighting: {e}")
@@ -320,20 +375,22 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
 
             for category, current_color in self.highlight_colors.items():
                 if ttk_available:
-                    ttk.Label(dialog, text=category.replace("_", " ").title() + ":").grid(
-                        row=row, column=0, sticky="w", padx=10, pady=5
-                    )
+                    ttk.Label(
+                        dialog, text=category.replace("_", " ").title() + ":"
+                    ).grid(row=row, column=0, sticky="w", padx=10, pady=5)
                 else:
-                    tk.Label(dialog, text=category.replace("_", " ").title() + ":").grid(
-                        row=row, column=0, sticky="w", padx=10, pady=5
-                    )
+                    tk.Label(
+                        dialog, text=category.replace("_", " ").title() + ":"
+                    ).grid(row=row, column=0, sticky="w", padx=10, pady=5)
 
                 color_vars[category] = tk.StringVar(value=current_color)
                 color_button = tk.Button(
                     dialog,
                     text="Choose Color",
                     bg=current_color,
-                    command=lambda cat=category: self.choose_color(color_vars[cat], dialog),
+                    command=lambda cat=category: self.choose_color(
+                        color_vars[cat], dialog
+                    ),
                 )
                 color_button.grid(row=row, column=1, padx=10, pady=5)
 
@@ -348,11 +405,17 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                     self.highlight_colors[category] = var.get()
                 self.configure_syntax_tags()
                 self.highlight_syntax()
-                messagebox.showinfo("Colors Applied", "Syntax highlighting colors updated!")
+                messagebox.showinfo(
+                    "Colors Applied", "Syntax highlighting colors updated!"
+                )
                 dialog.destroy()
 
-            tk.Button(button_frame, text="✅ Apply", command=apply_colors).pack(side=tk.LEFT, padx=5)
-            tk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+            tk.Button(button_frame, text="✅ Apply", command=apply_colors).pack(
+                side=tk.LEFT, padx=5
+            )
+            tk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(
+                side=tk.LEFT, padx=5
+            )
 
         except Exception as e:
             messagebox.showerror("Error", f"Could not open color customization: {e}")
@@ -370,7 +433,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         """Refresh syntax highlighting"""
         try:
             self.highlight_syntax()
-            messagebox.showinfo("Highlighting Refreshed", "Syntax highlighting has been refreshed!")
+            messagebox.showinfo(
+                "Highlighting Refreshed", "Syntax highlighting has been refreshed!"
+            )
         except Exception as e:
             messagebox.showerror("Error", f"Could not refresh highlighting: {e}")
 

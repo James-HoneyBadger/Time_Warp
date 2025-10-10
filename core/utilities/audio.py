@@ -11,7 +11,9 @@ import os
 def _has_exe(name):
     """Check if an executable is available in PATH"""
     try:
-        subprocess.run([name, "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            [name, "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
         return True
     except (FileNotFoundError, subprocess.SubprocessError):
         return False

@@ -18,28 +18,46 @@ class AdvancedSyntaxHighlighter:
     def setup_tags(self):
         """Setup syntax highlighting tags"""
         # PILOT syntax highlighting
-        self.text_widget.tag_configure("pilot_command", foreground="#0066cc", font=("Courier", 10, "bold"))
-        self.text_widget.tag_configure("pilot_label", foreground="#cc6600", font=("Courier", 10, "bold"))
+        self.text_widget.tag_configure(
+            "pilot_command", foreground="#0066cc", font=("Courier", 10, "bold")
+        )
+        self.text_widget.tag_configure(
+            "pilot_label", foreground="#cc6600", font=("Courier", 10, "bold")
+        )
         self.text_widget.tag_configure("pilot_variable", foreground="#009900")
 
         # Logo syntax highlighting
-        self.text_widget.tag_configure("logo_command", foreground="#990099", font=("Courier", 10, "bold"))
-        self.text_widget.tag_configure("logo_procedure", foreground="#cc00cc", font=("Courier", 10, "bold"))
+        self.text_widget.tag_configure(
+            "logo_command", foreground="#990099", font=("Courier", 10, "bold")
+        )
+        self.text_widget.tag_configure(
+            "logo_procedure", foreground="#cc00cc", font=("Courier", 10, "bold")
+        )
         self.text_widget.tag_configure("logo_number", foreground="#ff6600")
 
         # BASIC syntax highlighting
-        self.text_widget.tag_configure("basic_keyword", foreground="#0000cc", font=("Courier", 10, "bold"))
+        self.text_widget.tag_configure(
+            "basic_keyword", foreground="#0000cc", font=("Courier", 10, "bold")
+        )
         self.text_widget.tag_configure("basic_number", foreground="#ff6600")
         self.text_widget.tag_configure("basic_string", foreground="#009900")
 
         # Python syntax highlighting
-        self.text_widget.tag_configure("python_keyword", foreground="#0000cc", font=("Courier", 10, "bold"))
+        self.text_widget.tag_configure(
+            "python_keyword", foreground="#0000cc", font=("Courier", 10, "bold")
+        )
         self.text_widget.tag_configure("python_string", foreground="#009900")
-        self.text_widget.tag_configure("python_comment", foreground="#666666", font=("Courier", 10, "italic"))
-        self.text_widget.tag_configure("python_function", foreground="#cc00cc", font=("Courier", 10, "bold"))
+        self.text_widget.tag_configure(
+            "python_comment", foreground="#666666", font=("Courier", 10, "italic")
+        )
+        self.text_widget.tag_configure(
+            "python_function", foreground="#cc00cc", font=("Courier", 10, "bold")
+        )
 
         # Comments and general
-        self.text_widget.tag_configure("comment", foreground="#666666", font=("Courier", 10, "italic"))
+        self.text_widget.tag_configure(
+            "comment", foreground="#666666", font=("Courier", 10, "italic")
+        )
         self.text_widget.tag_configure("error", background="#ffcccc")
         self.text_widget.tag_configure("breakpoint", background="#ffcccc")
         self.text_widget.tag_configure("highlight", background="#ffffcc")
@@ -91,20 +109,32 @@ class AdvancedSyntaxHighlighter:
         content_lower = content.lower()
 
         # PILOT indicators
-        if any(cmd in content_lower for cmd in ["::type", "::accept", "::compute", "::jump", "::match"]):
+        if any(
+            cmd in content_lower
+            for cmd in ["::type", "::accept", "::compute", "::jump", "::match"]
+        ):
             return "pilot"
 
         # Logo indicators
-        if any(cmd in content_lower for cmd in ["forward", "fd", "back", "bk", "penup", "pendown"]):
+        if any(
+            cmd in content_lower
+            for cmd in ["forward", "fd", "back", "bk", "penup", "pendown"]
+        ):
             return "logo"
 
         # BASIC indicators
-        if any(cmd in content_lower for cmd in ["print", "input", "for", "next", "if", "then", "goto"]):
+        if any(
+            cmd in content_lower
+            for cmd in ["print", "input", "for", "next", "if", "then", "goto"]
+        ):
             if "def " not in content_lower and "import " not in content_lower:
                 return "basic"
 
         # Python indicators
-        if any(indicator in content_lower for indicator in ["def ", "import ", "class ", "from ", "__init__"]):
+        if any(
+            indicator in content_lower
+            for indicator in ["def ", "import ", "class ", "from ", "__init__"]
+        ):
             return "python"
 
         return "unknown"
@@ -127,13 +157,17 @@ class AdvancedSyntaxHighlighter:
                 else:
                     cmd_end = len(line)
 
-                self.text_widget.tag_add("pilot_command", f"{i+1}.{cmd_start}", f"{i+1}.{cmd_end}")
+                self.text_widget.tag_add(
+                    "pilot_command", f"{i+1}.{cmd_start}", f"{i+1}.{cmd_end}"
+                )
 
             # PILOT labels (ending with :)
             if ":" in line and not "::" in line:
                 label_end = line.find(":")
                 if label_end > 0:
-                    self.text_widget.tag_add("pilot_label", f"{i+1}.0", f"{i+1}.{label_end+1}")
+                    self.text_widget.tag_add(
+                        "pilot_label", f"{i+1}.0", f"{i+1}.{label_end+1}"
+                    )
 
     def highlight_logo(self, lines):
         """Highlight Logo syntax"""
@@ -168,13 +202,17 @@ class AdvancedSyntaxHighlighter:
                     word_start = line.find(word)
                     if word_start >= 0:
                         self.text_widget.tag_add(
-                            "logo_command", f"{i+1}.{word_start}", f"{i+1}.{word_start + len(word)}"
+                            "logo_command",
+                            f"{i+1}.{word_start}",
+                            f"{i+1}.{word_start + len(word)}",
                         )
 
             # Highlight numbers
             for match in re.finditer(r"\b\d+\.?\d*\b", line):
                 start, end = match.span()
-                self.text_widget.tag_add("logo_number", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "logo_number", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
     def highlight_basic(self, lines):
         """Highlight BASIC syntax"""
@@ -202,17 +240,23 @@ class AdvancedSyntaxHighlighter:
                 pattern = r"\b" + keyword + r"\b"
                 for match in re.finditer(pattern, line, re.IGNORECASE):
                     start, end = match.span()
-                    self.text_widget.tag_add("basic_keyword", f"{i+1}.{start}", f"{i+1}.{end}")
+                    self.text_widget.tag_add(
+                        "basic_keyword", f"{i+1}.{start}", f"{i+1}.{end}"
+                    )
 
             # Numbers
             for match in re.finditer(r"\b\d+\.?\d*\b", line):
                 start, end = match.span()
-                self.text_widget.tag_add("basic_number", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "basic_number", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
             # Strings
             for match in re.finditer(r'"[^"]*"', line):
                 start, end = match.span()
-                self.text_widget.tag_add("basic_string", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "basic_string", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
     def highlight_python(self, lines):
         """Highlight Python syntax"""
@@ -254,25 +298,33 @@ class AdvancedSyntaxHighlighter:
                 pattern = r"\b" + keyword + r"\b"
                 for match in re.finditer(pattern, line):
                     start, end = match.span()
-                    self.text_widget.tag_add("python_keyword", f"{i+1}.{start}", f"{i+1}.{end}")
+                    self.text_widget.tag_add(
+                        "python_keyword", f"{i+1}.{start}", f"{i+1}.{end}"
+                    )
 
             # Function definitions
             func_match = re.search(r"def\s+(\w+)", line)
             if func_match:
                 start = func_match.start(1)
                 end = func_match.end(1)
-                self.text_widget.tag_add("python_function", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "python_function", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
             # Strings
             for match in re.finditer(r'["\']([^"\'\\\\]|\\\\.)*["\']', line):
                 start, end = match.span()
-                self.text_widget.tag_add("python_string", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "python_string", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
             # Comments
             comment_match = re.search(r"#.*$", line)
             if comment_match:
                 start, end = comment_match.span()
-                self.text_widget.tag_add("python_comment", f"{i+1}.{start}", f"{i+1}.{end}")
+                self.text_widget.tag_add(
+                    "python_comment", f"{i+1}.{start}", f"{i+1}.{end}"
+                )
 
     def highlight_comments(self, lines):
         """Highlight comments in any language"""
@@ -281,7 +333,9 @@ class AdvancedSyntaxHighlighter:
             for comment_char in ["#", "//", ";", "'", "REM"]:
                 if comment_char in line:
                     comment_start = line.find(comment_char)
-                    self.text_widget.tag_add("comment", f"{i+1}.{comment_start}", f"{i+1}.{len(line)}")
+                    self.text_widget.tag_add(
+                        "comment", f"{i+1}.{comment_start}", f"{i+1}.{len(line)}"
+                    )
                     break
 
 
@@ -432,13 +486,18 @@ class AutoCompletionEngine:
         content = self.text_widget.get("1.0", tk.END)
         content_lower = content.lower()
 
-        if "::" in content or any(cmd in content_lower for cmd in ["::type", "::accept"]):
+        if "::" in content or any(
+            cmd in content_lower for cmd in ["::type", "::accept"]
+        ):
             return "pilot"
         elif any(cmd in content_lower for cmd in ["forward", "fd", "penup"]):
             return "logo"
         elif any(cmd in content_lower for cmd in ["def ", "import ", "class "]):
             return "python"
-        elif any(cmd in content_lower for cmd in ["print", "input"]) and "def " not in content_lower:
+        elif (
+            any(cmd in content_lower for cmd in ["print", "input"])
+            and "def " not in content_lower
+        ):
             return "basic"
         else:
             return "unknown"
@@ -456,7 +515,9 @@ class AutoCompletionEngine:
         elif language == "python":
             completions = self.python_completions
         else:
-            completions = self.pilot_completions + self.logo_completions + self.basic_completions
+            completions = (
+                self.pilot_completions + self.logo_completions + self.basic_completions
+            )
 
         # Filter completions that start with current word
         matching = []
@@ -494,8 +555,12 @@ class AutoCompletionEngine:
             listbox.selection_set(0)
 
         # Bind events
-        listbox.bind("<Double-Button-1>", lambda e: self.insert_completion(listbox, current_word))
-        listbox.bind("<Return>", lambda e: self.insert_completion(listbox, current_word))
+        listbox.bind(
+            "<Double-Button-1>", lambda e: self.insert_completion(listbox, current_word)
+        )
+        listbox.bind(
+            "<Return>", lambda e: self.insert_completion(listbox, current_word)
+        )
         listbox.bind("<Escape>", lambda e: self.hide_completion_popup())
 
         listbox.focus_set()
@@ -672,9 +737,13 @@ class RealTimeSyntaxChecker:
         end_pos = f"{line_num}.{end_col}"
 
         self.text_widget.tag_add("syntax_error", start_pos, end_pos)
-        self.text_widget.tag_configure("syntax_error", underline=True, underlinefg="red")
+        self.text_widget.tag_configure(
+            "syntax_error", underline=True, underlinefg="red"
+        )
 
-        self.error_markers.append({"line": line_num, "start": start_col, "end": end_col, "message": message})
+        self.error_markers.append(
+            {"line": line_num, "start": start_col, "end": end_col, "message": message}
+        )
 
     def detect_language(self, content):
         """Detect programming language"""
@@ -758,7 +827,9 @@ class CodeFoldingSystem:
     def setup_folding(self):
         """Setup code folding system"""
         # Add folding markers
-        self.text_widget.tag_configure("fold_marker", foreground="blue", font=("Courier", 8))
+        self.text_widget.tag_configure(
+            "fold_marker", foreground="blue", font=("Courier", 8)
+        )
 
         # Bind events
         self.text_widget.bind("<Button-1>", self.on_click)
@@ -778,7 +849,10 @@ class CodeFoldingSystem:
                     regions.append((i + 1, end_line))
 
             # Find control structures
-            elif any(line.strip().startswith(keyword) for keyword in ["if ", "for ", "while ", "try:"]):
+            elif any(
+                line.strip().startswith(keyword)
+                for keyword in ["if ", "for ", "while ", "try:"]
+            ):
                 end_line = self.find_block_end(lines, i)
                 if end_line > i + 1:
                     regions.append((i + 1, end_line))
@@ -826,13 +900,17 @@ class CodeFoldingSystem:
         if region_id in self.folded_regions:
             # Show lines
             for line_num in range(start_line + 1, end_line + 1):
-                self.text_widget.tag_remove("hidden", f"{line_num}.0", f"{line_num}.end")
+                self.text_widget.tag_remove(
+                    "hidden", f"{line_num}.0", f"{line_num}.end"
+                )
 
             # Remove fold marker
             content = self.text_widget.get(f"{start_line}.0", f"{start_line}.end")
             if " [+]" in content:
                 marker_start = content.find(" [+]")
-                self.text_widget.delete(f"{start_line}.{marker_start}", f"{start_line}.{marker_start + 4}")
+                self.text_widget.delete(
+                    f"{start_line}.{marker_start}", f"{start_line}.{marker_start + 4}"
+                )
 
             del self.folded_regions[region_id]
 

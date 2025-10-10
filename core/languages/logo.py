@@ -29,7 +29,9 @@ class LogoExecutor:
     def execute_command(self, command):
         """Execute a Logo command and return the result"""
         try:
-            prof_start = time.perf_counter() if self.interpreter.profile_enabled else None
+            prof_start = (
+                time.perf_counter() if self.interpreter.profile_enabled else None
+            )
             parts = command.strip().split()
             if not parts:
                 return "continue"
@@ -112,11 +114,19 @@ class LogoExecutor:
                 return self._handle_profile(parts)
 
             # Game Development Commands (Logo style)
-            elif cmd.startswith("CREATE") or cmd.startswith("MOVE") or cmd.startswith("GAME"):
+            elif (
+                cmd.startswith("CREATE")
+                or cmd.startswith("MOVE")
+                or cmd.startswith("GAME")
+            ):
                 return self._handle_game_commands(cmd, parts)
 
             # Audio System Commands (Logo style)
-            elif cmd.startswith("LOAD") or cmd.startswith("PLAY") or cmd.startswith("STOP"):
+            elif (
+                cmd.startswith("LOAD")
+                or cmd.startswith("PLAY")
+                or cmd.startswith("STOP")
+            ):
                 return self._handle_audio_commands(cmd, parts)
 
             else:
@@ -127,7 +137,9 @@ class LogoExecutor:
                 try:
                     elapsed = time.perf_counter() - prof_start
                     key = cmd.upper()[:25]
-                    stats = self.interpreter.profile_stats.setdefault(key, {"count": 0, "total": 0.0, "max": 0.0})
+                    stats = self.interpreter.profile_stats.setdefault(
+                        key, {"count": 0, "total": 0.0, "max": 0.0}
+                    )
                     stats["count"] += 1
                     stats["total"] += elapsed
                     if elapsed > stats["max"]:
@@ -177,7 +189,9 @@ class LogoExecutor:
         inner = block[1:-1].strip()
         subcommands = self._split_top_level_commands(inner)
         self.interpreter.macros[name] = subcommands
-        self.interpreter.log_output(f"Macro '{name}' defined ({len(subcommands)} commands)")
+        self.interpreter.log_output(
+            f"Macro '{name}' defined ({len(subcommands)} commands)"
+        )
         return "continue"
 
     def _handle_repeat(self, command):
@@ -220,7 +234,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
 
         return "continue"
 
@@ -239,7 +255,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
         return "continue"
 
     def _handle_left(self, parts):
@@ -256,7 +274,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
         return "continue"
 
     def _handle_right(self, parts):
@@ -276,7 +296,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
         return "continue"
 
     def _handle_penup(self):
@@ -293,15 +315,19 @@ class LogoExecutor:
         self.interpreter.turtle_graphics["pen_down"] = True
         # If transitioning from up to down, advance color for new shape for visibility
         if not prev_state:
-            self.interpreter._turtle_color_index = (self.interpreter._turtle_color_index + 1) % len(
-                self.interpreter._turtle_color_palette
+            self.interpreter._turtle_color_index = (
+                self.interpreter._turtle_color_index + 1
+            ) % len(self.interpreter._turtle_color_palette)
+            self.interpreter.turtle_graphics["pen_color"] = (
+                self.interpreter._turtle_color_palette[
+                    self.interpreter._turtle_color_index
+                ]
             )
-            self.interpreter.turtle_graphics["pen_color"] = self.interpreter._turtle_color_palette[
-                self.interpreter._turtle_color_index
-            ]
         self.interpreter.debug_output("Pen down - turtle will draw when moving")
         if self.interpreter.turtle_trace:
-            self.interpreter.log_output(f"TRACE: PEN=DOWN COLOR={self.interpreter.turtle_graphics['pen_color']}")
+            self.interpreter.log_output(
+                f"TRACE: PEN=DOWN COLOR={self.interpreter.turtle_graphics['pen_color']}"
+            )
         return "continue"
 
     def _handle_clearscreen(self):
@@ -317,7 +343,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
         return "continue"
 
     def _handle_setxy(self, parts):
@@ -332,7 +360,9 @@ class LogoExecutor:
         # Set turtle position variables for testing
         self.interpreter.variables["TURTLE_X"] = self.interpreter.turtle_graphics["x"]
         self.interpreter.variables["TURTLE_Y"] = self.interpreter.turtle_graphics["y"]
-        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics["heading"]
+        self.interpreter.variables["TURTLE_HEADING"] = self.interpreter.turtle_graphics[
+            "heading"
+        ]
         return "continue"
 
     def _handle_setcolor(self, parts):
@@ -409,7 +439,10 @@ class LogoExecutor:
 
     def _handle_position(self):
         """Handle POSITION command"""
-        x, y = self.interpreter.turtle_graphics["x"], self.interpreter.turtle_graphics["y"]
+        x, y = (
+            self.interpreter.turtle_graphics["x"],
+            self.interpreter.turtle_graphics["y"],
+        )
         self.interpreter.log_output(f"Turtle position: ({x:.1f}, {y:.1f})")
         return "continue"
 
@@ -425,7 +458,9 @@ class LogoExecutor:
                 self.interpreter.log_output("Turtle trace disabled")
         else:
             self.interpreter.turtle_trace = not self.interpreter.turtle_trace
-            self.interpreter.log_output(f"Turtle trace {'enabled' if self.interpreter.turtle_trace else 'disabled'}")
+            self.interpreter.log_output(
+                f"Turtle trace {'enabled' if self.interpreter.turtle_trace else 'disabled'}"
+            )
         return "continue"
 
     def _handle_profile(self, parts):
@@ -445,8 +480,14 @@ class LogoExecutor:
             if not self.interpreter.profile_stats:
                 self.interpreter.log_output("No profiling data")
             else:
-                self.interpreter.log_output("PROFILE REPORT (command  count   avg(ms)   max(ms)  total(ms)):")
-                for k, v in sorted(self.interpreter.profile_stats.items(), key=lambda kv: kv[1]["total"], reverse=True):
+                self.interpreter.log_output(
+                    "PROFILE REPORT (command  count   avg(ms)   max(ms)  total(ms)):"
+                )
+                for k, v in sorted(
+                    self.interpreter.profile_stats.items(),
+                    key=lambda kv: kv[1]["total"],
+                    reverse=True,
+                ):
                     avg = (v["total"] / v["count"]) if v["count"] else 0.0
                     self.interpreter.log_output(
                         f"  {k:<12} {v['count']:>5} {avg*1000:>9.3f} {v['max']*1000:>9.3f} {v['total']*1000:>10.3f}"

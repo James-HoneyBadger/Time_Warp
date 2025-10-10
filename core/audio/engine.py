@@ -104,7 +104,9 @@ class SpatialAudio:
         if distance > self.max_distance:
             volume = 0.0
         else:
-            volume = base_volume * (1.0 - (distance / self.max_distance) ** self.rolloff_factor)
+            volume = base_volume * (
+                1.0 - (distance / self.max_distance) ** self.rolloff_factor
+            )
 
         # Stereo panning based on relative position
         if distance > 0:
@@ -137,7 +139,9 @@ class AudioEngine:
         self.mixer_available = False
         if PYGAME_AVAILABLE and pygame:
             try:
-                pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
+                pygame.mixer.pre_init(
+                    frequency=44100, size=-16, channels=2, buffer=1024
+                )
                 pygame.mixer.init()
                 self.mixer_available = True
                 self.pygame = pygame
@@ -183,7 +187,9 @@ class AudioEngine:
 
         # Apply spatial audio if position is provided
         if position:
-            spatial_volume, pan = self.spatial_audio.calculate_volume_and_pan(position, play_volume)
+            spatial_volume, pan = self.spatial_audio.calculate_volume_and_pan(
+                position, play_volume
+            )
             play_volume = spatial_volume
 
         # Apply volume settings
@@ -272,7 +278,11 @@ class AudioEngine:
                 else:
                     self.pygame.mixer.music.play()
 
-                self.background_music = {"file_path": file_path, "loop": loop, "volume": music_volume}
+                self.background_music = {
+                    "file_path": file_path,
+                    "loop": loop,
+                    "volume": music_volume,
+                }
                 print(f"🔊 Audio: Playing music: {os.path.basename(file_path)}")
                 return True
 
@@ -280,7 +290,11 @@ class AudioEngine:
                 print(f"🔊 Audio: Music playback failed: {e}")
         else:
             # Simulation mode
-            self.background_music = {"file_path": file_path, "loop": loop, "volume": music_volume}
+            self.background_music = {
+                "file_path": file_path,
+                "loop": loop,
+                "volume": music_volume,
+            }
             print(f"🔊 Audio: [SIM] Playing music: {os.path.basename(file_path)}")
             return True
 

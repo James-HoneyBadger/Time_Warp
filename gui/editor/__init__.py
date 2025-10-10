@@ -68,17 +68,27 @@ class AdvancedCodeEditor:
 
         self.auto_complete_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            toolbar, text="Auto Complete", variable=self.auto_complete_var, command=self.toggle_auto_complete
+            toolbar,
+            text="Auto Complete",
+            variable=self.auto_complete_var,
+            command=self.toggle_auto_complete,
         ).pack(side=tk.LEFT, padx=(0, 10))
 
         self.syntax_check_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            toolbar, text="Syntax Check", variable=self.syntax_check_var, command=self.toggle_syntax_check
+            toolbar,
+            text="Syntax Check",
+            variable=self.syntax_check_var,
+            command=self.toggle_syntax_check,
         ).pack(side=tk.LEFT, padx=(0, 10))
 
         # Fold/Unfold buttons
-        ttk.Button(toolbar, text="Fold All", command=self.fold_all).pack(side=tk.RIGHT, padx=(5, 0))
-        ttk.Button(toolbar, text="Unfold All", command=self.unfold_all).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(toolbar, text="Fold All", command=self.fold_all).pack(
+            side=tk.RIGHT, padx=(5, 0)
+        )
+        ttk.Button(toolbar, text="Unfold All", command=self.unfold_all).pack(
+            side=tk.RIGHT, padx=(5, 0)
+        )
 
     def create_text_editor(self):
         """Create the main text editor with line numbers"""
@@ -227,7 +237,9 @@ class AdvancedCodeEditor:
         # Show completion if typing a word
         if len(current_line) > 0 and current_line[-1].isalnum():
             word_start = len(current_line) - 1
-            while word_start > 0 and (current_line[word_start].isalnum() or current_line[word_start] in "_:"):
+            while word_start > 0 and (
+                current_line[word_start].isalnum() or current_line[word_start] in "_:"
+            ):
                 word_start -= 1
 
             current_word = current_line[word_start:].strip()
@@ -401,8 +413,12 @@ class FindDialog:
         button_frame = ttk.Frame(self.dialog)
         button_frame.pack(pady=10)
 
-        ttk.Button(button_frame, text="Find Next", command=self.find_next).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Find Next", command=self.find_next).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(
+            side=tk.LEFT, padx=5
+        )
 
         # Bind Enter key
         self.find_entry.bind("<Return>", lambda e: self.find_next())
@@ -465,10 +481,18 @@ class ReplaceDialog:
         button_frame = ttk.Frame(self.dialog)
         button_frame.pack(pady=10)
 
-        ttk.Button(button_frame, text="Find Next", command=self.find_next).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="Replace", command=self.replace_current).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="Replace All", command=self.replace_all).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="Find Next", command=self.find_next).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="Replace", command=self.replace_current).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="Replace All", command=self.replace_all).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(
+            side=tk.LEFT, padx=2
+        )
 
         self.find_entry.focus()
 
@@ -541,8 +565,12 @@ class GotoDialog:
         button_frame = ttk.Frame(self.dialog)
         button_frame.pack(pady=10)
 
-        ttk.Button(button_frame, text="Go", command=self.goto_line).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Go", command=self.goto_line).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="Cancel", command=self.dialog.destroy).pack(
+            side=tk.LEFT, padx=5
+        )
 
         # Bind Enter key
         self.line_entry.bind("<Return>", lambda e: self.goto_line())

@@ -66,16 +66,25 @@ class PerformanceMonitor:
         control_frame = ttk.Frame(self.frame)
         control_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.start_btn = ttk.Button(control_frame, text="Start Monitoring", command=self.start_monitoring)
+        self.start_btn = ttk.Button(
+            control_frame, text="Start Monitoring", command=self.start_monitoring
+        )
         self.start_btn.pack(side=tk.LEFT, padx=2)
 
         self.stop_btn = ttk.Button(
-            control_frame, text="Stop Monitoring", command=self.stop_monitoring, state=tk.DISABLED
+            control_frame,
+            text="Stop Monitoring",
+            command=self.stop_monitoring,
+            state=tk.DISABLED,
         )
         self.stop_btn.pack(side=tk.LEFT, padx=2)
 
-        ttk.Button(control_frame, text="Clear Data", command=self.clear_data).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="Export Report", command=self.export_report).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_frame, text="Clear Data", command=self.clear_data).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(
+            control_frame, text="Export Report", command=self.export_report
+        ).pack(side=tk.LEFT, padx=2)
 
         # Notebook for different views
         self.notebook = ttk.Notebook(self.frame)
@@ -148,7 +157,9 @@ class PerformanceMonitor:
         self.stats_text = tk.Text(stats_frame, wrap=tk.WORD, height=10)
         self.stats_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        stats_scroll = ttk.Scrollbar(stats_frame, orient=tk.VERTICAL, command=self.stats_text.yview)
+        stats_scroll = ttk.Scrollbar(
+            stats_frame, orient=tk.VERTICAL, command=self.stats_text.yview
+        )
         stats_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.stats_text.configure(yscrollcommand=stats_scroll.set)
 
@@ -158,13 +169,21 @@ class PerformanceMonitor:
         profile_control = ttk.Frame(self.profiling_frame)
         profile_control.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(profile_control, text="Start Profiling", command=self.start_profiling).pack(side=tk.LEFT, padx=2)
-        ttk.Button(profile_control, text="Stop Profiling", command=self.stop_profiling).pack(side=tk.LEFT, padx=2)
-        ttk.Button(profile_control, text="Clear Profile", command=self.clear_profile).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            profile_control, text="Start Profiling", command=self.start_profiling
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            profile_control, text="Stop Profiling", command=self.stop_profiling
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            profile_control, text="Clear Profile", command=self.clear_profile
+        ).pack(side=tk.LEFT, padx=2)
 
         # Profiling results
         self.profile_tree = ttk.Treeview(
-            self.profiling_frame, columns=("calls", "total_time", "per_call", "cumulative"), show="tree headings"
+            self.profiling_frame,
+            columns=("calls", "total_time", "per_call", "cumulative"),
+            show="tree headings",
         )
         self.profile_tree.heading("#0", text="Function")
         self.profile_tree.heading("calls", text="Calls")
@@ -175,7 +194,9 @@ class PerformanceMonitor:
         self.profile_tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Scrollbar for profile tree
-        profile_scroll = ttk.Scrollbar(self.profiling_frame, orient=tk.VERTICAL, command=self.profile_tree.yview)
+        profile_scroll = ttk.Scrollbar(
+            self.profiling_frame, orient=tk.VERTICAL, command=self.profile_tree.yview
+        )
         profile_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.profile_tree.configure(yscrollcommand=profile_scroll.set)
 
@@ -253,7 +274,9 @@ class PerformanceMonitor:
 
         # Convert timestamps to relative seconds for plotting
         base_time = self.performance_data["timestamps"][0]
-        time_data = [(t - base_time).total_seconds() for t in self.performance_data["timestamps"]]
+        time_data = [
+            (t - base_time).total_seconds() for t in self.performance_data["timestamps"]
+        ]
 
         # Update CPU chart
         self.cpu_line.set_data(time_data, list(self.performance_data["cpu_usage"]))
@@ -261,7 +284,9 @@ class PerformanceMonitor:
         self.cpu_ax.set_ylim(0, max(100, max(self.performance_data["cpu_usage"]) * 1.1))
 
         # Update memory chart
-        self.memory_line.set_data(time_data, list(self.performance_data["memory_usage"]))
+        self.memory_line.set_data(
+            time_data, list(self.performance_data["memory_usage"])
+        )
         self.memory_ax.set_xlim(min(time_data), max(time_data))
         memory_max = max(self.performance_data["memory_usage"])
         self.memory_ax.set_ylim(0, memory_max * 1.1)
@@ -322,7 +347,9 @@ class PerformanceMonitor:
         # Extract top functions
         stats = ps.get_stats_profile()
 
-        for func_info, (cc, nc, tt, ct, callers) in list(stats.func_profiles.items())[:50]:  # Top 50
+        for func_info, (cc, nc, tt, ct, callers) in list(stats.func_profiles.items())[
+            :50
+        ]:  # Top 50
             filename, line_num, func_name = func_info
 
             # Format function name
@@ -333,7 +360,12 @@ class PerformanceMonitor:
                 "",
                 "end",
                 text=display_name,
-                values=(nc, f"{tt:.4f}s", f"{tt/nc:.4f}s" if nc > 0 else "0", f"{ct:.4f}s"),
+                values=(
+                    nc,
+                    f"{tt:.4f}s",
+                    f"{tt/nc:.4f}s" if nc > 0 else "0",
+                    f"{ct:.4f}s",
+                ),
             )
 
     def clear_profile(self):
@@ -419,11 +451,21 @@ class MemoryAnalyzer:
         control_frame = ttk.Frame(self.frame)
         control_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(control_frame, text="Start Tracking", command=self.start_tracking).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="Take Snapshot", command=self.take_snapshot).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="Stop Tracking", command=self.stop_tracking).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="Analyze Leaks", command=self.analyze_leaks).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="Clear Snapshots", command=self.clear_snapshots).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="Start Tracking", command=self.start_tracking
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="Take Snapshot", command=self.take_snapshot
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="Stop Tracking", command=self.stop_tracking
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="Analyze Leaks", command=self.analyze_leaks
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="Clear Snapshots", command=self.clear_snapshots
+        ).pack(side=tk.LEFT, padx=2)
 
         # Notebook for different views
         self.notebook = ttk.Notebook(self.frame)
@@ -446,13 +488,17 @@ class MemoryAnalyzer:
 
     def setup_overview(self):
         """Setup memory overview"""
-        self.overview_text = scrolledtext.ScrolledText(self.overview_frame, wrap=tk.WORD, width=80, height=20)
+        self.overview_text = scrolledtext.ScrolledText(
+            self.overview_frame, wrap=tk.WORD, width=80, height=20
+        )
         self.overview_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def setup_object_tracking(self):
         """Setup object tracking display"""
         self.objects_tree = ttk.Treeview(
-            self.objects_frame, columns=("count", "size", "avg_size"), show="tree headings"
+            self.objects_frame,
+            columns=("count", "size", "avg_size"),
+            show="tree headings",
         )
         self.objects_tree.heading("#0", text="Object Type")
         self.objects_tree.heading("count", text="Count")
@@ -461,13 +507,17 @@ class MemoryAnalyzer:
 
         self.objects_tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        objects_scroll = ttk.Scrollbar(self.objects_frame, orient=tk.VERTICAL, command=self.objects_tree.yview)
+        objects_scroll = ttk.Scrollbar(
+            self.objects_frame, orient=tk.VERTICAL, command=self.objects_tree.yview
+        )
         objects_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.objects_tree.configure(yscrollcommand=objects_scroll.set)
 
     def setup_leak_detection(self):
         """Setup leak detection display"""
-        self.leaks_text = scrolledtext.ScrolledText(self.leaks_frame, wrap=tk.WORD, width=80, height=20)
+        self.leaks_text = scrolledtext.ScrolledText(
+            self.leaks_frame, wrap=tk.WORD, width=80, height=20
+        )
         self.leaks_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def start_tracking(self):
@@ -564,10 +614,19 @@ class MemoryAnalyzer:
             type_stats[obj_type]["size"] += stat.size
 
         # Add to tree
-        for obj_type, data in sorted(type_stats.items(), key=lambda x: x[1]["size"], reverse=True)[:50]:
+        for obj_type, data in sorted(
+            type_stats.items(), key=lambda x: x[1]["size"], reverse=True
+        )[:50]:
             avg_size = data["size"] / data["count"] if data["count"] > 0 else 0
             self.objects_tree.insert(
-                "", "end", text=obj_type, values=(data["count"], f"{data['size'] / 1024:.1f} KB", f"{avg_size:.1f} B")
+                "",
+                "end",
+                text=obj_type,
+                values=(
+                    data["count"],
+                    f"{data['size'] / 1024:.1f} KB",
+                    f"{avg_size:.1f} B",
+                ),
             )
 
     def analyze_leaks(self):
@@ -586,8 +645,12 @@ class MemoryAnalyzer:
         analysis = "Memory Leak Analysis\n"
         analysis += "=" * 50 + "\n\n"
         analysis += f"Comparing snapshots:\n"
-        analysis += f"  Previous: {self.snapshots[-2]['timestamp'].strftime('%H:%M:%S')}\n"
-        analysis += f"  Current:  {self.snapshots[-1]['timestamp'].strftime('%H:%M:%S')}\n\n"
+        analysis += (
+            f"  Previous: {self.snapshots[-2]['timestamp'].strftime('%H:%M:%S')}\n"
+        )
+        analysis += (
+            f"  Current:  {self.snapshots[-1]['timestamp'].strftime('%H:%M:%S')}\n\n"
+        )
 
         if top_stats:
             analysis += "Top Memory Growth (potential leaks):\n"
@@ -651,12 +714,20 @@ class ProfilerInterface:
         profiler_combo.pack(side=tk.LEFT, padx=5)
 
         # Control buttons
-        ttk.Button(selection_frame, text="Start", command=self.start_profiler).pack(side=tk.LEFT, padx=5)
-        ttk.Button(selection_frame, text="Stop", command=self.stop_profiler).pack(side=tk.LEFT, padx=2)
-        ttk.Button(selection_frame, text="Save Report", command=self.save_report).pack(side=tk.LEFT, padx=2)
+        ttk.Button(selection_frame, text="Start", command=self.start_profiler).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(selection_frame, text="Stop", command=self.stop_profiler).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(selection_frame, text="Save Report", command=self.save_report).pack(
+            side=tk.LEFT, padx=2
+        )
 
         # Results display
-        self.results_text = scrolledtext.ScrolledText(self.frame, wrap=tk.WORD, width=100, height=25)
+        self.results_text = scrolledtext.ScrolledText(
+            self.frame, wrap=tk.WORD, width=100, height=25
+        )
         self.results_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def start_profiler(self):

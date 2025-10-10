@@ -109,7 +109,10 @@ class VirtualEnvironmentManager:
 
             # Run pip install
             result = subprocess.run(
-                [str(self.pip_exe), "install", package_spec], capture_output=True, text=True, timeout=300
+                [str(self.pip_exe), "install", package_spec],
+                capture_output=True,
+                text=True,
+                timeout=300,
             )  # 5 minute timeout
 
             if result.returncode == 0:
@@ -157,7 +160,11 @@ class VirtualEnvironmentManager:
             return []
 
         try:
-            result = subprocess.run([str(self.pip_exe), "list", "--format=json"], capture_output=True, text=True)
+            result = subprocess.run(
+                [str(self.pip_exe), "list", "--format=json"],
+                capture_output=True,
+                text=True,
+            )
 
             if result.returncode == 0:
                 packages = json.loads(result.stdout)
@@ -186,7 +193,10 @@ class VirtualEnvironmentManager:
                 site_packages = os.path.join(self.venv_dir, "Lib", "site-packages")
             else:  # Unix/Linux/macOS
                 site_packages = os.path.join(
-                    self.venv_dir, "lib", f"python{sys.version_info.major}.{sys.version_info.minor}", "site-packages"
+                    self.venv_dir,
+                    "lib",
+                    f"python{sys.version_info.major}.{sys.version_info.minor}",
+                    "site-packages",
                 )
 
             if os.path.exists(site_packages) and site_packages not in sys.path:

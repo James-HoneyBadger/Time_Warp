@@ -36,7 +36,9 @@ class PerformanceResult:
         self.operations_count = operations_count
         self.success = success
         self.error = error
-        self.ops_per_second = operations_count / execution_time if execution_time > 0 else 0
+        self.ops_per_second = (
+            operations_count / execution_time if execution_time > 0 else 0
+        )
 
 
 class TimeWarpPerformanceBench:
@@ -76,12 +78,16 @@ class TimeWarpPerformanceBench:
         end_memory = self.get_memory_usage()
         memory_delta = end_memory - start_memory
 
-        result = PerformanceResult(name, execution_time, memory_delta, operations_count, success, error)
+        result = PerformanceResult(
+            name, execution_time, memory_delta, operations_count, success, error
+        )
 
         self.results[name] = result
 
         status = "✅" if success else "❌"
-        print(f"  {status} {execution_time*1000:.2f}ms | {result.ops_per_second:,.0f} ops/sec | {memory_delta:+.2f}MB")
+        print(
+            f"  {status} {execution_time*1000:.2f}ms | {result.ops_per_second:,.0f} ops/sec | {memory_delta:+.2f}MB"
+        )
 
         return result
 
@@ -105,7 +111,9 @@ class TimeWarpPerformanceBench:
 
             root.destroy()
 
-        return self.run_performance_test("Interpreter Performance", interpreter_test, 10)
+        return self.run_performance_test(
+            "Interpreter Performance", interpreter_test, 10
+        )
 
     def test_language_execution_performance(self):
         """Test language command execution performance"""
@@ -252,7 +260,11 @@ class TimeWarpPerformanceBench:
 
                 # Store references temporarily
                 data_structures.append(
-                    {"list": filtered_list, "keys": dict_keys[:10], "words": len(string_words)}  # Keep only first 10
+                    {
+                        "list": filtered_list,
+                        "keys": dict_keys[:10],
+                        "words": len(string_words),
+                    }  # Keep only first 10
                 )
 
                 # Clean up large objects
@@ -260,7 +272,10 @@ class TimeWarpPerformanceBench:
                 del filtered_list, dict_keys, string_words
 
             # Final cleanup
-            total_items = sum(len(ds["list"]) + len(ds["keys"]) + ds["words"] for ds in data_structures)
+            total_items = sum(
+                len(ds["list"]) + len(ds["keys"]) + ds["words"]
+                for ds in data_structures
+            )
             del data_structures
             gc.collect()
 
@@ -334,14 +349,18 @@ class TimeWarpPerformanceBench:
 
             return len(text_data) + len(sorted_nums) + (total % 1000)
 
-        return self.run_performance_test("Computational Performance", computation_test, 16000)
+        return self.run_performance_test(
+            "Computational Performance", computation_test, 16000
+        )
 
     def run_all_tests(self):
         """Run all performance tests"""
         print("🚀 TimeWarp Performance Benchmark Suite")
         print("=" * 70)
         print(f"System: {os.name} | Python: {sys.version.split()[0]}")
-        print(f"CPU Count: {os.cpu_count()} | Memory: {psutil.virtual_memory().total // (1024**3)} GB")
+        print(
+            f"CPU Count: {os.cpu_count()} | Memory: {psutil.virtual_memory().total // (1024**3)} GB"
+        )
         print(f"Starting Memory: {self.get_memory_usage():.2f} MB")
         print("=" * 70)
 
@@ -362,7 +381,9 @@ class TimeWarpPerformanceBench:
         print("📊 PERFORMANCE BENCHMARK RESULTS")
         print("=" * 80)
 
-        print(f"{'Test Name':<25} {'Time (ms)':<10} {'Ops/Sec':<12} {'Memory (MB)':<12} {'Status':<8}")
+        print(
+            f"{'Test Name':<25} {'Time (ms)':<10} {'Ops/Sec':<12} {'Memory (MB)':<12} {'Status':<8}"
+        )
         print("-" * 80)
 
         total_operations = 0
@@ -372,10 +393,14 @@ class TimeWarpPerformanceBench:
         for name, result in self.results.items():
             status = "✅ PASS" if result.success else "❌ FAIL"
             time_ms = result.execution_time * 1000
-            ops_per_sec = f"{result.ops_per_second:,.0f}" if result.ops_per_second > 0 else "N/A"
+            ops_per_sec = (
+                f"{result.ops_per_second:,.0f}" if result.ops_per_second > 0 else "N/A"
+            )
             memory_str = f"{result.memory_delta:+.2f}"
 
-            print(f"{result.name:<25} {time_ms:>8.2f} {ops_per_sec:>10} {memory_str:>10} {status:<8}")
+            print(
+                f"{result.name:<25} {time_ms:>8.2f} {ops_per_sec:>10} {memory_str:>10} {status:<8}"
+            )
 
             if result.success:
                 total_operations += result.operations_count
@@ -403,14 +428,20 @@ class TimeWarpPerformanceBench:
             (200000, float("inf"), "🚀 Excellent Performance"),
         ]
 
-        for name, result in sorted(self.results.items(), key=lambda x: x[1].ops_per_second, reverse=True):
+        for name, result in sorted(
+            self.results.items(), key=lambda x: x[1].ops_per_second, reverse=True
+        ):
             if result.success and result.ops_per_second > 0:
                 ops = result.ops_per_second
-                rating = next(cat[2] for cat in performance_categories if cat[0] <= ops < cat[1])
+                rating = next(
+                    cat[2] for cat in performance_categories if cat[0] <= ops < cat[1]
+                )
                 print(f"  {result.name:<25} {ops:>8,.0f} ops/sec | {rating}")
 
         # Memory analysis
-        total_memory_usage = sum(r.memory_delta for r in self.results.values() if r.success)
+        total_memory_usage = sum(
+            r.memory_delta for r in self.results.values() if r.success
+        )
         print(f"\n💾 MEMORY ANALYSIS:")
         print(f"Total memory delta: {total_memory_usage:+.2f} MB")
         print(f"Final memory usage: {self.get_memory_usage():.2f} MB")
@@ -435,13 +466,19 @@ class TimeWarpPerformanceBench:
             for test in failed_tests:
                 print(f"    - {test.name}: {test.error}")
 
-        slow_tests = [r for r in self.results.values() if r.success and r.ops_per_second < 1000]
+        slow_tests = [
+            r for r in self.results.values() if r.success and r.ops_per_second < 1000
+        ]
         if slow_tests:
             print(f"  • Optimize performance for {len(slow_tests)} slow test(s)")
 
-        high_memory_tests = [r for r in self.results.values() if r.success and r.memory_delta > 20]
+        high_memory_tests = [
+            r for r in self.results.values() if r.success and r.memory_delta > 20
+        ]
         if high_memory_tests:
-            print(f"  • Reduce memory usage for {len(high_memory_tests)} memory-intensive test(s)")
+            print(
+                f"  • Reduce memory usage for {len(high_memory_tests)} memory-intensive test(s)"
+            )
 
         if successful_tests == len(self.results) and total_memory_usage < 50:
             print("  • ✅ TimeWarp shows excellent overall performance")

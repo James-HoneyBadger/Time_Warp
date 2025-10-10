@@ -47,7 +47,9 @@ class CollaborationUser:
         user.selection_range = data.get("selection_range")
         user.is_active = data.get("is_active", True)
         user.last_seen = data.get("last_seen", time.time())
-        user.permissions = data.get("permissions", {"read": True, "write": True, "execute": False})
+        user.permissions = data.get(
+            "permissions", {"read": True, "write": True, "execute": False}
+        )
         user.status = data.get("status", "online")
         return user
 
@@ -252,7 +254,9 @@ class NetworkManager:
                 self.connections[connection_id] = client_socket
 
                 # Start handler for this client
-                handler_thread = threading.Thread(target=self._handle_client, args=(connection_id, client_socket))
+                handler_thread = threading.Thread(
+                    target=self._handle_client, args=(connection_id, client_socket)
+                )
                 handler_thread.daemon = True
                 handler_thread.start()
 
@@ -366,11 +370,21 @@ class CollaborationManager:
         self.event_callbacks = {}
 
         # Register network message handlers
-        self.network_manager.register_message_handler("join_session", self._handle_join_session)
-        self.network_manager.register_message_handler("leave_session", self._handle_leave_session)
-        self.network_manager.register_message_handler("text_change", self._handle_text_change)
-        self.network_manager.register_message_handler("chat_message", self._handle_chat_message)
-        self.network_manager.register_message_handler("cursor_update", self._handle_cursor_update)
+        self.network_manager.register_message_handler(
+            "join_session", self._handle_join_session
+        )
+        self.network_manager.register_message_handler(
+            "leave_session", self._handle_leave_session
+        )
+        self.network_manager.register_message_handler(
+            "text_change", self._handle_text_change
+        )
+        self.network_manager.register_message_handler(
+            "chat_message", self._handle_chat_message
+        )
+        self.network_manager.register_message_handler(
+            "cursor_update", self._handle_cursor_update
+        )
 
     def create_session(self, session_name, user_id, username):
         """Create new collaboration session"""

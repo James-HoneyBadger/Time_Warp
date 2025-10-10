@@ -87,9 +87,15 @@ class ProjectExplorer:
         self.tree_widget.heading("#0", text="TimeWarp Files", anchor=tk.W)
 
         # Scrollbars
-        v_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree_widget.yview)
-        h_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=self.tree_widget.xview)
-        self.tree_widget.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        v_scrollbar = ttk.Scrollbar(
+            tree_frame, orient=tk.VERTICAL, command=self.tree_widget.yview
+        )
+        h_scrollbar = ttk.Scrollbar(
+            tree_frame, orient=tk.HORIZONTAL, command=self.tree_widget.xview
+        )
+        self.tree_widget.configure(
+            yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set
+        )
 
         # Pack tree and scrollbars
         self.tree_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -152,7 +158,9 @@ class ProjectExplorer:
                 icon = "📁" if item_type == "folder" else self.get_file_icon(item_name)
                 node_text = f"{icon} {item_name}"
 
-                node = self.tree_widget.insert(parent_node, tk.END, text=node_text, values=(item_path, item_type))
+                node = self.tree_widget.insert(
+                    parent_node, tk.END, text=node_text, values=(item_path, item_type)
+                )
 
                 # If it's a folder, add a placeholder child to make it expandable
                 if item_type == "folder":
@@ -189,7 +197,10 @@ class ProjectExplorer:
         values = self.tree_widget.item(item, "values")
         if len(values) >= 2 and values[1] == "folder":
             children = self.tree_widget.get_children(item)
-            if len(children) == 1 and self.tree_widget.item(children[0], "text") == "Loading...":
+            if (
+                len(children) == 1
+                and self.tree_widget.item(children[0], "text") == "Loading..."
+            ):
                 # Remove placeholder and load actual contents
                 self.tree_widget.delete(children[0])
                 self.populate_tree(values[0], item)
@@ -236,7 +247,9 @@ class ProjectExplorer:
             messagebox.showwarning("Warning", "Please open a project folder first")
             return
 
-        filename = simpledialog.askstring("New File", "Enter filename (with .jtc extension):")
+        filename = simpledialog.askstring(
+            "New File", "Enter filename (with .jtc extension):"
+        )
         if filename:
             if not filename.endswith(".jtc"):
                 filename += ".jtc"
@@ -277,15 +290,27 @@ E:
             file_path, item_type = values[0], values[1]
 
             if item_type == "file":
-                context_menu.add_command(label="Open", command=lambda: self.open_file(file_path))
+                context_menu.add_command(
+                    label="Open", command=lambda: self.open_file(file_path)
+                )
                 context_menu.add_separator()
-                context_menu.add_command(label="Rename", command=lambda: self.rename_item(file_path))
-                context_menu.add_command(label="Delete", command=lambda: self.delete_item(file_path))
+                context_menu.add_command(
+                    label="Rename", command=lambda: self.rename_item(file_path)
+                )
+                context_menu.add_command(
+                    label="Delete", command=lambda: self.delete_item(file_path)
+                )
             elif item_type == "folder":
-                context_menu.add_command(label="New File", command=lambda: self.new_file_in_folder(file_path))
+                context_menu.add_command(
+                    label="New File", command=lambda: self.new_file_in_folder(file_path)
+                )
                 context_menu.add_separator()
-                context_menu.add_command(label="Rename", command=lambda: self.rename_item(file_path))
-                context_menu.add_command(label="Delete", command=lambda: self.delete_item(file_path))
+                context_menu.add_command(
+                    label="Rename", command=lambda: self.rename_item(file_path)
+                )
+                context_menu.add_command(
+                    label="Delete", command=lambda: self.delete_item(file_path)
+                )
 
         try:
             context_menu.tk_popup(event.x_root, event.y_root)
@@ -295,7 +320,9 @@ E:
     def rename_item(self, item_path):
         """Rename a file or folder"""
         old_name = os.path.basename(item_path)
-        new_name = simpledialog.askstring("Rename", f"New name for '{old_name}':", initialvalue=old_name)
+        new_name = simpledialog.askstring(
+            "Rename", f"New name for '{old_name}':", initialvalue=old_name
+        )
         if new_name and new_name != old_name:
             try:
                 new_path = os.path.join(os.path.dirname(item_path), new_name)
@@ -307,7 +334,9 @@ E:
     def delete_item(self, item_path):
         """Delete a file or folder"""
         item_name = os.path.basename(item_path)
-        if messagebox.askyesno("Delete", f"Are you sure you want to delete '{item_name}'?"):
+        if messagebox.askyesno(
+            "Delete", f"Are you sure you want to delete '{item_name}'?"
+        ):
             try:
                 if os.path.isfile(item_path):
                     os.remove(item_path)

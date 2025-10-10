@@ -160,7 +160,9 @@ class TimeWarpInterpreter:
         self.globals.define(
             "MID$",
             lambda s, start, length=None: (
-                str(s)[int(start) - 1 : int(start) - 1 + int(length)] if length else str(s)[int(start) - 1 :]
+                str(s)[int(start) - 1 : int(start) - 1 + int(length)]
+                if length
+                else str(s)[int(start) - 1 :]
             ),
         )
 

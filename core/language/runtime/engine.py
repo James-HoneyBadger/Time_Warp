@@ -84,7 +84,9 @@ class VariableManager:
                     code=ErrorCode.UNDEFINED_VARIABLE,
                     severity=ErrorSeverity.ERROR,
                     message=f"Cannot modify constant '{name}'",
-                    location=SourceLocation(line_defined or 0, 0) if line_defined else None,
+                    location=(
+                        SourceLocation(line_defined or 0, 0) if line_defined else None
+                    ),
                 )
             )
 
@@ -107,7 +109,10 @@ class VariableManager:
                     code=ErrorCode.UNDEFINED_VARIABLE,
                     severity=ErrorSeverity.ERROR,
                     message=f"Undefined variable '{name}'",
-                    suggestions=[f"Define the variable before using it", f"Check for typos in the variable name"],
+                    suggestions=[
+                        f"Define the variable before using it",
+                        f"Check for typos in the variable name",
+                    ],
                 )
             )
         return var_info.value
@@ -178,7 +183,8 @@ class ExecutionContext:
 
         if self.instructions_executed >= self.max_instructions:
             self.error_manager.add_error(
-                ErrorCode.OUT_OF_MEMORY, "Maximum instruction limit reached - possible infinite loop"
+                ErrorCode.OUT_OF_MEMORY,
+                "Maximum instruction limit reached - possible infinite loop",
             )
             return False
 
@@ -279,7 +285,9 @@ class ModeHandler:
         except re.error as e:
             raise TimeWarpRuntimeError(
                 TimeWarpError(
-                    code=ErrorCode.PILOT_PATTERN_ERROR, severity=ErrorSeverity.ERROR, message=f"Invalid pattern: {e}"
+                    code=ErrorCode.PILOT_PATTERN_ERROR,
+                    severity=ErrorSeverity.ERROR,
+                    message=f"Invalid pattern: {e}",
                 )
             )
 
@@ -354,7 +362,9 @@ class RuntimeEngine:
             "instructions_executed": self.context.instructions_executed,
             "elapsed_time": elapsed,
             "mode": self.context.mode.value,
-            "variables_count": sum(len(scope) for scope in self.context.variables.scopes.values()),
+            "variables_count": sum(
+                len(scope) for scope in self.context.variables.scopes.values()
+            ),
             "errors_count": len(self.context.error_manager.errors),
             "warnings_count": len(self.context.error_manager.warnings),
         }

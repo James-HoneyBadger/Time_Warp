@@ -355,7 +355,9 @@ class BasicCodeGenerator(CodeGenerator):
 
         return lines
 
-    def generate_statement(self, stmt: Dict, index: int) -> List[str]:  # pylint: disable=unused-argument
+    def generate_statement(
+        self, stmt: Dict, index: int
+    ) -> List[str]:  # pylint: disable=unused-argument
         """Generate C code for a BASIC statement"""
         stmt_type = stmt.get("type")
         args = stmt.get("args", {})
@@ -456,7 +458,9 @@ class BasicCodeGenerator(CodeGenerator):
         lines = []
 
         if else_stmt:
-            lines.append(f'                if (evaluate_condition("{self.escape_string(condition)}")) {{')
+            lines.append(
+                f'                if (evaluate_condition("{self.escape_string(condition)}")) {{'
+            )
             # Handle THEN part
             if then_stmt.upper().startswith("GOTO "):
                 target = then_stmt[5:].strip()
@@ -470,7 +474,9 @@ class BasicCodeGenerator(CodeGenerator):
                     lines.append(f"                    pc = {self.labels[target]} - 1;")
             lines.append("                }")
         else:
-            lines.append(f'                if (evaluate_condition("{self.escape_string(condition)}")) {{')
+            lines.append(
+                f'                if (evaluate_condition("{self.escape_string(condition)}")) {{'
+            )
             if then_stmt.upper().startswith("GOTO "):
                 target = then_stmt[5:].strip()
                 if target in self.labels:
@@ -550,7 +556,12 @@ class BasicCodeGenerator(CodeGenerator):
         """Escape string for C code"""
         if not s:
             return ""
-        return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\t", "\\t")
+        return (
+            s.replace("\\", "\\\\")
+            .replace('"', '\\"')
+            .replace("\n", "\\n")
+            .replace("\t", "\\t")
+        )
 
 
 class BasicCompiler(BaseCompiler):
@@ -587,12 +598,16 @@ class BasicCompiler(BaseCompiler):
             if line_upper.startswith("PRINT "):
                 statements.append(self.parse_print(line[6:], actual_line_num))
             elif line_upper == "PRINT":
-                statements.append({"type": "PRINT", "args": {"items": []}, "line": actual_line_num})
+                statements.append(
+                    {"type": "PRINT", "args": {"items": []}, "line": actual_line_num}
+                )
             elif line_upper.startswith("INPUT "):
                 statements.append(self.parse_input(line[6:], actual_line_num))
             elif line_upper.startswith("LET "):
                 statements.append(self.parse_let(line[4:], actual_line_num))
-            elif "=" in line and not any(line_upper.startswith(x) for x in ["IF ", "FOR ", "WHILE "]):
+            elif "=" in line and not any(
+                line_upper.startswith(x) for x in ["IF ", "FOR ", "WHILE "]
+            ):
                 statements.append(self.parse_let(line, actual_line_num))
             elif line_upper.startswith("IF "):
                 statements.append(self.parse_if(line[3:], actual_line_num))
@@ -605,15 +620,25 @@ class BasicCompiler(BaseCompiler):
             elif line_upper.startswith("GOSUB "):
                 statements.append(self.parse_gosub(line[6:], actual_line_num))
             elif line_upper == "RETURN":
-                statements.append({"type": "RETURN", "args": {}, "line": actual_line_num})
+                statements.append(
+                    {"type": "RETURN", "args": {}, "line": actual_line_num}
+                )
             elif line_upper.startswith("DIM "):
                 statements.append(self.parse_dim(line[4:], actual_line_num))
             elif line_upper.startswith("REM "):
-                statements.append({"type": "REM", "args": {"comment": line[4:]}, "line": actual_line_num})
+                statements.append(
+                    {
+                        "type": "REM",
+                        "args": {"comment": line[4:]},
+                        "line": actual_line_num,
+                    }
+                )
             elif line_upper == "END":
                 statements.append({"type": "END", "args": {}, "line": actual_line_num})
             else:
-                statements.append({"type": "UNKNOWN", "args": {"text": line}, "line": actual_line_num})
+                statements.append(
+                    {"type": "UNKNOWN", "args": {"text": line}, "line": actual_line_num}
+                )
 
         return statements
 
@@ -671,10 +696,18 @@ class BasicCompiler(BaseCompiler):
                 prompt_match = re.search(r'"([^"]*)"', prompt_part)
                 prompt = prompt_match.group(1) if prompt_match else ""
 
-                return {"type": "INPUT", "args": {"prompt": prompt, "variable": var_part}, "line": line_num}
+                return {
+                    "type": "INPUT",
+                    "args": {"prompt": prompt, "variable": var_part},
+                    "line": line_num,
+                }
 
         # Simple INPUT variable
-        return {"type": "INPUT", "args": {"prompt": "", "variable": args.strip()}, "line": line_num}
+        return {
+            "type": "INPUT",
+            "args": {"prompt": "", "variable": args.strip()},
+            "line": line_num,
+        }
 
     def parse_let(self, args: str, line_num: int) -> Dict:
         """Parse LET/assignment statement"""
@@ -685,7 +718,11 @@ class BasicCompiler(BaseCompiler):
                 "args": {"variable": var_part.strip(), "expression": expr_part.strip()},
                 "line": line_num,
             }
-        return {"type": "LET", "args": {"variable": args.strip(), "expression": "0"}, "line": line_num}
+        return {
+            "type": "LET",
+            "args": {"variable": args.strip(), "expression": "0"},
+            "line": line_num,
+        }
 
     def parse_if(self, args: str, line_num: int) -> Dict:
         """Parse IF statement"""
@@ -706,16 +743,26 @@ class BasicCompiler(BaseCompiler):
 
             return {
                 "type": "IF",
-                "args": {"condition": condition, "then": then_action, "else": else_action},
+                "args": {
+                    "condition": condition,
+                    "then": then_action,
+                    "else": else_action,
+                },
                 "line": line_num,
             }
 
-        return {"type": "IF", "args": {"condition": args.strip(), "then": "", "else": ""}, "line": line_num}
+        return {
+            "type": "IF",
+            "args": {"condition": args.strip(), "then": "", "else": ""},
+            "line": line_num,
+        }
 
     def parse_for(self, args: str, line_num: int) -> Dict:
         """Parse FOR loop"""
         # FOR variable = start TO end [STEP step]
-        match = re.match(r"(\w+)\s*=\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+?))?$", args, re.IGNORECASE)
+        match = re.match(
+            r"(\w+)\s*=\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+?))?$", args, re.IGNORECASE
+        )
 
         if match:
             variable = match.group(1)
@@ -725,11 +772,20 @@ class BasicCompiler(BaseCompiler):
 
             return {
                 "type": "FOR",
-                "args": {"variable": variable, "start": start, "end": end, "step": step},
+                "args": {
+                    "variable": variable,
+                    "start": start,
+                    "end": end,
+                    "step": step,
+                },
                 "line": line_num,
             }
 
-        return {"type": "FOR", "args": {"variable": "I", "start": "1", "end": "10", "step": "1"}, "line": line_num}
+        return {
+            "type": "FOR",
+            "args": {"variable": "I", "start": "1", "end": "10", "step": "1"},
+            "line": line_num,
+        }
 
     def parse_next(self, args: str, line_num: int) -> Dict:
         """Parse NEXT statement"""
@@ -751,6 +807,14 @@ class BasicCompiler(BaseCompiler):
         if match:
             array_name = match.group(1)
             size = int(match.group(2))
-            return {"type": "DIM", "args": {"array": array_name, "size": size}, "line": line_num}
+            return {
+                "type": "DIM",
+                "args": {"array": array_name, "size": size},
+                "line": line_num,
+            }
 
-        return {"type": "DIM", "args": {"array": args.strip(), "size": 10}, "line": line_num}
+        return {
+            "type": "DIM",
+            "args": {"array": args.strip(), "size": 10},
+            "line": line_num,
+        }

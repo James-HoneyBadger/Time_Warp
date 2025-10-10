@@ -43,15 +43,30 @@ class IoTDevice:
             return None
         # Simulate device data based on type
         if self.device_type == "temperature":
-            self.last_data = {"temperature": round(random.uniform(18.0, 25.0), 1), "timestamp": time.time()}
+            self.last_data = {
+                "temperature": round(random.uniform(18.0, 25.0), 1),
+                "timestamp": time.time(),
+            }
         elif self.device_type == "humidity":
-            self.last_data = {"humidity": round(random.uniform(40.0, 70.0), 1), "timestamp": time.time()}
+            self.last_data = {
+                "humidity": round(random.uniform(40.0, 70.0), 1),
+                "timestamp": time.time(),
+            }
         elif self.device_type == "light":
-            self.last_data = {"brightness": random.randint(0, 100), "timestamp": time.time()}
+            self.last_data = {
+                "brightness": random.randint(0, 100),
+                "timestamp": time.time(),
+            }
         elif self.device_type == "motion":
-            self.last_data = {"motion_detected": random.choice([True, False]), "timestamp": time.time()}
+            self.last_data = {
+                "motion_detected": random.choice([True, False]),
+                "timestamp": time.time(),
+            }
         elif self.device_type == "camera":
-            self.last_data = {"recording": random.choice([True, False]), "timestamp": time.time()}
+            self.last_data = {
+                "recording": random.choice([True, False]),
+                "timestamp": time.time(),
+            }
         return self.last_data
 
 
@@ -69,11 +84,36 @@ class IoTDeviceManager:
         """Discover IoT devices on the network"""
         # Simulate device discovery
         discovered = [
-            {"id": "temp_01", "type": "temperature", "ip": "192.168.1.101", "name": "Living Room Temp"},
-            {"id": "humid_01", "type": "humidity", "ip": "192.168.1.102", "name": "Kitchen Humidity"},
-            {"id": "light_01", "type": "light", "ip": "192.168.1.103", "name": "Bedroom Light"},
-            {"id": "motion_01", "type": "motion", "ip": "192.168.1.104", "name": "Hallway Motion"},
-            {"id": "cam_01", "type": "camera", "ip": "192.168.1.105", "name": "Front Door Camera"},
+            {
+                "id": "temp_01",
+                "type": "temperature",
+                "ip": "192.168.1.101",
+                "name": "Living Room Temp",
+            },
+            {
+                "id": "humid_01",
+                "type": "humidity",
+                "ip": "192.168.1.102",
+                "name": "Kitchen Humidity",
+            },
+            {
+                "id": "light_01",
+                "type": "light",
+                "ip": "192.168.1.103",
+                "name": "Bedroom Light",
+            },
+            {
+                "id": "motion_01",
+                "type": "motion",
+                "ip": "192.168.1.104",
+                "name": "Hallway Motion",
+            },
+            {
+                "id": "cam_01",
+                "type": "camera",
+                "ip": "192.168.1.105",
+                "name": "Front Door Camera",
+            },
         ]
 
         for dev_info in discovered:
@@ -297,7 +337,9 @@ class SensorNetwork:
             raw_value = random.uniform(0, 100)
 
         # Apply calibration
-        calibrated_value = (raw_value + sensor["calibration"]["offset"]) * sensor["calibration"]["scale"]
+        calibrated_value = (raw_value + sensor["calibration"]["offset"]) * sensor[
+            "calibration"
+        ]["scale"]
 
         reading = {
             "sensor_id": sensor_id,
@@ -345,7 +387,9 @@ class SensorNetwork:
                 "timestamp": time.time(),
             }
             self.alerts.append(alert)
-            print(f"🚨 Alert: {sensor_id} below threshold ({value} < {threshold['min']})")
+            print(
+                f"🚨 Alert: {sensor_id} below threshold ({value} < {threshold['min']})"
+            )
 
         if threshold["max"] is not None and value > threshold["max"]:
             alert = {
@@ -356,7 +400,9 @@ class SensorNetwork:
                 "timestamp": time.time(),
             }
             self.alerts.append(alert)
-            print(f"🚨 Alert: {sensor_id} above threshold ({value} > {threshold['max']})")
+            print(
+                f"🚨 Alert: {sensor_id} above threshold ({value} > {threshold['max']})"
+            )
 
     def get_sensor_statistics(self, sensor_id, hours=24):
         """Get statistics for a sensor over time period"""
@@ -365,7 +411,9 @@ class SensorNetwork:
 
         data = self.data_streams[sensor_id]
         cutoff_time = time.time() - (hours * 3600)
-        recent_data = [reading for reading in data if reading["timestamp"] > cutoff_time]
+        recent_data = [
+            reading for reading in data if reading["timestamp"] > cutoff_time
+        ]
 
         if not recent_data:
             return None

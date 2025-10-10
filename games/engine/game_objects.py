@@ -96,7 +96,11 @@ class GameObject:
         """Apply force to object (F = ma, so a = F/m)"""
         # Ensure force is a Vector2D
         if not isinstance(force, Vector2D):
-            force = Vector2D(force, 0) if isinstance(force, (int, float)) else Vector2D(0, 0)
+            force = (
+                Vector2D(force, 0)
+                if isinstance(force, (int, float))
+                else Vector2D(0, 0)
+            )
         # Calculate acceleration from force (a = F/m)
         acceleration_delta = Vector2D(force.x / self.mass, force.y / self.mass)
         self.acceleration.x += acceleration_delta.x

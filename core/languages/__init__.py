@@ -18,4 +18,11 @@ from .perl import PerlExecutor
 from .python_executor import PythonExecutor
 from .javascript_executor import JavaScriptExecutor
 
-__all__ = ["PilotExecutor", "BasicExecutor", "LogoExecutor", "PerlExecutor", "PythonExecutor", "JavaScriptExecutor"]
+__all__ = [
+    "PilotExecutor",
+    "BasicExecutor",
+    "LogoExecutor",
+    "PerlExecutor",
+    "PythonExecutor",
+    "JavaScriptExecutor",
+]

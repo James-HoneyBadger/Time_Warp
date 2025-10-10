@@ -69,10 +69,14 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         """Activate the debugger"""
         try:
             # Add menu item
-            self.add_menu_item("Tools", "🐛 Advanced Debugger", self.show_tool_dialog, "Ctrl+Shift+D")
+            self.add_menu_item(
+                "Tools", "🐛 Advanced Debugger", self.show_tool_dialog, "Ctrl+Shift+D"
+            )
 
             # Add toolbar item
-            self.add_toolbar_item("🐛 Debug", self.show_tool_dialog, tooltip="Open Advanced Debugger")
+            self.add_toolbar_item(
+                "🐛 Debug", self.show_tool_dialog, tooltip="Open Advanced Debugger"
+            )
 
             return True
         except Exception as e:
@@ -102,9 +106,13 @@ class AdvancedDebuggerPlugin(ToolPlugin):
             header_frame = ttk.Frame(main_frame)
             header_frame.pack(fill=tk.X, pady=(0, 10))
 
-            ttk.Label(header_frame, text="🐛 Advanced Debugger", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+            ttk.Label(
+                header_frame, text="🐛 Advanced Debugger", font=("Arial", 16, "bold")
+            ).pack(side=tk.LEFT)
 
-            ttk.Button(header_frame, text="🔄 Refresh", command=self.refresh_all_data).pack(side=tk.RIGHT, padx=5)
+            ttk.Button(
+                header_frame, text="🔄 Refresh", command=self.refresh_all_data
+            ).pack(side=tk.RIGHT, padx=5)
 
             # Create notebook for different debugging aspects
             self.notebook = ttk.Notebook(main_frame)
@@ -134,15 +142,21 @@ class AdvancedDebuggerPlugin(ToolPlugin):
 
         # Treeview for breakpoints
         columns = ("File", "Line", "Condition", "Status")
-        self.breakpoints_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
+        self.breakpoints_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=15
+        )
 
         for col in columns:
             self.breakpoints_tree.heading(col, text=col)
             self.breakpoints_tree.column(col, width=150)
 
-        self.breakpoints_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.breakpoints_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        bp_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.breakpoints_tree.yview)
+        bp_scroll = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.breakpoints_tree.yview
+        )
         self.breakpoints_tree.config(yscrollcommand=bp_scroll.set)
         bp_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -150,11 +164,21 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         button_frame = ttk.Frame(breakpoints_frame)
         button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_frame, text="➕ Add Breakpoint", command=self._add_breakpoint).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="❌ Remove", command=self._remove_breakpoint).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="✅ Enable All", command=self._enable_all_breakpoints).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="⏸️ Disable All", command=self._disable_all_breakpoints).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="🧹 Clear All", command=self._clear_all_breakpoints).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="➕ Add Breakpoint", command=self._add_breakpoint
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="❌ Remove", command=self._remove_breakpoint
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="✅ Enable All", command=self._enable_all_breakpoints
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="⏸️ Disable All", command=self._disable_all_breakpoints
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="🧹 Clear All", command=self._clear_all_breakpoints
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_variables_tab(self):
         """Setup debug variables tab"""
@@ -167,7 +191,9 @@ class AdvancedDebuggerPlugin(ToolPlugin):
 
         # Variables treeview
         columns = ("Variable", "Type", "Value", "Scope")
-        self.debug_vars_tree = ttk.Treeview(tree_frame, columns=columns, show="headings", height=15)
+        self.debug_vars_tree = ttk.Treeview(
+            tree_frame, columns=columns, show="headings", height=15
+        )
 
         for col in columns:
             self.debug_vars_tree.heading(col, text=col)
@@ -176,9 +202,13 @@ class AdvancedDebuggerPlugin(ToolPlugin):
             else:
                 self.debug_vars_tree.column(col, width=120)
 
-        self.debug_vars_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.debug_vars_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        vars_scroll = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.debug_vars_tree.yview)
+        vars_scroll = ttk.Scrollbar(
+            tree_frame, orient=tk.VERTICAL, command=self.debug_vars_tree.yview
+        )
         self.debug_vars_tree.config(yscrollcommand=vars_scroll.set)
         vars_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -186,16 +216,20 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         vars_button_frame = ttk.Frame(variables_frame)
         vars_button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(vars_button_frame, text="🔄 Refresh", command=self._refresh_debug_variables).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(vars_button_frame, text="👁️ Watch Variable", command=self._add_watch_variable).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(vars_button_frame, text="✏️ Edit Value", command=self._edit_variable_value).pack(side=tk.LEFT, padx=2)
-        ttk.Button(vars_button_frame, text="💾 Export Variables", command=self._export_debug_variables).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            vars_button_frame, text="🔄 Refresh", command=self._refresh_debug_variables
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            vars_button_frame, text="👁️ Watch Variable", command=self._add_watch_variable
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            vars_button_frame, text="✏️ Edit Value", command=self._edit_variable_value
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            vars_button_frame,
+            text="💾 Export Variables",
+            command=self._export_debug_variables,
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_call_stack_tab(self):
         """Setup call stack tab"""
@@ -208,9 +242,13 @@ class AdvancedDebuggerPlugin(ToolPlugin):
 
         # Call stack listbox
         self.callstack_listbox = tk.Listbox(stack_frame, font=("Consolas", 10))
-        self.callstack_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.callstack_listbox.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        stack_scroll = ttk.Scrollbar(stack_frame, orient=tk.VERTICAL, command=self.callstack_listbox.yview)
+        stack_scroll = ttk.Scrollbar(
+            stack_frame, orient=tk.VERTICAL, command=self.callstack_listbox.yview
+        )
         self.callstack_listbox.config(yscrollcommand=stack_scroll.set)
         stack_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -219,10 +257,14 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         info_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.stack_info_text = tk.Text(info_frame, height=8, font=("Consolas", 9))
-        info_scroll = ttk.Scrollbar(info_frame, orient=tk.VERTICAL, command=self.stack_info_text.yview)
+        info_scroll = ttk.Scrollbar(
+            info_frame, orient=tk.VERTICAL, command=self.stack_info_text.yview
+        )
         self.stack_info_text.config(yscrollcommand=info_scroll.set)
 
-        self.stack_info_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.stack_info_text.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
         info_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
         # Bind selection event
@@ -244,28 +286,48 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         button_row1 = ttk.Frame(controls_frame)
         button_row1.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_row1, text="▶️ Run", command=self._debug_run).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row1, text="⏸️ Pause", command=self._debug_pause).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row1, text="⏹️ Stop", command=self._debug_stop).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row1, text="🔄 Restart", command=self._debug_restart).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row1, text="▶️ Run", command=self._debug_run).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_row1, text="⏸️ Pause", command=self._debug_pause).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_row1, text="⏹️ Stop", command=self._debug_stop).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_row1, text="🔄 Restart", command=self._debug_restart).pack(
+            side=tk.LEFT, padx=2
+        )
 
         button_row2 = ttk.Frame(controls_frame)
         button_row2.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_row2, text="➡️ Step Over", command=self._debug_step_over).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row2, text="⬇️ Step Into", command=self._debug_step_into).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row2, text="⬆️ Step Out", command=self._debug_step_out).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_row2, text="🏃 Run to Cursor", command=self._debug_run_to_cursor).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_row2, text="➡️ Step Over", command=self._debug_step_over).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_row2, text="⬇️ Step Into", command=self._debug_step_into).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_row2, text="⬆️ Step Out", command=self._debug_step_out).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(
+            button_row2, text="🏃 Run to Cursor", command=self._debug_run_to_cursor
+        ).pack(side=tk.LEFT, padx=2)
 
         # Execution status frame
         status_frame = ttk.LabelFrame(execution_frame, text="Execution Status")
         status_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         self.execution_text = tk.Text(status_frame, height=15, font=("Consolas", 10))
-        exec_scroll = ttk.Scrollbar(status_frame, orient=tk.VERTICAL, command=self.execution_text.yview)
+        exec_scroll = ttk.Scrollbar(
+            status_frame, orient=tk.VERTICAL, command=self.execution_text.yview
+        )
         self.execution_text.config(yscrollcommand=exec_scroll.set)
 
-        self.execution_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.execution_text.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
         exec_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
         # Initialize execution status
@@ -285,10 +347,18 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         stats_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.memory_labels = {}
-        memory_items = ["Total Memory", "Used Memory", "Free Memory", "Python Objects", "Variables Count"]
+        memory_items = [
+            "Total Memory",
+            "Used Memory",
+            "Free Memory",
+            "Python Objects",
+            "Variables Count",
+        ]
 
         for i, item in enumerate(memory_items):
-            ttk.Label(stats_frame, text=f"{item}:").grid(row=i, column=0, sticky="w", padx=5, pady=2)
+            ttk.Label(stats_frame, text=f"{item}:").grid(
+                row=i, column=0, sticky="w", padx=5, pady=2
+            )
             self.memory_labels[item] = ttk.Label(stats_frame, text="0 MB")
             self.memory_labels[item].grid(row=i, column=1, sticky="w", padx=20, pady=2)
 
@@ -297,7 +367,9 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         monitor_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         self.memory_text = tk.Text(monitor_frame, height=15, font=("Consolas", 9))
-        memory_scroll = ttk.Scrollbar(monitor_frame, orient=tk.VERTICAL, command=self.memory_text.yview)
+        memory_scroll = ttk.Scrollbar(
+            monitor_frame, orient=tk.VERTICAL, command=self.memory_text.yview
+        )
         self.memory_text.config(yscrollcommand=memory_scroll.set)
 
         self.memory_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -307,13 +379,17 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         memory_buttons = ttk.Frame(memory_frame)
         memory_buttons.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(memory_buttons, text="🔄 Refresh", command=self._refresh_memory_info).pack(side=tk.LEFT, padx=2)
-        ttk.Button(memory_buttons, text="📊 Memory Profile", command=self._show_memory_profile).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(memory_buttons, text="🧹 Garbage Collect", command=self._force_garbage_collection).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            memory_buttons, text="🔄 Refresh", command=self._refresh_memory_info
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            memory_buttons, text="📊 Memory Profile", command=self._show_memory_profile
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            memory_buttons,
+            text="🧹 Garbage Collect",
+            command=self._force_garbage_collection,
+        ).pack(side=tk.LEFT, padx=2)
 
         # Initialize memory display
         self._refresh_memory_info()
@@ -339,7 +415,9 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         if selection:
             index = selection[0]
             stack_info = (
-                self.debugger_state["call_stack"][index] if index < len(self.debugger_state["call_stack"]) else {}
+                self.debugger_state["call_stack"][index]
+                if index < len(self.debugger_state["call_stack"])
+                else {}
             )
 
             self.stack_info_text.delete("1.0", tk.END)
@@ -366,7 +444,9 @@ Details:
 
         ttk.Label(dialog, text="Line Number:").pack(pady=5)
         line_var = tk.IntVar(value=1)
-        ttk.Spinbox(dialog, from_=1, to=1000, textvariable=line_var, width=10).pack(pady=5)
+        ttk.Spinbox(dialog, from_=1, to=1000, textvariable=line_var, width=10).pack(
+            pady=5
+        )
 
         ttk.Label(dialog, text="Condition (optional):").pack(pady=5)
         condition_var = tk.StringVar()
@@ -384,12 +464,18 @@ Details:
                 "enabled": True,
             }
 
-            self.breakpoints_tree.insert("", "end", values=("main.py", line, condition, "Enabled"))
+            self.breakpoints_tree.insert(
+                "", "end", values=("main.py", line, condition, "Enabled")
+            )
             messagebox.showinfo("Breakpoint Added", f"Breakpoint added at line {line}")
             dialog.destroy()
 
-        ttk.Button(dialog, text="✅ Add", command=create_bp).pack(side=tk.LEFT, padx=5, pady=20)
-        ttk.Button(dialog, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5, pady=20)
+        ttk.Button(dialog, text="✅ Add", command=create_bp).pack(
+            side=tk.LEFT, padx=5, pady=20
+        )
+        ttk.Button(dialog, text="❌ Cancel", command=dialog.destroy).pack(
+            side=tk.LEFT, padx=5, pady=20
+        )
 
     def _remove_breakpoint(self):
         """Remove selected breakpoint"""
@@ -398,7 +484,9 @@ Details:
             self.breakpoints_tree.delete(selection[0])
             messagebox.showinfo("Breakpoint Removed", "Breakpoint removed successfully")
         else:
-            messagebox.showwarning("No Selection", "Please select a breakpoint to remove")
+            messagebox.showwarning(
+                "No Selection", "Please select a breakpoint to remove"
+            )
 
     def _enable_all_breakpoints(self):
         """Enable all breakpoints"""
@@ -438,8 +526,13 @@ Details:
                 variables = {}
 
                 # Get PILOT variables
-                if hasattr(self.ide.interpreter, "pilot_executor") and self.ide.interpreter.pilot_executor:
-                    pilot_vars = getattr(self.ide.interpreter.pilot_executor, "variables", {})
+                if (
+                    hasattr(self.ide.interpreter, "pilot_executor")
+                    and self.ide.interpreter.pilot_executor
+                ):
+                    pilot_vars = getattr(
+                        self.ide.interpreter.pilot_executor, "variables", {}
+                    )
                     for var, value in pilot_vars.items():
                         variables[f"PILOT:{var}"] = {
                             "type": type(value).__name__,
@@ -448,8 +541,13 @@ Details:
                         }
 
                 # Get BASIC variables
-                if hasattr(self.ide.interpreter, "basic_executor") and self.ide.interpreter.basic_executor:
-                    basic_vars = getattr(self.ide.interpreter.basic_executor, "variables", {})
+                if (
+                    hasattr(self.ide.interpreter, "basic_executor")
+                    and self.ide.interpreter.basic_executor
+                ):
+                    basic_vars = getattr(
+                        self.ide.interpreter.basic_executor, "variables", {}
+                    )
                     for var, value in basic_vars.items():
                         variables[f"BASIC:{var}"] = {
                             "type": type(value).__name__,
@@ -458,26 +556,48 @@ Details:
                         }
 
                 # Get Logo variables
-                if hasattr(self.ide.interpreter, "logo_executor") and self.ide.interpreter.logo_executor:
-                    logo_vars = getattr(self.ide.interpreter.logo_executor, "variables", {})
+                if (
+                    hasattr(self.ide.interpreter, "logo_executor")
+                    and self.ide.interpreter.logo_executor
+                ):
+                    logo_vars = getattr(
+                        self.ide.interpreter.logo_executor, "variables", {}
+                    )
                     for var, value in logo_vars.items():
-                        variables[f"Logo:{var}"] = {"type": type(value).__name__, "value": str(value), "scope": "Logo"}
+                        variables[f"Logo:{var}"] = {
+                            "type": type(value).__name__,
+                            "value": str(value),
+                            "scope": "Logo",
+                        }
 
                 # Add to tree
                 for var_name, var_info in variables.items():
                     self.debug_vars_tree.insert(
-                        "", "end", values=(var_name, var_info["type"], var_info["value"][:50], var_info["scope"])
+                        "",
+                        "end",
+                        values=(
+                            var_name,
+                            var_info["type"],
+                            var_info["value"][:50],
+                            var_info["scope"],
+                        ),
                     )
 
         except Exception as e:
-            self.debug_vars_tree.insert("", "end", values=("Error", "N/A", str(e)[:50], "System"))
+            self.debug_vars_tree.insert(
+                "", "end", values=("Error", "N/A", str(e)[:50], "System")
+            )
 
     def _add_watch_variable(self):
         """Add a variable to watch"""
-        var_name = simpledialog.askstring("Watch Variable", "Enter variable name to watch:")
+        var_name = simpledialog.askstring(
+            "Watch Variable", "Enter variable name to watch:"
+        )
         if var_name:
             self.debugger_state["watch_variables"].append(var_name)
-            messagebox.showinfo("Watch Added", f"Variable '{var_name}' added to watch list")
+            messagebox.showinfo(
+                "Watch Added", f"Variable '{var_name}' added to watch list"
+            )
 
     def _edit_variable_value(self):
         """Edit selected variable value"""
@@ -488,10 +608,15 @@ Details:
             old_value = item["values"][2]
 
             new_value = simpledialog.askstring(
-                "Edit Variable", f"Enter new value for {var_name}:", initialvalue=old_value
+                "Edit Variable",
+                f"Enter new value for {var_name}:",
+                initialvalue=old_value,
             )
             if new_value is not None:
-                messagebox.showinfo("Variable Updated", f"Variable '{var_name}' updated to '{new_value}'")
+                messagebox.showinfo(
+                    "Variable Updated",
+                    f"Variable '{var_name}' updated to '{new_value}'",
+                )
         else:
             messagebox.showwarning("No Selection", "Please select a variable to edit")
 
@@ -508,12 +633,18 @@ Details:
                 variables = {}
                 for item in self.debug_vars_tree.get_children():
                     values = self.debug_vars_tree.item(item)["values"]
-                    variables[values[0]] = {"type": values[1], "value": values[2], "scope": values[3]}
+                    variables[values[0]] = {
+                        "type": values[1],
+                        "value": values[2],
+                        "scope": values[3],
+                    }
 
                 with open(filename, "w", encoding="utf-8") as f:
                     json.dump(variables, f, indent=2)
 
-                messagebox.showinfo("Export Complete", f"Variables exported to {filename}")
+                messagebox.showinfo(
+                    "Export Complete", f"Variables exported to {filename}"
+                )
 
         except Exception as e:
             messagebox.showerror("Export Error", f"Failed to export variables: {e}")
@@ -557,7 +688,9 @@ Details:
     def _debug_step_over(self):
         """Step over current line"""
         self.debugger_state["current_line"] += 1
-        self._update_execution_status(f"Stepped over to line {self.debugger_state['current_line']}")
+        self._update_execution_status(
+            f"Stepped over to line {self.debugger_state['current_line']}"
+        )
         self.emit_event("debug_step_over_request")
 
     def _debug_step_into(self):
@@ -595,16 +728,36 @@ Details:
     def _populate_sample_call_stack(self):
         """Populate call stack with sample data"""
         sample_stack = [
-            {"function": "main()", "file": "main.py", "line": 15, "args": "[]", "locals": {"x": 10, "y": 20}},
-            {"function": "calculate(x, y)", "file": "main.py", "line": 8, "args": "[10, 20]", "locals": {"result": 30}},
-            {"function": "add(a, b)", "file": "utils.py", "line": 3, "args": "[10, 20]", "locals": {"a": 10, "b": 20}},
+            {
+                "function": "main()",
+                "file": "main.py",
+                "line": 15,
+                "args": "[]",
+                "locals": {"x": 10, "y": 20},
+            },
+            {
+                "function": "calculate(x, y)",
+                "file": "main.py",
+                "line": 8,
+                "args": "[10, 20]",
+                "locals": {"result": 30},
+            },
+            {
+                "function": "add(a, b)",
+                "file": "utils.py",
+                "line": 3,
+                "args": "[10, 20]",
+                "locals": {"a": 10, "b": 20},
+            },
         ]
 
         self.debugger_state["call_stack"] = sample_stack
 
         self.callstack_listbox.delete(0, tk.END)
         for i, frame in enumerate(sample_stack):
-            display_text = f"{i+1}. {frame['function']} - {frame['file']}:{frame['line']}"
+            display_text = (
+                f"{i+1}. {frame['function']} - {frame['file']}:{frame['line']}"
+            )
             self.callstack_listbox.insert(tk.END, display_text)
 
             # Add details for stack frame
@@ -621,9 +774,15 @@ Details:
             memory = psutil.virtual_memory()
 
             # Update labels
-            self.memory_labels["Total Memory"].config(text=f"{memory.total / (1024**3):.1f} GB")
-            self.memory_labels["Used Memory"].config(text=f"{memory.used / (1024**3):.1f} GB")
-            self.memory_labels["Free Memory"].config(text=f"{memory.available / (1024**3):.1f} GB")
+            self.memory_labels["Total Memory"].config(
+                text=f"{memory.total / (1024**3):.1f} GB"
+            )
+            self.memory_labels["Used Memory"].config(
+                text=f"{memory.used / (1024**3):.1f} GB"
+            )
+            self.memory_labels["Free Memory"].config(
+                text=f"{memory.available / (1024**3):.1f} GB"
+            )
 
             # Get Python object count
             import gc
@@ -634,7 +793,11 @@ Details:
             # Get variable count from interpreter
             var_count = 0
             if hasattr(self.ide, "interpreter") and self.ide.interpreter:
-                for executor_name in ["pilot_executor", "basic_executor", "logo_executor"]:
+                for executor_name in [
+                    "pilot_executor",
+                    "basic_executor",
+                    "logo_executor",
+                ]:
                     executor = getattr(self.ide.interpreter, executor_name, None)
                     if executor and hasattr(executor, "variables"):
                         var_count += len(executor.variables)
@@ -682,7 +845,8 @@ Garbage Collection:
             if not tracemalloc.is_tracing():
                 tracemalloc.start()
                 messagebox.showinfo(
-                    "Memory Profiler", "Memory tracing started. Run some code and check again for detailed profiling."
+                    "Memory Profiler",
+                    "Memory tracing started. Run some code and check again for detailed profiling.",
                 )
                 return
 
@@ -694,7 +858,9 @@ Garbage Collection:
             profile_dialog.transient(self._tool_window)
 
             profile_text = tk.Text(profile_dialog, font=("Consolas", 10))
-            profile_scroll = ttk.Scrollbar(profile_dialog, orient=tk.VERTICAL, command=profile_text.yview)
+            profile_scroll = ttk.Scrollbar(
+                profile_dialog, orient=tk.VERTICAL, command=profile_text.yview
+            )
             profile_text.config(yscrollcommand=profile_scroll.set)
 
             profile_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
@@ -715,24 +881,35 @@ Top Memory Consumers:
 
             for i, stat in enumerate(top_stats[:10]):
                 profile_info += f"\n{i+1}. {stat.traceback.format()[-1]}"
-                profile_info += f"   Size: {stat.size / 1024:.1f} KB ({stat.count} blocks)\n"
+                profile_info += (
+                    f"   Size: {stat.size / 1024:.1f} KB ({stat.count} blocks)\n"
+                )
 
             profile_text.insert("1.0", profile_info)
             profile_text.config(state=tk.DISABLED)
 
         except ImportError:
-            messagebox.showwarning("Memory Profiler", "tracemalloc not available in this Python version")
+            messagebox.showwarning(
+                "Memory Profiler", "tracemalloc not available in this Python version"
+            )
         except Exception as e:
-            messagebox.showerror("Memory Profiler Error", f"Error generating memory profile: {e}")
+            messagebox.showerror(
+                "Memory Profiler Error", f"Error generating memory profile: {e}"
+            )
 
     def _force_garbage_collection(self):
         """Force garbage collection"""
         try:
             collected = gc.collect()
-            messagebox.showinfo("Garbage Collection", f"Garbage collection completed.\nCollected {collected} objects.")
+            messagebox.showinfo(
+                "Garbage Collection",
+                f"Garbage collection completed.\nCollected {collected} objects.",
+            )
             self._refresh_memory_info()
         except Exception as e:
-            messagebox.showerror("Garbage Collection Error", f"Error during garbage collection: {e}")
+            messagebox.showerror(
+                "Garbage Collection Error", f"Error during garbage collection: {e}"
+            )
 
     # === UTILITY METHODS ===
 

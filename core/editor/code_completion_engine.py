@@ -209,7 +209,12 @@ class CodeCompletionEngine:
         self.context_cache = {}
 
     def get_completions(
-        self, language: str, text: str, position: int, line_text: str = "", cursor_column: int = 0
+        self,
+        language: str,
+        text: str,
+        position: int,
+        line_text: str = "",
+        cursor_column: int = 0,
     ) -> List[CompletionItem]:
         """
         Get code completion suggestions for given context
@@ -237,10 +242,14 @@ class CodeCompletionEngine:
             completions.extend(self._get_function_completions(language, current_word))
 
             # Add variable completions
-            completions.extend(self._get_variable_completions(text, current_word, language))
+            completions.extend(
+                self._get_variable_completions(text, current_word, language)
+            )
 
             # Add context-specific completions
-            completions.extend(self._get_context_completions(language, line_text, current_word))
+            completions.extend(
+                self._get_context_completions(language, line_text, current_word)
+            )
 
             # Sort by relevance score
             completions.sort(key=lambda x: x.score, reverse=True)
@@ -267,7 +276,9 @@ class CodeCompletionEngine:
 
         return line_text[start:cursor_column]
 
-    def _get_keyword_completions(self, language: str, current_word: str) -> List[CompletionItem]:
+    def _get_keyword_completions(
+        self, language: str, current_word: str
+    ) -> List[CompletionItem]:
         """Get keyword completions for the language"""
         completions = []
         keywords = self.language_keywords.get(language, [])
@@ -285,7 +296,9 @@ class CodeCompletionEngine:
 
         return completions
 
-    def _get_function_completions(self, language: str, current_word: str) -> List[CompletionItem]:
+    def _get_function_completions(
+        self, language: str, current_word: str
+    ) -> List[CompletionItem]:
         """Get function completions for the language"""
         completions = []
         functions = self.language_functions.get(language, {})
@@ -304,7 +317,9 @@ class CodeCompletionEngine:
 
         return completions
 
-    def _get_variable_completions(self, text: str, current_word: str, language: str) -> List[CompletionItem]:
+    def _get_variable_completions(
+        self, text: str, current_word: str, language: str
+    ) -> List[CompletionItem]:
         """Extract variables from code and suggest completions"""
         completions = []
         variables = set()
@@ -312,7 +327,11 @@ class CodeCompletionEngine:
         try:
             if language == "basic":
                 # Find BASIC variables (LET statements, FOR loops)
-                var_patterns = [r"LET\s+([A-Z][A-Z0-9]*)", r"FOR\s+([A-Z][A-Z0-9]*)", r"INPUT\s+([A-Z][A-Z0-9]*)"]
+                var_patterns = [
+                    r"LET\s+([A-Z][A-Z0-9]*)",
+                    r"FOR\s+([A-Z][A-Z0-9]*)",
+                    r"INPUT\s+([A-Z][A-Z0-9]*)",
+                ]
 
                 for pattern in var_patterns:
                     matches = re.findall(pattern, text.upper())
@@ -320,7 +339,11 @@ class CodeCompletionEngine:
 
             elif language == "pilot":
                 # PILOT uses memory locations and labels
-                var_patterns = [r"Y:\s*([A-Z][A-Z0-9]*)", r"N:\s*([A-Z][A-Z0-9]*)", r"#([A-Z][A-Z0-9]*)"]
+                var_patterns = [
+                    r"Y:\s*([A-Z][A-Z0-9]*)",
+                    r"N:\s*([A-Z][A-Z0-9]*)",
+                    r"#([A-Z][A-Z0-9]*)",
+                ]
 
                 for pattern in var_patterns:
                     matches = re.findall(pattern, text.upper())
@@ -336,7 +359,11 @@ class CodeCompletionEngine:
             for var in variables:
                 if not current_word or var.lower().startswith(current_word.lower()):
                     completion = CompletionItem(
-                        text=var, kind="variable", description=f"Variable in {language}", insert_text=var, score=0.7
+                        text=var,
+                        kind="variable",
+                        description=f"Variable in {language}",
+                        insert_text=var,
+                        score=0.7,
                     )
                     completions.append(completion)
 
@@ -345,7 +372,9 @@ class CodeCompletionEngine:
 
         return completions
 
-    def _get_context_completions(self, language: str, line_text: str, current_word: str) -> List[CompletionItem]:
+    def _get_context_completions(
+        self, language: str, line_text: str, current_word: str
+    ) -> List[CompletionItem]:
         """Get context-aware completions based on current line"""
         completions = []
 
@@ -357,27 +386,43 @@ class CodeCompletionEngine:
                 if line_upper.startswith("IF"):
                     completions.append(
                         CompletionItem(
-                            text="THEN", kind="keyword", description="THEN clause for IF statement", score=0.95
+                            text="THEN",
+                            kind="keyword",
+                            description="THEN clause for IF statement",
+                            score=0.95,
                         )
                     )
                 elif line_upper.startswith("FOR"):
                     completions.append(
-                        CompletionItem(text="TO", kind="keyword", description="TO clause for FOR loop", score=0.95)
+                        CompletionItem(
+                            text="TO",
+                            kind="keyword",
+                            description="TO clause for FOR loop",
+                            score=0.95,
+                        )
                     )
 
             elif language == "pilot":
                 if line_upper.startswith("T:"):
                     completions.extend(
                         [
-                            CompletionItem("50", "constant", "Move 50 units", score=0.8),
-                            CompletionItem("100", "constant", "Move 100 units", score=0.8),
+                            CompletionItem(
+                                "50", "constant", "Move 50 units", score=0.8
+                            ),
+                            CompletionItem(
+                                "100", "constant", "Move 100 units", score=0.8
+                            ),
                         ]
                     )
                 elif line_upper.startswith("A:"):
                     completions.extend(
                         [
-                            CompletionItem("90", "constant", "Turn 90 degrees", score=0.8),
-                            CompletionItem("45", "constant", "Turn 45 degrees", score=0.8),
+                            CompletionItem(
+                                "90", "constant", "Turn 90 degrees", score=0.8
+                            ),
+                            CompletionItem(
+                                "45", "constant", "Turn 45 degrees", score=0.8
+                            ),
                         ]
                     )
 
@@ -385,9 +430,15 @@ class CodeCompletionEngine:
                 if line_upper.startswith("REPEAT"):
                     completions.extend(
                         [
-                            CompletionItem("4", "constant", "Repeat 4 times", score=0.8),
-                            CompletionItem("6", "constant", "Repeat 6 times", score=0.8),
-                            CompletionItem("[", "constant", "Start command block", score=0.9),
+                            CompletionItem(
+                                "4", "constant", "Repeat 4 times", score=0.8
+                            ),
+                            CompletionItem(
+                                "6", "constant", "Repeat 6 times", score=0.8
+                            ),
+                            CompletionItem(
+                                "[", "constant", "Start command block", score=0.9
+                            ),
                         ]
                     )
 
@@ -396,7 +447,9 @@ class CodeCompletionEngine:
 
         return completions
 
-    def get_signature_help(self, language: str, function_name: str) -> Optional[Dict[str, Any]]:
+    def get_signature_help(
+        self, language: str, function_name: str
+    ) -> Optional[Dict[str, Any]]:
         """Get function signature and parameter information"""
         functions = self.language_functions.get(language, {})
 
@@ -409,39 +462,91 @@ class CodeCompletionEngine:
 
         return None
 
-    def _get_function_parameters(self, language: str, function_name: str) -> List[Dict[str, str]]:
+    def _get_function_parameters(
+        self, language: str, function_name: str
+    ) -> List[Dict[str, str]]:
         """Get parameter information for function"""
         param_info = {
             "pilot": {
-                "T:": [{"name": "distance", "type": "number", "description": "Distance to move"}],
-                "A:": [{"name": "angle", "type": "number", "description": "Angle to turn in degrees"}],
-                "C:": [{"name": "color", "type": "string", "description": "Color name or code"}],
+                "T:": [
+                    {
+                        "name": "distance",
+                        "type": "number",
+                        "description": "Distance to move",
+                    }
+                ],
+                "A:": [
+                    {
+                        "name": "angle",
+                        "type": "number",
+                        "description": "Angle to turn in degrees",
+                    }
+                ],
+                "C:": [
+                    {
+                        "name": "color",
+                        "type": "string",
+                        "description": "Color name or code",
+                    }
+                ],
             },
             "basic": {
-                "PRINT": [{"name": "expression", "type": "any", "description": "Value to print"}],
+                "PRINT": [
+                    {
+                        "name": "expression",
+                        "type": "any",
+                        "description": "Value to print",
+                    }
+                ],
                 "LET": [
-                    {"name": "variable", "type": "identifier", "description": "Variable name"},
+                    {
+                        "name": "variable",
+                        "type": "identifier",
+                        "description": "Variable name",
+                    },
                     {"name": "value", "type": "any", "description": "Value to assign"},
                 ],
                 "FOR": [
-                    {"name": "variable", "type": "identifier", "description": "Loop variable"},
+                    {
+                        "name": "variable",
+                        "type": "identifier",
+                        "description": "Loop variable",
+                    },
                     {"name": "start", "type": "number", "description": "Start value"},
                     {"name": "end", "type": "number", "description": "End value"},
                 ],
             },
             "logo": {
-                "FORWARD": [{"name": "distance", "type": "number", "description": "Distance to move"}],
-                "LEFT": [{"name": "angle", "type": "number", "description": "Angle to turn"}],
+                "FORWARD": [
+                    {
+                        "name": "distance",
+                        "type": "number",
+                        "description": "Distance to move",
+                    }
+                ],
+                "LEFT": [
+                    {"name": "angle", "type": "number", "description": "Angle to turn"}
+                ],
                 "REPEAT": [
-                    {"name": "count", "type": "number", "description": "Number of repetitions"},
-                    {"name": "commands", "type": "list", "description": "Commands to repeat"},
+                    {
+                        "name": "count",
+                        "type": "number",
+                        "description": "Number of repetitions",
+                    },
+                    {
+                        "name": "commands",
+                        "type": "list",
+                        "description": "Commands to repeat",
+                    },
                 ],
             },
         }
 
         return param_info.get(language, {}).get(function_name, [])
 
-    def validate_syntax(self, language: str, code: str) -> Tuple[bool, List[Dict[str, Any]]]:
+    def validate_syntax(
+        self, language: str, code: str
+    ) -> Tuple[bool, List[Dict[str, Any]]]:
         """
         Validate syntax and return errors/warnings
 
@@ -457,7 +562,13 @@ class CodeCompletionEngine:
                     return True, []
                 except SyntaxError as e:
                     issues.append(
-                        {"type": "error", "line": e.lineno, "column": e.offset, "message": str(e), "severity": "error"}
+                        {
+                            "type": "error",
+                            "line": e.lineno,
+                            "column": e.offset,
+                            "message": str(e),
+                            "severity": "error",
+                        }
                     )
 
             else:
@@ -495,7 +606,12 @@ class CodeCompletionEngine:
 
         except Exception as e:
             issues.append(
-                {"type": "error", "line": 1, "message": f"Syntax validation error: {str(e)}", "severity": "error"}
+                {
+                    "type": "error",
+                    "line": 1,
+                    "message": f"Syntax validation error: {str(e)}",
+                    "severity": "error",
+                }
             )
             return False, issues
 

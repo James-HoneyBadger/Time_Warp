@@ -30,7 +30,12 @@ except ImportError:
             pass
 
         def get_info(self):
-            return {"name": self.name, "version": self.version, "author": self.author, "description": self.description}
+            return {
+                "name": self.name,
+                "version": self.version,
+                "author": self.author,
+                "description": self.description,
+            }
 
 
 class TimeWarpPlugin(BaseTimeWarpPlugin):
@@ -74,7 +79,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                 for i in range(self.ide.menubar.index("end") + 1):
                     try:
                         if self.ide.menubar.entryconfig(i, "label")[4][1] == "Edit":
-                            edit_menu = self.ide.menubar.nametowidget(self.ide.menubar.entryconfig(i, "menu")[4][1])
+                            edit_menu = self.ide.menubar.nametowidget(
+                                self.ide.menubar.entryconfig(i, "menu")[4][1]
+                            )
                             break
                     except:
                         continue
@@ -84,11 +91,21 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                     edit_menu.add_separator()
 
                     # Add formatting options
-                    edit_menu.add_command(label="🎨 Format Code", command=self.format_current_code)
-                    edit_menu.add_command(label="📐 Indent Code", command=self.indent_code)
-                    edit_menu.add_command(label="🧹 Clean Whitespace", command=self.clean_whitespace)
+                    edit_menu.add_command(
+                        label="🎨 Format Code", command=self.format_current_code
+                    )
+                    edit_menu.add_command(
+                        label="📐 Indent Code", command=self.indent_code
+                    )
+                    edit_menu.add_command(
+                        label="🧹 Clean Whitespace", command=self.clean_whitespace
+                    )
 
-                    self.menu_items = ["🎨 Format Code", "📐 Indent Code", "🧹 Clean Whitespace"]
+                    self.menu_items = [
+                        "🎨 Format Code",
+                        "📐 Indent Code",
+                        "🧹 Clean Whitespace",
+                    ]
 
         except Exception as e:
             print(f"Error adding menu items: {e}")
@@ -122,9 +139,13 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                 # Replace editor content
                 self.ide.editor.delete("1.0", tk.END)
                 self.ide.editor.insert("1.0", formatted_code)
-                messagebox.showinfo("Code Formatted", "Code has been formatted successfully!")
+                messagebox.showinfo(
+                    "Code Formatted", "Code has been formatted successfully!"
+                )
             else:
-                messagebox.showinfo("Already Formatted", "Code is already properly formatted")
+                messagebox.showinfo(
+                    "Already Formatted", "Code is already properly formatted"
+                )
 
         except Exception as e:
             messagebox.showerror("Format Error", f"Could not format code: {e}")
@@ -142,9 +163,13 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
             if indented_code != current_code:
                 self.ide.editor.delete("1.0", tk.END)
                 self.ide.editor.insert("1.0", indented_code)
-                messagebox.showinfo("Indentation Fixed", "Code indentation has been corrected!")
+                messagebox.showinfo(
+                    "Indentation Fixed", "Code indentation has been corrected!"
+                )
             else:
-                messagebox.showinfo("Already Indented", "Code indentation is already correct")
+                messagebox.showinfo(
+                    "Already Indented", "Code indentation is already correct"
+                )
 
         except Exception as e:
             messagebox.showerror("Indent Error", f"Could not fix indentation: {e}")
@@ -162,7 +187,9 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
             if cleaned_code != current_code:
                 self.ide.editor.delete("1.0", tk.END)
                 self.ide.editor.insert("1.0", cleaned_code)
-                messagebox.showinfo("Whitespace Cleaned", "Unnecessary whitespace has been removed!")
+                messagebox.showinfo(
+                    "Whitespace Cleaned", "Unnecessary whitespace has been removed!"
+                )
             else:
                 messagebox.showinfo("Already Clean", "Code whitespace is already clean")
 
@@ -185,18 +212,45 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         """Check if code is PILOT"""
         pilot_commands = ["T:", "A:", "Y:", "N:", "J:", "M:", "C:", "U:", "E:"]
         lines = code.split("\n")
-        pilot_count = sum(1 for line in lines if any(line.strip().startswith(cmd) for cmd in pilot_commands))
+        pilot_count = sum(
+            1
+            for line in lines
+            if any(line.strip().startswith(cmd) for cmd in pilot_commands)
+        )
         return pilot_count > len(lines) * 0.3  # 30% of lines are PILOT commands
 
     def is_basic_code(self, code):
         """Check if code is BASIC"""
-        basic_keywords = ["PRINT", "INPUT", "LET", "GOTO", "GOSUB", "IF", "THEN", "FOR", "NEXT", "REM"]
+        basic_keywords = [
+            "PRINT",
+            "INPUT",
+            "LET",
+            "GOTO",
+            "GOSUB",
+            "IF",
+            "THEN",
+            "FOR",
+            "NEXT",
+            "REM",
+        ]
         upper_code = code.upper()
         return any(keyword in upper_code for keyword in basic_keywords)
 
     def is_logo_code(self, code):
         """Check if code is Logo"""
-        logo_commands = ["FD", "FORWARD", "BK", "BACK", "LT", "LEFT", "RT", "RIGHT", "PU", "PD", "REPEAT"]
+        logo_commands = [
+            "FD",
+            "FORWARD",
+            "BK",
+            "BACK",
+            "LT",
+            "LEFT",
+            "RT",
+            "RIGHT",
+            "PU",
+            "PD",
+            "REPEAT",
+        ]
         upper_code = code.upper()
         return any(cmd in upper_code for cmd in logo_commands)
 

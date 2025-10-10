@@ -29,7 +29,9 @@ class JavaScriptExecutor:
         for node_name in node_names:
             try:
                 # Check if node is available
-                result = subprocess.run([node_name, "--version"], capture_output=True, text=True, timeout=5)
+                result = subprocess.run(
+                    [node_name, "--version"], capture_output=True, text=True, timeout=5
+                )
                 if result.returncode == 0:
                     return node_name
             except (subprocess.TimeoutExpired, FileNotFoundError):
@@ -56,17 +58,26 @@ class JavaScriptExecutor:
         """Execute JavaScript script text"""
         if not self.node_executable:
             self.interpreter.log_output("❌ Node.js not found on system")
-            self.interpreter.log_output("   Please install Node.js to run JavaScript scripts")
+            self.interpreter.log_output(
+                "   Please install Node.js to run JavaScript scripts"
+            )
             return "error"
 
         try:
             # Create temporary file for the JavaScript script
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".js", delete=False
+            ) as temp_file:
                 temp_file.write(script_text)
                 temp_file_path = temp_file.name
 
             # Execute the JavaScript script
-            result = subprocess.run([self.node_executable, temp_file_path], capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                [self.node_executable, temp_file_path],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
             # Clean up temporary file
             os.unlink(temp_file_path)
@@ -80,7 +91,9 @@ class JavaScriptExecutor:
                 return "error"
 
             if result.returncode != 0:
-                self.interpreter.log_output(f"JavaScript script exited with code {result.returncode}")
+                self.interpreter.log_output(
+                    f"JavaScript script exited with code {result.returncode}"
+                )
                 return "error"
 
             return "continue"
@@ -103,7 +116,12 @@ class JavaScriptExecutor:
                 self.interpreter.log_output(f"❌ JavaScript file not found: {filepath}")
                 return False
 
-            result = subprocess.run([self.node_executable, filepath], capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                [self.node_executable, filepath],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
             if result.stdout:
                 self.interpreter.log_output(result.stdout)
@@ -124,7 +142,12 @@ class JavaScriptExecutor:
             return "Node.js not available"
 
         try:
-            result = subprocess.run([self.node_executable, "--version"], capture_output=True, text=True, timeout=5)
+            result = subprocess.run(
+                [self.node_executable, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
             if result.returncode == 0:
                 return f"Node.js {result.stdout.strip()}"
             else:

@@ -16,7 +16,12 @@ from .parser import (
     ProgramNode,
 )
 from ..runtime.engine import RuntimeEngine, ExecutionContext
-from ..errors.error_manager import TimeWarpError, TimeWarpRuntimeError, ErrorCode, ErrorSeverity
+from ..errors.error_manager import (
+    TimeWarpError,
+    TimeWarpRuntimeError,
+    ErrorCode,
+    ErrorSeverity,
+)
 
 
 class CodeGenerator:
@@ -282,7 +287,11 @@ class CodeGenerator:
             return None
 
         value = self._execute_node(node.value, context)
-        context.variables.set_variable(node.target, value, line_defined=node.location.line if node.location else None)
+        context.variables.set_variable(
+            node.target,
+            value,
+            line_defined=node.location.line if node.location else None,
+        )
         return value
 
     def compile_to_bytecode(self, ast: ASTNode) -> List[Dict[str, Any]]:
@@ -298,20 +307,34 @@ class CodeGenerator:
 
         if node.node_type == ASTNodeType.NUMBER:
             if isinstance(node, LiteralNode):
-                instructions.append({"op": "LOAD_CONST", "value": node.value, "location": node.location})
+                instructions.append(
+                    {"op": "LOAD_CONST", "value": node.value, "location": node.location}
+                )
         elif node.node_type == ASTNodeType.STRING:
             if isinstance(node, LiteralNode):
-                instructions.append({"op": "LOAD_CONST", "value": node.value, "location": node.location})
+                instructions.append(
+                    {"op": "LOAD_CONST", "value": node.value, "location": node.location}
+                )
         elif node.node_type == ASTNodeType.IDENTIFIER:
             if isinstance(node, IdentifierNode):
-                instructions.append({"op": "LOAD_VAR", "name": node.name, "location": node.location})
+                instructions.append(
+                    {"op": "LOAD_VAR", "name": node.name, "location": node.location}
+                )
         elif node.node_type == ASTNodeType.BINARY_OP:
             if isinstance(node, BinaryOpNode):
                 self._compile_node(node.left, instructions)
                 self._compile_node(node.right, instructions)
-                instructions.append({"op": "BINARY_OP", "operator": node.operator, "location": node.location})
+                instructions.append(
+                    {
+                        "op": "BINARY_OP",
+                        "operator": node.operator,
+                        "location": node.location,
+                    }
+                )
         elif node.node_type == ASTNodeType.ASSIGNMENT:
             if isinstance(node, AssignmentNode):
                 self._compile_node(node.value, instructions)
-                instructions.append({"op": "STORE_VAR", "name": node.target, "location": node.location})
+                instructions.append(
+                    {"op": "STORE_VAR", "name": node.target, "location": node.location}
+                )
         # Add more node types as needed

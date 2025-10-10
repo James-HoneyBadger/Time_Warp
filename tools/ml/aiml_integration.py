@@ -62,11 +62,17 @@ class AIMLIntegration:
 
         self.log_ml_message("AI/ML Integration initialized")
         if not self.sklearn_available:
-            self.log_ml_message("⚠️ scikit-learn not available - install with: pip install scikit-learn")
+            self.log_ml_message(
+                "⚠️ scikit-learn not available - install with: pip install scikit-learn"
+            )
         if not self.numpy_available:
-            self.log_ml_message("⚠️ numpy not available - install with: pip install numpy")
+            self.log_ml_message(
+                "⚠️ numpy not available - install with: pip install numpy"
+            )
         if not self.pandas_available:
-            self.log_ml_message("⚠️ pandas not available - install with: pip install pandas")
+            self.log_ml_message(
+                "⚠️ pandas not available - install with: pip install pandas"
+            )
 
     def set_output_callback(self, callback):
         """Set callback for ML output messages"""
@@ -106,7 +112,9 @@ class AIMLIntegration:
                 X[:50] += [2, 2]  # Create two clusters
                 self.datasets[dataset_name] = {"X": X, "type": "clustering"}
 
-            self.log_ml_message(f"Sample dataset '{dataset_name}' created ({data_type})")
+            self.log_ml_message(
+                f"Sample dataset '{dataset_name}' created ({data_type})"
+            )
             return True
 
         except Exception as e:
@@ -167,15 +175,22 @@ class AIMLIntegration:
             else:
                 # Supervised learning
                 if "y" not in dataset:
-                    self.log_ml_message(f"Dataset '{dataset_name}' missing target variable")
+                    self.log_ml_message(
+                        f"Dataset '{dataset_name}' missing target variable"
+                    )
                     return False
 
                 model_info["model"].fit(dataset["X"], dataset["y"])
 
             model_info["trained"] = True
-            self.training_history[model_name] = {"dataset": dataset_name, "timestamp": datetime.now().isoformat()}
+            self.training_history[model_name] = {
+                "dataset": dataset_name,
+                "timestamp": datetime.now().isoformat(),
+            }
 
-            self.log_ml_message(f"Model '{model_name}' trained on dataset '{dataset_name}'")
+            self.log_ml_message(
+                f"Model '{model_name}' trained on dataset '{dataset_name}'"
+            )
             return True
 
         except Exception as e:

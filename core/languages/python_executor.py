@@ -40,13 +40,18 @@ class PythonExecutor:
         """Execute Python script text"""
         try:
             # Create temporary file for the Python script
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".py", delete=False
+            ) as temp_file:
                 temp_file.write(script_text)
                 temp_file_path = temp_file.name
 
             # Execute the Python script
             result = subprocess.run(
-                [self.python_executable, temp_file_path], capture_output=True, text=True, timeout=30
+                [self.python_executable, temp_file_path],
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
 
             # Clean up temporary file
@@ -61,7 +66,9 @@ class PythonExecutor:
                 return "error"
 
             if result.returncode != 0:
-                self.interpreter.log_output(f"Python script exited with code {result.returncode}")
+                self.interpreter.log_output(
+                    f"Python script exited with code {result.returncode}"
+                )
                 return "error"
 
             return "continue"
@@ -80,7 +87,12 @@ class PythonExecutor:
                 self.interpreter.log_output(f"❌ Python file not found: {filepath}")
                 return False
 
-            result = subprocess.run([self.python_executable, filepath], capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                [self.python_executable, filepath],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
             if result.stdout:
                 self.interpreter.log_output(result.stdout)

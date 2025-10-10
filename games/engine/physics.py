@@ -62,8 +62,12 @@ class PhysicsEngine:
         bounds = obj.get_bounds()
 
         # Calculate overlap on each axis
-        overlap_x = min(bounds["right"] - static["left"], static["right"] - bounds["left"])
-        overlap_y = min(bounds["bottom"] - static["top"], static["bottom"] - bounds["top"])
+        overlap_x = min(
+            bounds["right"] - static["left"], static["right"] - bounds["left"]
+        )
+        overlap_y = min(
+            bounds["bottom"] - static["top"], static["bottom"] - bounds["top"]
+        )
 
         # Resolve collision on the axis with smallest overlap
         if overlap_x < overlap_y:
@@ -131,7 +135,9 @@ class PhysicsEngine:
             obj.on_ground = False
 
             # Apply gravity
-            gravity_force = Vector2D(self.gravity.x * obj.gravity_scale, self.gravity.y * obj.gravity_scale)
+            gravity_force = Vector2D(
+                self.gravity.x * obj.gravity_scale, self.gravity.y * obj.gravity_scale
+            )
             obj.apply_force(gravity_force)
 
             # Update physics
@@ -159,4 +165,9 @@ class PhysicsEngine:
         obj2_bottom = obj2.position.y + obj2.height
 
         # Check for overlap
-        return obj1_left < obj2_right and obj1_right > obj2_left and obj1_top < obj2_bottom and obj1_bottom > obj2_top
+        return (
+            obj1_left < obj2_right
+            and obj1_right > obj2_left
+            and obj1_top < obj2_bottom
+            and obj1_bottom > obj2_top
+        )

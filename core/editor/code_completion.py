@@ -54,7 +54,13 @@ class CompletionPopup:
         self.selected_index = 0
         self.callback: Optional[Callable[[CompletionItem], None]] = None
 
-    def show(self, x: int, y: int, items: List[CompletionItem], callback: Callable[[CompletionItem], None]):
+    def show(
+        self,
+        x: int,
+        y: int,
+        items: List[CompletionItem],
+        callback: Callable[[CompletionItem], None],
+    ):
         """Show completion popup at specified position"""
         self.items = items
         self.callback = callback
@@ -240,7 +246,10 @@ class CodeCompletionEngine:
 
         # Find word at cursor
         word_start = cursor_col
-        while word_start > 0 and (current_line[word_start - 1].isalnum() or current_line[word_start - 1] in "_:*#"):
+        while word_start > 0 and (
+            current_line[word_start - 1].isalnum()
+            or current_line[word_start - 1] in "_:*#"
+        ):
             word_start -= 1
 
         current_word = current_line[word_start:cursor_col]
@@ -257,7 +266,9 @@ class CodeCompletionEngine:
         for completion in raw_completions:
             if isinstance(completion, str):
                 # Filter by current word
-                if current_word and not completion.lower().startswith(current_word.lower()):
+                if current_word and not completion.lower().startswith(
+                    current_word.lower()
+                ):
                     continue
 
                 item = self._create_completion_item(completion, engine)
@@ -268,7 +279,9 @@ class CodeCompletionEngine:
 
         return items[:20]  # Limit to 20 items
 
-    def _create_completion_item(self, text: str, engine: BaseLanguageEngine) -> CompletionItem:
+    def _create_completion_item(
+        self, text: str, engine: BaseLanguageEngine
+    ) -> CompletionItem:
         """Create a completion item from text"""
         kind = "keyword"
         detail = ""
@@ -314,7 +327,13 @@ class CodeCompletionEngine:
         elif language == "python":
             documentation = self._get_python_documentation(text)
 
-        return CompletionItem(text=text, kind=kind, detail=detail, documentation=documentation, priority=priority)
+        return CompletionItem(
+            text=text,
+            kind=kind,
+            detail=detail,
+            documentation=documentation,
+            priority=priority,
+        )
 
     def _get_pilot_documentation(self, text: str) -> str:
         """Get PILOT-specific documentation"""
@@ -406,11 +425,16 @@ class CodeCompletionEngine:
 
         # Find word boundaries
         word_start = cursor_col
-        while word_start > 0 and (current_line[word_start - 1].isalnum() or current_line[word_start - 1] in "_:*#"):
+        while word_start > 0 and (
+            current_line[word_start - 1].isalnum()
+            or current_line[word_start - 1] in "_:*#"
+        ):
             word_start -= 1
 
         word_end = cursor_col
-        while word_end < len(current_line) and (current_line[word_end].isalnum() or current_line[word_end] in "_:*#"):
+        while word_end < len(current_line) and (
+            current_line[word_end].isalnum() or current_line[word_end] in "_:*#"
+        ):
             word_end += 1
 
         # Replace the word

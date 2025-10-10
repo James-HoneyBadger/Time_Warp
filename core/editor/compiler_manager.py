@@ -17,7 +17,13 @@ import shutil
 class CompilerResult:
     """Result of compilation process"""
 
-    def __init__(self, success: bool, output: str = "", error: str = "", executable_path: str = ""):
+    def __init__(
+        self,
+        success: bool,
+        output: str = "",
+        error: str = "",
+        executable_path: str = "",
+    ):
         self.success = success
         self.output = output
         self.error = error
@@ -44,7 +50,12 @@ class CompilerEngine:
     def run_executable(self, executable_path: str) -> subprocess.Popen:
         """Run compiled executable"""
         try:
-            return subprocess.Popen([executable_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            return subprocess.Popen(
+                [executable_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
         except Exception as e:
             if self.output_callback:
                 self.output_callback(f"❌ Error running executable: {str(e)}")
@@ -71,10 +82,14 @@ class PILOTCompiler(CompilerEngine):
 
             if result.get("success", False):
                 return CompilerResult(
-                    success=True, output=result.get("output", "Compilation successful"), executable_path=output_file
+                    success=True,
+                    output=result.get("output", "Compilation successful"),
+                    executable_path=output_file,
                 )
             else:
-                return CompilerResult(success=False, error=result.get("error", "Compilation failed"))
+                return CompilerResult(
+                    success=False, error=result.get("error", "Compilation failed")
+                )
 
         except ImportError:
             return CompilerResult(success=False, error="PILOT compiler not available")
@@ -102,10 +117,14 @@ class BASICCompiler(CompilerEngine):
 
             if result.get("success", False):
                 return CompilerResult(
-                    success=True, output=result.get("output", "Compilation successful"), executable_path=output_file
+                    success=True,
+                    output=result.get("output", "Compilation successful"),
+                    executable_path=output_file,
                 )
             else:
-                return CompilerResult(success=False, error=result.get("error", "Compilation failed"))
+                return CompilerResult(
+                    success=False, error=result.get("error", "Compilation failed")
+                )
 
         except ImportError:
             return CompilerResult(success=False, error="BASIC compiler not available")
@@ -133,10 +152,14 @@ class LogoCompiler(CompilerEngine):
 
             if result.get("success", False):
                 return CompilerResult(
-                    success=True, output=result.get("output", "Compilation successful"), executable_path=output_file
+                    success=True,
+                    output=result.get("output", "Compilation successful"),
+                    executable_path=output_file,
                 )
             else:
-                return CompilerResult(success=False, error=result.get("error", "Compilation failed"))
+                return CompilerResult(
+                    success=False, error=result.get("error", "Compilation failed")
+                )
 
         except ImportError:
             return CompilerResult(success=False, error="Logo compiler not available")
@@ -148,7 +171,11 @@ class CompilerManager:
     """Manages all compilers and compilation processes"""
 
     def __init__(self):
-        self.compilers = {"pilot": PILOTCompiler(), "basic": BASICCompiler(), "logo": LogoCompiler()}
+        self.compilers = {
+            "pilot": PILOTCompiler(),
+            "basic": BASICCompiler(),
+            "logo": LogoCompiler(),
+        }
         self.current_compiler = None
         self.output_callback: Optional[Callable[[str], None]] = None
         self.running_processes: List[subprocess.Popen] = []
@@ -170,34 +197,46 @@ class CompilerManager:
             return True
         return False
 
-    def compile_file(self, source_file: str, language: str = None, output_file: str = "") -> CompilerResult:
+    def compile_file(
+        self, source_file: str, language: str = None, output_file: str = ""
+    ) -> CompilerResult:
         """Compile a source file"""
         if language:
             if not self.set_compiler(language):
-                return CompilerResult(success=False, error=f"Compiler for {language} not available")
+                return CompilerResult(
+                    success=False, error=f"Compiler for {language} not available"
+                )
 
         if not self.current_compiler:
             return CompilerResult(success=False, error="No compiler selected")
 
         if not os.path.exists(source_file):
-            return CompilerResult(success=False, error=f"Source file not found: {source_file}")
+            return CompilerResult(
+                success=False, error=f"Source file not found: {source_file}"
+            )
 
         if self.output_callback:
-            self.output_callback(f"🔨 Compiling {source_file} with {self.current_compiler.name}...")
+            self.output_callback(
+                f"🔨 Compiling {source_file} with {self.current_compiler.name}..."
+            )
 
         # Perform compilation in a separate thread to avoid blocking UI
         result = self.current_compiler.compile(source_file, output_file)
 
         if result.success:
             if self.output_callback:
-                self.output_callback(f"✅ Compilation successful: {result.executable_path}")
+                self.output_callback(
+                    f"✅ Compilation successful: {result.executable_path}"
+                )
         else:
             if self.output_callback:
                 self.output_callback(f"❌ Compilation failed: {result.error}")
 
         return result
 
-    def compile_text(self, text: str, language: str, filename: str = "temp") -> CompilerResult:
+    def compile_text(
+        self, text: str, language: str, filename: str = "temp"
+    ) -> CompilerResult:
         """Compile text content"""
         # Create temporary file
         temp_dir = tempfile.mkdtemp()
@@ -219,7 +258,9 @@ class CompilerManager:
             return result
 
         except Exception as e:
-            return CompilerResult(success=False, error=f"Error creating temporary file: {str(e)}")
+            return CompilerResult(
+                success=False, error=f"Error creating temporary file: {str(e)}"
+            )
         finally:
             # Clean up temporary directory
             try:
@@ -238,7 +279,12 @@ class CompilerManager:
             self.output_callback(f"🚀 Running {executable_path}...")
 
         try:
-            process = subprocess.Popen([executable_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            process = subprocess.Popen(
+                [executable_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
 
             self.running_processes.append(process)
 
@@ -258,7 +304,9 @@ class CompilerManager:
                             self.output_callback("✅ Program completed successfully")
                     else:
                         if self.output_callback:
-                            self.output_callback(f"❌ Program exited with code {process.returncode}")
+                            self.output_callback(
+                                f"❌ Program exited with code {process.returncode}"
+                            )
 
                 except subprocess.TimeoutExpired:
                     process.kill()

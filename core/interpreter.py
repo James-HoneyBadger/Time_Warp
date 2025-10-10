@@ -50,7 +50,14 @@ except ImportError:
     print("ℹ️  PIL/Pillow not available - image features disabled")
 
 # Import language executors
-from .languages import PilotExecutor, BasicExecutor, LogoExecutor, PerlExecutor, PythonExecutor, JavaScriptExecutor
+from .languages import (
+    PilotExecutor,
+    BasicExecutor,
+    LogoExecutor,
+    PerlExecutor,
+    PythonExecutor,
+    JavaScriptExecutor,
+)
 
 # Import performance optimizations
 try:
@@ -84,7 +91,12 @@ try:
     # Try to import from actual modules first
     from games.engine import GameManager
     from core.audio import AudioEngine
-    from core.hardware import RPiController, RobotInterface, GameController, SensorVisualizer
+    from core.hardware import (
+        RPiController,
+        RobotInterface,
+        GameController,
+        SensorVisualizer,
+    )
     from core.iot import IoTDeviceManager, SmartHomeHub, SensorNetwork
     from core.utilities import Mixer, Tween, Timer, Particle
     from core.networking import CollaborationManager
@@ -131,7 +143,12 @@ except ImportError:
             pass
 
         def get_audio_info(self):
-            return {"mixer_available": False, "loaded_clips": 0, "playing_sounds": 0, "built_in_sounds": []}
+            return {
+                "mixer_available": False,
+                "loaded_clips": 0,
+                "playing_sounds": 0,
+                "built_in_sounds": [],
+            }
 
         clips = {}
         sound_library = {}
@@ -450,7 +467,16 @@ class TimeWarpInterpreter:
         self.call_stack = []
         # Color cycle for turtle shapes
         self._turtle_color_index = 0
-        self._turtle_color_palette = ["black", "red", "blue", "green", "purple", "orange", "teal", "magenta"]
+        self._turtle_color_palette = [
+            "black",
+            "red",
+            "blue",
+            "green",
+            "purple",
+            "orange",
+            "teal",
+            "magenta",
+        ]
         # Turtle tracing (verbose position/heading logging) and persistence flags
         self.turtle_trace = False
         self.preserve_turtle_canvas = False
@@ -465,7 +491,9 @@ class TimeWarpInterpreter:
         self.game_manager.set_output_callback(self.log_output)
 
         # Multiplayer Game Framework
-        self.multiplayer_game = MultiplayerGameManager(canvas=None, is_server=False, network_manager=None)
+        self.multiplayer_game = MultiplayerGameManager(
+            canvas=None, is_server=False, network_manager=None
+        )
 
         # Enhanced Audio System
         self.audio_engine = AudioEngine()
@@ -503,7 +531,9 @@ class TimeWarpInterpreter:
         self.sensor_network = SensorNetwork() if SensorNetwork else None
         if self.sensor_network:
             self.sensor_network.simulation_mode = True
-        self.advanced_robot = AdvancedRobotInterface() if AdvancedRobotInterface else None
+        self.advanced_robot = (
+            AdvancedRobotInterface() if AdvancedRobotInterface else None
+        )
         if self.advanced_robot:
             self.advanced_robot.simulation_mode = True
 
@@ -690,7 +720,9 @@ class TimeWarpInterpreter:
         if not self.turtle_graphics:
             self.init_turtle_graphics()
 
-        self.turtle_graphics["heading"] = (self.turtle_graphics["heading"] + angle) % 360
+        self.turtle_graphics["heading"] = (
+            self.turtle_graphics["heading"] + angle
+        ) % 360
         # Sync heading variable
         self.variables["TURTLE_HEADING"] = self.turtle_graphics["heading"]
         self.update_turtle_display()
@@ -906,7 +938,10 @@ class TimeWarpInterpreter:
                     array_var = self.variables[array_name]
                     if isinstance(array_var, dict):
                         # Evaluate each index
-                        indices = [int(self.evaluate_expression(idx.strip())) for idx in indices_str.split(",")]
+                        indices = [
+                            int(self.evaluate_expression(idx.strip()))
+                            for idx in indices_str.split(",")
+                        ]
 
                         # Navigate through the array structure
                         current = array_var
@@ -925,7 +960,9 @@ class TimeWarpInterpreter:
         # Then replace bare variable names using word boundaries to avoid
         # accidental substring replacements (e.g. A vs AB).
         # Sort variables by length (longest first) to prevent A from interfering with A$
-        for var_name, var_value in sorted(self.variables.items(), key=lambda x: len(x[0]), reverse=True):
+        for var_name, var_value in sorted(
+            self.variables.items(), key=lambda x: len(x[0]), reverse=True
+        ):
             if isinstance(var_value, dict):
                 continue  # Skip arrays, they're handled above
             if isinstance(var_value, (int, float)):
@@ -964,7 +1001,9 @@ class TimeWarpInterpreter:
             "LOWER": lambda x: str(x).lower(),
             "MID": (
                 lambda s, start, length: (
-                    str(s)[int(start) - 1 : int(start) - 1 + int(length)] if isinstance(s, (str, int, float)) else ""
+                    str(s)[int(start) - 1 : int(start) - 1 + int(length)]
+                    if isinstance(s, (str, int, float))
+                    else ""
                 )
             ),
             # BASIC-style functions
@@ -1283,7 +1322,11 @@ class TimeWarpInterpreter:
         iterations = 0
 
         try:
-            while self.current_line < len(self.program_lines) and self.running and iterations < max_iterations:
+            while (
+                self.current_line < len(self.program_lines)
+                and self.running
+                and iterations < max_iterations
+            ):
                 iterations += 1
 
                 if self.debug_mode and self.current_line in self.breakpoints:
@@ -1426,7 +1469,12 @@ class TimeWarpInterpreter:
         y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
 
         text_id = canvas.create_text(
-            x, y, text=text, font=("Arial", int(size)), fill=self.turtle_graphics["pen_color"], anchor="nw"
+            x,
+            y,
+            text=text,
+            font=("Arial", int(size)),
+            fill=self.turtle_graphics["pen_color"],
+            anchor="nw",
         )
         self.turtle_graphics["lines"].append(text_id)
 

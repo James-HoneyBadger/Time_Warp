@@ -70,7 +70,9 @@ class BinaryOpNode(ASTNode):
     operator: str
     right: ASTNode
 
-    def __init__(self, left: ASTNode, operator: str, right: ASTNode, line: int, column: int):
+    def __init__(
+        self, left: ASTNode, operator: str, right: ASTNode, line: int, column: int
+    ):
         super().__init__(line, column)
         self.left = left
         self.operator = operator
@@ -187,7 +189,9 @@ class WhileNode(ASTNode):
     condition: ASTNode
     statements: List[ASTNode]
 
-    def __init__(self, condition: ASTNode, statements: List[ASTNode], line: int, column: int):
+    def __init__(
+        self, condition: ASTNode, statements: List[ASTNode], line: int, column: int
+    ):
         super().__init__(line, column)
         self.condition = condition
         self.statements = statements
@@ -201,7 +205,14 @@ class FunctionDefNode(ASTNode):
     parameters: List[str]
     statements: List[ASTNode]
 
-    def __init__(self, name: str, parameters: List[str], statements: List[ASTNode], line: int, column: int):
+    def __init__(
+        self,
+        name: str,
+        parameters: List[str],
+        statements: List[ASTNode],
+        line: int,
+        column: int,
+    ):
         super().__init__(line, column)
         self.name = name
         self.parameters = parameters
@@ -532,7 +543,9 @@ class TimeWarpParser:
             raise ParseError("Expected ENDIF")
         self._advance()
 
-        return IfNode(condition, then_statements, elif_conditions, else_statements, line, col)
+        return IfNode(
+            condition, then_statements, elif_conditions, else_statements, line, col
+        )
 
     def _for_statement(self) -> ForNode:
         """Parse FOR loop"""
@@ -719,7 +732,9 @@ class TimeWarpParser:
             # Collect all tokens on this line
             line_tokens = []
             while (
-                not self._check(TokenType.NEWLINE) and not self._check(TokenType.END_PYTHON) and not self._is_at_end()
+                not self._check(TokenType.NEWLINE)
+                and not self._check(TokenType.END_PYTHON)
+                and not self._is_at_end()
             ):
                 line_tokens.append(self._advance().value)
 
@@ -798,7 +813,10 @@ class TimeWarpParser:
     def _expression_statement(self) -> Optional[ASTNode]:
         """Parse expression statement (assignment without LET)"""
         # Look ahead to see if this is an assignment
-        if self.current + 1 < len(self.tokens) and self.tokens[self.current + 1].type == TokenType.EQUALS:
+        if (
+            self.current + 1 < len(self.tokens)
+            and self.tokens[self.current + 1].type == TokenType.EQUALS
+        ):
             return self._assignment_statement()
 
         # Otherwise, it's just an expression (function call, etc.)

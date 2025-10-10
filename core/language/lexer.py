@@ -233,7 +233,11 @@ class TimeWarpLexer:
                     i += 2
                 else:
                     i += 1
-                tokens.append(Token(TokenType.COMMENT, line[comment_start:], line_num, comment_start))
+                tokens.append(
+                    Token(
+                        TokenType.COMMENT, line[comment_start:], line_num, comment_start
+                    )
+                )
                 break
 
             # Multi-line comments
@@ -247,18 +251,26 @@ class TimeWarpLexer:
                 num_start = i
                 while i < len(line) and line[i].isdigit():
                     i += 1
-                tokens.append(Token(TokenType.LINE_NUMBER, line[num_start:i], line_num, num_start))
+                tokens.append(
+                    Token(TokenType.LINE_NUMBER, line[num_start:i], line_num, num_start)
+                )
                 continue
 
             # Numbers
-            if line[i].isdigit() or (line[i] == "." and i + 1 < len(line) and line[i + 1].isdigit()):
+            if line[i].isdigit() or (
+                line[i] == "." and i + 1 < len(line) and line[i + 1].isdigit()
+            ):
                 num_start = i
                 has_dot = False
-                while i < len(line) and (line[i].isdigit() or (line[i] == "." and not has_dot)):
+                while i < len(line) and (
+                    line[i].isdigit() or (line[i] == "." and not has_dot)
+                ):
                     if line[i] == ".":
                         has_dot = True
                     i += 1
-                tokens.append(Token(TokenType.NUMBER, line[num_start:i], line_num, num_start))
+                tokens.append(
+                    Token(TokenType.NUMBER, line[num_start:i], line_num, num_start)
+                )
                 continue
 
             # Strings
@@ -272,7 +284,9 @@ class TimeWarpLexer:
                         i += 1
                 if i < len(line):
                     i += 1  # Skip closing quote
-                tokens.append(Token(TokenType.STRING, line[str_start:i], line_num, str_start))
+                tokens.append(
+                    Token(TokenType.STRING, line[str_start:i], line_num, str_start)
+                )
                 continue
 
             # Two-character operators
@@ -318,24 +332,43 @@ class TimeWarpLexer:
             # Identifiers and keywords
             if line[i].isalpha() or line[i] == "_":
                 id_start = i
-                while i < len(line) and (line[i].isalnum() or line[i] == "_" or line[i] == "$"):
+                while i < len(line) and (
+                    line[i].isalnum() or line[i] == "_" or line[i] == "$"
+                ):
                     i += 1
 
                 identifier = line[id_start:i].upper()
 
                 # Check for PILOT commands
-                if i < len(line) and line[i] == ":" and identifier in ["T", "A", "M", "J", "C", "U", "R", "E"]:
+                if (
+                    i < len(line)
+                    and line[i] == ":"
+                    and identifier in ["T", "A", "M", "J", "C", "U", "R", "E"]
+                ):
                     pilot_cmd = identifier + ":"
                     if pilot_cmd in self.pilot_commands:
-                        tokens.append(Token(self.pilot_commands[pilot_cmd], pilot_cmd, line_num, id_start))
+                        tokens.append(
+                            Token(
+                                self.pilot_commands[pilot_cmd],
+                                pilot_cmd,
+                                line_num,
+                                id_start,
+                            )
+                        )
                         i += 1
                         continue
 
                 # Check for keywords
                 if identifier in self.keywords:
-                    tokens.append(Token(self.keywords[identifier], identifier, line_num, id_start))
+                    tokens.append(
+                        Token(self.keywords[identifier], identifier, line_num, id_start)
+                    )
                 else:
-                    tokens.append(Token(TokenType.IDENTIFIER, line[id_start:i], line_num, id_start))
+                    tokens.append(
+                        Token(
+                            TokenType.IDENTIFIER, line[id_start:i], line_num, id_start
+                        )
+                    )
                 continue
 
             # Unknown character

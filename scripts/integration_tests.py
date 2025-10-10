@@ -24,6 +24,7 @@ try:
     from core.editor.compiler_manager import CompilerManager
     from core.editor.syntax_analyzer import SyntaxAnalyzer
     from core.editor.code_completion_engine import CodeCompletionEngine
+
     ENHANCED_EDITOR_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Enhanced editor not available: {e}")
@@ -31,7 +32,12 @@ except ImportError as e:
 
 # Test learning assistant
 try:
-    from tools.plugins.learning_assistant.plugin import LearningAssistantPlugin, CodeAnalyzer, TutorialManager
+    from tools.plugins.learning_assistant.plugin import (
+        LearningAssistantPlugin,
+        CodeAnalyzer,
+        TutorialManager,
+    )
+
     LEARNING_ASSISTANT_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Learning assistant not available: {e}")
@@ -40,38 +46,38 @@ except ImportError as e:
 
 class IntegrationTestRunner:
     """Comprehensive integration test runner for TimeWarp IDE"""
-    
+
     def __init__(self):
         self.results = {
-            'total_tests': 0,
-            'passed': 0,
-            'failed': 0,
-            'skipped': 0,
-            'details': []
+            "total_tests": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+            "details": [],
         }
         self.root = None
         self.test_files_created = []
-    
+
     def setup_test_environment(self):
         """Set up the test environment"""
         print("🔧 Setting up test environment...")
-        
+
         # Create root window for UI tests
         self.root = tk.Tk()
         self.root.title("TimeWarp Integration Tests")
         self.root.geometry("800x600")
         self.root.withdraw()  # Hide initially
-        
+
         # Create test directory
         self.test_dir = os.path.join(os.path.dirname(__file__), "test_samples")
         os.makedirs(self.test_dir, exist_ok=True)
-        
+
         print("✅ Test environment ready")
-    
+
     def cleanup_test_environment(self):
         """Clean up test environment"""
         print("🧹 Cleaning up test environment...")
-        
+
         # Clean up test files
         for file_path in self.test_files_created:
             try:
@@ -79,100 +85,116 @@ class IntegrationTestRunner:
                     os.remove(file_path)
             except Exception as e:
                 print(f"⚠️ Could not remove test file {file_path}: {e}")
-        
+
         # Clean up UI
         if self.root:
             self.root.destroy()
-        
+
         print("✅ Cleanup complete")
-    
+
     def run_test(self, test_name: str, test_func):
         """Run a single test and record results"""
-        self.results['total_tests'] += 1
-        
+        self.results["total_tests"] += 1
+
         try:
             print(f"🧪 Running {test_name}...")
             result = test_func()
-            
+
             if result:
-                self.results['passed'] += 1
+                self.results["passed"] += 1
                 print(f"✅ {test_name} - PASSED")
-                self.results['details'].append({'test': test_name, 'status': 'PASSED', 'message': 'Test completed successfully'})
+                self.results["details"].append(
+                    {
+                        "test": test_name,
+                        "status": "PASSED",
+                        "message": "Test completed successfully",
+                    }
+                )
             else:
-                self.results['failed'] += 1
+                self.results["failed"] += 1
                 print(f"❌ {test_name} - FAILED")
-                self.results['details'].append({'test': test_name, 'status': 'FAILED', 'message': 'Test returned False'})
-                
+                self.results["details"].append(
+                    {
+                        "test": test_name,
+                        "status": "FAILED",
+                        "message": "Test returned False",
+                    }
+                )
+
         except Exception as e:
-            self.results['failed'] += 1
+            self.results["failed"] += 1
             print(f"❌ {test_name} - ERROR: {str(e)}")
-            self.results['details'].append({'test': test_name, 'status': 'ERROR', 'message': str(e)})
-    
+            self.results["details"].append(
+                {"test": test_name, "status": "ERROR", "message": str(e)}
+            )
+
     def test_enhanced_editor_integration(self):
         """Test enhanced editor integration"""
         if not ENHANCED_EDITOR_AVAILABLE:
-            self.results['skipped'] += 1
+            self.results["skipped"] += 1
             return False
-        
+
         # Test language engine
         engine = LanguageEngine()
         pilot_completions = engine.get_completions("T:", 2)
         if len(pilot_completions) == 0:
             return False
-        
+
         # Test syntax analyzer
         analyzer = SyntaxAnalyzer(engine)
         pilot_errors = analyzer.analyze_syntax("T: Hello\nE:", "pilot")
         if pilot_errors is None:
             return False
-        
+
         # Test compiler manager
         compiler = CompilerManager()
         compilers = compiler.get_available_compilers()
-        if 'pilot' not in compilers:
+        if "pilot" not in compilers:
             return False
-        
+
         return True
-    
+
     def test_learning_assistant_integration(self):
         """Test learning assistant integration"""
         if not LEARNING_ASSISTANT_AVAILABLE:
-            self.results['skipped'] += 1
+            self.results["skipped"] += 1
             return False
-        
+
         # Test code analyzer
         analyzer = CodeAnalyzer()
         pilot_result = analyzer.analyze_code("T: Hello\nE:", "pilot")
-        if 'score' not in pilot_result:
+        if "score" not in pilot_result:
             return False
-        
+
         # Test tutorial manager
         tutorial_mgr = TutorialManager()
         if len(tutorial_mgr.tutorials) == 0:
             return False
-        
+
         return True
-    
+
     def test_sample_programs_compilation(self):
         """Test compilation of sample programs"""
         sample_programs = self.create_sample_programs()
-        
+
         if not ENHANCED_EDITOR_AVAILABLE:
             print("⚠️ Enhanced editor not available, skipping compilation tests")
             return True
-        
+
         compiler = CompilerManager()
         success_count = 0
-        
+
         for lang, code in sample_programs.items():
             if lang in compiler.get_available_compilers():
                 try:
                     # Create temporary file
-                    temp_file = os.path.join(self.test_dir, f"test_{lang}_sample.{lang}")
-                    with open(temp_file, 'w') as f:
+                    temp_file = os.path.join(
+                        self.test_dir, f"test_{lang}_sample.{lang}"
+                    )
+                    with open(temp_file, "w") as f:
                         f.write(code)
                     self.test_files_created.append(temp_file)
-                    
+
                     # Test compilation
                     result = compiler.compile_file(temp_file, lang)
                     if result and result.success:
@@ -180,121 +202,121 @@ class IntegrationTestRunner:
                         print(f"✅ {lang.upper()} sample program compiled successfully")
                     else:
                         print(f"⚠️ {lang.upper()} sample program compilation failed")
-                
+
                 except Exception as e:
                     print(f"❌ Error testing {lang} compilation: {e}")
-        
+
         return success_count > 0
-    
+
     def test_file_operations(self):
         """Test file loading and saving operations"""
         test_content = {
-            'pilot': "T: Integration Test\nE:",
-            'basic': "10 PRINT \"Integration Test\"\n20 END",
-            'logo': "FORWARD 100\nRIGHT 90",
-            'python': "print('Integration Test')"
+            "pilot": "T: Integration Test\nE:",
+            "basic": '10 PRINT "Integration Test"\n20 END',
+            "logo": "FORWARD 100\nRIGHT 90",
+            "python": "print('Integration Test')",
         }
-        
+
         success_count = 0
-        
+
         for lang, content in test_content.items():
             try:
                 # Test file creation and reading
                 test_file = os.path.join(self.test_dir, f"integration_test.{lang}")
-                
+
                 # Write file
-                with open(test_file, 'w', encoding='utf-8') as f:
+                with open(test_file, "w", encoding="utf-8") as f:
                     f.write(content)
                 self.test_files_created.append(test_file)
-                
+
                 # Read file back
-                with open(test_file, 'r', encoding='utf-8') as f:
+                with open(test_file, "r", encoding="utf-8") as f:
                     read_content = f.read()
-                
+
                 if read_content.strip() == content.strip():
                     success_count += 1
                     print(f"✅ {lang.upper()} file operations successful")
                 else:
                     print(f"❌ {lang.upper()} file content mismatch")
-                
+
             except Exception as e:
                 print(f"❌ Error in {lang} file operations: {e}")
-        
+
         return success_count == len(test_content)
-    
+
     def test_ui_components(self):
         """Test UI component creation and basic functionality"""
         if not ENHANCED_EDITOR_AVAILABLE:
-            self.results['skipped'] += 1
+            self.results["skipped"] += 1
             return True
-        
+
         try:
             # Test enhanced editor creation
             editor = EnhancedCodeEditor(self.root, initial_language="pilot")
-            
+
             # Test content operations
             test_code = "T: Hello, World!\nE:"
             editor.set_content(test_code)
             retrieved_content = editor.get_content()
-            
+
             if retrieved_content.strip() != test_code.strip():
                 return False
-            
+
             # Test language switching
             editor.set_language("basic")
             current_lang = editor.get_current_language()
-            
+
             if current_lang != "basic":
                 return False
-            
+
             print("✅ UI components test successful")
             return True
-            
+
         except Exception as e:
             print(f"❌ UI components test failed: {e}")
             return False
-    
+
     def test_plugin_lifecycle(self):
         """Test plugin lifecycle management"""
         if not LEARNING_ASSISTANT_AVAILABLE:
-            self.results['skipped'] += 1
+            self.results["skipped"] += 1
             return True
-        
+
         try:
             # Create plugin instance
             plugin = LearningAssistantPlugin()
-            
+
             # Test initialization
             result = plugin.initialize(self.root)
             if not result:
                 return False
-            
+
             # Test activation
             result = plugin.activate()
             if not result:
                 return False
-            
+
             # Test deactivation
             result = plugin.deactivate()
             if not result:
                 return False
-            
+
             # Test cleanup
             result = plugin.destroy()
             if not result:
                 return False
-            
+
             print("✅ Plugin lifecycle test successful")
             return True
-            
+
         except Exception as e:
             print(f"❌ Plugin lifecycle test failed: {e}")
             return False
-    
+
     def create_sample_programs(self):
         """Create comprehensive sample programs for all languages"""
         return {
-            'pilot': '''R: PILOT Calculator Program
+            "pilot": """R: PILOT Calculator Program
 R: This program demonstrates PILOT programming concepts
 *START
 T: Welcome to the PILOT Calculator!
@@ -315,9 +337,8 @@ M: #CONTINUE, Y, *START
 M: #CONTINUE, y, *START
 *END
 T: Thanks for using the PILOT Calculator!
-E:''',
-            
-            'basic': '''10 REM BASIC Game - Number Guessing Game
+E:""",
+            "basic": """10 REM BASIC Game - Number Guessing Game
 20 REM This program demonstrates BASIC programming
 30 REM Initialize variables
 40 SECRET = INT(RND(1) * 100) + 1
@@ -341,9 +362,8 @@ E:''',
 215 GOTO 230
 220 PRINT "Congratulations! You guessed it in"; ATTEMPTS; "attempts!"
 230 PRINT "Thanks for playing!"
-240 END''',
-            
-            'logo': '''; Logo Graphics Art Program
+240 END""",
+            "logo": """; Logo Graphics Art Program
 ; This program creates beautiful geometric patterns
 
 TO SQUARE :SIZE
@@ -405,9 +425,8 @@ FORWARD 150
 LEFT 90
 PENDOWN
 SETPENCOLOR "BLUE"
-SPIRAL 5 91 2''',
-            
-            'python': '''#!/usr/bin/env python3
+SPIRAL 5 91 2""",
+            "python": '''#!/usr/bin/env python3
 """
 Python Text Adventure Game
 This program demonstrates Python programming concepts including:
@@ -639,62 +658,65 @@ def main():
         print("Please report this bug!")
 
 if __name__ == "__main__":
-    main()'''
+    main()''',
         }
-    
+
     def run_comprehensive_tests(self):
         """Run all integration tests"""
         print("🎮 TimeWarp IDE - Comprehensive Integration Tests")
         print("=" * 60)
-        
+
         self.setup_test_environment()
-        
+
         # Define all tests
         tests = [
             ("Enhanced Editor Integration", self.test_enhanced_editor_integration),
-            ("Learning Assistant Integration", self.test_learning_assistant_integration),
+            (
+                "Learning Assistant Integration",
+                self.test_learning_assistant_integration,
+            ),
             ("Sample Programs Compilation", self.test_sample_programs_compilation),
             ("File Operations", self.test_file_operations),
             ("UI Components", self.test_ui_components),
             ("Plugin Lifecycle", self.test_plugin_lifecycle),
         ]
-        
+
         # Run all tests
         for test_name, test_func in tests:
             self.run_test(test_name, test_func)
-        
+
         # Create sample program files for manual testing
         self.create_sample_program_files()
-        
+
         # Generate report
         self.generate_test_report()
-        
+
         # Cleanup
         self.cleanup_test_environment()
-        
-        return self.results['failed'] == 0
-    
+
+        return self.results["failed"] == 0
+
     def create_sample_program_files(self):
         """Create sample program files for manual testing and demonstration"""
         print("\n📁 Creating sample program files...")
-        
+
         sample_programs = self.create_sample_programs()
         samples_dir = os.path.join(os.path.dirname(__file__), "samples")
         os.makedirs(samples_dir, exist_ok=True)
-        
-        extensions = {'pilot': 'pilot', 'basic': 'bas', 'logo': 'logo', 'python': 'py'}
-        
+
+        extensions = {"pilot": "pilot", "basic": "bas", "logo": "logo", "python": "py"}
+
         for lang, code in sample_programs.items():
             filename = f"sample_{lang}_program.{extensions[lang]}"
             filepath = os.path.join(samples_dir, filename)
-            
+
             try:
-                with open(filepath, 'w', encoding='utf-8') as f:
+                with open(filepath, "w", encoding="utf-8") as f:
                     f.write(code)
                 print(f"✅ Created {filename}")
             except Exception as e:
                 print(f"❌ Failed to create {filename}: {e}")
-        
+
         # Create a README for the samples
         readme_content = """# TimeWarp IDE Sample Programs
 
@@ -740,55 +762,59 @@ This directory contains sample programs demonstrating the capabilities of TimeWa
 
 Enjoy exploring programming with TimeWarp IDE! 🎓
 """
-        
+
         readme_path = os.path.join(samples_dir, "README.md")
         try:
-            with open(readme_path, 'w', encoding='utf-8') as f:
+            with open(readme_path, "w", encoding="utf-8") as f:
                 f.write(readme_content)
             print("✅ Created README.md")
         except Exception as e:
             print(f"❌ Failed to create README.md: {e}")
-        
+
         print(f"📁 Sample programs created in: {samples_dir}")
-    
+
     def generate_test_report(self):
         """Generate a comprehensive test report"""
         print("\n" + "=" * 60)
         print("📊 INTEGRATION TEST REPORT")
         print("=" * 60)
-        
-        total = self.results['total_tests']
-        passed = self.results['passed']
-        failed = self.results['failed']
-        skipped = self.results['skipped']
-        
+
+        total = self.results["total_tests"]
+        passed = self.results["passed"]
+        failed = self.results["failed"]
+        skipped = self.results["skipped"]
+
         print(f"Total Tests: {total}")
         print(f"✅ Passed: {passed}")
         print(f"❌ Failed: {failed}")
         print(f"⏭️ Skipped: {skipped}")
-        
+
         if total > 0:
             success_rate = (passed / total) * 100
             print(f"📈 Success Rate: {success_rate:.1f}%")
-        
+
         print("\nDetailed Results:")
         print("-" * 40)
-        
-        for detail in self.results['details']:
-            status_icon = {'PASSED': '✅', 'FAILED': '❌', 'ERROR': '💥'}.get(detail['status'], '❓')
+
+        for detail in self.results["details"]:
+            status_icon = {"PASSED": "✅", "FAILED": "❌", "ERROR": "💥"}.get(
+                detail["status"], "❓"
+            )
             print(f"{status_icon} {detail['test']}: {detail['status']}")
-            if detail['status'] != 'PASSED':
+            if detail["status"] != "PASSED":
                 print(f"   Message: {detail['message']}")
-        
+
         # Save report to file
-        report_path = os.path.join(os.path.dirname(__file__), "integration_test_report.json")
+        report_path = os.path.join(
+            os.path.dirname(__file__), "integration_test_report.json"
+        )
         try:
-            with open(report_path, 'w') as f:
+            with open(report_path, "w") as f:
                 json.dump(self.results, f, indent=2)
             print(f"\n📄 Detailed report saved to: {report_path}")
         except Exception as e:
             print(f"⚠️ Could not save detailed report: {e}")
-        
+
         # Overall assessment
         print("\n" + "=" * 60)
         if failed == 0:
@@ -801,10 +827,10 @@ Enjoy exploring programming with TimeWarp IDE! 🎓
 
 
 def main():
-    """Main function to run integration tests"""    
+    """Main function to run integration tests"""
     runner = IntegrationTestRunner()
     success = runner.run_comprehensive_tests()
-    
+
     return 0 if success else 1
 
 

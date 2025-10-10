@@ -213,7 +213,11 @@ class PilotHandler:
         # Default: treat as literal string
         return re.escape(pattern_spec)
 
-    def set_callbacks(self, output_callback: Callable[[str], None], input_callback: Callable[[str], str]):
+    def set_callbacks(
+        self,
+        output_callback: Callable[[str], None],
+        input_callback: Callable[[str], str],
+    ):
         """Set I/O callbacks"""
         self.output_callback = output_callback
         self.input_callback = input_callback

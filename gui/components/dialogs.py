@@ -89,9 +89,15 @@ class ProjectExplorer:
         self.tree_widget.heading("#0", text="TimeWarp Files", anchor=tk.W)
 
         # Scrollbars
-        v_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree_widget.yview)
-        h_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=self.tree_widget.xview)
-        self.tree_widget.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        v_scrollbar = ttk.Scrollbar(
+            tree_frame, orient=tk.VERTICAL, command=self.tree_widget.yview
+        )
+        h_scrollbar = ttk.Scrollbar(
+            tree_frame, orient=tk.HORIZONTAL, command=self.tree_widget.xview
+        )
+        self.tree_widget.configure(
+            yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set
+        )
 
         # Pack tree and scrollbars
         self.tree_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -154,7 +160,9 @@ class ProjectExplorer:
                 icon = "📁" if item_type == "folder" else self.get_file_icon(item_name)
                 node_text = f"{icon} {item_name}"
 
-                node = self.tree_widget.insert(parent_node, tk.END, text=node_text, values=(item_path, item_type))
+                node = self.tree_widget.insert(
+                    parent_node, tk.END, text=node_text, values=(item_path, item_type)
+                )
 
                 # If it's a folder, add a placeholder child to make it expandable
                 if item_type == "folder":
@@ -195,7 +203,10 @@ class ProjectExplorer:
         values = self.tree_widget.item(item, "values")
         if len(values) >= 2 and values[1] == "folder":
             children = self.tree_widget.get_children(item)
-            if len(children) == 1 and self.tree_widget.item(children[0], "text") == "Loading...":
+            if (
+                len(children) == 1
+                and self.tree_widget.item(children[0], "text") == "Loading..."
+            ):
                 # Remove placeholder and load actual contents
                 self.tree_widget.delete(children[0])
                 self.populate_tree(values[0], item)
@@ -246,7 +257,9 @@ class ProjectExplorer:
             messagebox.showwarning("Warning", "Please open a project folder first")
             return
 
-        filename = simpledialog.askstring("New File", "Enter filename (with .jtc extension):")
+        filename = simpledialog.askstring(
+            "New File", "Enter filename (with .jtc extension):"
+        )
         if filename:
             if not filename.endswith(".jtc"):
                 filename += ".jtc"
@@ -332,14 +345,18 @@ class GameManagerDialog:
 
         # Treeview for objects
         columns = ("Name", "Type", "Position", "Size", "Velocity")
-        self.objects_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=10)
+        self.objects_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=10
+        )
 
         for col in columns:
             self.objects_tree.heading(col, text=col)
             self.objects_tree.column(col, width=120)
 
         # Scrollbar for tree
-        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.objects_tree.yview)
+        scrollbar = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.objects_tree.yview
+        )
         self.objects_tree.configure(yscrollcommand=scrollbar.set)
 
         self.objects_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -349,11 +366,21 @@ class GameManagerDialog:
         buttons_frame = ttk.Frame(parent)
         buttons_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(buttons_frame, text="🎯 Create Object", command=self.create_object).pack(side=tk.LEFT, padx=2)
-        ttk.Button(buttons_frame, text="📝 Edit Properties", command=self.edit_object).pack(side=tk.LEFT, padx=2)
-        ttk.Button(buttons_frame, text="🗑️ Delete Object", command=self.delete_object).pack(side=tk.LEFT, padx=2)
-        ttk.Button(buttons_frame, text="🔄 Refresh", command=self.refresh_objects).pack(side=tk.LEFT, padx=2)
-        ttk.Button(buttons_frame, text="🧹 Clear All", command=self.clear_all_objects).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            buttons_frame, text="🎯 Create Object", command=self.create_object
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            buttons_frame, text="📝 Edit Properties", command=self.edit_object
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            buttons_frame, text="🗑️ Delete Object", command=self.delete_object
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(buttons_frame, text="🔄 Refresh", command=self.refresh_objects).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(
+            buttons_frame, text="🧹 Clear All", command=self.clear_all_objects
+        ).pack(side=tk.LEFT, padx=2)
 
         self.refresh_objects()
 
@@ -369,7 +396,13 @@ class GameManagerDialog:
 
         ttk.Label(gravity_frame, text="Gravity:").pack(side=tk.LEFT)
         self.gravity_var = tk.DoubleVar(value=9.8)
-        gravity_scale = ttk.Scale(gravity_frame, from_=0, to=20, variable=self.gravity_var, orient=tk.HORIZONTAL)
+        gravity_scale = ttk.Scale(
+            gravity_frame,
+            from_=0,
+            to=20,
+            variable=self.gravity_var,
+            orient=tk.HORIZONTAL,
+        )
         gravity_scale.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 10))
 
         gravity_label = ttk.Label(gravity_frame, text="9.8")
@@ -377,14 +410,16 @@ class GameManagerDialog:
 
         def update_gravity_label(*args):
             gravity_label.config(text=f"{self.gravity_var.get():.1f}")
-            if hasattr(self.ide, "interpreter") and hasattr(self.ide.interpreter, "game_manager"):
+            if hasattr(self.ide, "interpreter") and hasattr(
+                self.ide.interpreter, "game_manager"
+            ):
                 self.ide.interpreter.game_manager.set_gravity(self.gravity_var.get())
 
         self.gravity_var.trace("w", update_gravity_label)
 
-        ttk.Button(gravity_frame, text="🌍 Apply Gravity", command=lambda: self.apply_gravity()).pack(
-            side=tk.RIGHT, padx=5
-        )
+        ttk.Button(
+            gravity_frame, text="🌍 Apply Gravity", command=lambda: self.apply_gravity()
+        ).pack(side=tk.RIGHT, padx=5)
 
         # Physics simulation controls
         sim_frame = ttk.LabelFrame(parent, text="Simulation Controls")
@@ -393,17 +428,27 @@ class GameManagerDialog:
         control_frame = ttk.Frame(sim_frame)
         control_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(control_frame, text="▶️ Start Physics", command=self.start_physics).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="⏸️ Pause Physics", command=self.pause_physics).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="⏹️ Stop Physics", command=self.stop_physics).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="🔄 Single Step", command=self.step_physics).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="▶️ Start Physics", command=self.start_physics
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="⏸️ Pause Physics", command=self.pause_physics
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="⏹️ Stop Physics", command=self.stop_physics
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="🔄 Single Step", command=self.step_physics
+        ).pack(side=tk.LEFT, padx=2)
 
         # Physics info
         info_frame = ttk.LabelFrame(parent, text="Physics Information")
         info_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         self.physics_info = tk.Text(info_frame, height=8, font=("Consolas", 10))
-        info_scrollbar = ttk.Scrollbar(info_frame, orient=tk.VERTICAL, command=self.physics_info.yview)
+        info_scrollbar = ttk.Scrollbar(
+            info_frame, orient=tk.VERTICAL, command=self.physics_info.yview
+        )
         self.physics_info.configure(yscrollcommand=info_scrollbar.set)
         self.physics_info.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         info_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -423,10 +468,18 @@ class GameManagerDialog:
         control_frame = ttk.Frame(parent)
         control_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(control_frame, text="🎨 Render Scene", command=self.render_preview).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="🔄 Auto-Refresh", command=self.toggle_auto_refresh).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="💾 Save Scene", command=self.save_scene).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_frame, text="📁 Load Scene", command=self.load_scene).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="🎨 Render Scene", command=self.render_preview
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_frame, text="🔄 Auto-Refresh", command=self.toggle_auto_refresh
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(control_frame, text="💾 Save Scene", command=self.save_scene).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(control_frame, text="📁 Load Scene", command=self.load_scene).pack(
+            side=tk.LEFT, padx=2
+        )
 
         self.render_preview()
 
@@ -444,19 +497,26 @@ class GameManagerDialog:
             demo_frame = ttk.LabelFrame(parent, text=name)
             demo_frame.pack(fill=tk.X, padx=5, pady=5)
 
-            desc_label = ttk.Label(demo_frame, text=description, font=("Arial", 9), foreground="gray")
+            desc_label = ttk.Label(
+                demo_frame, text=description, font=("Arial", 9), foreground="gray"
+            )
             desc_label.pack(anchor=tk.W, padx=5, pady=2)
 
-            ttk.Button(demo_frame, text=f"🚀 Run {name}", command=lambda dt=demo_type: self.run_demo(dt)).pack(
-                padx=5, pady=5, anchor=tk.W
-            )
+            ttk.Button(
+                demo_frame,
+                text=f"🚀 Run {name}",
+                command=lambda dt=demo_type: self.run_demo(dt),
+            ).pack(padx=5, pady=5, anchor=tk.W)
 
         # Custom demo section
         custom_frame = ttk.LabelFrame(parent, text="🛠️ Custom Demo")
         custom_frame.pack(fill=tk.X, padx=5, pady=5)
 
         ttk.Label(
-            custom_frame, text="Create your own demo with custom parameters:", font=("Arial", 9), foreground="gray"
+            custom_frame,
+            text="Create your own demo with custom parameters:",
+            font=("Arial", 9),
+            foreground="gray",
         ).pack(anchor=tk.W, padx=5, pady=2)
 
         params_frame = ttk.Frame(custom_frame)
@@ -464,17 +524,24 @@ class GameManagerDialog:
 
         ttk.Label(params_frame, text="Objects:").pack(side=tk.LEFT)
         self.demo_objects = tk.IntVar(value=5)
-        ttk.Spinbox(params_frame, from_=1, to=20, textvariable=self.demo_objects, width=5).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(
+            params_frame, from_=1, to=20, textvariable=self.demo_objects, width=5
+        ).pack(side=tk.LEFT, padx=5)
 
         ttk.Label(params_frame, text="Gravity:").pack(side=tk.LEFT, padx=(10, 0))
         self.demo_gravity = tk.DoubleVar(value=9.8)
-        ttk.Spinbox(params_frame, from_=0, to=20, textvariable=self.demo_gravity, width=8, increment=0.1).pack(
-            side=tk.LEFT, padx=5
-        )
+        ttk.Spinbox(
+            params_frame,
+            from_=0,
+            to=20,
+            textvariable=self.demo_gravity,
+            width=8,
+            increment=0.1,
+        ).pack(side=tk.LEFT, padx=5)
 
-        ttk.Button(custom_frame, text="🎮 Run Custom Demo", command=self.run_custom_demo).pack(
-            padx=5, pady=5, anchor=tk.W
-        )
+        ttk.Button(
+            custom_frame, text="🎮 Run Custom Demo", command=self.run_custom_demo
+        ).pack(padx=5, pady=5, anchor=tk.W)
 
     # Game management methods - Full Implementation
     def create_object(self):
@@ -493,7 +560,9 @@ class GameManagerDialog:
         ttk.Label(dialog, text="Object Type:").pack(pady=5)
         type_var = tk.StringVar(value="sprite")
         type_combo = ttk.Combobox(
-            dialog, textvariable=type_var, values=["sprite", "platform", "enemy", "powerup", "projectile"]
+            dialog,
+            textvariable=type_var,
+            values=["sprite", "platform", "enemy", "powerup", "projectile"],
         )
         type_combo.pack(pady=5)
 
@@ -505,9 +574,13 @@ class GameManagerDialog:
         y_var = tk.IntVar(value=100)
 
         ttk.Label(pos_frame, text="X:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(pos_frame, from_=0, to=800, textvariable=x_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=800, textvariable=x_var, width=8).pack(
+            side=tk.LEFT, padx=5
+        )
         ttk.Label(pos_frame, text="Y:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(pos_frame, from_=0, to=600, textvariable=y_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(pos_frame, from_=0, to=600, textvariable=y_var, width=8).pack(
+            side=tk.LEFT, padx=5
+        )
 
         # Size frame
         size_frame = ttk.LabelFrame(dialog, text="Size")
@@ -517,9 +590,13 @@ class GameManagerDialog:
         height_var = tk.IntVar(value=32)
 
         ttk.Label(size_frame, text="Width:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=width_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=width_var, width=8).pack(
+            side=tk.LEFT, padx=5
+        )
         ttk.Label(size_frame, text="Height:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=height_var, width=8).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(size_frame, from_=1, to=200, textvariable=height_var, width=8).pack(
+            side=tk.LEFT, padx=5
+        )
 
         # Color
         ttk.Label(dialog, text="Color:").pack(pady=5)
@@ -527,7 +604,16 @@ class GameManagerDialog:
         color_combo = ttk.Combobox(
             dialog,
             textvariable=color_var,
-            values=["red", "blue", "green", "yellow", "purple", "orange", "black", "white"],
+            values=[
+                "red",
+                "blue",
+                "green",
+                "yellow",
+                "purple",
+                "orange",
+                "black",
+                "white",
+            ],
         )
         color_combo.pack(pady=5)
 
@@ -549,7 +635,10 @@ class GameManagerDialog:
                         color_var.get(),
                     )
                     if success:
-                        messagebox.showinfo("Success", f"Object '{name_var.get()}' created successfully!")
+                        messagebox.showinfo(
+                            "Success",
+                            f"Object '{name_var.get()}' created successfully!",
+                        )
                         self.refresh_objects()
                         dialog.destroy()
                     else:
@@ -559,8 +648,12 @@ class GameManagerDialog:
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to create object: {e}")
 
-        ttk.Button(button_frame, text="✅ Create", command=create).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="✅ Create", command=create).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(
+            side=tk.LEFT, padx=5
+        )
 
     def edit_object(self):
         """Edit selected object"""
@@ -597,9 +690,13 @@ class GameManagerDialog:
         y_var = tk.DoubleVar(value=obj.position.y)
 
         ttk.Label(pos_frame, text="X:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(pos_frame, from_=0, to=800, textvariable=x_var, width=8, increment=1).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(
+            pos_frame, from_=0, to=800, textvariable=x_var, width=8, increment=1
+        ).pack(side=tk.LEFT, padx=5)
         ttk.Label(pos_frame, text="Y:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(pos_frame, from_=0, to=600, textvariable=y_var, width=8, increment=1).pack(side=tk.LEFT, padx=5)
+        ttk.Spinbox(
+            pos_frame, from_=0, to=600, textvariable=y_var, width=8, increment=1
+        ).pack(side=tk.LEFT, padx=5)
 
         # Velocity controls
         vel_frame = ttk.LabelFrame(dialog, text="Velocity")
@@ -609,13 +706,13 @@ class GameManagerDialog:
         vy_var = tk.DoubleVar(value=obj.velocity.y)
 
         ttk.Label(vel_frame, text="VX:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(vel_frame, from_=-500, to=500, textvariable=vx_var, width=8, increment=10).pack(
-            side=tk.LEFT, padx=5
-        )
+        ttk.Spinbox(
+            vel_frame, from_=-500, to=500, textvariable=vx_var, width=8, increment=10
+        ).pack(side=tk.LEFT, padx=5)
         ttk.Label(vel_frame, text="VY:").pack(side=tk.LEFT, padx=5)
-        ttk.Spinbox(vel_frame, from_=-500, to=500, textvariable=vy_var, width=8, increment=10).pack(
-            side=tk.LEFT, padx=5
-        )
+        ttk.Spinbox(
+            vel_frame, from_=-500, to=500, textvariable=vy_var, width=8, increment=10
+        ).pack(side=tk.LEFT, padx=5)
 
         # Color
         color_frame = ttk.LabelFrame(dialog, text="Appearance")
@@ -626,7 +723,16 @@ class GameManagerDialog:
         color_combo = ttk.Combobox(
             color_frame,
             textvariable=color_var,
-            values=["red", "blue", "green", "yellow", "purple", "orange", "black", "white"],
+            values=[
+                "red",
+                "blue",
+                "green",
+                "yellow",
+                "purple",
+                "orange",
+                "black",
+                "white",
+            ],
         )
         color_combo.pack(side=tk.LEFT, padx=5)
 
@@ -641,14 +747,20 @@ class GameManagerDialog:
                 game_manager.set_object_velocity(obj_name, vx_var.get(), vy_var.get())
                 obj.color = color_var.get()
 
-                messagebox.showinfo("Success", f"Object '{obj_name}' updated successfully!")
+                messagebox.showinfo(
+                    "Success", f"Object '{obj_name}' updated successfully!"
+                )
                 self.refresh_objects()
                 dialog.destroy()
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to update object: {e}")
 
-        ttk.Button(button_frame, text="✅ Apply", command=apply_changes).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="✅ Apply", command=apply_changes).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="❌ Cancel", command=dialog.destroy).pack(
+            side=tk.LEFT, padx=5
+        )
 
     def delete_object(self):
         """Delete selected object"""
@@ -665,7 +777,9 @@ class GameManagerDialog:
                 game_manager = getattr(self.ide.interpreter, "game_manager", None)
                 if game_manager:
                     game_manager.remove_object(obj_name)
-                    messagebox.showinfo("Success", f"Object '{obj_name}' deleted successfully!")
+                    messagebox.showinfo(
+                        "Success", f"Object '{obj_name}' deleted successfully!"
+                    )
                     self.refresh_objects()
                 else:
                     messagebox.showerror("Error", "Game engine not available")
@@ -687,13 +801,17 @@ class GameManagerDialog:
                     size = f"{obj.width}x{obj.height}"
                     velocity = f"({obj.velocity.x:.1f}, {obj.velocity.y:.1f})"
 
-                    self.objects_tree.insert("", "end", values=(name, obj_type, position, size, velocity))
+                    self.objects_tree.insert(
+                        "", "end", values=(name, obj_type, position, size, velocity)
+                    )
         except Exception as e:
             print(f"Error refreshing objects: {e}")
 
     def clear_all_objects(self):
         """Clear all game objects"""
-        if messagebox.askyesno("Confirm", "Clear all game objects? This cannot be undone."):
+        if messagebox.askyesno(
+            "Confirm", "Clear all game objects? This cannot be undone."
+        ):
             try:
                 game_manager = getattr(self.ide.interpreter, "game_manager", None)
                 if game_manager:
@@ -777,8 +895,16 @@ class GameManagerDialog:
         try:
             game_manager = getattr(self.ide.interpreter, "game_manager", None)
             if game_manager:
-                gravity = getattr(game_manager.physics, "gravity", 9.8) if hasattr(game_manager, "physics") else 9.8
-                active_objects = len(game_manager.game_objects) if hasattr(game_manager, "game_objects") else 0
+                gravity = (
+                    getattr(game_manager.physics, "gravity", 9.8)
+                    if hasattr(game_manager, "physics")
+                    else 9.8
+                )
+                active_objects = (
+                    len(game_manager.game_objects)
+                    if hasattr(game_manager, "game_objects")
+                    else 0
+                )
                 frame_count = getattr(game_manager, "frame_count", 0)
                 running = getattr(game_manager, "running", False)
                 fps = getattr(game_manager, "fps", 60)
@@ -856,9 +982,15 @@ Available Commands:
                         color = getattr(obj, "color", "blue")
 
                         # Draw object
-                        self.preview_canvas.create_rectangle(x, y, x + w, y + h, fill=color, outline="black")
+                        self.preview_canvas.create_rectangle(
+                            x, y, x + w, y + h, fill=color, outline="black"
+                        )
                         self.preview_canvas.create_text(
-                            x + w // 2, y + h // 2, text=name, font=("Arial", 8), fill="white"
+                            x + w // 2,
+                            y + h // 2,
+                            text=name,
+                            font=("Arial", 8),
+                            fill="white",
                         )
 
                     # Draw physics info
@@ -866,7 +998,12 @@ Available Commands:
                     if hasattr(game_manager, "physics"):
                         info_text += f" | Gravity: {getattr(game_manager.physics, 'gravity', 9.8):.1f}"
                     self.preview_canvas.create_text(
-                        10, 10, text=info_text, anchor=tk.NW, font=("Arial", 10), fill="black"
+                        10,
+                        10,
+                        text=info_text,
+                        anchor=tk.NW,
+                        font=("Arial", 10),
+                        fill="black",
                     )
             else:
                 self.preview_canvas.create_text(
@@ -880,7 +1017,12 @@ Available Commands:
 
         except Exception as e:
             self.preview_canvas.create_text(
-                300, 200, text=f"Preview Error:\n{str(e)[:100]}", font=("Arial", 12), fill="red", justify=tk.CENTER
+                300,
+                200,
+                text=f"Preview Error:\n{str(e)[:100]}",
+                font=("Arial", 12),
+                fill="red",
+                justify=tk.CENTER,
             )
 
     def toggle_auto_refresh(self):
@@ -910,7 +1052,9 @@ Available Commands:
                 return
 
             filename = filedialog.asksaveasfilename(
-                title="Save Scene", defaultextension=".json", filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+                title="Save Scene",
+                defaultextension=".json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
             )
 
             if filename:
@@ -918,7 +1062,9 @@ Available Commands:
                     "objects": [],
                     "physics": {
                         "gravity": (
-                            getattr(game_manager.physics, "gravity", 9.8) if hasattr(game_manager, "physics") else 9.8
+                            getattr(game_manager.physics, "gravity", 9.8)
+                            if hasattr(game_manager, "physics")
+                            else 9.8
                         )
                     },
                 }
@@ -949,7 +1095,8 @@ Available Commands:
             import json
 
             filename = filedialog.askopenfilename(
-                title="Load Scene", filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
+                title="Load Scene",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
             )
 
             if filename:
@@ -966,7 +1113,9 @@ Available Commands:
 
                 # Set physics
                 if "physics" in scene_data and hasattr(game_manager, "physics"):
-                    game_manager.physics.gravity = scene_data["physics"].get("gravity", 9.8)
+                    game_manager.physics.gravity = scene_data["physics"].get(
+                        "gravity", 9.8
+                    )
                     self.gravity_var.set(game_manager.physics.gravity)
 
                 # Load objects
@@ -984,7 +1133,9 @@ Available Commands:
                     # Set velocity
                     if "velocity" in obj_data:
                         game_manager.set_object_velocity(
-                            obj_data["name"], obj_data["velocity"]["x"], obj_data["velocity"]["y"]
+                            obj_data["name"],
+                            obj_data["velocity"]["x"],
+                            obj_data["velocity"]["y"],
                         )
 
                 messagebox.showinfo("Success", f"Scene loaded from {filename}")
@@ -1008,8 +1159,12 @@ Available Commands:
 
             if demo_type == "pong":
                 # Create Pong demo
-                game_manager.create_object("left_paddle", "paddle", 20, 250, 10, 60, "white")
-                game_manager.create_object("right_paddle", "paddle", 770, 250, 10, 60, "white")
+                game_manager.create_object(
+                    "left_paddle", "paddle", 20, 250, 10, 60, "white"
+                )
+                game_manager.create_object(
+                    "right_paddle", "paddle", 770, 250, 10, 60, "white"
+                )
                 game_manager.create_object("ball", "ball", 400, 300, 10, 10, "white")
                 game_manager.set_object_velocity("ball", 100, 50)
 
@@ -1020,7 +1175,9 @@ Available Commands:
                 for i in range(5):
                     x = random.randint(50, 750)
                     color = random.choice(["red", "blue", "green", "yellow", "purple"])
-                    game_manager.create_object(f"ball_{i}", "ball", x, 50 + i * 30, 20, 20, color)
+                    game_manager.create_object(
+                        f"ball_{i}", "ball", x, 50 + i * 30, 20, 20, color
+                    )
                 # Create platforms
                 game_manager.create_platform(100, 500, 200, 20)
                 game_manager.create_platform(400, 400, 200, 20)
@@ -1040,14 +1197,21 @@ Available Commands:
 
             elif demo_type == "snake":
                 # Create snake demo
-                game_manager.create_object("snake_head", "snake", 400, 300, 20, 20, "green")
-                game_manager.create_object("snake_body1", "snake", 380, 300, 20, 20, "darkgreen")
-                game_manager.create_object("snake_body2", "snake", 360, 300, 20, 20, "darkgreen")
+                game_manager.create_object(
+                    "snake_head", "snake", 400, 300, 20, 20, "green"
+                )
+                game_manager.create_object(
+                    "snake_body1", "snake", 380, 300, 20, 20, "darkgreen"
+                )
+                game_manager.create_object(
+                    "snake_body2", "snake", 360, 300, 20, 20, "darkgreen"
+                )
                 game_manager.create_object("food", "food", 200, 200, 15, 15, "red")
                 game_manager.set_object_velocity("snake_head", 20, 0)
 
             messagebox.showinfo(
-                "Demo Started", f"{demo_type.title()} demo created successfully!\nUse Physics tab to start simulation."
+                "Demo Started",
+                f"{demo_type.title()} demo created successfully!\nUse Physics tab to start simulation.",
             )
             self.refresh_objects()
             self.render_preview()
@@ -1078,7 +1242,16 @@ Available Commands:
             # Create random objects
             import random
 
-            colors = ["red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan"]
+            colors = [
+                "red",
+                "blue",
+                "green",
+                "yellow",
+                "purple",
+                "orange",
+                "pink",
+                "cyan",
+            ]
 
             for i in range(objects):
                 x = random.randint(50, 750)
@@ -1088,7 +1261,9 @@ Available Commands:
                 vx = random.randint(-50, 50)
                 vy = random.randint(-20, 20)
 
-                game_manager.create_object(f"obj_{i}", "sprite", x, y, size, size, color)
+                game_manager.create_object(
+                    f"obj_{i}", "sprite", x, y, size, size, color
+                )
                 game_manager.set_object_velocity(f"obj_{i}", vx, vy)
 
             # Create some platforms
@@ -1214,7 +1389,10 @@ class VirtualEnvironmentManager:
 
             # Run pip install
             result = subprocess.run(
-                [str(self.pip_exe), "install", package_spec], capture_output=True, text=True, timeout=300
+                [str(self.pip_exe), "install", package_spec],
+                capture_output=True,
+                text=True,
+                timeout=300,
             )  # 5 minute timeout
 
             if result.returncode == 0:
@@ -1260,7 +1438,10 @@ class VirtualEnvironmentManager:
 
         try:
             result = subprocess.run(
-                [str(self.pip_exe), "list", "--format=freeze"], capture_output=True, text=True, timeout=30
+                [str(self.pip_exe), "list", "--format=freeze"],
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
 
             if result.returncode == 0:

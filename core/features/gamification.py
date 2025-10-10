@@ -347,7 +347,9 @@ class GamificationSystem:
             icon="🔍",
             rarity=BadgeRarity.EPIC,
             points=180,
-            requirements={"features_discovered": 6},  # Tutorial, AI, Gamification, Themes, Settings, etc.
+            requirements={
+                "features_discovered": 6
+            },  # Tutorial, AI, Gamification, Themes, Settings, etc.
         )
 
         self.achievements["time_traveler"] = Achievement(
@@ -508,7 +510,9 @@ class GamificationSystem:
             category="logic",
             starter_code="# Ask for name and create greeting\nEND",
             solution_template="A:What is your name?\nU:NAME=*\nT:Hello, *NAME*! Welcome to PILOT!\nEND",
-            test_cases=[{"input": "Alice", "expected_output": "Hello, Alice! Welcome to PILOT!"}],
+            test_cases=[
+                {"input": "Alice", "expected_output": "Hello, Alice! Welcome to PILOT!"}
+            ],
             points=30,
         )
 
@@ -573,7 +577,9 @@ class GamificationSystem:
             time_limit=300,  # 5 minutes
         )
 
-    def record_activity(self, activity_type: str, data: Optional[Dict[str, Any]] = None):
+    def record_activity(
+        self, activity_type: str, data: Optional[Dict[str, Any]] = None
+    ):
         """Record user activity and update stats"""
         if data is None:
             data = {}
@@ -593,7 +599,9 @@ class GamificationSystem:
         else:
             self.user_stats.current_streak = 1
 
-        self.user_stats.longest_streak = max(self.user_stats.longest_streak, self.user_stats.current_streak)
+        self.user_stats.longest_streak = max(
+            self.user_stats.longest_streak, self.user_stats.current_streak
+        )
         self.user_stats.last_activity = now.isoformat()
 
         # Handle specific activities
@@ -603,7 +611,9 @@ class GamificationSystem:
             language = data.get("language", "unknown")
             if self.user_stats.languages_used is None:
                 self.user_stats.languages_used = {}
-            self.user_stats.languages_used[language] = self.user_stats.languages_used.get(language, 0) + 1
+            self.user_stats.languages_used[language] = (
+                self.user_stats.languages_used.get(language, 0) + 1
+            )
 
         elif activity_type == "tutorial_completed":
             self.user_stats.tutorials_finished += 1
@@ -615,7 +625,10 @@ class GamificationSystem:
                 challenge_id = data.get("challenge_id")
                 if challenge_id in self.challenges:
                     challenge = self.challenges[challenge_id]
-                    if challenge.best_time is None or completion_time < challenge.best_time:
+                    if (
+                        challenge.best_time is None
+                        or completion_time < challenge.best_time
+                    ):
                         challenge.best_time = completion_time
 
         # Award points and experience
@@ -719,7 +732,9 @@ class GamificationSystem:
         """Track theme usage for achievements"""
         if self.user_stats.themes_used is None:
             self.user_stats.themes_used = {}
-        self.user_stats.themes_used[theme_name] = self.user_stats.themes_used.get(theme_name, 0) + 1
+        self.user_stats.themes_used[theme_name] = (
+            self.user_stats.themes_used.get(theme_name, 0) + 1
+        )
         self.save_user_stats()
 
     def track_feature_discovery(self, feature_name: str):
@@ -749,10 +764,14 @@ class GamificationSystem:
         """Track programming language usage"""
         if self.user_stats.languages_used is None:
             self.user_stats.languages_used = {}
-        self.user_stats.languages_used[language] = self.user_stats.languages_used.get(language, 0) + 1
+        self.user_stats.languages_used[language] = (
+            self.user_stats.languages_used.get(language, 0) + 1
+        )
         self.save_user_stats()
 
-    def award_points_and_experience(self, points: int, experience: Optional[int] = None):
+    def award_points_and_experience(
+        self, points: int, experience: Optional[int] = None
+    ):
         """Award points and experience to the user"""
         self.user_stats.total_points += points
         if experience is None:
@@ -784,70 +803,105 @@ class GamificationSystem:
                 current_progress = 0.0
 
                 if req_type == "programs_written":
-                    current_progress = min(self.user_stats.programs_written / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.programs_written / req_value, 1.0
+                    )
                     if self.user_stats.programs_written < req_value:
                         requirements_met = False
 
                 elif req_type == "tutorials_completed":
-                    current_progress = min(self.user_stats.tutorials_finished / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.tutorials_finished / req_value, 1.0
+                    )
                     if self.user_stats.tutorials_finished < req_value:
                         requirements_met = False
 
                 elif req_type == "streak_days":
-                    current_progress = min(self.user_stats.current_streak / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.current_streak / req_value, 1.0
+                    )
                     if self.user_stats.current_streak < req_value:
                         requirements_met = False
 
                 elif req_type == "languages_used":
-                    languages_count = len(self.user_stats.languages_used) if self.user_stats.languages_used else 0
+                    languages_count = (
+                        len(self.user_stats.languages_used)
+                        if self.user_stats.languages_used
+                        else 0
+                    )
                     current_progress = min(languages_count / req_value, 1.0)
                     if languages_count < req_value:
                         requirements_met = False
 
                 elif req_type == "themes_used":
-                    themes_count = len(self.user_stats.themes_used) if self.user_stats.themes_used else 0
+                    themes_count = (
+                        len(self.user_stats.themes_used)
+                        if self.user_stats.themes_used
+                        else 0
+                    )
                     current_progress = min(themes_count / req_value, 1.0)
                     if themes_count < req_value:
                         requirements_met = False
 
                 elif req_type == "perfect_programs":
-                    current_progress = min(self.user_stats.perfect_programs / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.perfect_programs / req_value, 1.0
+                    )
                     if self.user_stats.perfect_programs < req_value:
                         requirements_met = False
 
                 elif req_type == "daily_challenges":
-                    current_progress = min(self.user_stats.daily_challenges_completed / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.daily_challenges_completed / req_value, 1.0
+                    )
                     if self.user_stats.daily_challenges_completed < req_value:
                         requirements_met = False
 
                 elif req_type == "session_time":
-                    current_progress = min(self.user_stats.total_session_time / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.total_session_time / req_value, 1.0
+                    )
                     if self.user_stats.total_session_time < req_value:
                         requirements_met = False
 
                 elif req_type == "features_discovered":
                     features_count = (
-                        len(self.user_stats.features_discovered) if self.user_stats.features_discovered else 0
+                        len(self.user_stats.features_discovered)
+                        if self.user_stats.features_discovered
+                        else 0
                     )
                     current_progress = min(features_count / req_value, 1.0)
                     if features_count < req_value:
                         requirements_met = False
 
                 elif req_type == "long_program":
-                    current_progress = min(self.user_stats.lines_of_code / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.lines_of_code / req_value, 1.0
+                    )
                     if self.user_stats.lines_of_code < req_value:
                         requirements_met = False
 
                 # Language-specific program counts
-                elif req_type in ["basic_programs", "logo_programs", "python_programs", "pilot_programs"]:
+                elif req_type in [
+                    "basic_programs",
+                    "logo_programs",
+                    "python_programs",
+                    "pilot_programs",
+                ]:
                     language = req_type.split("_")[0]
-                    count = self.user_stats.languages_used.get(language, 0) if self.user_stats.languages_used else 0
+                    count = (
+                        self.user_stats.languages_used.get(language, 0)
+                        if self.user_stats.languages_used
+                        else 0
+                    )
                     current_progress = min(count / req_value, 1.0)
                     if count < req_value:
                         requirements_met = False
 
                 elif req_type == "error_free_programs":
-                    current_progress = min(self.user_stats.perfect_programs / req_value, 1.0)
+                    current_progress = min(
+                        self.user_stats.perfect_programs / req_value, 1.0
+                    )
                     if self.user_stats.perfect_programs < req_value:
                         requirements_met = False
 
@@ -856,7 +910,10 @@ class GamificationSystem:
                     current_progress = 1.0
 
                 # Update achievement progress to the minimum progress across all requirements
-                if current_progress < achievement.progress or achievement.progress == 0.0:
+                if (
+                    current_progress < achievement.progress
+                    or achievement.progress == 0.0
+                ):
                     achievement.progress = current_progress
 
             if requirements_met:
@@ -875,10 +932,14 @@ class GamificationSystem:
         challenges = list(self.challenges.values())
 
         if language:
-            challenges = [c for c in challenges if c.language.lower() == language.lower()]
+            challenges = [
+                c for c in challenges if c.language.lower() == language.lower()
+            ]
 
         if difficulty:
-            challenges = [c for c in challenges if c.difficulty.lower() == difficulty.lower()]
+            challenges = [
+                c for c in challenges if c.difficulty.lower() == difficulty.lower()
+            ]
 
         return sorted(challenges, key=lambda x: x.points)
 
@@ -890,7 +951,9 @@ class GamificationSystem:
             return challenge
         return None
 
-    def complete_challenge(self, challenge_id: str, user_code: str, completion_time: float) -> Dict[str, Any]:
+    def complete_challenge(
+        self, challenge_id: str, user_code: str, completion_time: float
+    ) -> Dict[str, Any]:
         """Complete a challenge and award points"""
         if challenge_id not in self.challenges:
             return {"success": False, "message": "Challenge not found"}
@@ -901,7 +964,10 @@ class GamificationSystem:
         passed_tests = 0
         for test_case in challenge.test_cases:
             # This is a simplified test - real implementation would execute the code
-            if test_case["expected_output"] in user_code or "drawn" in test_case["expected_output"]:
+            if (
+                test_case["expected_output"] in user_code
+                or "drawn" in test_case["expected_output"]
+            ):
                 passed_tests += 1
 
         if passed_tests == len(challenge.test_cases):
@@ -910,7 +976,9 @@ class GamificationSystem:
 
             # Bonus points for speed
             if challenge.time_limit and completion_time < challenge.time_limit * 0.5:
-                points_awarded = int(points_awarded * 1.5)  # 50% bonus for fast completion
+                points_awarded = int(
+                    points_awarded * 1.5
+                )  # 50% bonus for fast completion
 
             self.record_activity(
                 "challenge_completed",
@@ -925,7 +993,11 @@ class GamificationSystem:
                 "success": True,
                 "points_awarded": points_awarded,
                 "message": f"Challenge completed! +{points_awarded} points",
-                "fast_completion": (completion_time < challenge.time_limit * 0.5 if challenge.time_limit else False),
+                "fast_completion": (
+                    completion_time < challenge.time_limit * 0.5
+                    if challenge.time_limit
+                    else False
+                ),
             }
         else:
             return {
@@ -959,7 +1031,9 @@ class GamificationSystem:
     def get_user_dashboard(self) -> Dict[str, Any]:
         """Get complete user dashboard data"""
         unlocked_achievements = [a for a in self.achievements.values() if a.unlocked]
-        in_progress_achievements = [a for a in self.achievements.values() if not a.unlocked and a.progress > 0]
+        in_progress_achievements = [
+            a for a in self.achievements.values() if not a.unlocked and a.progress > 0
+        ]
 
         return {
             "stats": asdict(self.user_stats),
@@ -989,8 +1063,13 @@ class GamificationSystem:
 
             data = {
                 "user_stats": asdict(self.user_stats),
-                "achievements": {aid: asdict(achievement) for aid, achievement in self.achievements.items()},
-                "challenges": {cid: asdict(challenge) for cid, challenge in self.challenges.items()},
+                "achievements": {
+                    aid: asdict(achievement)
+                    for aid, achievement in self.achievements.items()
+                },
+                "challenges": {
+                    cid: asdict(challenge) for cid, challenge in self.challenges.items()
+                },
                 "last_updated": datetime.now().isoformat(),
             }
 
@@ -1042,7 +1121,13 @@ class GamificationSystem:
         total_achievements = len(self.achievements)
         unlocked_achievements = sum(1 for a in self.achievements.values() if a.unlocked)
 
-        rarity_counts = {"common": 0, "uncommon": 0, "rare": 0, "epic": 0, "legendary": 0}
+        rarity_counts = {
+            "common": 0,
+            "uncommon": 0,
+            "rare": 0,
+            "epic": 0,
+            "legendary": 0,
+        }
 
         for achievement in self.achievements.values():
             if achievement.unlocked:
@@ -1052,7 +1137,9 @@ class GamificationSystem:
             "total_achievements": total_achievements,
             "unlocked_achievements": unlocked_achievements,
             "completion_percentage": (
-                (unlocked_achievements / total_achievements * 100) if total_achievements > 0 else 0
+                (unlocked_achievements / total_achievements * 100)
+                if total_achievements > 0
+                else 0
             ),
             "rarity_counts": rarity_counts,
             "total_points": self.user_stats.total_points,
@@ -1067,21 +1154,32 @@ class GamificationSystem:
 
         # Progress insights based on stats
         if self.user_stats.programs_written < 5:
-            insights.append("💡 Try writing a few more programs to unlock your first achievements!")
+            insights.append(
+                "💡 Try writing a few more programs to unlock your first achievements!"
+            )
 
         if self.user_stats.current_streak == 0:
             insights.append("🔥 Start a coding streak! Code daily to build momentum.")
         elif self.user_stats.current_streak < 7:
-            insights.append(f"🔥 Great streak of {self.user_stats.current_streak} days! Can you make it to 7?")
+            insights.append(
+                f"🔥 Great streak of {self.user_stats.current_streak} days! Can you make it to 7?"
+            )
 
-        if not self.user_stats.languages_used or len(self.user_stats.languages_used) == 1:
-            insights.append("🌍 Try exploring different programming languages to unlock the Polyglot achievement!")
+        if (
+            not self.user_stats.languages_used
+            or len(self.user_stats.languages_used) == 1
+        ):
+            insights.append(
+                "🌍 Try exploring different programming languages to unlock the Polyglot achievement!"
+            )
 
         if self.user_stats.daily_challenges_completed == 0:
             insights.append("⚔️ Take on today's daily challenge for bonus points!")
 
         if self.user_stats.perfect_programs == 0:
-            insights.append("💎 Aim for perfection! Write a program with no errors on the first try.")
+            insights.append(
+                "💎 Aim for perfection! Write a program with no errors on the first try."
+            )
 
         # Check if close to unlocking achievements
         for achievement in self.achievements.values():

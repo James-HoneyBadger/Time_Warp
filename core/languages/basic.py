@@ -49,7 +49,9 @@ class BasicExecutor:
             self.pygame_screen.fill((0, 0, 0))  # Black background
             pygame.display.flip()
 
-            self.interpreter.log_output(f"✅ Pygame window created: {width}x{height} '{title}'")
+            self.interpreter.log_output(
+                f"✅ Pygame window created: {width}x{height} '{title}'"
+            )
             return True
         except ImportError:
             self.interpreter.log_output("❌ Error: pygame not available for graphics")
@@ -99,7 +101,11 @@ class BasicExecutor:
             elif cmd.startswith("MP") or cmd.startswith("NET"):
                 return self._handle_multiplayer_commands(command, cmd, parts)
             # Audio System Commands (BASIC style)
-            elif cmd.startswith("SOUND") or cmd.startswith("MUSIC") or cmd == "MASTERVOLUME":
+            elif (
+                cmd.startswith("SOUND")
+                or cmd.startswith("MUSIC")
+                or cmd == "MASTERVOLUME"
+            ):
                 return self._handle_audio_commands(command, cmd, parts)
 
         except Exception as e:
@@ -123,9 +129,12 @@ class BasicExecutor:
                     if "(" in var_name and ")" in var_name:
                         # Extract array name and indices
                         array_name = var_name[: var_name.index("(")]
-                        indices_str = var_name[var_name.index("(") + 1 : var_name.rindex(")")]
+                        indices_str = var_name[
+                            var_name.index("(") + 1 : var_name.rindex(")")
+                        ]
                         indices = [
-                            int(self.interpreter.evaluate_expression(idx.strip())) for idx in indices_str.split(",")
+                            int(self.interpreter.evaluate_expression(idx.strip()))
+                            for idx in indices_str.split(",")
                         ]
 
                         # Get or create array
@@ -168,7 +177,11 @@ class BasicExecutor:
     def _handle_for(self, command):
         """Handle FOR loop initialization"""
         try:
-            m = re.match(r"FOR\s+([A-Za-z_]\w*)\s*=\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$", command, re.IGNORECASE)
+            m = re.match(
+                r"FOR\s+([A-Za-z_]\w*)\s*=\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$",
+                command,
+                re.IGNORECASE,
+            )
             if m:
                 var_name = m.group(1)
                 start_expr = m.group(2).strip()
@@ -177,7 +190,11 @@ class BasicExecutor:
 
                 start_val = self.interpreter.evaluate_expression(start_expr)
                 end_val = self.interpreter.evaluate_expression(end_expr)
-                step_val = self.interpreter.evaluate_expression(step_expr) if step_expr is not None else 1
+                step_val = (
+                    self.interpreter.evaluate_expression(step_expr)
+                    if step_expr is not None
+                    else 1
+                )
 
                 # Integer-only loops: coerce start/end/step to int
                 try:
@@ -196,7 +213,12 @@ class BasicExecutor:
                 # Store the loop variable and position
                 self.interpreter.variables[var_name] = start_val
                 self.interpreter.for_stack.append(
-                    {"var": var_name, "end": end_val, "step": step_val, "for_line": self.interpreter.current_line}
+                    {
+                        "var": var_name,
+                        "end": end_val,
+                        "step": step_val,
+                        "for_line": self.interpreter.current_line,
+                    }
                 )
         except Exception as e:
             self.interpreter.debug_output(f"FOR statement error: {e}")
@@ -331,7 +353,9 @@ class BasicExecutor:
                         found_idx = i
                         break
                 if found_idx is None:
-                    self.interpreter.debug_output(f"NEXT for unknown variable {var_spec}")
+                    self.interpreter.debug_output(
+                        f"NEXT for unknown variable {var_spec}"
+                    )
                     return "continue"
                 ctx = self.interpreter.for_stack[found_idx]
                 # remove any inner loops above this one? keep nested intact
@@ -391,22 +415,31 @@ class BasicExecutor:
 
                     # Create multi-dimensional array initialized with zeros
                     if len(dimensions) == 1:
-                        array = [0] * (dimensions[0] + 1)  # +1 for BASIC 0-based indexing
+                        array = [0] * (
+                            dimensions[0] + 1
+                        )  # +1 for BASIC 0-based indexing
                     elif len(dimensions) == 2:
-                        array = [[0 for _ in range(dimensions[1] + 1)] for _ in range(dimensions[0] + 1)]
+                        array = [
+                            [0 for _ in range(dimensions[1] + 1)]
+                            for _ in range(dimensions[0] + 1)
+                        ]
                     else:
                         # For higher dimensions, create nested lists
                         def create_array(dims):
                             if len(dims) == 1:
                                 return [0] * (dims[0] + 1)
                             else:
-                                return [create_array(dims[1:]) for _ in range(dims[0] + 1)]
+                                return [
+                                    create_array(dims[1:]) for _ in range(dims[0] + 1)
+                                ]
 
                         array = create_array(dimensions)
 
                     # Store the array
                     self.interpreter.variables[array_name] = array
-                    self.interpreter.log_output(f"Array {array_name} declared with dimensions {dimensions}")
+                    self.interpreter.log_output(
+                        f"Array {array_name} declared with dimensions {dimensions}"
+                    )
         except Exception as e:
             self.interpreter.debug_output(f"DIM statement error: {e}")
         return "continue"
@@ -419,21 +452,38 @@ class BasicExecutor:
                 try:
                     width = int(parts[1].rstrip(","))
                     height = int(parts[2].rstrip(","))
-                    title = " ".join(parts[3:]).strip('"') if len(parts) > 3 else "TimeWarp Game Window"
-                    self.interpreter.log_output(f"🎮 Game screen initialized: {width}x{height} - {title}")
+                    title = (
+                        " ".join(parts[3:]).strip('"')
+                        if len(parts) > 3
+                        else "TimeWarp Game Window"
+                    )
+                    self.interpreter.log_output(
+                        f"🎮 Game screen initialized: {width}x{height} - {title}"
+                    )
 
                     # Initialize graphics - either IDE canvas or standalone pygame
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode - use turtle canvas
                         canvas = self.interpreter.ide_turtle_canvas
                         canvas.delete("all")  # Clear canvas
-                        canvas.config(width=min(width, 600), height=min(height, 400))  # Limit size
-                        canvas.create_text(width // 2, 20, text=title, font=("Arial", 16), fill="white")
-                        self.interpreter.log_output("🎨 Graphics canvas initialized for game")
+                        canvas.config(
+                            width=min(width, 600), height=min(height, 400)
+                        )  # Limit size
+                        canvas.create_text(
+                            width // 2, 20, text=title, font=("Arial", 16), fill="white"
+                        )
+                        self.interpreter.log_output(
+                            "🎨 Graphics canvas initialized for game"
+                        )
                     else:
                         # Standalone mode - use pygame
                         self._init_pygame_graphics(width, height, title)
-                        self.interpreter.log_output("🎮 Pygame graphics initialized for standalone game")
+                        self.interpreter.log_output(
+                            "🎮 Pygame graphics initialized for standalone game"
+                        )
                 except ValueError:
                     self.interpreter.log_output("Error: Invalid GAMESCREEN parameters")
         elif cmd == "GAMEBG":
@@ -444,9 +494,14 @@ class BasicExecutor:
                     g = int(parts[2].rstrip(","))
                     b = int(parts[3].rstrip(","))
                     color = f"#{r:02x}{g:02x}{b:02x}"
-                    self.interpreter.log_output(f"🎨 Background color set to RGB({r},{g},{b})")
+                    self.interpreter.log_output(
+                        f"🎨 Background color set to RGB({r},{g},{b})"
+                    )
 
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode
                         self.interpreter.ide_turtle_canvas.config(bg=color)
                     elif self.pygame_screen:
@@ -461,7 +516,10 @@ class BasicExecutor:
         elif cmd == "GAMECLEAR":
             # Clear the game screen
             self.interpreter.log_output("🧹 Game screen cleared")
-            if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+            if (
+                hasattr(self.interpreter, "ide_turtle_canvas")
+                and self.interpreter.ide_turtle_canvas
+            ):
                 # IDE mode
                 self.interpreter.ide_turtle_canvas.delete("game_objects")
             elif self.pygame_screen:
@@ -476,7 +534,9 @@ class BasicExecutor:
                     b = int(parts[3].rstrip(","))
                     self.interpreter.variables["GAME_COLOR"] = f"#{r:02x}{g:02x}{b:02x}"
                     self.current_color = (r, g, b)  # Store for pygame
-                    self.interpreter.log_output(f"🎨 Drawing color set to RGB({r},{g},{b})")
+                    self.interpreter.log_output(
+                        f"🎨 Drawing color set to RGB({r},{g},{b})"
+                    )
                 except ValueError:
                     self.interpreter.log_output("Error: Invalid GAMECOLOR values")
         elif cmd == "GAMEPOINT":
@@ -487,15 +547,28 @@ class BasicExecutor:
                     y = int(parts[2].rstrip(","))
                     color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
 
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode
                         canvas = self.interpreter.ide_turtle_canvas
-                        canvas.create_oval(x, y, x + 2, y + 2, fill=color, outline=color, tags="game_objects")
+                        canvas.create_oval(
+                            x,
+                            y,
+                            x + 2,
+                            y + 2,
+                            fill=color,
+                            outline=color,
+                            tags="game_objects",
+                        )
                     elif self.pygame_screen:
                         # Pygame mode
                         import pygame
 
-                        pygame.draw.circle(self.pygame_screen, self.current_color, (x, y), 1)
+                        pygame.draw.circle(
+                            self.pygame_screen, self.current_color, (x, y), 1
+                        )
                 except ValueError:
                     self.interpreter.log_output("Error: Invalid GAMEPOINT coordinates")
         elif cmd == "GAMERECT":
@@ -509,24 +582,44 @@ class BasicExecutor:
                     filled = int(parts[5])
                     color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
 
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode
                         canvas = self.interpreter.ide_turtle_canvas
                         if filled:
                             canvas.create_rectangle(
-                                x, y, x + width, y + height, fill=color, outline=color, tags="game_objects"
+                                x,
+                                y,
+                                x + width,
+                                y + height,
+                                fill=color,
+                                outline=color,
+                                tags="game_objects",
                             )
                         else:
-                            canvas.create_rectangle(x, y, x + width, y + height, outline=color, tags="game_objects")
+                            canvas.create_rectangle(
+                                x,
+                                y,
+                                x + width,
+                                y + height,
+                                outline=color,
+                                tags="game_objects",
+                            )
                     elif self.pygame_screen:
                         # Pygame mode
                         import pygame
 
                         rect = pygame.Rect(x, y, width, height)
                         if filled:
-                            pygame.draw.rect(self.pygame_screen, self.current_color, rect)
+                            pygame.draw.rect(
+                                self.pygame_screen, self.current_color, rect
+                            )
                         else:
-                            pygame.draw.rect(self.pygame_screen, self.current_color, rect, 2)
+                            pygame.draw.rect(
+                                self.pygame_screen, self.current_color, rect, 2
+                            )
                 except ValueError:
                     self.interpreter.log_output("Error: Invalid GAMERECT parameters")
         elif cmd == "GAMELOOP":
@@ -540,10 +633,20 @@ class BasicExecutor:
                     text = " ".join(parts[3:]).strip('"')
                     color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
 
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode
                         canvas = self.interpreter.ide_turtle_canvas
-                        canvas.create_text(x, y, text=text, fill=color, font=("Arial", 12), tags="game_objects")
+                        canvas.create_text(
+                            x,
+                            y,
+                            text=text,
+                            fill=color,
+                            font=("Arial", 12),
+                            tags="game_objects",
+                        )
                     elif self.pygame_screen:
                         # Pygame mode
                         import pygame
@@ -555,7 +658,10 @@ class BasicExecutor:
                     self.interpreter.log_output("Error: Invalid GAMETEXT parameters")
         elif cmd == "GAMEUPDATE":
             # Update/refresh the display
-            if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+            if (
+                hasattr(self.interpreter, "ide_turtle_canvas")
+                and self.interpreter.ide_turtle_canvas
+            ):
                 # IDE mode
                 self.interpreter.ide_turtle_canvas.update()
                 self.interpreter.log_output("🔄 Display updated")
@@ -585,7 +691,10 @@ class BasicExecutor:
                     filled = int(parts[4]) if len(parts) >= 5 else 0  # Default unfilled
                     color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
 
-                    if hasattr(self.interpreter, "ide_turtle_canvas") and self.interpreter.ide_turtle_canvas:
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
                         # IDE mode
                         canvas = self.interpreter.ide_turtle_canvas
                         if filled:
@@ -600,16 +709,29 @@ class BasicExecutor:
                             )
                         else:
                             canvas.create_oval(
-                                x - radius, y - radius, x + radius, y + radius, outline=color, tags="game_objects"
+                                x - radius,
+                                y - radius,
+                                x + radius,
+                                y + radius,
+                                outline=color,
+                                tags="game_objects",
                             )
                     elif self.pygame_screen:
                         # Pygame mode
                         import pygame
 
                         if filled:
-                            pygame.draw.circle(self.pygame_screen, self.current_color, (x, y), radius)
+                            pygame.draw.circle(
+                                self.pygame_screen, self.current_color, (x, y), radius
+                            )
                         else:
-                            pygame.draw.circle(self.pygame_screen, self.current_color, (x, y), radius, 2)
+                            pygame.draw.circle(
+                                self.pygame_screen,
+                                self.current_color,
+                                (x, y),
+                                radius,
+                                2,
+                            )
                 except ValueError:
                     self.interpreter.log_output("Error: Invalid GAMECIRCLE parameters")
         elif cmd == "GAMEKEY":

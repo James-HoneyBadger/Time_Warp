@@ -44,7 +44,11 @@ class VersionControlSystem:
     def save_version(self, comment=""):
         """Save current state as a new version"""
         content = self.ide.editor.get("1.0", tk.END)
-        version = {"content": content, "timestamp": datetime.now().isoformat(), "comment": comment}
+        version = {
+            "content": content,
+            "timestamp": datetime.now().isoformat(),
+            "comment": comment,
+        }
         self.history.append(version)
         self.current_version = len(self.history) - 1
 
@@ -69,21 +73,33 @@ class AdvancedDebugger:
         if not hasattr(self.ide, "editor") or not self.ide.editor:
             return  # Editor not ready yet
 
-        self.ide.editor.tag_configure("breakpoint", background="#FFE6E6", foreground="#CC0000")
         self.ide.editor.tag_configure(
-            "current_line", background="#E6F3FF", foreground="#0066CC", relief="raised", borderwidth=1
+            "breakpoint", background="#FFE6E6", foreground="#CC0000"
         )
-        self.ide.editor.tag_configure("call_stack_line", background="#F0F8E6", foreground="#336600")
+        self.ide.editor.tag_configure(
+            "current_line",
+            background="#E6F3FF",
+            foreground="#0066CC",
+            relief="raised",
+            borderwidth=1,
+        )
+        self.ide.editor.tag_configure(
+            "call_stack_line", background="#F0F8E6", foreground="#336600"
+        )
         self.tags_setup = True
 
     def toggle_breakpoint(self, line_number):
         """Toggle breakpoint at specified line"""
         if line_number in self.breakpoints:
             self.breakpoints.remove(line_number)
-            self.ide.editor.tag_remove("breakpoint", f"{line_number}.0", f"{line_number}.end")
+            self.ide.editor.tag_remove(
+                "breakpoint", f"{line_number}.0", f"{line_number}.end"
+            )
         else:
             self.breakpoints.add(line_number)
-            self.ide.editor.tag_add("breakpoint", f"{line_number}.0", f"{line_number}.end")
+            self.ide.editor.tag_add(
+                "breakpoint", f"{line_number}.0", f"{line_number}.end"
+            )
 
         # Sync with interpreter
         self.sync_breakpoints_with_interpreter()
@@ -112,7 +128,9 @@ class AdvancedDebugger:
 
         # Update status
         if hasattr(self.ide, "status_label"):
-            self.ide.status_label.config(text="🐛 Debug Mode - Ready to step through code")
+            self.ide.status_label.config(
+                text="🐛 Debug Mode - Ready to step through code"
+            )
 
     def stop_debug_session(self):
         """Stop the debugging session"""
@@ -190,7 +208,9 @@ class AdvancedDebugger:
 
         # Highlight current line
         if line_number > 0:
-            self.ide.editor.tag_add("current_line", f"{line_number}.0", f"{line_number}.end")
+            self.ide.editor.tag_add(
+                "current_line", f"{line_number}.0", f"{line_number}.end"
+            )
 
             # Scroll to current line
             self.ide.editor.see(f"{line_number}.0")
@@ -219,11 +239,15 @@ class AdvancedDebugger:
 
                 if hasattr(self.ide, "interpreter") and self.ide.interpreter:
                     for var_name in sorted(self.variable_watches):
-                        value = self.ide.interpreter.variables.get(var_name, "undefined")
+                        value = self.ide.interpreter.variables.get(
+                            var_name, "undefined"
+                        )
                         text_widget.insert(tk.END, f"{var_name}: {value}\n")
 
                     text_widget.insert(tk.END, "\n=== All Variables ===\n\n")
-                    for var_name, value in sorted(self.ide.interpreter.variables.items()):
+                    for var_name, value in sorted(
+                        self.ide.interpreter.variables.items()
+                    ):
                         text_widget.insert(tk.END, f"{var_name}: {value}\n")
 
             except Exception as e:
@@ -263,7 +287,9 @@ class AdvancedDebugger:
                 self.add_variable_watch(var_name)
                 watch_entry.delete(0, tk.END)
 
-        tk.Button(controls_frame, text="Add Watch", command=add_watch).pack(side=tk.RIGHT)
+        tk.Button(controls_frame, text="Add Watch", command=add_watch).pack(
+            side=tk.RIGHT
+        )
 
         # Bind Enter key to add watch
         watch_entry.bind("<Return>", lambda e: add_watch())
@@ -272,7 +298,9 @@ class AdvancedDebugger:
         self.update_variable_watches()
 
         # Handle window closing
-        window.protocol("WM_DELETE_WINDOW", lambda: self.close_debug_window("variables"))
+        window.protocol(
+            "WM_DELETE_WINDOW", lambda: self.close_debug_window("variables")
+        )
 
     def show_call_stack_window(self):
         """Show the call stack window"""
@@ -297,7 +325,9 @@ class AdvancedDebugger:
         self.debug_windows["call_stack"] = window
 
         # Handle window closing
-        window.protocol("WM_DELETE_WINDOW", lambda: self.close_debug_window("call_stack"))
+        window.protocol(
+            "WM_DELETE_WINDOW", lambda: self.close_debug_window("call_stack")
+        )
 
         # Update call stack display
         self.update_call_stack_display()

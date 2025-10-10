@@ -241,7 +241,9 @@ class PilotCodeGenerator(CodeGenerator):
 
         return lines
 
-    def generate_statement(self, stmt: Dict, index: int) -> List[str]:  # pylint: disable=unused-argument
+    def generate_statement(
+        self, stmt: Dict, index: int
+    ) -> List[str]:  # pylint: disable=unused-argument
         """Generate C code for a PILOT statement"""
         stmt_type = stmt.get("type")
         args = stmt.get("args", {})
@@ -365,7 +367,12 @@ class PilotCodeGenerator(CodeGenerator):
         """Escape string for C code"""
         if not s:
             return ""
-        return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\t", "\\t")
+        return (
+            s.replace("\\", "\\\\")
+            .replace('"', '\\"')
+            .replace("\n", "\\n")
+            .replace("\t", "\\t")
+        )
 
 
 class PilotCompiler(BaseCompiler):
@@ -413,7 +420,9 @@ class PilotCompiler(BaseCompiler):
                     args = parts[2].strip() if len(parts) > 2 else ""
                 else:
                     # Invalid format
-                    statements.append({"type": "UNKNOWN", "args": {"text": line}, "line": line_num})
+                    statements.append(
+                        {"type": "UNKNOWN", "args": {"text": line}, "line": line_num}
+                    )
                     continue
 
                 # Store label if present
@@ -443,9 +452,13 @@ class PilotCompiler(BaseCompiler):
                 elif command == "R":
                     statements.append(self.parse_remark(args, line_num))
                 else:
-                    statements.append({"type": "UNKNOWN", "args": {"text": line}, "line": line_num})
+                    statements.append(
+                        {"type": "UNKNOWN", "args": {"text": line}, "line": line_num}
+                    )
             else:
-                statements.append({"type": "UNKNOWN", "args": {"text": line}, "line": line_num})
+                statements.append(
+                    {"type": "UNKNOWN", "args": {"text": line}, "line": line_num}
+                )
 
         # Set labels on code generator
         if isinstance(self.code_generator, PilotCodeGenerator):
@@ -465,10 +478,18 @@ class PilotCompiler(BaseCompiler):
 
         if not args or " " in args or any(c in args for c in ".,!?"):
             # Text output
-            return {"type": "T", "args": {"text": args}, "line": line_num}  # Treat as Type statement
+            return {
+                "type": "T",
+                "args": {"text": args},
+                "line": line_num,
+            }  # Treat as Type statement
         else:
             # Input variable
-            return {"type": "A", "args": {"variable": args, "prompt": ""}, "line": line_num}
+            return {
+                "type": "A",
+                "args": {"variable": args, "prompt": ""},
+                "line": line_num,
+            }
 
     def parse_jump(self, args: str, line_num: int) -> Dict:
         """Parse J: (Jump) statement"""
@@ -485,7 +506,11 @@ class PilotCompiler(BaseCompiler):
             condition = args.strip()
             label = ""
 
-        return {"type": "Y", "args": {"condition": condition, "label": label}, "line": line_num}
+        return {
+            "type": "Y",
+            "args": {"condition": condition, "label": label},
+            "line": line_num,
+        }
 
     def parse_no(self, args: str, line_num: int) -> Dict:
         """Parse N: (No) statement"""
@@ -498,7 +523,11 @@ class PilotCompiler(BaseCompiler):
             condition = args.strip()
             label = ""
 
-        return {"type": "N", "args": {"condition": condition, "label": label}, "line": line_num}
+        return {
+            "type": "N",
+            "args": {"condition": condition, "label": label},
+            "line": line_num,
+        }
 
     def parse_compute(self, args: str, line_num: int) -> Dict:
         """Parse C: (Compute) statement"""
@@ -510,7 +539,11 @@ class PilotCompiler(BaseCompiler):
                 "args": {"variable": var_part.strip(), "expression": expr_part.strip()},
                 "line": line_num,
             }
-        return {"type": "C", "args": {"variable": args.strip(), "expression": "0"}, "line": line_num}
+        return {
+            "type": "C",
+            "args": {"variable": args.strip(), "expression": "0"},
+            "line": line_num,
+        }
 
     def parse_match(self, args: str, line_num: int) -> Dict:
         """Parse M: (Match) statement"""
@@ -525,7 +558,11 @@ class PilotCompiler(BaseCompiler):
             pattern = ""
             label = ""
 
-        return {"type": "M", "args": {"variable": variable, "pattern": pattern, "label": label}, "line": line_num}
+        return {
+            "type": "M",
+            "args": {"variable": variable, "pattern": pattern, "label": label},
+            "line": line_num,
+        }
 
     def parse_use(self, args: str, line_num: int) -> Dict:
         """Parse U: (Use) statement"""

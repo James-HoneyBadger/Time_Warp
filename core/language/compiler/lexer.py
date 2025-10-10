@@ -159,7 +159,12 @@ class LexerState:
         """Get current source location"""
         return SourceLocation(self.line, self.column, self.filename)
 
-    def add_token(self, token_type: TokenType, value: str, start_location: Optional[SourceLocation] = None):
+    def add_token(
+        self,
+        token_type: TokenType,
+        value: str,
+        start_location: Optional[SourceLocation] = None,
+    ):
         """Add token to list"""
         location = start_location or self.current_location()
         token = Token(token_type, value, location)
@@ -287,12 +292,18 @@ class EnhancedLexer:
             return
 
         # Comments
-        if char == "#" or (char == "R" and self.state.peek_char() == "E" and self.state.peek_char(2) == "M"):
+        if char == "#" or (
+            char == "R"
+            and self.state.peek_char() == "E"
+            and self.state.peek_char(2) == "M"
+        ):
             self._scan_comment()
             return
 
         # Numbers
-        if char.isdigit() or (char == "." and self.state.peek_char() and self.state.peek_char().isdigit()):
+        if char.isdigit() or (
+            char == "." and self.state.peek_char() and self.state.peek_char().isdigit()
+        ):
             self._scan_number()
             return
 
@@ -306,7 +317,9 @@ class EnhancedLexer:
         if two_char in self.MULTI_CHAR_TOKENS:
             self.state.advance()
             self.state.advance()
-            self.state.add_token(self.MULTI_CHAR_TOKENS[two_char], two_char, start_location)
+            self.state.add_token(
+                self.MULTI_CHAR_TOKENS[two_char], two_char, start_location
+            )
             return
 
         # Single character tokens
@@ -325,7 +338,10 @@ class EnhancedLexer:
             ErrorCode.INVALID_CHARACTER,
             f"Unexpected character '{char}'",
             start_location,
-            suggestions=["Remove the invalid character", "Check for proper string delimiters"],
+            suggestions=[
+                "Remove the invalid character",
+                "Check for proper string delimiters",
+            ],
         )
         self.state.advance()
         self.state.add_token(TokenType.ERROR, char, start_location)
@@ -403,7 +419,9 @@ class EnhancedLexer:
                 int(number_text)
         except ValueError:
             self.state.error_manager.add_error(
-                ErrorCode.INVALID_NUMBER, f"Invalid number format: '{number_text}'", start_location
+                ErrorCode.INVALID_NUMBER,
+                f"Invalid number format: '{number_text}'",
+                start_location,
             )
             self.state.add_token(TokenType.ERROR, number_text, start_location)
             return
@@ -428,7 +446,15 @@ class EnhancedLexer:
                 if next_char is None:
                     break
 
-                escape_map = {"n": "\n", "t": "\t", "r": "\r", "\\": "\\", "'": "'", '"': '"', "0": "\0"}
+                escape_map = {
+                    "n": "\n",
+                    "t": "\t",
+                    "r": "\r",
+                    "\\": "\\",
+                    "'": "'",
+                    '"': '"',
+                    "0": "\0",
+                }
 
                 if next_char in escape_map:
                     value += escape_map[next_char]
@@ -459,7 +485,9 @@ class EnhancedLexer:
         start_pos = self.state.position
         start_location = self.state.current_location()
 
-        while self.state.current_char() and (self.state.current_char().isalnum() or self.state.current_char() in "_$"):
+        while self.state.current_char() and (
+            self.state.current_char().isalnum() or self.state.current_char() in "_$"
+        ):
             self.state.advance()
 
         text = self.state.text[start_pos : self.state.position]

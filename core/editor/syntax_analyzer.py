@@ -13,7 +13,14 @@ from .language_engine import LanguageEngine, BaseLanguageEngine
 class SyntaxError:
     """Represents a syntax error or warning"""
 
-    def __init__(self, line: int, column: int, message: str, error_type: str = "error", severity: str = "error"):
+    def __init__(
+        self,
+        line: int,
+        column: int,
+        message: str,
+        error_type: str = "error",
+        severity: str = "error",
+    ):
         self.line = line
         self.column = column
         self.message = message
@@ -50,7 +57,9 @@ class SyntaxAnalyzer:
         """Set callback for syntax errors"""
         self.error_callback = callback
 
-    def analyze_syntax(self, text: str, language: str = None, immediate: bool = False) -> List[SyntaxError]:
+    def analyze_syntax(
+        self, text: str, language: str = None, immediate: bool = False
+    ) -> List[SyntaxError]:
         """Analyze syntax and return errors/warnings"""
         if language:
             original_lang = self.language_engine.current_language
@@ -63,7 +72,9 @@ class SyntaxAnalyzer:
         else:
             return self._analyze_with_current_engine(text, immediate)
 
-    def _analyze_with_current_engine(self, text: str, immediate: bool = False) -> List[SyntaxError]:
+    def _analyze_with_current_engine(
+        self, text: str, immediate: bool = False
+    ) -> List[SyntaxError]:
         """Analyze syntax with current language engine"""
         engine = self.language_engine.get_current_engine()
         if not engine:
@@ -77,7 +88,9 @@ class SyntaxAnalyzer:
             self.last_analysis_time = time.time()
 
             if self.analysis_thread is None or not self.analysis_thread.is_alive():
-                self.analysis_thread = threading.Thread(target=self._delayed_analysis, args=(text, engine), daemon=True)
+                self.analysis_thread = threading.Thread(
+                    target=self._delayed_analysis, args=(text, engine), daemon=True
+                )
                 self.analysis_thread.start()
 
             return []  # Return empty list for now, results will come via callback
@@ -87,7 +100,10 @@ class SyntaxAnalyzer:
         time.sleep(self.analysis_delay)
 
         # Check if we should still analyze (user might still be typing)
-        if not self.should_analyze or time.time() - self.last_analysis_time < self.analysis_delay:
+        if (
+            not self.should_analyze
+            or time.time() - self.last_analysis_time < self.analysis_delay
+        ):
             return
 
         self.should_analyze = False
@@ -96,7 +112,9 @@ class SyntaxAnalyzer:
         if self.error_callback:
             self.error_callback(errors)
 
-    def _perform_analysis(self, text: str, engine: BaseLanguageEngine) -> List[SyntaxError]:
+    def _perform_analysis(
+        self, text: str, engine: BaseLanguageEngine
+    ) -> List[SyntaxError]:
         """Perform the actual syntax analysis"""
         try:
             # Use the language engine's syntax checking
@@ -122,10 +140,18 @@ class SyntaxAnalyzer:
         except Exception as e:
             # Return a generic error if analysis fails
             return [
-                SyntaxError(line=1, column=1, message=f"Analysis error: {str(e)}", error_type="error", severity="error")
+                SyntaxError(
+                    line=1,
+                    column=1,
+                    message=f"Analysis error: {str(e)}",
+                    error_type="error",
+                    severity="error",
+                )
             ]
 
-    def _additional_analysis(self, text: str, engine: BaseLanguageEngine) -> List[SyntaxError]:
+    def _additional_analysis(
+        self, text: str, engine: BaseLanguageEngine
+    ) -> List[SyntaxError]:
         """Perform additional language-specific analysis"""
         errors = []
         language = engine.config.name.lower()
@@ -161,12 +187,20 @@ class SyntaxAnalyzer:
                 label = stripped[1:].strip()
                 if not label:
                     errors.append(
-                        SyntaxError(line=line_num, column=2, message="Empty label definition", error_type="error")
+                        SyntaxError(
+                            line=line_num,
+                            column=2,
+                            message="Empty label definition",
+                            error_type="error",
+                        )
                     )
                 elif label in defined_labels:
                     errors.append(
                         SyntaxError(
-                            line=line_num, column=1, message=f"Duplicate label definition: {label}", error_type="error"
+                            line=line_num,
+                            column=1,
+                            message=f"Duplicate label definition: {label}",
+                            error_type="error",
                         )
                     )
                 else:
@@ -176,7 +210,12 @@ class SyntaxAnalyzer:
             # Check command format
             if ":" not in stripped:
                 errors.append(
-                    SyntaxError(line=line_num, column=1, message="Missing command separator ':'", error_type="error")
+                    SyntaxError(
+                        line=line_num,
+                        column=1,
+                        message="Missing command separator ':'",
+                        error_type="error",
+                    )
                 )
                 continue
 
@@ -188,7 +227,10 @@ class SyntaxAnalyzer:
             if command not in valid_commands:
                 errors.append(
                     SyntaxError(
-                        line=line_num, column=1, message=f"Unknown PILOT command: {command}", error_type="error"
+                        line=line_num,
+                        column=1,
+                        message=f"Unknown PILOT command: {command}",
+                        error_type="error",
                     )
                 )
 
@@ -210,7 +252,14 @@ class SyntaxAnalyzer:
         # Check for undefined labels
         for label in used_labels:
             if label not in defined_labels:
-                errors.append(SyntaxError(line=1, column=1, message=f"Undefined label: {label}", error_type="warning"))
+                errors.append(
+                    SyntaxError(
+                        line=1,
+                        column=1,
+                        message=f"Undefined label: {label}",
+                        error_type="warning",
+                    )
+                )
 
         return errors
 
@@ -248,12 +297,26 @@ class SyntaxAnalyzer:
             open_parens = stripped.count("(")
             close_parens = stripped.count(")")
             if open_parens != close_parens:
-                errors.append(SyntaxError(line=line_num, column=1, message="Unmatched parentheses", error_type="error"))
+                errors.append(
+                    SyntaxError(
+                        line=line_num,
+                        column=1,
+                        message="Unmatched parentheses",
+                        error_type="error",
+                    )
+                )
 
             # Check for unmatched quotes
             quote_count = stripped.count('"')
             if quote_count % 2 != 0:
-                errors.append(SyntaxError(line=line_num, column=1, message="Unmatched quotes", error_type="error"))
+                errors.append(
+                    SyntaxError(
+                        line=line_num,
+                        column=1,
+                        message="Unmatched quotes",
+                        error_type="error",
+                    )
+                )
 
         return errors
 
@@ -273,7 +336,9 @@ class SyntaxAnalyzer:
                 continue
 
             # Check procedure definitions
-            to_match = re.match(r"^TO\s+([A-Za-z][A-Za-z0-9]*)", stripped, re.IGNORECASE)
+            to_match = re.match(
+                r"^TO\s+([A-Za-z][A-Za-z0-9]*)", stripped, re.IGNORECASE
+            )
             if to_match:
                 proc_name = to_match.group(1)
                 if proc_name.upper() in defined_procedures:
@@ -293,7 +358,12 @@ class SyntaxAnalyzer:
             if stripped.upper() == "END":
                 if not procedure_stack:
                     errors.append(
-                        SyntaxError(line=line_num, column=1, message="END without matching TO", error_type="error")
+                        SyntaxError(
+                            line=line_num,
+                            column=1,
+                            message="END without matching TO",
+                            error_type="error",
+                        )
                     )
                 else:
                     procedure_stack.pop()
@@ -303,12 +373,24 @@ class SyntaxAnalyzer:
             open_brackets = stripped.count("[")
             close_brackets = stripped.count("]")
             if open_brackets != close_brackets:
-                errors.append(SyntaxError(line=line_num, column=1, message="Unmatched brackets", error_type="error"))
+                errors.append(
+                    SyntaxError(
+                        line=line_num,
+                        column=1,
+                        message="Unmatched brackets",
+                        error_type="error",
+                    )
+                )
 
         # Check for unmatched TOs
         for line_num, proc_name in procedure_stack:
             errors.append(
-                SyntaxError(line=line_num, column=1, message=f"Procedure {proc_name} missing END", error_type="error")
+                SyntaxError(
+                    line=line_num,
+                    column=1,
+                    message=f"Procedure {proc_name} missing END",
+                    error_type="error",
+                )
             )
 
         return errors
@@ -323,11 +405,21 @@ class SyntaxAnalyzer:
         except SyntaxError as e:
             errors.append(
                 SyntaxError(
-                    line=e.lineno or 1, column=e.offset or 1, message=e.msg or "Syntax error", error_type="error"
+                    line=e.lineno or 1,
+                    column=e.offset or 1,
+                    message=e.msg or "Syntax error",
+                    error_type="error",
                 )
             )
         except Exception as e:
-            errors.append(SyntaxError(line=1, column=1, message=f"Python error: {str(e)}", error_type="error"))
+            errors.append(
+                SyntaxError(
+                    line=1,
+                    column=1,
+                    message=f"Python error: {str(e)}",
+                    error_type="error",
+                )
+            )
 
         # Additional checks
         lines = text.split("\n")
@@ -342,7 +434,10 @@ class SyntaxAnalyzer:
             if line.startswith(" ") and line.startswith("\t"):
                 errors.append(
                     SyntaxError(
-                        line=line_num, column=1, message="Mixed tabs and spaces in indentation", error_type="warning"
+                        line=line_num,
+                        column=1,
+                        message="Mixed tabs and spaces in indentation",
+                        error_type="warning",
                     )
                 )
 
@@ -360,7 +455,10 @@ class SyntaxAnalyzer:
         return summary
 
     def filter_errors(
-        self, errors: List[SyntaxError], error_types: List[str] = None, min_severity: str = None
+        self,
+        errors: List[SyntaxError],
+        error_types: List[str] = None,
+        min_severity: str = None,
     ) -> List[SyntaxError]:
         """Filter errors by type and severity"""
         filtered = errors
@@ -371,7 +469,9 @@ class SyntaxAnalyzer:
         if min_severity:
             severity_order = {"info": 0, "warning": 1, "error": 2}
             min_level = severity_order.get(min_severity, 0)
-            filtered = [e for e in filtered if severity_order.get(e.severity, 0) >= min_level]
+            filtered = [
+                e for e in filtered if severity_order.get(e.severity, 0) >= min_level
+            ]
 
         return filtered
 

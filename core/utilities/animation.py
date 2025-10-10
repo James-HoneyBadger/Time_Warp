@@ -15,7 +15,15 @@ EASE = {
 class Tween:
     """Smooth transition between two values over time"""
 
-    def __init__(self, store: dict, key: str, a: float, b: float, dur_ms: int, ease: str = "linear"):
+    def __init__(
+        self,
+        store: dict,
+        key: str,
+        a: float,
+        b: float,
+        dur_ms: int,
+        ease: str = "linear",
+    ):
         self.store = store
         self.key = key
         self.a = float(a)

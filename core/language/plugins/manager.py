@@ -135,7 +135,10 @@ class PluginManager:
     def _integrate_runtime_hooks(self, plugin: PluginInterface):
         """Integrate runtime hook plugin"""
         # Store hooks for runtime to call
-        self.integration_context[plugin.metadata.name] = {"type": "runtime_hooks", "plugin": plugin}
+        self.integration_context[plugin.metadata.name] = {
+            "type": "runtime_hooks",
+            "plugin": plugin,
+        }
 
     def _integrate_mode_handler(self, plugin: PluginInterface):
         """Integrate mode handler plugin"""
@@ -170,7 +173,9 @@ class PluginManager:
                 try:
                     getattr(plugin, hook_name)(*args, **kwargs)
                 except Exception as e:
-                    print(f"Error in plugin {plugin.metadata.name} hook {hook_name}: {e}")
+                    print(
+                        f"Error in plugin {plugin.metadata.name} hook {hook_name}: {e}"
+                    )
 
     def list_plugins(self) -> List[Dict[str, Any]]:
         """List all plugins"""
@@ -203,7 +208,9 @@ class PluginManager:
 
         return success
 
-    def create_plugin_template(self, filepath: str, plugin_type: PluginType = PluginType.FUNCTION_LIBRARY):
+    def create_plugin_template(
+        self, filepath: str, plugin_type: PluginType = PluginType.FUNCTION_LIBRARY
+    ):
         """Create a plugin template"""
         self.loader.create_plugin_template(filepath, plugin_type)
 
@@ -241,7 +248,9 @@ class PluginManager:
 
     def extend_stdlib_with_plugins(self, stdlib: StandardLibrary):
         """Extend standard library with plugin functions"""
-        function_plugins = self.registry.get_enabled_plugins_by_type(PluginType.FUNCTION_LIBRARY)
+        function_plugins = self.registry.get_enabled_plugins_by_type(
+            PluginType.FUNCTION_LIBRARY
+        )
 
         for plugin in function_plugins:
             if hasattr(plugin, "get_functions"):

@@ -27,9 +27,7 @@ class SensorVisualizerPlugin(ToolPlugin):
         self.name = "Sensor Visualizer"
         self.version = "1.0.0"
         self.author = "TimeWarp IDE Team"
-        self.description = (
-            "Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities"
-        )
+        self.description = "Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities"
         self.category = "sensors"
 
         # Sensor state
@@ -79,10 +77,14 @@ class SensorVisualizerPlugin(ToolPlugin):
         """Activate the sensor visualizer"""
         try:
             # Add menu item
-            self.add_menu_item("Tools", "📊 Sensor Visualizer", self.show_tool_dialog, "Ctrl+Shift+S")
+            self.add_menu_item(
+                "Tools", "📊 Sensor Visualizer", self.show_tool_dialog, "Ctrl+Shift+S"
+            )
 
             # Add toolbar item
-            self.add_toolbar_item("📊 Sensors", self.show_tool_dialog, tooltip="Open Sensor Visualizer")
+            self.add_toolbar_item(
+                "📊 Sensors", self.show_tool_dialog, tooltip="Open Sensor Visualizer"
+            )
 
             return True
         except Exception as e:
@@ -132,11 +134,15 @@ class SensorVisualizerPlugin(ToolPlugin):
             header_frame = ttk.Frame(main_frame)
             header_frame.pack(fill=tk.X, pady=(0, 10))
 
-            ttk.Label(header_frame, text="📊 Sensor Data Visualizer", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+            ttk.Label(
+                header_frame,
+                text="📊 Sensor Data Visualizer",
+                font=("Arial", 16, "bold"),
+            ).pack(side=tk.LEFT)
 
-            ttk.Button(header_frame, text="🔄 Refresh All", command=self._refresh_all_sensors).pack(
-                side=tk.RIGHT, padx=5
-            )
+            ttk.Button(
+                header_frame, text="🔄 Refresh All", command=self._refresh_all_sensors
+            ).pack(side=tk.RIGHT, padx=5)
 
             # Create notebook for different sensor aspects
             notebook = ttk.Notebook(main_frame)
@@ -153,7 +159,9 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         except Exception as e:
             print(f"Error creating sensor visualizer UI: {e}")
-            return ttk.Label(parent_widget, text=f"Error creating sensor visualizer UI: {e}")
+            return ttk.Label(
+                parent_widget, text=f"Error creating sensor visualizer UI: {e}"
+            )
 
     def _setup_live_data_tab(self, notebook):
         """Setup live sensor data tab"""
@@ -168,7 +176,9 @@ class SensorVisualizerPlugin(ToolPlugin):
         self.charts_canvas = tk.Canvas(charts_frame, bg="white", height=500)
         self.charts_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        charts_scroll = ttk.Scrollbar(charts_frame, orient=tk.VERTICAL, command=self.charts_canvas.yview)
+        charts_scroll = ttk.Scrollbar(
+            charts_frame, orient=tk.VERTICAL, command=self.charts_canvas.yview
+        )
         self.charts_canvas.config(yscrollcommand=charts_scroll.set)
         charts_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -179,15 +189,25 @@ class SensorVisualizerPlugin(ToolPlugin):
         chart_controls = ttk.Frame(live_frame)
         chart_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(chart_controls, text="▶️ Start Real-time", command=self._start_realtime_monitoring).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(chart_controls, text="⏸️ Pause", command=self._pause_realtime_monitoring).pack(side=tk.LEFT, padx=2)
-        ttk.Button(chart_controls, text="🔄 Refresh", command=self._refresh_sensor_charts).pack(side=tk.LEFT, padx=2)
-        ttk.Button(chart_controls, text="⚙️ Configure Charts", command=self._configure_sensor_charts).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(chart_controls, text="📸 Save Chart", command=self._save_sensor_chart).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            chart_controls,
+            text="▶️ Start Real-time",
+            command=self._start_realtime_monitoring,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            chart_controls, text="⏸️ Pause", command=self._pause_realtime_monitoring
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            chart_controls, text="🔄 Refresh", command=self._refresh_sensor_charts
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            chart_controls,
+            text="⚙️ Configure Charts",
+            command=self._configure_sensor_charts,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            chart_controls, text="📸 Save Chart", command=self._save_sensor_chart
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_charts_tab(self, notebook):
         """Setup customizable charts tab"""
@@ -213,26 +233,38 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         ttk.Label(range_grid, text="From:").grid(row=0, column=0, padx=5, pady=2)
         self.from_date_var = tk.StringVar(value="2024-01-01")
-        ttk.Entry(range_grid, textvariable=self.from_date_var).grid(row=0, column=1, padx=5, pady=2)
+        ttk.Entry(range_grid, textvariable=self.from_date_var).grid(
+            row=0, column=1, padx=5, pady=2
+        )
 
         ttk.Label(range_grid, text="To:").grid(row=0, column=2, padx=5, pady=2)
         self.to_date_var = tk.StringVar(value="2024-01-15")
-        ttk.Entry(range_grid, textvariable=self.to_date_var).grid(row=0, column=3, padx=5, pady=2)
-
-        ttk.Button(range_grid, text="📊 Load Data", command=self._load_historical_data).grid(
-            row=0, column=4, padx=5, pady=2
+        ttk.Entry(range_grid, textvariable=self.to_date_var).grid(
+            row=0, column=3, padx=5, pady=2
         )
+
+        ttk.Button(
+            range_grid, text="📊 Load Data", command=self._load_historical_data
+        ).grid(row=0, column=4, padx=5, pady=2)
 
         # Analysis controls
         analysis_controls = ttk.Frame(charts_frame)
         analysis_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(analysis_controls, text="📈 Trend Analysis", command=self._analyze_trends).pack(side=tk.LEFT, padx=2)
-        ttk.Button(analysis_controls, text="📊 Statistics", command=self._show_statistics).pack(side=tk.LEFT, padx=2)
-        ttk.Button(analysis_controls, text="🔍 Find Patterns", command=self._find_patterns).pack(side=tk.LEFT, padx=2)
-        ttk.Button(analysis_controls, text="⚠️ Anomaly Detection", command=self._detect_anomalies).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            analysis_controls, text="📈 Trend Analysis", command=self._analyze_trends
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analysis_controls, text="📊 Statistics", command=self._show_statistics
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analysis_controls, text="🔍 Find Patterns", command=self._find_patterns
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analysis_controls,
+            text="⚠️ Anomaly Detection",
+            command=self._detect_anomalies,
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_data_log_tab(self, notebook):
         """Setup data logging tab"""
@@ -246,7 +278,9 @@ class SensorVisualizerPlugin(ToolPlugin):
         config_grid = ttk.Frame(config_frame)
         config_grid.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Label(config_grid, text="Log Interval:").grid(row=0, column=0, padx=5, pady=2, sticky="e")
+        ttk.Label(config_grid, text="Log Interval:").grid(
+            row=0, column=0, padx=5, pady=2, sticky="e"
+        )
         self.log_interval_var = tk.StringVar(value="5 seconds")
         ttk.Combobox(
             config_grid,
@@ -254,10 +288,16 @@ class SensorVisualizerPlugin(ToolPlugin):
             values=["1 second", "5 seconds", "10 seconds", "30 seconds", "1 minute"],
         ).grid(row=0, column=1, padx=5, pady=2)
 
-        ttk.Label(config_grid, text="Log File:").grid(row=0, column=2, padx=5, pady=2, sticky="e")
+        ttk.Label(config_grid, text="Log File:").grid(
+            row=0, column=2, padx=5, pady=2, sticky="e"
+        )
         self.log_file_var = tk.StringVar(value="sensor_data.csv")
-        ttk.Entry(config_grid, textvariable=self.log_file_var, width=20).grid(row=0, column=3, padx=5, pady=2)
-        ttk.Button(config_grid, text="📁 Browse", command=self._browse_log_file).grid(row=0, column=4, padx=5, pady=2)
+        ttk.Entry(config_grid, textvariable=self.log_file_var, width=20).grid(
+            row=0, column=3, padx=5, pady=2
+        )
+        ttk.Button(config_grid, text="📁 Browse", command=self._browse_log_file).grid(
+            row=0, column=4, padx=5, pady=2
+        )
 
         # Data log display
         log_frame = ttk.LabelFrame(logger_frame, text="Recent Log Entries")
@@ -265,7 +305,9 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         # Log treeview
         columns = ("Timestamp", "Sensor", "Value", "Unit", "Status")
-        self.log_tree = ttk.Treeview(log_frame, columns=columns, show="headings", height=12)
+        self.log_tree = ttk.Treeview(
+            log_frame, columns=columns, show="headings", height=12
+        )
 
         for col in columns:
             self.log_tree.heading(col, text=col)
@@ -273,7 +315,9 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         self.log_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        log_scroll = ttk.Scrollbar(log_frame, orient=tk.VERTICAL, command=self.log_tree.yview)
+        log_scroll = ttk.Scrollbar(
+            log_frame, orient=tk.VERTICAL, command=self.log_tree.yview
+        )
         self.log_tree.config(yscrollcommand=log_scroll.set)
         log_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -284,10 +328,18 @@ class SensorVisualizerPlugin(ToolPlugin):
         logger_controls = ttk.Frame(logger_frame)
         logger_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(logger_controls, text="▶️ Start Logging", command=self._start_data_logging).pack(side=tk.LEFT, padx=2)
-        ttk.Button(logger_controls, text="⏹️ Stop Logging", command=self._stop_data_logging).pack(side=tk.LEFT, padx=2)
-        ttk.Button(logger_controls, text="🧹 Clear Log", command=self._clear_data_log).pack(side=tk.LEFT, padx=2)
-        ttk.Button(logger_controls, text="💾 Export Log", command=self._export_data_log).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            logger_controls, text="▶️ Start Logging", command=self._start_data_logging
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            logger_controls, text="⏹️ Stop Logging", command=self._stop_data_logging
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            logger_controls, text="🧹 Clear Log", command=self._clear_data_log
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            logger_controls, text="💾 Export Log", command=self._export_data_log
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_sensor_config_tab(self, notebook):
         """Setup sensor configuration tab"""
@@ -328,17 +380,23 @@ class SensorVisualizerPlugin(ToolPlugin):
         export_grid = ttk.Frame(export_config_frame)
         export_grid.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Label(export_grid, text="Format:").grid(row=0, column=0, padx=5, pady=2, sticky="e")
+        ttk.Label(export_grid, text="Format:").grid(
+            row=0, column=0, padx=5, pady=2, sticky="e"
+        )
         self.export_format_var = tk.StringVar(value="CSV")
         ttk.Combobox(
-            export_grid, textvariable=self.export_format_var, values=["CSV", "JSON", "XML", "Excel", "PDF"]
+            export_grid,
+            textvariable=self.export_format_var,
+            values=["CSV", "JSON", "XML", "Excel", "PDF"],
         ).grid(row=0, column=1, padx=5, pady=2)
 
-        ttk.Label(export_grid, text="Include:").grid(row=0, column=2, padx=5, pady=2, sticky="e")
-        self.include_charts_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(export_grid, text="Charts", variable=self.include_charts_var).grid(
-            row=0, column=3, padx=5, pady=2
+        ttk.Label(export_grid, text="Include:").grid(
+            row=0, column=2, padx=5, pady=2, sticky="e"
         )
+        self.include_charts_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(
+            export_grid, text="Charts", variable=self.include_charts_var
+        ).grid(row=0, column=3, padx=5, pady=2)
 
         # Available reports
         reports_frame = ttk.LabelFrame(config_frame, text="Available Reports")
@@ -356,12 +414,16 @@ class SensorVisualizerPlugin(ToolPlugin):
         ]
 
         self.reports_listbox = tk.Listbox(reports_frame, font=("Arial", 10))
-        self.reports_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.reports_listbox.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
         for report in reports_list:
             self.reports_listbox.insert(tk.END, report)
 
-        reports_scroll = ttk.Scrollbar(reports_frame, orient=tk.VERTICAL, command=self.reports_listbox.yview)
+        reports_scroll = ttk.Scrollbar(
+            reports_frame, orient=tk.VERTICAL, command=self.reports_listbox.yview
+        )
         self.reports_listbox.config(yscrollcommand=reports_scroll.set)
         reports_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -369,16 +431,20 @@ class SensorVisualizerPlugin(ToolPlugin):
         export_controls = ttk.Frame(config_frame)
         export_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(export_controls, text="📄 Generate Report", command=self._generate_sensor_report).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(export_controls, text="💾 Export Data", command=self._export_sensor_data).pack(side=tk.LEFT, padx=2)
-        ttk.Button(export_controls, text="📧 Email Report", command=self._email_sensor_report).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(export_controls, text="🌐 Web Dashboard", command=self._open_web_dashboard).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            export_controls,
+            text="📄 Generate Report",
+            command=self._generate_sensor_report,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            export_controls, text="💾 Export Data", command=self._export_sensor_data
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            export_controls, text="📧 Email Report", command=self._email_sensor_report
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            export_controls, text="🌐 Web Dashboard", command=self._open_web_dashboard
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_alerts_tab(self, notebook):
         """Setup sensor alerts and thresholds tab"""
@@ -391,15 +457,21 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         # Thresholds treeview
         columns = ("Sensor", "Min Value", "Max Value", "Current", "Status", "Actions")
-        self.thresholds_tree = ttk.Treeview(thresholds_frame, columns=columns, show="headings", height=10)
+        self.thresholds_tree = ttk.Treeview(
+            thresholds_frame, columns=columns, show="headings", height=10
+        )
 
         for col in columns:
             self.thresholds_tree.heading(col, text=col)
             self.thresholds_tree.column(col, width=100)
 
-        self.thresholds_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.thresholds_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        thresholds_scroll = ttk.Scrollbar(thresholds_frame, orient=tk.VERTICAL, command=self.thresholds_tree.yview)
+        thresholds_scroll = ttk.Scrollbar(
+            thresholds_frame, orient=tk.VERTICAL, command=self.thresholds_tree.yview
+        )
         self.thresholds_tree.config(yscrollcommand=thresholds_scroll.set)
         thresholds_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -410,7 +482,9 @@ class SensorVisualizerPlugin(ToolPlugin):
         alerts_history_frame = ttk.LabelFrame(alerts_frame, text="Recent Alerts")
         alerts_history_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.alerts_text = scrolledtext.ScrolledText(alerts_history_frame, height=8, font=("Consolas", 9))
+        self.alerts_text = scrolledtext.ScrolledText(
+            alerts_history_frame, height=8, font=("Consolas", 9)
+        )
         self.alerts_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Add sample alerts
@@ -420,12 +494,20 @@ class SensorVisualizerPlugin(ToolPlugin):
         alert_controls = ttk.Frame(alerts_frame)
         alert_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(alert_controls, text="⚙️ Configure Thresholds", command=self._configure_thresholds).pack(
+        ttk.Button(
+            alert_controls,
+            text="⚙️ Configure Thresholds",
+            command=self._configure_thresholds,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(alert_controls, text="🧪 Test Alert", command=self._test_alert).pack(
             side=tk.LEFT, padx=2
         )
-        ttk.Button(alert_controls, text="🧪 Test Alert", command=self._test_alert).pack(side=tk.LEFT, padx=2)
-        ttk.Button(alert_controls, text="🧹 Clear Alerts", command=self._clear_alerts).pack(side=tk.LEFT, padx=2)
-        ttk.Button(alert_controls, text="📧 Email Alerts", command=self._setup_email_alerts).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            alert_controls, text="🧹 Clear Alerts", command=self._clear_alerts
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            alert_controls, text="📧 Email Alerts", command=self._setup_email_alerts
+        ).pack(side=tk.LEFT, padx=2)
 
     # === EVENT HANDLERS ===
 
@@ -520,12 +602,18 @@ class SensorVisualizerPlugin(ToolPlugin):
     def _draw_line_chart(self, canvas, x, y, width, height, title, data, color):
         """Draw a line chart on canvas"""
         # Chart border and title
-        canvas.create_rectangle(x, y, x + width, y + height, outline="black", fill="white")
-        canvas.create_text(x + width // 2, y - 10, text=title, font=("Arial", 10, "bold"))
+        canvas.create_rectangle(
+            x, y, x + width, y + height, outline="black", fill="white"
+        )
+        canvas.create_text(
+            x + width // 2, y - 10, text=title, font=("Arial", 10, "bold")
+        )
 
         # Scale data to fit chart
         if not data or len(data) < 2:
-            canvas.create_text(x + width // 2, y + height // 2, text="No Data", font=("Arial", 12))
+            canvas.create_text(
+                x + width // 2, y + height // 2, text="No Data", font=("Arial", 12)
+            )
             return
 
         max_val = max(point[1] for point in data)
@@ -545,15 +633,25 @@ class SensorVisualizerPlugin(ToolPlugin):
             y2_pos = y + height - ((y2_data - min_val) / val_range) * (height - 20) - 10
 
             canvas.create_line(x1_pos, y1_pos, x2_pos, y2_pos, fill=color, width=2)
-            canvas.create_oval(x1_pos - 3, y1_pos - 3, x1_pos + 3, y1_pos + 3, fill=color)
+            canvas.create_oval(
+                x1_pos - 3, y1_pos - 3, x1_pos + 3, y1_pos + 3, fill=color
+            )
 
-    def _draw_bar_chart(self, canvas, x, y, width, height, title, labels, values, color):
+    def _draw_bar_chart(
+        self, canvas, x, y, width, height, title, labels, values, color
+    ):
         """Draw a bar chart on canvas"""
-        canvas.create_rectangle(x, y, x + width, y + height, outline="black", fill="white")
-        canvas.create_text(x + width // 2, y - 10, text=title, font=("Arial", 10, "bold"))
+        canvas.create_rectangle(
+            x, y, x + width, y + height, outline="black", fill="white"
+        )
+        canvas.create_text(
+            x + width // 2, y - 10, text=title, font=("Arial", 10, "bold")
+        )
 
         if not values:
-            canvas.create_text(x + width // 2, y + height // 2, text="No Data", font=("Arial", 12))
+            canvas.create_text(
+                x + width // 2, y + height // 2, text="No Data", font=("Arial", 12)
+            )
             return
 
         max_val = max(values)
@@ -564,13 +662,30 @@ class SensorVisualizerPlugin(ToolPlugin):
             bar_height = (value / max_val) * (height - 40)
             bar_y = y + height - 20 - bar_height
 
-            canvas.create_rectangle(bar_x, bar_y, bar_x + bar_width - 5, y + height - 20, fill=color, outline="black")
-            canvas.create_text(bar_x + bar_width // 2, y + height - 5, text=label[:8], font=("Arial", 8), angle=45)
+            canvas.create_rectangle(
+                bar_x,
+                bar_y,
+                bar_x + bar_width - 5,
+                y + height - 20,
+                fill=color,
+                outline="black",
+            )
+            canvas.create_text(
+                bar_x + bar_width // 2,
+                y + height - 5,
+                text=label[:8],
+                font=("Arial", 8),
+                angle=45,
+            )
 
     def _draw_status_indicators(self, canvas, x, y, width, height):
         """Draw sensor status indicators"""
-        canvas.create_rectangle(x, y, x + width, y + height, outline="black", fill="white")
-        canvas.create_text(x + width // 2, y - 10, text="Sensor Status", font=("Arial", 10, "bold"))
+        canvas.create_rectangle(
+            x, y, x + width, y + height, outline="black", fill="white"
+        )
+        canvas.create_text(
+            x + width // 2, y - 10, text="Sensor Status", font=("Arial", 10, "bold")
+        )
 
         sensors = [
             ("Temperature", "Online", "#4CAF50"),
@@ -582,8 +697,16 @@ class SensorVisualizerPlugin(ToolPlugin):
 
         for i, (sensor, status, color) in enumerate(sensors):
             indicator_y = y + 30 + i * 20
-            canvas.create_oval(x + 20, indicator_y, x + 30, indicator_y + 10, fill=color)
-            canvas.create_text(x + 50, indicator_y + 5, text=f"{sensor}: {status}", font=("Arial", 9), anchor="w")
+            canvas.create_oval(
+                x + 20, indicator_y, x + 30, indicator_y + 10, fill=color
+            )
+            canvas.create_text(
+                x + 50,
+                indicator_y + 5,
+                text=f"{sensor}: {status}",
+                font=("Arial", 9),
+                anchor="w",
+            )
 
     def _draw_historical_charts(self):
         """Draw historical data analysis charts"""
@@ -594,7 +717,9 @@ class SensorVisualizerPlugin(ToolPlugin):
         canvas.delete("all")
 
         # Historical trend chart
-        canvas.create_text(500, 20, text="Historical Sensor Data Analysis", font=("Arial", 14, "bold"))
+        canvas.create_text(
+            500, 20, text="Historical Sensor Data Analysis", font=("Arial", 14, "bold")
+        )
 
         # Multi-sensor trend lines
         self._draw_line_chart(
@@ -703,7 +828,9 @@ Uptime: 99.8%"""
     def _refresh_sensor_charts(self):
         """Refresh sensor charts"""
         self._draw_sensor_charts()
-        messagebox.showinfo("Charts Refreshed", "Sensor charts refreshed with latest data")
+        messagebox.showinfo(
+            "Charts Refreshed", "Sensor charts refreshed with latest data"
+        )
         self.emit_event("visualization_updated", "charts_refreshed")
 
     def _configure_sensor_charts(self):
@@ -763,7 +890,10 @@ Uptime: 99.8%"""
     def _start_data_logging(self):
         """Start data logging"""
         self.sensor_state["logging_enabled"] = True
-        messagebox.showinfo("Data Logging", "Data logging started\n\n📝 Logging sensor data\n💾 Saving to file")
+        messagebox.showinfo(
+            "Data Logging",
+            "Data logging started\n\n📝 Logging sensor data\n💾 Saving to file",
+        )
         self.emit_event("data_logging_started")
 
     def _stop_data_logging(self):
@@ -790,7 +920,9 @@ Uptime: 99.8%"""
         if not self.log_file_var:
             return
         filename = filedialog.asksaveasfilename(
-            title="Select Log File", defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+            title="Select Log File",
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")],
         )
         if filename:
             self.log_file_var.set(filename)
@@ -814,7 +946,8 @@ Uptime: 99.8%"""
     def _email_sensor_report(self):
         """Email sensor report"""
         messagebox.showinfo(
-            "Email Report", "Sensor report emailed\n\n📧 Report sent to configured recipients\n✅ Delivery confirmed"
+            "Email Report",
+            "Sensor report emailed\n\n📧 Report sent to configured recipients\n✅ Delivery confirmed",
         )
 
     def _open_web_dashboard(self):
@@ -833,7 +966,10 @@ Uptime: 99.8%"""
 
     def _test_alert(self):
         """Test alert system"""
-        messagebox.showinfo("Alert Test", "Alert system test\n\n🧪 Test alert sent\n✅ Alert system functioning")
+        messagebox.showinfo(
+            "Alert Test",
+            "Alert system test\n\n🧪 Test alert sent\n✅ Alert system functioning",
+        )
         self.emit_event("alert_triggered", "test_alert")
 
     def _clear_alerts(self):
@@ -847,7 +983,8 @@ Uptime: 99.8%"""
     def _setup_email_alerts(self):
         """Setup email alerts"""
         messagebox.showinfo(
-            "Email Alerts", "Email alert configuration\n\n📧 Email settings\n⏰ Alert schedules\n👥 Recipient lists"
+            "Email Alerts",
+            "Email alert configuration\n\n📧 Email settings\n⏰ Alert schedules\n👥 Recipient lists",
         )
 
     def _update_realtime_data(self, sensor_name, value, unit):
@@ -856,7 +993,9 @@ Uptime: 99.8%"""
         if self.sensor_state["logging_enabled"] and self.log_tree:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             status = "Normal"  # Could be determined by threshold checking
-            self.log_tree.insert("", 0, values=(timestamp, sensor_name, value, unit, status))
+            self.log_tree.insert(
+                "", 0, values=(timestamp, sensor_name, value, unit, status)
+            )
 
         # Update charts if canvas exists
         if self.charts_canvas:

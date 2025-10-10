@@ -9,7 +9,12 @@ import time
 import os
 import sys
 from typing import Any, Dict, Callable, Union, Optional
-from ..errors.error_manager import TimeWarpRuntimeError, TimeWarpTypeError, create_runtime_error, create_type_error
+from ..errors.error_manager import (
+    TimeWarpRuntimeError,
+    TimeWarpTypeError,
+    create_runtime_error,
+    create_type_error,
+)
 
 
 class StandardLibrary:
@@ -84,10 +89,14 @@ class StandardLibrary:
         self.register_function("UPPER$", lambda s: str(s).upper())
         self.register_function("LOWER$", lambda s: str(s).lower())
         self.register_function("TRIM$", lambda s: str(s).strip())
-        self.register_function("REPLACE$", lambda s, old, new: str(s).replace(str(old), str(new)))
+        self.register_function(
+            "REPLACE$", lambda s, old, new: str(s).replace(str(old), str(new))
+        )
         self.register_function("FIND", lambda s, sub: str(s).find(str(sub)))
         self.register_function("SPLIT$", lambda s, sep=" ": str(s).split(str(sep)))
-        self.register_function("JOIN$", lambda lst, sep="": str(sep).join(str(x) for x in lst))
+        self.register_function(
+            "JOIN$", lambda lst, sep="": str(sep).join(str(x) for x in lst)
+        )
 
         # Type conversion functions
         self.register_function("STR$", str)
@@ -146,7 +155,9 @@ class StandardLibrary:
         try:
             x = float(x)
             if x < 0:
-                error = create_runtime_error("Cannot take square root of negative number")
+                error = create_runtime_error(
+                    "Cannot take square root of negative number"
+                )
                 raise TimeWarpRuntimeError(error)
             return math.sqrt(x)
         except (ValueError, TypeError) as e:
@@ -160,7 +171,9 @@ class StandardLibrary:
             if base != math.e:
                 base = float(base)
             if x <= 0:
-                error = create_runtime_error("Cannot take logarithm of non-positive number")
+                error = create_runtime_error(
+                    "Cannot take logarithm of non-positive number"
+                )
                 raise TimeWarpRuntimeError(error)
             if base != math.e and base <= 0:
                 error = create_runtime_error("Logarithm base must be positive")

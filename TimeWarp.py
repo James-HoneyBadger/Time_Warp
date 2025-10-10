@@ -128,38 +128,58 @@ class IDETimeWarp:
         file_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="New", command=self.new_file, accelerator="Ctrl+N")
-        file_menu.add_command(label="Open", command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label="Save As", command=self.save_as_file, accelerator="Ctrl+Shift+S")
+        file_menu.add_command(
+            label="Open", command=self.open_file, accelerator="Ctrl+O"
+        )
+        file_menu.add_command(
+            label="Save", command=self.save_file, accelerator="Ctrl+S"
+        )
+        file_menu.add_command(
+            label="Save As", command=self.save_as_file, accelerator="Ctrl+Shift+S"
+        )
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.quit_app, accelerator="Ctrl+Q")
 
         # Edit menu
         edit_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Edit", menu=edit_menu)
-        edit_menu.add_command(label="Find", command=self.find_text, accelerator="Ctrl+F")
-        edit_menu.add_command(label="Replace", command=self.replace_text, accelerator="Ctrl+H")
+        edit_menu.add_command(
+            label="Find", command=self.find_text, accelerator="Ctrl+F"
+        )
+        edit_menu.add_command(
+            label="Replace", command=self.replace_text, accelerator="Ctrl+H"
+        )
 
         # Run menu
         run_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Run", menu=run_menu)
         run_menu.add_command(label="Run Code", command=self.run_code, accelerator="F5")
-        run_menu.add_command(label="Stop", command=self.stop_execution, accelerator="Shift+F5")
+        run_menu.add_command(
+            label="Stop", command=self.stop_execution, accelerator="Shift+F5"
+        )
         run_menu.add_separator()
         run_menu.add_command(label="Clear Output", command=self.clear_output)
 
         # Tools menu
         tools_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Tools", menu=tools_menu)
-        tools_menu.add_command(label="🎨 Theme Selector", command=self.show_theme_selector)
+        tools_menu.add_command(
+            label="🎨 Theme Selector", command=self.show_theme_selector
+        )
         tools_menu.add_command(label="⚙️ Settings", command=self.show_settings)
 
         # Features menu
         features_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Features", menu=features_menu)
-        features_menu.add_command(label="📚 Tutorial System", command=self.show_tutorial_system)
-        features_menu.add_command(label="🤖 AI Code Assistant", command=self.show_ai_assistant)
-        features_menu.add_command(label="🎮 Gamification Dashboard", command=self.show_gamification_dashboard)
+        features_menu.add_command(
+            label="📚 Tutorial System", command=self.show_tutorial_system
+        )
+        features_menu.add_command(
+            label="🤖 AI Code Assistant", command=self.show_ai_assistant
+        )
+        features_menu.add_command(
+            label="🎮 Gamification Dashboard", command=self.show_gamification_dashboard
+        )
 
         # Help menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
@@ -169,7 +189,9 @@ class IDETimeWarp:
     def setup_editor(self):
         """Setup clean code editor canvas"""
         # Editor section - clean canvas without toolbar
-        editor_frame = ttk.LabelFrame(self.left_section, text="⏰ Time Warp Code Portal")
+        editor_frame = ttk.LabelFrame(
+            self.left_section, text="⏰ Time Warp Code Portal"
+        )
         editor_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 4))
 
         # Initialize language variable for compatibility (used by other methods)
@@ -190,7 +212,9 @@ class IDETimeWarp:
         console_frame = ttk.LabelFrame(self.left_section, text="⏰ Time Warp Output")
         console_frame.pack(fill=tk.X, expand=False, pady=(4, 0))
 
-        self.output_text = scrolledtext.ScrolledText(console_frame, height=8, state=tk.DISABLED, wrap=tk.WORD)
+        self.output_text = scrolledtext.ScrolledText(
+            console_frame, height=8, state=tk.DISABLED, wrap=tk.WORD
+        )
         self.output_text.pack(fill=tk.BOTH, expand=False, padx=5, pady=5)
 
     def setup_graphics(self):
@@ -284,7 +308,9 @@ class IDETimeWarp:
 
                     self.current_file = file_path
                     self.auto_detect_language(file_path)
-                    self.write_to_console(f"⏰ Time portal opened: {os.path.basename(file_path)}")
+                    self.write_to_console(
+                        f"⏰ Time portal opened: {os.path.basename(file_path)}"
+                    )
 
             except Exception as e:
                 messagebox.showerror("Error", f"Could not open file: {e}")
@@ -481,7 +507,9 @@ class IDETimeWarp:
             # Close button
             close_frame = tk.Frame(dialog)
             close_frame.pack(pady=15)
-            tk.Button(close_frame, text="✖ Close", command=dialog.destroy, width=15).pack()
+            tk.Button(
+                close_frame, text="✖ Close", command=dialog.destroy, width=15
+            ).pack()
 
             print("✅ Theme selector opened successfully!")
 
@@ -565,7 +593,9 @@ class IDETimeWarp:
             editor_frame = ttk.Frame(notebook)
             notebook.add(editor_frame, text="📝 Editor")
 
-            tk.Label(editor_frame, text="Editor Configuration", font=("Arial", 11, "bold")).pack(pady=10)
+            tk.Label(
+                editor_frame, text="Editor Configuration", font=("Arial", 11, "bold")
+            ).pack(pady=10)
 
             # Font size setting
             font_frame = tk.Frame(editor_frame)
@@ -588,19 +618,27 @@ class IDETimeWarp:
             options_frame.pack(pady=10, fill=tk.X, padx=20)
 
             line_numbers_var = tk.BooleanVar(value=True)
-            tk.Checkbutton(options_frame, text="Show line numbers", variable=line_numbers_var).pack(anchor=tk.W)
+            tk.Checkbutton(
+                options_frame, text="Show line numbers", variable=line_numbers_var
+            ).pack(anchor=tk.W)
 
             syntax_var = tk.BooleanVar(value=True)
-            tk.Checkbutton(options_frame, text="Syntax highlighting", variable=syntax_var).pack(anchor=tk.W)
+            tk.Checkbutton(
+                options_frame, text="Syntax highlighting", variable=syntax_var
+            ).pack(anchor=tk.W)
 
             auto_indent_var = tk.BooleanVar(value=True)
-            tk.Checkbutton(options_frame, text="Auto indent", variable=auto_indent_var).pack(anchor=tk.W)
+            tk.Checkbutton(
+                options_frame, text="Auto indent", variable=auto_indent_var
+            ).pack(anchor=tk.W)
 
             # Theme Settings Tab
             theme_frame = ttk.Frame(notebook)
             notebook.add(theme_frame, text="🎨 Themes")
 
-            tk.Label(theme_frame, text="Theme Configuration", font=("Arial", 11, "bold")).pack(pady=10)
+            tk.Label(
+                theme_frame, text="Theme Configuration", font=("Arial", 11, "bold")
+            ).pack(pady=10)
             tk.Label(
                 theme_frame,
                 text=f"Current theme: {getattr(self, 'current_theme', 'dracula')}",
@@ -630,7 +668,9 @@ Python: {sys.version.split()[0]}
 
 Built for radical code adventures across time.
             """
-            tk.Label(about_frame, text=about_text, justify=tk.LEFT, font=("Arial", 9)).pack(pady=20, padx=20)
+            tk.Label(
+                about_frame, text=about_text, justify=tk.LEFT, font=("Arial", 9)
+            ).pack(pady=20, padx=20)
 
             # Buttons
             button_frame = tk.Frame(dialog)
@@ -640,8 +680,12 @@ Built for radical code adventures across time.
                 self.write_to_console("⚙️ Settings saved!")
                 dialog.destroy()
 
-            tk.Button(button_frame, text="💾 Save", command=save_settings, width=12).pack(side=tk.LEFT, padx=5)
-            tk.Button(button_frame, text="✖ Cancel", command=dialog.destroy, width=12).pack(side=tk.LEFT, padx=5)
+            tk.Button(
+                button_frame, text="💾 Save", command=save_settings, width=12
+            ).pack(side=tk.LEFT, padx=5)
+            tk.Button(
+                button_frame, text="✖ Cancel", command=dialog.destroy, width=12
+            ).pack(side=tk.LEFT, padx=5)
 
             print("✅ Settings dialog opened successfully!")
 
@@ -687,14 +731,18 @@ Warp through code like never before!
             search_term = simpledialog.askstring("Replace", "Enter text to replace:")
             if not search_term:
                 return
-            replace_term = simpledialog.askstring("Replace", f"Replace '{search_term}' with:")
+            replace_term = simpledialog.askstring(
+                "Replace", f"Replace '{search_term}' with:"
+            )
             if replace_term is None:
                 return
             content = self.code_editor.text_editor.get(1.0, tk.END)
             new_content = content.replace(search_term, replace_term)
             self.code_editor.text_editor.delete(1.0, tk.END)
             self.code_editor.text_editor.insert(1.0, new_content)
-            self.write_to_console(f"🔄 Replaced all occurrences of '{search_term}' with '{replace_term}'")
+            self.write_to_console(
+                f"🔄 Replaced all occurrences of '{search_term}' with '{replace_term}'"
+            )
 
     def apply_theme(self):
         """Apply current theme to all UI components"""
@@ -724,7 +772,9 @@ Warp through code like never before!
                 )
 
             # Apply to code editor if it has text_editor
-            if hasattr(self, "code_editor") and hasattr(self.code_editor, "text_editor"):
+            if hasattr(self, "code_editor") and hasattr(
+                self.code_editor, "text_editor"
+            ):
                 self.code_editor.text_editor.configure(
                     bg=colors.get("bg_secondary", "#282A36"),
                     fg=colors.get("text_primary", "#F8F8F2"),
@@ -737,7 +787,8 @@ Warp through code like never before!
             if hasattr(self, "graphics_canvas"):
                 canvas_bg = (
                     colors.get("bg_tertiary", "#FFFFFF")
-                    if "light" in self.current_theme or self.current_theme in ["spring", "sunset", "candy", "forest"]
+                    if "light" in self.current_theme
+                    or self.current_theme in ["spring", "sunset", "candy", "forest"]
                     else "#2F3349"
                 )
                 self.graphics_canvas.configure(bg=canvas_bg)
@@ -790,7 +841,9 @@ Warp through code like never before!
                 background=[("selected", colors.get("accent", "#FF79C6"))],
             )
 
-            self.write_to_console(f"🎨 Theme '{self.current_theme}' applied successfully!")
+            self.write_to_console(
+                f"🎨 Theme '{self.current_theme}' applied successfully!"
+            )
 
         except Exception as e:
             print(f"❌ Theme application error: {e}")
@@ -807,7 +860,9 @@ Warp through code like never before!
 
             message = f"🏆 Achievement Unlocked!\n\n{achievement.icon} {achievement.name}\n{achievement.description}\n\n+{achievement.points} points!"
             messagebox.showinfo("Achievement Unlocked!", message)
-            self.write_to_console(f"🏆 Achievement unlocked: {achievement.name} (+{achievement.points} points)")
+            self.write_to_console(
+                f"🏆 Achievement unlocked: {achievement.name} (+{achievement.points} points)"
+            )
         except Exception as e:
             print(f"Error showing achievement notification: {e}")
 
@@ -818,7 +873,9 @@ Warp through code like never before!
 
             message = f"🎉 Level Up!\n\nYou've reached Level {new_level}!\n\nKeep coding to unlock more features and challenges!"
             messagebox.showinfo("Level Up!", message)
-            self.write_to_console(f"🎉 Level up! You're now level {new_level} (was {old_level})")
+            self.write_to_console(
+                f"🎉 Level up! You're now level {new_level} (was {old_level})"
+            )
         except Exception as e:
             print(f"Error showing level up notification: {e}")
 
@@ -866,7 +923,9 @@ Warp through code like never before!
             notebook.add(stats_frame, text="📊 Stats")
 
             stats_text = tk.Text(stats_frame, wrap=tk.WORD, height=20)
-            stats_scrollbar = tk.Scrollbar(stats_frame, orient=tk.VERTICAL, command=stats_text.yview)
+            stats_scrollbar = tk.Scrollbar(
+                stats_frame, orient=tk.VERTICAL, command=stats_text.yview
+            )
             stats_text.configure(yscrollcommand=stats_scrollbar.set)
 
             stats_content = f"""🎮 Gamification Dashboard
@@ -911,12 +970,14 @@ Warp through code like never before!
             achievements_content = "🏆 All Achievements:\n\n"
 
             for achievement in self.gamification.achievements.values():
-                status = "✅" if achievement.unlocked else f"🔒 ({achievement.progress:.0%})"
-                achievements_content += f"{status} {achievement.icon} {achievement.name}\n"
-                achievements_content += f"   {achievement.description}\n"
-                achievements_content += (
-                    f"   Rarity: {achievement.rarity.value.title()} | Points: {achievement.points}\n\n"
+                status = (
+                    "✅" if achievement.unlocked else f"🔒 ({achievement.progress:.0%})"
                 )
+                achievements_content += (
+                    f"{status} {achievement.icon} {achievement.name}\n"
+                )
+                achievements_content += f"   {achievement.description}\n"
+                achievements_content += f"   Rarity: {achievement.rarity.value.title()} | Points: {achievement.points}\n\n"
 
             achievements_text.insert(tk.END, achievements_content)
             achievements_text.config(state=tk.DISABLED)
@@ -929,7 +990,9 @@ Warp through code like never before!
             notebook.add(challenges_frame, text="🎯 Challenges")
 
             challenges_text = tk.Text(challenges_frame, wrap=tk.WORD, height=20)
-            challenges_scrollbar = tk.Scrollbar(challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview)
+            challenges_scrollbar = tk.Scrollbar(
+                challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview
+            )
             challenges_text.configure(yscrollcommand=challenges_scrollbar.set)
 
             challenges_content = "🎯 Available Challenges:\n\n"
@@ -994,7 +1057,9 @@ Warp through code like never before!
             content_frame.pack(fill=tk.BOTH, expand=True)
 
             tutorial_text = tk.Text(content_frame, wrap=tk.WORD, height=25, width=80)
-            tutorial_scrollbar = tk.Scrollbar(content_frame, orient=tk.VERTICAL, command=tutorial_text.yview)
+            tutorial_scrollbar = tk.Scrollbar(
+                content_frame, orient=tk.VERTICAL, command=tutorial_text.yview
+            )
             tutorial_text.configure(yscrollcommand=tutorial_scrollbar.set)
 
             tutorial_content = """📚 Interactive Tutorial System
@@ -1062,7 +1127,9 @@ Happy learning! Your journey through programming history begins here! ⏰"""
             )
             start_button.pack(side=tk.LEFT)
 
-            close_button = tk.Button(button_frame, text="❌ Close", command=tutorial_window.destroy)
+            close_button = tk.Button(
+                button_frame, text="❌ Close", command=tutorial_window.destroy
+            )
             close_button.pack(side=tk.RIGHT)
 
         except Exception as e:
@@ -1087,7 +1154,9 @@ Happy learning! Your journey through programming history begins here! ⏰"""
                     f"� Tutorial system loaded. Follow the interactive lessons in the tutorial window."
                 )
                 # Record tutorial activity
-                self.gamification.record_activity("tutorial_started", {"tutorial": tutorial_id})
+                self.gamification.record_activity(
+                    "tutorial_started", {"tutorial": tutorial_id}
+                )
             else:
                 self.write_to_console(f"❌ Unknown tutorial: {tutorial_name}")
 
@@ -1113,7 +1182,9 @@ Happy learning! Your journey through programming history begins here! ⏰"""
             input_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
 
             code_text = tk.Text(input_frame, height=15, wrap=tk.WORD)
-            code_scrollbar = tk.Scrollbar(input_frame, orient=tk.VERTICAL, command=code_text.yview)
+            code_scrollbar = tk.Scrollbar(
+                input_frame, orient=tk.VERTICAL, command=code_text.yview
+            )
             code_text.configure(yscrollcommand=code_scrollbar.set)
 
             # Get current code from editor
@@ -1146,7 +1217,9 @@ Happy learning! Your journey through programming history begins here! ⏰"""
             analyze_button = tk.Button(
                 options_frame,
                 text="🧠 Analyze Code",
-                command=lambda: self.analyze_code_with_ai(code_text.get(1.0, tk.END), language_var.get()),
+                command=lambda: self.analyze_code_with_ai(
+                    code_text.get(1.0, tk.END), language_var.get()
+                ),
             )
             analyze_button.pack(side=tk.LEFT)
 
@@ -1154,8 +1227,12 @@ Happy learning! Your journey through programming history begins here! ⏰"""
             results_frame = tk.LabelFrame(main_frame, text="🎯 AI Analysis Results")
             results_frame.pack(fill=tk.BOTH, expand=True)
 
-            results_text = tk.Text(results_frame, height=15, wrap=tk.WORD, state=tk.DISABLED)
-            results_scrollbar = tk.Scrollbar(results_frame, orient=tk.VERTICAL, command=results_text.yview)
+            results_text = tk.Text(
+                results_frame, height=15, wrap=tk.WORD, state=tk.DISABLED
+            )
+            results_scrollbar = tk.Scrollbar(
+                results_frame, orient=tk.VERTICAL, command=results_text.yview
+            )
             results_text.configure(yscrollcommand=results_scrollbar.set)
 
             # Store reference for updating
@@ -1194,7 +1271,9 @@ Welcome to the intelligent code analysis system!
             button_frame = tk.Frame(main_frame)
             button_frame.pack(fill=tk.X, pady=(10, 0))
 
-            close_button = tk.Button(button_frame, text="❌ Close", command=ai_window.destroy)
+            close_button = tk.Button(
+                button_frame, text="❌ Close", command=ai_window.destroy
+            )
             close_button.pack(side=tk.RIGHT)
 
         except Exception as e:
@@ -1229,7 +1308,10 @@ Welcome to the intelligent code analysis system!
 
                     quality_score = max(
                         0,
-                        10 - (error_count * 3) - (warning_count * 1) - (info_count * 0.5),
+                        10
+                        - (error_count * 3)
+                        - (warning_count * 1)
+                        - (info_count * 0.5),
                     )
                     results += f"\n🎯 Code Quality Score: {quality_score:.1f}/10\n"
 
@@ -1257,7 +1339,9 @@ Welcome to the intelligent code analysis system!
 
     def quit_app(self):
         """Exit the time warp"""
-        if messagebox.askokcancel("Exit Time Warp", "Ready to return to your own time?"):
+        if messagebox.askokcancel(
+            "Exit Time Warp", "Ready to return to your own time?"
+        ):
             self.root.quit()
 
 

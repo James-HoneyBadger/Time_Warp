@@ -35,7 +35,13 @@ class LogoPath:
     """Represents a path drawn by the turtle"""
 
     def __init__(
-        self, start_x: float, start_y: float, end_x: float, end_y: float, color: str = "black", width: int = 1
+        self,
+        start_x: float,
+        start_y: float,
+        end_x: float,
+        end_y: float,
+        color: str = "black",
+        width: int = 1,
     ):
         self.start_x = start_x
         self.start_y = start_y
@@ -91,7 +97,9 @@ class LogoHandler:
         elif command == "HOME":
             return self._home()
         elif command == "SETXY":
-            return self._set_position(args[0] if len(args) > 0 else 0, args[1] if len(args) > 1 else 0)
+            return self._set_position(
+                args[0] if len(args) > 0 else 0, args[1] if len(args) > 1 else 0
+            )
         elif command == "SETHEADING":
             return self._set_heading(args[0] if args else 0)
 
@@ -101,7 +109,10 @@ class LogoHandler:
 
         # Control commands
         elif command == "REPEAT":
-            return self._repeat(args[0] if args else 1, node.arguments[1:] if len(node.arguments) > 1 else [])
+            return self._repeat(
+                args[0] if args else 1,
+                node.arguments[1:] if len(node.arguments) > 1 else [],
+            )
 
         # Query commands
         elif command == "XCOR":
@@ -130,7 +141,14 @@ class LogoHandler:
 
         # Draw line if pen is down
         if self.turtle.pen_down:
-            path = LogoPath(old_x, old_y, self.turtle.x, self.turtle.y, self.turtle.pen_color, self.turtle.pen_width)
+            path = LogoPath(
+                old_x,
+                old_y,
+                self.turtle.x,
+                self.turtle.y,
+                self.turtle.pen_color,
+                self.turtle.pen_width,
+            )
             self.paths.append(path)
 
             if self.draw_callback:
@@ -169,7 +187,9 @@ class LogoHandler:
 
         # Draw line if pen is down
         if self.turtle.pen_down:
-            path = LogoPath(old_x, old_y, 0.0, 0.0, self.turtle.pen_color, self.turtle.pen_width)
+            path = LogoPath(
+                old_x, old_y, 0.0, 0.0, self.turtle.pen_color, self.turtle.pen_width
+            )
             self.paths.append(path)
 
             if self.draw_callback:
@@ -186,7 +206,14 @@ class LogoHandler:
 
         # Draw line if pen is down
         if self.turtle.pen_down:
-            path = LogoPath(old_x, old_y, self.turtle.x, self.turtle.y, self.turtle.pen_color, self.turtle.pen_width)
+            path = LogoPath(
+                old_x,
+                old_y,
+                self.turtle.x,
+                self.turtle.y,
+                self.turtle.pen_color,
+                self.turtle.pen_width,
+            )
             self.paths.append(path)
 
             if self.draw_callback:
@@ -236,7 +263,11 @@ class LogoHandler:
         if self.state_stack:
             self.turtle = self.state_stack.pop()
 
-    def set_callbacks(self, draw_callback: Callable[[LogoPath], None], clear_callback: Callable[[], None]):
+    def set_callbacks(
+        self,
+        draw_callback: Callable[[LogoPath], None],
+        clear_callback: Callable[[], None],
+    ):
         """Set graphics callbacks"""
         self.draw_callback = draw_callback
         self.clear_callback = clear_callback
@@ -271,7 +302,9 @@ class LogoHandler:
             offset_x = width // 2 - (bounds[0] + bounds[2]) * scale // 2
             offset_y = height // 2 - (bounds[1] + bounds[3]) * scale // 2
 
-        svg_lines = [f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">']
+        svg_lines = [
+            f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">'
+        ]
 
         for path in self.paths:
             x1 = path.start_x * scale + offset_x

@@ -49,7 +49,9 @@ class OutputBuffer:
 
         # Check for PILOT comment lines: "R: This is comment line N"
         pilot_pattern = r"^R:\s*This is comment line \d+$"
-        if re.match(pilot_pattern, new_line.strip()) and re.match(pilot_pattern, last_line.strip()):
+        if re.match(pilot_pattern, new_line.strip()) and re.match(
+            pilot_pattern, last_line.strip()
+        ):
             return True
 
         # Check for numbered sequences (like "line N")
@@ -134,7 +136,12 @@ class MemoryManager:
             }
         except (ImportError, Exception):
             # Fallback without psutil or on error
-            return {"rss": 0, "vms": 0, "percent": 0, "available": 1000}  # Assume 1GB available
+            return {
+                "rss": 0,
+                "vms": 0,
+                "percent": 0,
+                "available": 1000,
+            }  # Assume 1GB available
 
 
 class PerformanceProfiler:
@@ -182,14 +189,20 @@ class PerformanceProfiler:
                 # Generate suggestions based on performance
                 avg_time = report["timings"][operation]["average"]
                 if avg_time > 0.1:  # 100ms
-                    report["suggestions"].append(f"⚠️ {operation} averaging {avg_time:.3f}s - consider optimization")
+                    report["suggestions"].append(
+                        f"⚠️ {operation} averaging {avg_time:.3f}s - consider optimization"
+                    )
 
         # Analyze counters for suggestions
         if self._counters.get("output_lines", 0) > 1000:
-            report["suggestions"].append("📊 High output volume detected - consider using output buffering")
+            report["suggestions"].append(
+                "📊 High output volume detected - consider using output buffering"
+            )
 
         if self._counters.get("unicode_operations", 0) > 100:
-            report["suggestions"].append("🌍 Many Unicode operations - ensure proper encoding handling")
+            report["suggestions"].append(
+                "🌍 Many Unicode operations - ensure proper encoding handling"
+            )
 
         return report
 
@@ -259,7 +272,11 @@ def optimize_for_production():
     # Set recursion limit for better stack management
     sys.setrecursionlimit(1500)  # Reasonable limit
 
-    return {"gc_threshold_set": True, "recursion_limit": sys.getrecursionlimit(), "optimization_level": "production"}
+    return {
+        "gc_threshold_set": True,
+        "recursion_limit": sys.getrecursionlimit(),
+        "optimization_level": "production",
+    }
 
 
 def get_system_performance() -> Dict[str, Any]:

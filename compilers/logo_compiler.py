@@ -503,7 +503,10 @@ class LogoCompiler(BaseCompiler):
         # For now, just return a simple repeat
         return {
             "type": "REPEAT",
-            "args": {"count": count, "statements": []},  # Would need proper parsing for nested statements
+            "args": {
+                "count": count,
+                "statements": [],
+            },  # Would need proper parsing for nested statements
         }
 
     def parse_make(self, line: str) -> Dict:
@@ -521,7 +524,10 @@ class LogoCompiler(BaseCompiler):
         match = re.search(r"IF\s+(.+)", line, re.IGNORECASE)
         condition = match.group(1).strip() if match else "0"
 
-        return {"type": "IF", "args": {"condition": condition, "statements": []}}  # Would need proper parsing
+        return {
+            "type": "IF",
+            "args": {"condition": condition, "statements": []},
+        }  # Would need proper parsing
 
     def parse_to(self, line: str) -> Dict:
         """Parse TO procedure definition"""
@@ -529,4 +535,7 @@ class LogoCompiler(BaseCompiler):
         match = re.search(r"TO\s+(\w+)", line, re.IGNORECASE)
         name = match.group(1) if match else "procedure"
 
-        return {"type": "TO", "args": {"name": name, "params": [], "statements": []}}  # Would need proper parsing
+        return {
+            "type": "TO",
+            "args": {"name": name, "params": [], "statements": []},
+        }  # Would need proper parsing

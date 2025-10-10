@@ -34,7 +34,9 @@ class CodeFormatter:
             return engine.format_code(text)
         return text
 
-    def format_selection(self, text: str, start_line: int, end_line: int, language: str = None) -> str:
+    def format_selection(
+        self, text: str, start_line: int, end_line: int, language: str = None
+    ) -> str:
         """Format a selection of lines"""
         lines = text.split("\n")
         if start_line < 0 or end_line >= len(lines) or start_line > end_line:
@@ -90,7 +92,9 @@ class CodeFormatter:
         # Otherwise, trigger completion (return empty to let completion system handle)
         return ""
 
-    def format_on_type(self, text: str, cursor_pos: int, typed_char: str, language: str = None) -> Optional[str]:
+    def format_on_type(
+        self, text: str, cursor_pos: int, typed_char: str, language: str = None
+    ) -> Optional[str]:
         """Format code as user types (on specific trigger characters)"""
         # Get language-specific trigger characters
         engine = self.language_engine.get_current_engine()
@@ -125,7 +129,9 @@ class CodeFormatter:
 
         return base_triggers
 
-    def _handle_newline_formatting(self, text: str, cursor_pos: int, engine: BaseLanguageEngine) -> Optional[str]:
+    def _handle_newline_formatting(
+        self, text: str, cursor_pos: int, engine: BaseLanguageEngine
+    ) -> Optional[str]:
         """Handle formatting when newline is typed"""
         lines = text[:cursor_pos].split("\n")
         if len(lines) < 2:
@@ -149,7 +155,9 @@ class CodeFormatter:
         # More sophisticated bracket matching could be added
         return None
 
-    def _handle_colon_formatting(self, text: str, cursor_pos: int, engine: BaseLanguageEngine) -> Optional[str]:
+    def _handle_colon_formatting(
+        self, text: str, cursor_pos: int, engine: BaseLanguageEngine
+    ) -> Optional[str]:
         """Handle formatting when colon is typed (Python, PILOT)"""
         if engine.config.name.lower() == "python":
             # Check if this looks like a function/class/if/for/while definition
@@ -195,7 +203,13 @@ class CodeFormatter:
 
         # Language-specific options
         if engine.config.name.lower() == "python":
-            options.update({"max_line_length": 88, "quote_style": "double", "trailing_commas": True})
+            options.update(
+                {
+                    "max_line_length": 88,
+                    "quote_style": "double",
+                    "trailing_commas": True,
+                }
+            )
         elif engine.config.name.lower() == "pilot":
             options.update({"uppercase_commands": True, "space_after_colon": True})
         elif engine.config.name.lower() == "basic":

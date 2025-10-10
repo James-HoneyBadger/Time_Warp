@@ -375,7 +375,9 @@ class LoggingPlugin(RuntimeHookPlugin):
 
     def on_function_call(self, name: str, args: List[Any], context: Dict[str, Any]):
         if self.log_file:
-            self.log_file.write(f"Function called: {name}({', '.join(map(str, args))})\n")
+            self.log_file.write(
+                f"Function called: {name}({', '.join(map(str, args))})\n"
+            )
             self.log_file.flush()
 
     def on_error(self, error: Exception, context: Dict[str, Any]):

@@ -66,10 +66,14 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         """Activate the IoT device manager"""
         try:
             # Add menu item
-            self.add_menu_item("Tools", "🌐 IoT Device Manager", self.show_tool_dialog, "Ctrl+Shift+I")
+            self.add_menu_item(
+                "Tools", "🌐 IoT Device Manager", self.show_tool_dialog, "Ctrl+Shift+I"
+            )
 
             # Add toolbar item
-            self.add_toolbar_item("🌐 IoT", self.show_tool_dialog, tooltip="Open IoT Device Manager")
+            self.add_toolbar_item(
+                "🌐 IoT", self.show_tool_dialog, tooltip="Open IoT Device Manager"
+            )
 
             return True
         except Exception as e:
@@ -115,9 +119,13 @@ class IoTDeviceManagerPlugin(ToolPlugin):
             header_frame = ttk.Frame(main_frame)
             header_frame.pack(fill=tk.X, pady=(0, 10))
 
-            ttk.Label(header_frame, text="🌐 IoT Device Manager", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+            ttk.Label(
+                header_frame, text="🌐 IoT Device Manager", font=("Arial", 16, "bold")
+            ).pack(side=tk.LEFT)
 
-            ttk.Button(header_frame, text="🔄 Refresh All", command=self._refresh_all_iot).pack(side=tk.RIGHT, padx=5)
+            ttk.Button(
+                header_frame, text="🔄 Refresh All", command=self._refresh_all_iot
+            ).pack(side=tk.RIGHT, padx=5)
 
             # Create notebook for different IoT aspects
             notebook = ttk.Notebook(main_frame)
@@ -134,7 +142,9 @@ class IoTDeviceManagerPlugin(ToolPlugin):
 
         except Exception as e:
             print(f"Error creating IoT device manager UI: {e}")
-            return ttk.Label(parent_widget, text=f"Error creating IoT device manager UI: {e}")
+            return ttk.Label(
+                parent_widget, text=f"Error creating IoT device manager UI: {e}"
+            )
 
     def _setup_device_discovery_tab(self, notebook):
         """Setup device discovery tab for IoT manager"""
@@ -150,11 +160,15 @@ class IoTDeviceManagerPlugin(ToolPlugin):
 
         ttk.Label(scan_controls, text="Network Range:").pack(side=tk.LEFT, padx=2)
         self.network_range_var = tk.StringVar(value="192.168.1.0/24")
-        ttk.Entry(scan_controls, textvariable=self.network_range_var, width=20).pack(side=tk.LEFT, padx=2)
-        ttk.Button(scan_controls, text="🔍 Scan Network", command=self._scan_network).pack(side=tk.LEFT, padx=2)
-        ttk.Button(scan_controls, text="🔄 Auto-Discover", command=self._auto_discover_devices).pack(
+        ttk.Entry(scan_controls, textvariable=self.network_range_var, width=20).pack(
             side=tk.LEFT, padx=2
         )
+        ttk.Button(
+            scan_controls, text="🔍 Scan Network", command=self._scan_network
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            scan_controls, text="🔄 Auto-Discover", command=self._auto_discover_devices
+        ).pack(side=tk.LEFT, padx=2)
 
         # Discovered devices
         devices_frame = ttk.LabelFrame(discovery_frame, text="Discovered Devices")
@@ -162,15 +176,21 @@ class IoTDeviceManagerPlugin(ToolPlugin):
 
         # Device discovery treeview
         columns = ("IP Address", "Device Type", "Protocol", "Status", "Description")
-        self.discovery_tree = ttk.Treeview(devices_frame, columns=columns, show="headings", height=15)
+        self.discovery_tree = ttk.Treeview(
+            devices_frame, columns=columns, show="headings", height=15
+        )
 
         for col in columns:
             self.discovery_tree.heading(col, text=col)
             self.discovery_tree.column(col, width=120)
 
-        self.discovery_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.discovery_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        discovery_scroll = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL, command=self.discovery_tree.yview)
+        discovery_scroll = ttk.Scrollbar(
+            devices_frame, orient=tk.VERTICAL, command=self.discovery_tree.yview
+        )
         self.discovery_tree.config(yscrollcommand=discovery_scroll.set)
         discovery_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -181,16 +201,22 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         action_frame = ttk.Frame(discovery_frame)
         action_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(action_frame, text="➕ Add Device", command=self._add_discovered_device).pack(side=tk.LEFT, padx=2)
-        ttk.Button(action_frame, text="📋 Device Info", command=self._show_discovered_device_info).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(action_frame, text="🔧 Configure", command=self._configure_discovered_device).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(action_frame, text="🧪 Test Connection", command=self._test_device_connection).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            action_frame, text="➕ Add Device", command=self._add_discovered_device
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            action_frame,
+            text="📋 Device Info",
+            command=self._show_discovered_device_info,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            action_frame, text="🔧 Configure", command=self._configure_discovered_device
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            action_frame,
+            text="🧪 Test Connection",
+            command=self._test_device_connection,
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_device_control_tab(self, notebook):
         """Setup device control tab"""
@@ -202,8 +228,17 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         devices_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Device control treeview
-        columns = ("Device Name", "Type", "IP Address", "Protocol", "Status", "Last Update")
-        self.control_tree = ttk.Treeview(devices_frame, columns=columns, show="headings", height=12)
+        columns = (
+            "Device Name",
+            "Type",
+            "IP Address",
+            "Protocol",
+            "Status",
+            "Last Update",
+        )
+        self.control_tree = ttk.Treeview(
+            devices_frame, columns=columns, show="headings", height=12
+        )
 
         for col in columns:
             self.control_tree.heading(col, text=col)
@@ -211,7 +246,9 @@ class IoTDeviceManagerPlugin(ToolPlugin):
 
         self.control_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        control_scroll = ttk.Scrollbar(devices_frame, orient=tk.VERTICAL, command=self.control_tree.yview)
+        control_scroll = ttk.Scrollbar(
+            devices_frame, orient=tk.VERTICAL, command=self.control_tree.yview
+        )
         self.control_tree.config(yscrollcommand=control_scroll.set)
         control_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -225,15 +262,21 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         control_buttons = ttk.Frame(control_panel)
         control_buttons.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(control_buttons, text="💡 Control Device", command=self._control_iot_device).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(control_buttons, text="📊 Get Status", command=self._get_device_status).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_buttons, text="📝 Send Command", command=self._send_device_command).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(control_buttons, text="🔄 Refresh All", command=self._refresh_all_devices).pack(side=tk.LEFT, padx=2)
-        ttk.Button(control_buttons, text="⚙️ Settings", command=self._device_settings).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_buttons, text="💡 Control Device", command=self._control_iot_device
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_buttons, text="📊 Get Status", command=self._get_device_status
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_buttons, text="📝 Send Command", command=self._send_device_command
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_buttons, text="🔄 Refresh All", command=self._refresh_all_devices
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            control_buttons, text="⚙️ Settings", command=self._device_settings
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_network_monitoring_tab(self, notebook):
         """Setup network monitoring tab"""
@@ -260,7 +303,9 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         for i, (label, value) in enumerate(stats_labels):
             row = i // 2
             col = i % 2
-            ttk.Label(stats_grid, text=label).grid(row=row, column=col * 2, padx=5, pady=2, sticky="e")
+            ttk.Label(stats_grid, text=label).grid(
+                row=row, column=col * 2, padx=5, pady=2, sticky="e"
+            )
             ttk.Label(stats_grid, text=value, font=("Arial", 10, "bold")).grid(
                 row=row, column=col * 2 + 1, padx=5, pady=2, sticky="w"
             )
@@ -270,7 +315,9 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         traffic_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Traffic log
-        self.traffic_text = scrolledtext.ScrolledText(traffic_frame, height=15, font=("Consolas", 9))
+        self.traffic_text = scrolledtext.ScrolledText(
+            traffic_frame, height=15, font=("Consolas", 9)
+        )
         self.traffic_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Add sample traffic data
@@ -280,14 +327,22 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         monitor_controls = ttk.Frame(network_frame)
         monitor_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(monitor_controls, text="▶️ Start Monitoring", command=self._start_traffic_monitoring).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(monitor_controls, text="⏹️ Stop Monitoring", command=self._stop_traffic_monitoring).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(monitor_controls, text="💾 Export Log", command=self._export_traffic_log).pack(side=tk.LEFT, padx=2)
-        ttk.Button(monitor_controls, text="🧹 Clear Log", command=self._clear_traffic_log).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            monitor_controls,
+            text="▶️ Start Monitoring",
+            command=self._start_traffic_monitoring,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            monitor_controls,
+            text="⏹️ Stop Monitoring",
+            command=self._stop_traffic_monitoring,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            monitor_controls, text="💾 Export Log", command=self._export_traffic_log
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            monitor_controls, text="🧹 Clear Log", command=self._clear_traffic_log
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_protocols_tab(self, notebook):
         """Setup IoT protocols configuration tab"""
@@ -295,20 +350,28 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         notebook.add(protocols_frame, text="📡 Protocols")
 
         # Protocol settings
-        protocols_list_frame = ttk.LabelFrame(protocols_frame, text="Supported IoT Protocols")
+        protocols_list_frame = ttk.LabelFrame(
+            protocols_frame, text="Supported IoT Protocols"
+        )
         protocols_list_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Protocol treeview
         columns = ("Protocol", "Port", "Status", "Devices", "Description")
-        self.protocols_tree = ttk.Treeview(protocols_list_frame, columns=columns, show="headings", height=12)
+        self.protocols_tree = ttk.Treeview(
+            protocols_list_frame, columns=columns, show="headings", height=12
+        )
 
         for col in columns:
             self.protocols_tree.heading(col, text=col)
             self.protocols_tree.column(col, width=120)
 
-        self.protocols_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.protocols_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        protocol_scroll = ttk.Scrollbar(protocols_list_frame, orient=tk.VERTICAL, command=self.protocols_tree.yview)
+        protocol_scroll = ttk.Scrollbar(
+            protocols_list_frame, orient=tk.VERTICAL, command=self.protocols_tree.yview
+        )
         self.protocols_tree.config(yscrollcommand=protocol_scroll.set)
         protocol_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -319,16 +382,20 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         protocol_controls = ttk.Frame(protocols_frame)
         protocol_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(protocol_controls, text="⚙️ Configure Protocol", command=self._configure_protocol).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(protocol_controls, text="▶️ Enable Protocol", command=self._enable_protocol).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(protocol_controls, text="⏹️ Disable Protocol", command=self._disable_protocol).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(protocol_controls, text="🧪 Test Protocol", command=self._test_protocol).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            protocol_controls,
+            text="⚙️ Configure Protocol",
+            command=self._configure_protocol,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            protocol_controls, text="▶️ Enable Protocol", command=self._enable_protocol
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            protocol_controls, text="⏹️ Disable Protocol", command=self._disable_protocol
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            protocol_controls, text="🧪 Test Protocol", command=self._test_protocol
+        ).pack(side=tk.LEFT, padx=2)
 
     def _setup_iot_analytics_tab(self, notebook):
         """Setup IoT data analytics tab"""
@@ -336,7 +403,9 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         notebook.add(analytics_frame, text="📊 Data Analytics")
 
         # Analytics dashboard
-        dashboard_frame = ttk.LabelFrame(analytics_frame, text="IoT Analytics Dashboard")
+        dashboard_frame = ttk.LabelFrame(
+            analytics_frame, text="IoT Analytics Dashboard"
+        )
         dashboard_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Analytics canvas
@@ -350,16 +419,24 @@ class IoTDeviceManagerPlugin(ToolPlugin):
         analytics_controls = ttk.Frame(analytics_frame)
         analytics_controls.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(analytics_controls, text="📊 Refresh Charts", command=self._refresh_iot_analytics).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(analytics_controls, text="💾 Export Data", command=self._export_iot_data).pack(side=tk.LEFT, padx=2)
-        ttk.Button(analytics_controls, text="📈 Generate Report", command=self._generate_iot_report).pack(
-            side=tk.LEFT, padx=2
-        )
-        ttk.Button(analytics_controls, text="⚙️ Configure Alerts", command=self._configure_iot_alerts).pack(
-            side=tk.LEFT, padx=2
-        )
+        ttk.Button(
+            analytics_controls,
+            text="📊 Refresh Charts",
+            command=self._refresh_iot_analytics,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analytics_controls, text="💾 Export Data", command=self._export_iot_data
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analytics_controls,
+            text="📈 Generate Report",
+            command=self._generate_iot_report,
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            analytics_controls,
+            text="⚙️ Configure Alerts",
+            command=self._configure_iot_alerts,
+        ).pack(side=tk.LEFT, padx=2)
 
     # === EVENT HANDLERS ===
 
@@ -383,12 +460,36 @@ class IoTDeviceManagerPlugin(ToolPlugin):
             return
 
         sample_devices = [
-            ("192.168.1.101", "Smart Light", "HTTP/REST", "Online", "Philips Hue Bridge"),
-            ("192.168.1.102", "Thermostat", "MQTT", "Online", "Nest Learning Thermostat"),
+            (
+                "192.168.1.101",
+                "Smart Light",
+                "HTTP/REST",
+                "Online",
+                "Philips Hue Bridge",
+            ),
+            (
+                "192.168.1.102",
+                "Thermostat",
+                "MQTT",
+                "Online",
+                "Nest Learning Thermostat",
+            ),
             ("192.168.1.103", "Security Camera", "RTSP", "Online", "Ring Doorbell Pro"),
             ("192.168.1.104", "Smart Speaker", "UPnP", "Online", "Amazon Echo Dot"),
-            ("192.168.1.105", "IoT Sensor", "CoAP", "Online", "Temperature/Humidity Sensor"),
-            ("192.168.1.106", "Smart Plug", "HTTP", "Offline", "TP-Link Kasa Smart Plug"),
+            (
+                "192.168.1.105",
+                "IoT Sensor",
+                "CoAP",
+                "Online",
+                "Temperature/Humidity Sensor",
+            ),
+            (
+                "192.168.1.106",
+                "Smart Plug",
+                "HTTP",
+                "Offline",
+                "TP-Link Kasa Smart Plug",
+            ),
         ]
 
         for device in sample_devices:
@@ -401,7 +502,8 @@ class IoTDeviceManagerPlugin(ToolPlugin):
             return
         network = self.network_range_var.get()
         messagebox.showinfo(
-            "Network Scan", f"Scanning network {network}...\n\nFound 6 IoT devices\n\n✅ Scan complete!"
+            "Network Scan",
+            f"Scanning network {network}...\n\nFound 6 IoT devices\n\n✅ Scan complete!",
         )
         self.emit_event("network_scan_completed", network)
 
@@ -488,11 +590,46 @@ Capabilities:
             return
 
         sample_iot_devices = [
-            ("Living Room Light", "Smart Bulb", "192.168.1.101", "HTTP", "On", "2024-01-15 14:30"),
-            ("Smart Thermostat", "Climate Control", "192.168.1.102", "MQTT", "Auto 72°F", "2024-01-15 14:29"),
-            ("Front Door Camera", "Security", "192.168.1.103", "RTSP", "Recording", "2024-01-15 14:28"),
-            ("Kitchen Sensor", "Environmental", "192.168.1.105", "CoAP", "Active", "2024-01-15 14:27"),
-            ("Smart Plug 1", "Power Control", "192.168.1.106", "HTTP", "Off", "2024-01-15 14:25"),
+            (
+                "Living Room Light",
+                "Smart Bulb",
+                "192.168.1.101",
+                "HTTP",
+                "On",
+                "2024-01-15 14:30",
+            ),
+            (
+                "Smart Thermostat",
+                "Climate Control",
+                "192.168.1.102",
+                "MQTT",
+                "Auto 72°F",
+                "2024-01-15 14:29",
+            ),
+            (
+                "Front Door Camera",
+                "Security",
+                "192.168.1.103",
+                "RTSP",
+                "Recording",
+                "2024-01-15 14:28",
+            ),
+            (
+                "Kitchen Sensor",
+                "Environmental",
+                "192.168.1.105",
+                "CoAP",
+                "Active",
+                "2024-01-15 14:27",
+            ),
+            (
+                "Smart Plug 1",
+                "Power Control",
+                "192.168.1.106",
+                "HTTP",
+                "Off",
+                "2024-01-15 14:25",
+            ),
         ]
 
         for device in sample_iot_devices:
@@ -509,7 +646,8 @@ Capabilities:
             device_name = item["values"][0]
             device_type = item["values"][1]
             messagebox.showinfo(
-                "Device Control", f"Controlling {device_name} ({device_type})\n\n✅ Commands sent successfully"
+                "Device Control",
+                f"Controlling {device_name} ({device_type})\n\n✅ Commands sent successfully",
             )
             self.emit_event("iot_device_controlled", device_name)
         else:
@@ -548,9 +686,13 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         selection = self.control_tree.selection()
         if selection:
             device_name = self.control_tree.item(selection[0])["values"][0]
-            command = simpledialog.askstring("Send Command", f"Enter command for {device_name}:")
+            command = simpledialog.askstring(
+                "Send Command", f"Enter command for {device_name}:"
+            )
             if command:
-                messagebox.showinfo("Command Sent", f"Command '{command}' sent to {device_name}")
+                messagebox.showinfo(
+                    "Command Sent", f"Command '{command}' sent to {device_name}"
+                )
                 self.emit_event("device_command_sent", device_name, command)
         else:
             messagebox.showwarning("No Selection", "Please select a device")
@@ -599,13 +741,17 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
 
     def _export_traffic_log(self):
         """Export traffic log to file"""
-        messagebox.showinfo("Export Complete", "Traffic log exported to iot_traffic_log.txt")
+        messagebox.showinfo(
+            "Export Complete", "Traffic log exported to iot_traffic_log.txt"
+        )
         self.emit_event("traffic_log_exported")
 
     def _clear_traffic_log(self):
         """Clear the traffic log"""
         if not self.traffic_text:
-            messagebox.showwarning("No Traffic Log", "Traffic monitoring not initialized")
+            messagebox.showwarning(
+                "No Traffic Log", "Traffic monitoring not initialized"
+            )
             return
         if messagebox.askyesno("Clear Log", "Clear all traffic log entries?"):
             self.traffic_text.delete("1.0", tk.END)
@@ -623,7 +769,13 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
             ("HTTP/REST", "80/443", "Active", "8", "RESTful web services"),
             ("MQTT", "1883", "Active", "5", "Message queuing protocol"),
             ("CoAP", "5683", "Active", "3", "Constrained Application Protocol"),
-            ("WebSocket", "8080", "Active", "2", "Real-time bidirectional communication"),
+            (
+                "WebSocket",
+                "8080",
+                "Active",
+                "2",
+                "Real-time bidirectional communication",
+            ),
             ("RTSP", "554", "Active", "1", "Real-time streaming protocol"),
             ("UPnP", "1900", "Standby", "1", "Universal Plug and Play"),
             ("Zigbee", "N/A", "Offline", "0", "Low-power mesh networking"),
@@ -636,7 +788,9 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
     def _configure_protocol(self):
         """Configure selected protocol"""
         if not self.protocols_tree:
-            messagebox.showwarning("No Protocol Tree", "Protocol configuration not initialized")
+            messagebox.showwarning(
+                "No Protocol Tree", "Protocol configuration not initialized"
+            )
             return
         selection = self.protocols_tree.selection()
         if selection:
@@ -652,7 +806,9 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
     def _enable_protocol(self):
         """Enable selected protocol"""
         if not self.protocols_tree:
-            messagebox.showwarning("No Protocol Tree", "Protocol configuration not initialized")
+            messagebox.showwarning(
+                "No Protocol Tree", "Protocol configuration not initialized"
+            )
             return
         selection = self.protocols_tree.selection()
         if selection:
@@ -665,7 +821,9 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
     def _disable_protocol(self):
         """Disable selected protocol"""
         if not self.protocols_tree:
-            messagebox.showwarning("No Protocol Tree", "Protocol configuration not initialized")
+            messagebox.showwarning(
+                "No Protocol Tree", "Protocol configuration not initialized"
+            )
             return
         selection = self.protocols_tree.selection()
         if selection:
@@ -678,7 +836,9 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
     def _test_protocol(self):
         """Test selected protocol"""
         if not self.protocols_tree:
-            messagebox.showwarning("No Protocol Tree", "Protocol configuration not initialized")
+            messagebox.showwarning(
+                "No Protocol Tree", "Protocol configuration not initialized"
+            )
             return
         selection = self.protocols_tree.selection()
         if selection:
@@ -702,23 +862,44 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
         self.analytics_canvas.delete("all")
 
         # Device count chart
-        self.analytics_canvas.create_text(100, 20, text="Device Types", font=("Arial", 12, "bold"))
+        self.analytics_canvas.create_text(
+            100, 20, text="Device Types", font=("Arial", 12, "bold")
+        )
         colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FECA57"]
-        device_types = [("Smart Lights", 8), ("Sensors", 5), ("Cameras", 3), ("Thermostats", 2), ("Other", 4)]
+        device_types = [
+            ("Smart Lights", 8),
+            ("Sensors", 5),
+            ("Cameras", 3),
+            ("Thermostats", 2),
+            ("Other", 4),
+        ]
 
         x_start = 20
         for i, (device_type, count) in enumerate(device_types):
             bar_height = count * 10
             self.analytics_canvas.create_rectangle(
-                x_start + i * 40, 100 - bar_height, x_start + i * 40 + 30, 100, fill=colors[i], outline="black"
+                x_start + i * 40,
+                100 - bar_height,
+                x_start + i * 40 + 30,
+                100,
+                fill=colors[i],
+                outline="black",
             )
-            self.analytics_canvas.create_text(x_start + i * 40 + 15, 110, text=str(count), font=("Arial", 8))
             self.analytics_canvas.create_text(
-                x_start + i * 40 + 15, 125, text=device_type[:8], font=("Arial", 7), angle=45
+                x_start + i * 40 + 15, 110, text=str(count), font=("Arial", 8)
+            )
+            self.analytics_canvas.create_text(
+                x_start + i * 40 + 15,
+                125,
+                text=device_type[:8],
+                font=("Arial", 7),
+                angle=45,
             )
 
         # Network traffic chart
-        self.analytics_canvas.create_text(400, 20, text="Network Traffic (24h)", font=("Arial", 12, "bold"))
+        self.analytics_canvas.create_text(
+            400, 20, text="Network Traffic (24h)", font=("Arial", 12, "bold")
+        )
 
         # Draw traffic line
         points = []
@@ -728,10 +909,14 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
             points.extend([x, y])
 
         if len(points) >= 4:
-            self.analytics_canvas.create_line(points, fill="#45B7D1", width=2, smooth=True)
+            self.analytics_canvas.create_line(
+                points, fill="#45B7D1", width=2, smooth=True
+            )
 
         # Status indicators
-        self.analytics_canvas.create_text(100, 200, text="System Status", font=("Arial", 12, "bold"))
+        self.analytics_canvas.create_text(
+            100, 200, text="System Status", font=("Arial", 12, "bold")
+        )
 
         status_items = [
             ("Network", "Online", "#4ECDC4"),
@@ -742,18 +927,26 @@ Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
 
         for i, (item, status, color) in enumerate(status_items):
             y_pos = 230 + i * 25
-            self.analytics_canvas.create_oval(20, y_pos - 5, 30, y_pos + 5, fill=color, outline="black")
-            self.analytics_canvas.create_text(40, y_pos, text=f"{item}: {status}", font=("Arial", 10), anchor="w")
+            self.analytics_canvas.create_oval(
+                20, y_pos - 5, 30, y_pos + 5, fill=color, outline="black"
+            )
+            self.analytics_canvas.create_text(
+                40, y_pos, text=f"{item}: {status}", font=("Arial", 10), anchor="w"
+            )
 
     def _refresh_iot_analytics(self):
         """Refresh IoT analytics charts"""
         self._draw_iot_analytics()
-        messagebox.showinfo("Analytics Refreshed", "IoT analytics charts refreshed with latest data")
+        messagebox.showinfo(
+            "Analytics Refreshed", "IoT analytics charts refreshed with latest data"
+        )
         self.emit_event("analytics_refreshed")
 
     def _export_iot_data(self):
         """Export IoT data to file"""
-        messagebox.showinfo("Export Complete", "IoT data exported to iot_analytics_data.csv")
+        messagebox.showinfo(
+            "Export Complete", "IoT data exported to iot_analytics_data.csv"
+        )
         self.emit_event("iot_data_exported")
 
     def _generate_iot_report(self):

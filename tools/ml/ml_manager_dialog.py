@@ -55,13 +55,17 @@ class MLManagerDialog:
 
         # Treeview for models
         columns = ("Name", "Type", "Status", "Trained")
-        self.models_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=8)
+        self.models_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=8
+        )
 
         for col in columns:
             self.models_tree.heading(col, text=col)
             self.models_tree.column(col, width=120)
 
-        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.models_tree.yview)
+        scrollbar = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.models_tree.yview
+        )
         self.models_tree.configure(yscrollcommand=scrollbar.set)
 
         self.models_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -71,10 +75,18 @@ class MLManagerDialog:
         controls_frame = ttk.Frame(parent)
         controls_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(controls_frame, text="Load Model", command=self.load_model).pack(side=tk.LEFT, padx=2)
-        ttk.Button(controls_frame, text="Remove Model", command=self.remove_model).pack(side=tk.LEFT, padx=2)
-        ttk.Button(controls_frame, text="Model Info", command=self.show_model_info).pack(side=tk.LEFT, padx=2)
-        ttk.Button(controls_frame, text="Refresh", command=self.refresh_models).pack(side=tk.LEFT, padx=2)
+        ttk.Button(controls_frame, text="Load Model", command=self.load_model).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(controls_frame, text="Remove Model", command=self.remove_model).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(
+            controls_frame, text="Model Info", command=self.show_model_info
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(controls_frame, text="Refresh", command=self.refresh_models).pack(
+            side=tk.LEFT, padx=2
+        )
 
     def setup_datasets_tab(self, parent):
         """Setup the datasets management tab"""
@@ -84,13 +96,17 @@ class MLManagerDialog:
 
         # Treeview for datasets
         columns = ("Name", "Type", "Size", "Features")
-        self.datasets_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=8)
+        self.datasets_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=8
+        )
 
         for col in columns:
             self.datasets_tree.heading(col, text=col)
             self.datasets_tree.column(col, width=120)
 
-        scrollbar2 = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.datasets_tree.yview)
+        scrollbar2 = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.datasets_tree.yview
+        )
         self.datasets_tree.configure(yscrollcommand=scrollbar2.set)
 
         self.datasets_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -100,12 +116,18 @@ class MLManagerDialog:
         controls_frame = ttk.Frame(parent)
         controls_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(controls_frame, text="Create Sample Data", command=self.create_sample_data).pack(
+        ttk.Button(
+            controls_frame, text="Create Sample Data", command=self.create_sample_data
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            controls_frame, text="Remove Dataset", command=self.remove_dataset
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(controls_frame, text="View Data", command=self.view_dataset).pack(
             side=tk.LEFT, padx=2
         )
-        ttk.Button(controls_frame, text="Remove Dataset", command=self.remove_dataset).pack(side=tk.LEFT, padx=2)
-        ttk.Button(controls_frame, text="View Data", command=self.view_dataset).pack(side=tk.LEFT, padx=2)
-        ttk.Button(controls_frame, text="Refresh", command=self.refresh_datasets).pack(side=tk.LEFT, padx=2)
+        ttk.Button(controls_frame, text="Refresh", command=self.refresh_datasets).pack(
+            side=tk.LEFT, padx=2
+        )
 
     def setup_demo_tab(self, parent):
         """Setup the quick demo tab"""
@@ -114,24 +136,40 @@ class MLManagerDialog:
         demo_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Demo buttons
-        ttk.Label(demo_frame, text="Choose a demonstration to run:", font=("Arial", 12)).pack(pady=10)
+        ttk.Label(
+            demo_frame, text="Choose a demonstration to run:", font=("Arial", 12)
+        ).pack(pady=10)
 
         button_frame = ttk.Frame(demo_frame)
         button_frame.pack(expand=True)
 
         demos = [
-            ("Linear Regression", "linear", "Learn how linear models predict continuous values"),
-            ("Classification", "classification", "Learn how to classify data into categories"),
-            ("Clustering", "clustering", "Learn how to find patterns and group similar data"),
+            (
+                "Linear Regression",
+                "linear",
+                "Learn how linear models predict continuous values",
+            ),
+            (
+                "Classification",
+                "classification",
+                "Learn how to classify data into categories",
+            ),
+            (
+                "Clustering",
+                "clustering",
+                "Learn how to find patterns and group similar data",
+            ),
         ]
 
         for i, (title, demo_type, desc) in enumerate(demos):
             frame = ttk.Frame(button_frame)
             frame.pack(fill=tk.X, padx=10, pady=5)
 
-            ttk.Button(frame, text=f"Run {title} Demo", command=lambda dt=demo_type: self.run_demo(dt)).pack(
-                side=tk.LEFT
-            )
+            ttk.Button(
+                frame,
+                text=f"Run {title} Demo",
+                command=lambda dt=demo_type: self.run_demo(dt),
+            ).pack(side=tk.LEFT)
             ttk.Label(frame, text=desc, foreground="gray").pack(side=tk.LEFT, padx=10)
 
         # Info text
@@ -169,14 +207,21 @@ Educational Features:
         ttk.Label(dialog, text="Model Type:").pack(pady=5)
         type_var = tk.StringVar(value="linear_regression")
         type_combo = ttk.Combobox(dialog, textvariable=type_var, width=30)
-        type_combo["values"] = ("linear_regression", "logistic_regression", "decision_tree", "kmeans")
+        type_combo["values"] = (
+            "linear_regression",
+            "logistic_regression",
+            "decision_tree",
+            "kmeans",
+        )
         type_combo.pack(pady=5)
 
         def do_load():
             name = name_entry.get().strip()
             model_type = type_var.get()
             if name and model_type:
-                if hasattr(self.ide, "interpreter") and hasattr(self.ide.interpreter, "aiml"):
+                if hasattr(self.ide, "interpreter") and hasattr(
+                    self.ide.interpreter, "aiml"
+                ):
                     if self.ide.interpreter.aiml.load_model(name, model_type):
                         self.refresh_models()
                         dialog.destroy()
@@ -185,7 +230,9 @@ Educational Features:
                 else:
                     messagebox.showerror("Error", "ML integration not available")
             else:
-                messagebox.showwarning("Warning", "Please enter model name and select type")
+                messagebox.showwarning(
+                    "Warning", "Please enter model name and select type"
+                )
 
         ttk.Button(dialog, text="Load", command=do_load).pack(pady=10)
 
@@ -238,7 +285,9 @@ Training History:
             for name, info in self.ide.interpreter.aiml.models.items():
                 status = "Ready" if info["trained"] else "Not Trained"
                 trained = "Yes" if info["trained"] else "No"
-                self.models_tree.insert("", tk.END, values=(name, info["type"], status, trained))
+                self.models_tree.insert(
+                    "", tk.END, values=(name, info["type"], status, trained)
+                )
 
     def create_sample_data(self):
         """Create sample dataset"""
@@ -261,7 +310,9 @@ Training History:
             name = name_entry.get().strip()
             data_type = type_var.get()
             if name and data_type:
-                if hasattr(self.ide, "interpreter") and hasattr(self.ide.interpreter, "aiml"):
+                if hasattr(self.ide, "interpreter") and hasattr(
+                    self.ide.interpreter, "aiml"
+                ):
                     if self.ide.interpreter.aiml.create_sample_data(name, data_type):
                         self.refresh_datasets()
                         dialog.destroy()
@@ -270,7 +321,9 @@ Training History:
                 else:
                     messagebox.showerror("Error", "ML integration not available")
             else:
-                messagebox.showwarning("Warning", "Please enter dataset name and select type")
+                messagebox.showwarning(
+                    "Warning", "Please enter dataset name and select type"
+                )
 
         ttk.Button(dialog, text="Create", command=do_create).pack(pady=10)
 
@@ -322,13 +375,21 @@ Sample Features: {str(dataset['X'][:3]) if 'X' in dataset else 'N/A'}
             for name, data in self.ide.interpreter.aiml.datasets.items():
                 data_type = data.get("type", "Unknown")
                 size = f"{data['X'].shape[0]}" if "X" in data else "Unknown"
-                features = f"{data['X'].shape[1]}" if "X" in data and len(data["X"].shape) > 1 else "1"
-                self.datasets_tree.insert("", tk.END, values=(name, data_type, size, features))
+                features = (
+                    f"{data['X'].shape[1]}"
+                    if "X" in data and len(data["X"].shape) > 1
+                    else "1"
+                )
+                self.datasets_tree.insert(
+                    "", tk.END, values=(name, data_type, size, features)
+                )
 
     def run_demo(self, demo_type):
         """Run ML demonstration"""
         try:
-            if hasattr(self.ide, "interpreter") and hasattr(self.ide.interpreter, "_run_ml_demo"):
+            if hasattr(self.ide, "interpreter") and hasattr(
+                self.ide.interpreter, "_run_ml_demo"
+            ):
                 self.ide.interpreter._run_ml_demo(demo_type)
                 self.refresh_models()
                 self.refresh_datasets()

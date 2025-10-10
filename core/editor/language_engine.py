@@ -83,7 +83,13 @@ class BaseLanguageEngine(ABC):
         # Strings
         if self.config.string_quotes:
             for quote in self.config.string_quotes:
-                pattern = re.escape(quote) + r"[^" + re.escape(quote) + r"]*" + re.escape(quote)
+                pattern = (
+                    re.escape(quote)
+                    + r"[^"
+                    + re.escape(quote)
+                    + r"]*"
+                    + re.escape(quote)
+                )
                 for match in re.finditer(pattern, text):
                     highlights.append(("string", match.start(), match.end()))
 
@@ -122,7 +128,9 @@ class PILOTEngine(BaseLanguageEngine):
 
         # Command completions
         if not current_line.strip() or current_line.strip()[-1] not in ":":
-            completions.extend(["T: ", "A: ", "J: ", "Y: ", "N: ", "U: ", "C: ", "R: ", "M: ", "E: "])
+            completions.extend(
+                ["T: ", "A: ", "J: ", "Y: ", "N: ", "U: ", "C: ", "R: ", "M: ", "E: "]
+            )
 
         # Variable completions
         if "#" in current_line:
@@ -153,7 +161,13 @@ class PILOTEngine(BaseLanguageEngine):
                     # Label definition - valid
                     continue
                 else:
-                    errors.append({"type": "error", "line": i + 1, "message": f"Invalid PILOT command: {line}"})
+                    errors.append(
+                        {
+                            "type": "error",
+                            "line": i + 1,
+                            "message": f"Invalid PILOT command: {line}",
+                        }
+                    )
 
         return errors
 
@@ -171,7 +185,10 @@ class PILOTEngine(BaseLanguageEngine):
             if stripped.startswith("*"):
                 # Label - no indentation
                 formatted.append(stripped)
-            elif any(stripped.startswith(cmd) for cmd in ["T:", "A:", "J:", "Y:", "N:", "U:", "C:", "R:", "M:", "E:"]):
+            elif any(
+                stripped.startswith(cmd)
+                for cmd in ["T:", "A:", "J:", "Y:", "N:", "U:", "C:", "R:", "M:", "E:"]
+            ):
                 # Command - standard format
                 formatted.append(stripped)
             else:
@@ -294,10 +311,18 @@ class BASICEngine(BaseLanguageEngine):
                 line = line[line_number_match.end() :].strip()
 
             # Check basic structure
-            if line and not any(line.upper().startswith(kw) for kw in self.config.keywords):
+            if line and not any(
+                line.upper().startswith(kw) for kw in self.config.keywords
+            ):
                 # Check if it's an assignment
                 if "=" not in line:
-                    errors.append({"type": "warning", "line": i + 1, "message": f"Unrecognized statement: {line}"})
+                    errors.append(
+                        {
+                            "type": "warning",
+                            "line": i + 1,
+                            "message": f"Unrecognized statement: {line}",
+                        }
+                    )
 
         return errors
 
@@ -384,7 +409,9 @@ class LogoEngine(BaseLanguageEngine):
         super().__init__(config)
 
         # Logo-specific patterns
-        self.procedure_pattern = re.compile(r"TO\s+([A-Za-z][A-Za-z0-9]*)", re.IGNORECASE)
+        self.procedure_pattern = re.compile(
+            r"TO\s+([A-Za-z][A-Za-z0-9]*)", re.IGNORECASE
+        )
         self.variable_pattern = re.compile(r":[A-Za-z][A-Za-z0-9]*")
 
     def get_completions(self, text: str, cursor_pos: int) -> List[str]:
@@ -398,7 +425,9 @@ class LogoEngine(BaseLanguageEngine):
         completions.extend(self.config.keywords)
 
         # Procedure completions
-        procedures = set(re.findall(r"TO\s+([A-Za-z][A-Za-z0-9]*)", text, re.IGNORECASE))
+        procedures = set(
+            re.findall(r"TO\s+([A-Za-z][A-Za-z0-9]*)", text, re.IGNORECASE)
+        )
         completions.extend(list(procedures))
 
         # Variable completions
@@ -423,13 +452,25 @@ class LogoEngine(BaseLanguageEngine):
                 procedure_stack.append(i + 1)
             elif line.upper() == "END":
                 if not procedure_stack:
-                    errors.append({"type": "error", "line": i + 1, "message": "END without matching TO"})
+                    errors.append(
+                        {
+                            "type": "error",
+                            "line": i + 1,
+                            "message": "END without matching TO",
+                        }
+                    )
                 else:
                     procedure_stack.pop()
 
         # Check for unmatched TOs
         for line_num in procedure_stack:
-            errors.append({"type": "error", "line": line_num, "message": "TO without matching END"})
+            errors.append(
+                {
+                    "type": "error",
+                    "line": line_num,
+                    "message": "TO without matching END",
+                }
+            )
 
         return errors
 
@@ -516,7 +557,22 @@ class PythonEngine(BaseLanguageEngine):
                 "False",
                 "None",
             ],
-            operators=["+", "-", "*", "/", "//", "%", "**", "=", "==", "!=", "<", ">", "<=", ">="],
+            operators=[
+                "+",
+                "-",
+                "*",
+                "/",
+                "//",
+                "%",
+                "**",
+                "=",
+                "==",
+                "!=",
+                "<",
+                ">",
+                "<=",
+                ">=",
+            ],
             delimiters=["(", ")", "[", "]", "{", "}", ",", ":", ";"],
             comment_markers=["#"],
             line_comment="#",
@@ -527,8 +583,12 @@ class PythonEngine(BaseLanguageEngine):
         super().__init__(config)
 
         # Python-specific patterns
-        self.function_pattern = re.compile(r"def\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE)
-        self.class_pattern = re.compile(r"class\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE)
+        self.function_pattern = re.compile(
+            r"def\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE
+        )
+        self.class_pattern = re.compile(
+            r"class\s+([A-Za-z_][A-Za-z0-9_]*)", re.IGNORECASE
+        )
 
     def get_completions(self, text: str, cursor_pos: int) -> List[str]:
         """Get Python-specific completions"""
@@ -601,8 +661,12 @@ class PythonEngine(BaseLanguageEngine):
         completions.extend(builtins)
 
         # Functions and classes defined in the text
-        functions = set(re.findall(r"def\s+([A-Za-z_][A-Za-z0-9_]*)", text, re.IGNORECASE))
-        classes = set(re.findall(r"class\s+([A-Za-z_][A-Za-z0-9_]*)", text, re.IGNORECASE))
+        functions = set(
+            re.findall(r"def\s+([A-Za-z_][A-Za-z0-9_]*)", text, re.IGNORECASE)
+        )
+        classes = set(
+            re.findall(r"class\s+([A-Za-z_][A-Za-z0-9_]*)", text, re.IGNORECASE)
+        )
         completions.extend(list(functions))
         completions.extend(list(classes))
 
@@ -615,9 +679,13 @@ class PythonEngine(BaseLanguageEngine):
         try:
             compile(text, "<string>", "exec")
         except SyntaxError as e:
-            errors.append({"type": "error", "line": e.lineno or 1, "message": str(e.msg)})
+            errors.append(
+                {"type": "error", "line": e.lineno or 1, "message": str(e.msg)}
+            )
         except Exception as e:
-            errors.append({"type": "error", "line": 1, "message": f"Python error: {str(e)}"})
+            errors.append(
+                {"type": "error", "line": 1, "message": f"Python error: {str(e)}"}
+            )
 
         return errors
 
@@ -660,7 +728,12 @@ class LanguageEngine:
     """Main language engine that manages all language-specific engines"""
 
     def __init__(self):
-        self.engines = {"pilot": PILOTEngine(), "basic": BASICEngine(), "logo": LogoEngine(), "python": PythonEngine()}
+        self.engines = {
+            "pilot": PILOTEngine(),
+            "basic": BASICEngine(),
+            "logo": LogoEngine(),
+            "python": PythonEngine(),
+        }
         self.current_language = "pilot"
 
     def set_language(self, language: str):

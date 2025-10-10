@@ -48,8 +48,12 @@ class GameRenderer:
         if self.debug_draw:
             # Draw velocity vector
             vel_scale = 2.0
-            vel_end_x = screen_x + obj.width / 2 + obj.velocity.x * vel_scale * self.zoom
-            vel_end_y = screen_y + obj.height / 2 + obj.velocity.y * vel_scale * self.zoom
+            vel_end_x = (
+                screen_x + obj.width / 2 + obj.velocity.x * vel_scale * self.zoom
+            )
+            vel_end_y = (
+                screen_y + obj.height / 2 + obj.velocity.y * vel_scale * self.zoom
+            )
 
             self.canvas.create_line(
                 screen_x + obj.width / 2,

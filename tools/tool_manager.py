@@ -86,7 +86,9 @@ class ToolManager(PluginManager):
 
         try:
             # Load the tool plugin module
-            spec = importlib.util.spec_from_file_location(f"tool_{tool_name}", plugin_file)
+            spec = importlib.util.spec_from_file_location(
+                f"tool_{tool_name}", plugin_file
+            )
             if spec is None or spec.loader is None:
                 print(f"Could not load tool plugin spec for {tool_name}")
                 return False
@@ -189,7 +191,11 @@ class ToolManager(PluginManager):
 
     def list_tools_by_category(self, category: str) -> List[str]:
         """List tools in a specific category"""
-        return [name for name, tool in self.loaded_tools.items() if tool.category == category]
+        return [
+            name
+            for name, tool in self.loaded_tools.items()
+            if tool.category == category
+        ]
 
     def is_tool_active(self, tool_name: str) -> bool:
         """Check if a tool is active"""
@@ -245,13 +251,19 @@ class ToolManagerDialog:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(header_frame, text="🛠️ TimeWarp Tool Manager", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+        ttk.Label(
+            header_frame, text="🛠️ TimeWarp Tool Manager", font=("Arial", 16, "bold")
+        ).pack(side=tk.LEFT)
 
         header_buttons = ttk.Frame(header_frame)
         header_buttons.pack(side=tk.RIGHT)
 
-        ttk.Button(header_buttons, text="🔄 Refresh", command=self.refresh_tools).pack(side=tk.LEFT, padx=2)
-        ttk.Button(header_buttons, text="⚡ Auto-Load All", command=self.auto_load_all_tools).pack(side=tk.LEFT, padx=2)
+        ttk.Button(header_buttons, text="🔄 Refresh", command=self.refresh_tools).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(
+            header_buttons, text="⚡ Auto-Load All", command=self.auto_load_all_tools
+        ).pack(side=tk.LEFT, padx=2)
 
         # Create notebook for different tool sections
         notebook = ttk.Notebook(main_frame)
@@ -286,16 +298,26 @@ class ToolManagerDialog:
 
         # Treeview for tools
         columns = ("Name", "Version", "Category", "Status", "Description")
-        self.tools_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
+        self.tools_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=15
+        )
 
-        column_widths = {"Name": 150, "Version": 80, "Category": 100, "Status": 80, "Description": 300}
+        column_widths = {
+            "Name": 150,
+            "Version": 80,
+            "Category": 100,
+            "Status": 80,
+            "Description": 300,
+        }
         for col in columns:
             self.tools_tree.heading(col, text=col)
             self.tools_tree.column(col, width=column_widths.get(col, 150))
 
         self.tools_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        tree_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.tools_tree.yview)
+        tree_scroll = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.tools_tree.yview
+        )
         self.tools_tree.config(yscrollcommand=tree_scroll.set)
         tree_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -303,8 +325,12 @@ class ToolManagerDialog:
         details_frame = ttk.LabelFrame(parent, text="Tool Details")
         details_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.details_text = tk.Text(details_frame, height=6, font=("Arial", 10), wrap=tk.WORD)
-        details_scroll = ttk.Scrollbar(details_frame, orient=tk.VERTICAL, command=self.details_text.yview)
+        self.details_text = tk.Text(
+            details_frame, height=6, font=("Arial", 10), wrap=tk.WORD
+        )
+        details_scroll = ttk.Scrollbar(
+            details_frame, orient=tk.VERTICAL, command=self.details_text.yview
+        )
         self.details_text.config(yscrollcommand=details_scroll.set)
         self.details_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         details_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
@@ -313,11 +339,21 @@ class ToolManagerDialog:
         button_frame = ttk.Frame(parent)
         button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_frame, text="🔧 Load Tool", command=self.load_tool).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="✅ Activate", command=self.activate_tool).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="❌ Deactivate", command=self.deactivate_tool).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="🚀 Show Tool", command=self.show_tool).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="🗑️ Unload", command=self.unload_tool).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="🔧 Load Tool", command=self.load_tool).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="✅ Activate", command=self.activate_tool).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(
+            button_frame, text="❌ Deactivate", command=self.deactivate_tool
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="🚀 Show Tool", command=self.show_tool).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="🗑️ Unload", command=self.unload_tool).pack(
+            side=tk.LEFT, padx=5
+        )
 
         # Bind selection event
         self.tools_tree.bind("<<TreeviewSelect>>", self.on_tool_select)
@@ -332,7 +368,9 @@ class ToolManagerDialog:
         self.category_listbox = tk.Listbox(cat_frame, font=("Arial", 11))
         self.category_listbox.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
 
-        cat_scroll = ttk.Scrollbar(cat_frame, orient=tk.VERTICAL, command=self.category_listbox.yview)
+        cat_scroll = ttk.Scrollbar(
+            cat_frame, orient=tk.VERTICAL, command=self.category_listbox.yview
+        )
         self.category_listbox.config(yscrollcommand=cat_scroll.set)
         cat_scroll.pack(side=tk.LEFT, fill=tk.Y, pady=5)
 
@@ -340,7 +378,9 @@ class ToolManagerDialog:
         tools_in_cat_frame = ttk.Frame(cat_frame)
         tools_in_cat_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        ttk.Label(tools_in_cat_frame, text="Tools in Category:", font=("Arial", 12, "bold")).pack(anchor="w")
+        ttk.Label(
+            tools_in_cat_frame, text="Tools in Category:", font=("Arial", 12, "bold")
+        ).pack(anchor="w")
 
         self.category_tools_tree = ttk.Treeview(
             tools_in_cat_frame, columns=("Name", "Status"), show="headings", height=12
@@ -358,10 +398,14 @@ class ToolManagerDialog:
 
     def setup_development_tab(self, parent):
         """Setup the development tab"""
-        ttk.Label(parent, text="Tool Development Guide", font=("Arial", 14, "bold")).pack(pady=10)
+        ttk.Label(
+            parent, text="Tool Development Guide", font=("Arial", 14, "bold")
+        ).pack(pady=10)
 
         guide_text = tk.Text(parent, height=25, font=("Arial", 10), wrap=tk.WORD)
-        guide_scroll = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=guide_text.yview)
+        guide_scroll = ttk.Scrollbar(
+            parent, orient=tk.VERTICAL, command=guide_text.yview
+        )
         guide_text.config(yscrollcommand=guide_scroll.set)
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
@@ -477,7 +521,9 @@ TimeWarpPlugin = MyToolPlugin
             info = self.tool_manager.get_tool_info(tool_name)
             if info:
                 is_loaded = self.tool_manager.is_tool_loaded(tool_name)
-                is_active = self.tool_manager.is_tool_active(tool_name) if is_loaded else False
+                is_active = (
+                    self.tool_manager.is_tool_active(tool_name) if is_loaded else False
+                )
 
                 if is_active:
                     status = "Active"
@@ -553,7 +599,9 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
                 tool = self.tool_manager.loaded_tools.get(tool_name)
                 if tool:
                     status = "Active" if tool.is_active() else "Loaded"
-                    self.category_tools_tree.insert("", "end", values=(tool.name, status))
+                    self.category_tools_tree.insert(
+                        "", "end", values=(tool.name, status)
+                    )
 
     def load_tool(self):
         """Load selected tool"""
@@ -567,10 +615,15 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
                 info = self.tool_manager.get_tool_info(tool_name)
                 if info and info.get("name") == tool_display_name:
                     if self.tool_manager.load_tool(tool_name):
-                        messagebox.showinfo("Tool Loaded", f"Tool '{tool_display_name}' loaded successfully")
+                        messagebox.showinfo(
+                            "Tool Loaded",
+                            f"Tool '{tool_display_name}' loaded successfully",
+                        )
                         self.refresh_tools()
                     else:
-                        messagebox.showerror("Error", f"Failed to load tool '{tool_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to load tool '{tool_display_name}'"
+                        )
                     break
 
     def activate_tool(self):
@@ -585,10 +638,15 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
                 info = self.tool_manager.get_tool_info(tool_name)
                 if info and info.get("name") == tool_display_name:
                     if self.tool_manager.activate_tool(tool_name):
-                        messagebox.showinfo("Tool Activated", f"Tool '{tool_display_name}' activated successfully")
+                        messagebox.showinfo(
+                            "Tool Activated",
+                            f"Tool '{tool_display_name}' activated successfully",
+                        )
                         self.refresh_tools()
                     else:
-                        messagebox.showerror("Error", f"Failed to activate tool '{tool_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to activate tool '{tool_display_name}'"
+                        )
                     break
 
     def deactivate_tool(self):
@@ -603,10 +661,15 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
                 info = self.tool_manager.get_tool_info(tool_name)
                 if info and info.get("name") == tool_display_name:
                     if self.tool_manager.deactivate_tool(tool_name):
-                        messagebox.showinfo("Tool Deactivated", f"Tool '{tool_display_name}' deactivated successfully")
+                        messagebox.showinfo(
+                            "Tool Deactivated",
+                            f"Tool '{tool_display_name}' deactivated successfully",
+                        )
                         self.refresh_tools()
                     else:
-                        messagebox.showerror("Error", f"Failed to deactivate tool '{tool_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to deactivate tool '{tool_display_name}'"
+                        )
                     break
 
     def show_tool(self):
@@ -623,7 +686,9 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
                     if self.tool_manager.show_tool(tool_name):
                         self.close()  # Close tool manager when showing tool
                     else:
-                        messagebox.showerror("Error", f"Failed to show tool '{tool_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to show tool '{tool_display_name}'"
+                        )
                     break
 
     def unload_tool(self):
@@ -633,16 +698,23 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
             item = self.tools_tree.item(selection[0])
             tool_display_name = item["values"][0]
 
-            if messagebox.askyesno("Unload Tool", f"Are you sure you want to unload '{tool_display_name}'?"):
+            if messagebox.askyesno(
+                "Unload Tool", f"Are you sure you want to unload '{tool_display_name}'?"
+            ):
                 # Find actual tool name
                 for tool_name in self.tool_manager.list_available_tools():
                     info = self.tool_manager.get_tool_info(tool_name)
                     if info and info.get("name") == tool_display_name:
                         if self.tool_manager.unload_tool(tool_name):
-                            messagebox.showinfo("Tool Unloaded", f"Tool '{tool_display_name}' unloaded successfully")
+                            messagebox.showinfo(
+                                "Tool Unloaded",
+                                f"Tool '{tool_display_name}' unloaded successfully",
+                            )
                             self.refresh_tools()
                         else:
-                            messagebox.showerror("Error", f"Failed to unload tool '{tool_display_name}'")
+                            messagebox.showerror(
+                                "Error", f"Failed to unload tool '{tool_display_name}'"
+                            )
                         break
 
     def auto_load_all_tools(self):
@@ -650,7 +722,9 @@ Dependencies: {', '.join(info.get('dependencies', []))}"""
         if messagebox.askyesno("Auto-Load Tools", "Load all available tools?"):
             self.tool_manager.auto_load_tools()
             self.refresh_tools()
-            messagebox.showinfo("Auto-Load Complete", "All available tools have been loaded")
+            messagebox.showinfo(
+                "Auto-Load Complete", "All available tools have been loaded"
+            )
 
     def close(self):
         """Close the dialog"""

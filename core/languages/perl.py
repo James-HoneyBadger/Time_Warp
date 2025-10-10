@@ -29,7 +29,9 @@ class PerlExecutor:
         for perl_name in perl_names:
             try:
                 # Check if perl is available
-                result = subprocess.run([perl_name, "--version"], capture_output=True, text=True, timeout=5)
+                result = subprocess.run(
+                    [perl_name, "--version"], capture_output=True, text=True, timeout=5
+                )
                 if result.returncode == 0:
                     return perl_name
             except (subprocess.TimeoutExpired, FileNotFoundError):
@@ -61,12 +63,19 @@ class PerlExecutor:
 
         try:
             # Create temporary file for the Perl script
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".pl", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".pl", delete=False
+            ) as temp_file:
                 temp_file.write(script_text)
                 temp_file_path = temp_file.name
 
             # Execute the Perl script
-            result = subprocess.run([self.perl_executable, temp_file_path], capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                [self.perl_executable, temp_file_path],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
             # Clean up temporary file
             os.unlink(temp_file_path)
@@ -80,7 +89,9 @@ class PerlExecutor:
                 return "error"
 
             if result.returncode != 0:
-                self.interpreter.log_output(f"Perl script exited with code {result.returncode}")
+                self.interpreter.log_output(
+                    f"Perl script exited with code {result.returncode}"
+                )
                 return "error"
 
             return "continue"
@@ -103,7 +114,12 @@ class PerlExecutor:
                 self.interpreter.log_output(f"❌ Perl file not found: {filepath}")
                 return False
 
-            result = subprocess.run([self.perl_executable, filepath], capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                [self.perl_executable, filepath],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
 
             if result.stdout:
                 self.interpreter.log_output(result.stdout)
@@ -124,7 +140,12 @@ class PerlExecutor:
             return "Perl not available"
 
         try:
-            result = subprocess.run([self.perl_executable, "--version"], capture_output=True, text=True, timeout=5)
+            result = subprocess.run(
+                [self.perl_executable, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
             if result.returncode == 0:
                 # Extract version from output
                 lines = result.stdout.split("\n")

@@ -7,15 +7,22 @@ from setuptools import setup, find_packages
 import os
 import re
 
+
 # Read the README file
 def read_readme():
-    with open(os.path.join(os.path.dirname(__file__), 'README.md'), encoding='utf-8') as f:
+    with open(
+        os.path.join(os.path.dirname(__file__), "README.md"), encoding="utf-8"
+    ) as f:
         return f.read()
+
 
 # Read requirements
 def read_requirements():
-    with open(os.path.join(os.path.dirname(__file__), 'requirements.txt'), encoding='utf-8') as f:
-        return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+    with open(
+        os.path.join(os.path.dirname(__file__), "requirements.txt"), encoding="utf-8"
+    ) as f:
+        return [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
 
 # Get version from a version file or set manually
 __version__ = "1.0.0"
@@ -51,7 +58,7 @@ setup(
         "Natural Language :: English",
     ],
     keywords="education programming ide pilot basic logo python javascript educational",
-    packages=find_packages(exclude=['tests', 'test_*', 'docs', 'examples']),
+    packages=find_packages(exclude=["tests", "test_*", "docs", "examples"]),
     include_package_data=True,
     python_requires=">=3.9",
     install_requires=read_requirements(),
@@ -74,9 +81,13 @@ setup(
             "timewarp-ide=timewarp_ide.main:main",
         ],
     },
-    data_files=[
-        ('share/applications', ['data/timewarp-ide.desktop']),
-        ('share/pixmaps', ['data/timewarp-ide.png']),
-    ] if os.path.exists('data') else [],
+    data_files=(
+        [
+            ("share/applications", ["data/timewarp-ide.desktop"]),
+            ("share/pixmaps", ["data/timewarp-ide.png"]),
+        ]
+        if os.path.exists("data")
+        else []
+    ),
     zip_safe=False,
 )

@@ -22,11 +22,15 @@ class BreakpointManager:
 
     def __init__(self):
         self.breakpoints: Dict[str, List[int]] = {}  # file -> list of line numbers
-        self.conditional_breakpoints: Dict[str, Dict[int, str]] = {}  # file -> {line: condition}
+        self.conditional_breakpoints: Dict[str, Dict[int, str]] = (
+            {}
+        )  # file -> {line: condition}
         self.hit_counts: Dict[str, Dict[int, int]] = {}  # file -> {line: count}
         self.enabled: Dict[str, Dict[int, bool]] = {}  # file -> {line: enabled}
 
-    def add_breakpoint(self, filename: str, line_number: int, condition: Optional[str] = None) -> bool:
+    def add_breakpoint(
+        self, filename: str, line_number: int, condition: Optional[str] = None
+    ) -> bool:
         """Add a breakpoint at the specified location"""
         if filename not in self.breakpoints:
             self.breakpoints[filename] = []
@@ -62,13 +66,20 @@ class BreakpointManager:
     def toggle_breakpoint(self, filename: str, line_number: int) -> bool:
         """Toggle breakpoint enabled/disabled state"""
         if filename in self.enabled and line_number in self.enabled[filename]:
-            self.enabled[filename][line_number] = not self.enabled[filename][line_number]
+            self.enabled[filename][line_number] = not self.enabled[filename][
+                line_number
+            ]
             return self.enabled[filename][line_number]
         return False
 
-    def is_breakpoint_hit(self, filename: str, line_number: int, local_vars: Optional[Dict] = None) -> bool:
+    def is_breakpoint_hit(
+        self, filename: str, line_number: int, local_vars: Optional[Dict] = None
+    ) -> bool:
         """Check if breakpoint should be hit"""
-        if filename not in self.breakpoints or line_number not in self.breakpoints[filename]:
+        if (
+            filename not in self.breakpoints
+            or line_number not in self.breakpoints[filename]
+        ):
             return False
 
         if not self.enabled[filename].get(line_number, False):
@@ -127,7 +138,9 @@ class VariableInspector:
         self.locals_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.locals_frame, text="Locals")
 
-        self.locals_tree = ttk.Treeview(self.locals_frame, columns=("type", "value"), show="tree headings")
+        self.locals_tree = ttk.Treeview(
+            self.locals_frame, columns=("type", "value"), show="tree headings"
+        )
         self.locals_tree.heading("#0", text="Name")
         self.locals_tree.heading("type", text="Type")
         self.locals_tree.heading("value", text="Value")
@@ -137,7 +150,9 @@ class VariableInspector:
         self.globals_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.globals_frame, text="Globals")
 
-        self.globals_tree = ttk.Treeview(self.globals_frame, columns=("type", "value"), show="tree headings")
+        self.globals_tree = ttk.Treeview(
+            self.globals_frame, columns=("type", "value"), show="tree headings"
+        )
         self.globals_tree.heading("#0", text="Name")
         self.globals_tree.heading("type", text="Type")
         self.globals_tree.heading("value", text="Value")
@@ -154,9 +169,13 @@ class VariableInspector:
         self.watch_entry = ttk.Entry(watch_entry_frame)
         self.watch_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
-        ttk.Button(watch_entry_frame, text="Add", command=self.add_watch_expression).pack(side=tk.RIGHT, padx=(5, 0))
+        ttk.Button(
+            watch_entry_frame, text="Add", command=self.add_watch_expression
+        ).pack(side=tk.RIGHT, padx=(5, 0))
 
-        self.watch_tree = ttk.Treeview(self.watch_frame, columns=("expression", "value"), show="tree headings")
+        self.watch_tree = ttk.Treeview(
+            self.watch_frame, columns=("expression", "value"), show="tree headings"
+        )
         self.watch_tree.heading("#0", text="#")
         self.watch_tree.heading("expression", text="Expression")
         self.watch_tree.heading("value", text="Value")
@@ -204,7 +223,10 @@ class VariableInspector:
             if isinstance(value, dict):
                 for k, v in list(value.items())[:10]:  # Limit to first 10 items
                     child_item = tree.insert(
-                        parent_item, "end", text=str(k), values=(type(v).__name__, self._format_value(v))
+                        parent_item,
+                        "end",
+                        text=str(k),
+                        values=(type(v).__name__, self._format_value(v)),
                     )
                     if isinstance(v, (dict, list, tuple)):
                         self._add_expandable_item(tree, child_item, v)
@@ -212,7 +234,10 @@ class VariableInspector:
             elif isinstance(value, (list, tuple)):
                 for i, v in enumerate(list(value)[:10]):  # Limit to first 10 items
                     child_item = tree.insert(
-                        parent_item, "end", text=f"[{i}]", values=(type(v).__name__, self._format_value(v))
+                        parent_item,
+                        "end",
+                        text=f"[{i}]",
+                        values=(type(v).__name__, self._format_value(v)),
                     )
                     if isinstance(v, (dict, list, tuple)):
                         self._add_expandable_item(tree, child_item, v)
@@ -241,7 +266,9 @@ class VariableInspector:
             except Exception as e:
                 value_str = f"Error: {str(e)}"
 
-            self.watch_tree.insert("", "end", text=str(i + 1), values=(expression, value_str))
+            self.watch_tree.insert(
+                "", "end", text=str(i + 1), values=(expression, value_str)
+            )
 
 
 class CallStackVisualizer:
@@ -257,7 +284,9 @@ class CallStackVisualizer:
         self.frame = ttk.LabelFrame(self.parent, text="Call Stack")
         self.frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        self.tree = ttk.Treeview(self.frame, columns=("function", "file", "line"), show="tree headings")
+        self.tree = ttk.Treeview(
+            self.frame, columns=("function", "file", "line"), show="tree headings"
+        )
         self.tree.heading("#0", text="#")
         self.tree.heading("function", text="Function")
         self.tree.heading("file", text="File")
@@ -266,7 +295,9 @@ class CallStackVisualizer:
         self.tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Scrollbar
-        scrollbar = ttk.Scrollbar(self.frame, orient=tk.VERTICAL, command=self.tree.yview)
+        scrollbar = ttk.Scrollbar(
+            self.frame, orient=tk.VERTICAL, command=self.tree.yview
+        )
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
@@ -297,7 +328,12 @@ class CallStackVisualizer:
             )
 
             # Add to tree
-            self.tree.insert("", "end", text=str(level), values=(function_name, filename.split("/")[-1], line_number))
+            self.tree.insert(
+                "",
+                "end",
+                text=str(level),
+                values=(function_name, filename.split("/")[-1], line_number),
+            )
 
             current_frame = current_frame.f_back
             level += 1
@@ -342,11 +378,21 @@ class VisualDebugger:
         button_frame = ttk.Frame(controls_frame)
         button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_frame, text="▶ Continue", command=self.continue_execution).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="⏭ Step Over", command=self.step_over).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="⏬ Step Into", command=self.step_into).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="⏫ Step Out", command=self.step_out).pack(side=tk.LEFT, padx=2)
-        ttk.Button(button_frame, text="⏹ Stop", command=self.stop_debugging).pack(side=tk.LEFT, padx=2)
+        ttk.Button(
+            button_frame, text="▶ Continue", command=self.continue_execution
+        ).pack(side=tk.LEFT, padx=2)
+        ttk.Button(button_frame, text="⏭ Step Over", command=self.step_over).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="⏬ Step Into", command=self.step_into).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="⏫ Step Out", command=self.step_out).pack(
+            side=tk.LEFT, padx=2
+        )
+        ttk.Button(button_frame, text="⏹ Stop", command=self.stop_debugging).pack(
+            side=tk.LEFT, padx=2
+        )
 
         # Call stack frame
         self.stack_frame = ttk.Frame(left_panel)
@@ -362,7 +408,9 @@ class VisualDebugger:
             return False
 
         self.is_debugging = True
-        self.debug_thread = threading.Thread(target=self._debug_worker, args=(code, filename))
+        self.debug_thread = threading.Thread(
+            target=self._debug_worker, args=(code, filename)
+        )
         self.debug_thread.daemon = True
         self.debug_thread.start()
         return True
@@ -448,7 +496,9 @@ class TimeWarpDebugger(pdb.Pdb):
         line_number = frame.f_lineno
 
         # Check for breakpoint
-        if self.visual_debugger.breakpoint_manager.is_breakpoint_hit(filename, line_number, frame.f_locals):
+        if self.visual_debugger.breakpoint_manager.is_breakpoint_hit(
+            filename, line_number, frame.f_locals
+        ):
             self.visual_debugger.update_debug_display(frame, "line", None)
             self._wait_for_command()
 

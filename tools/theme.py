@@ -46,7 +46,12 @@ def load_config():
             "word_wrap": False,
             "tab_size": 4,
         },
-        "window_settings": {"width": 1200, "height": 800, "maximized": False, "remember_size": True},
+        "window_settings": {
+            "width": 1200,
+            "height": 800,
+            "maximized": False,
+            "remember_size": True,
+        },
         "advanced_features": {
             "code_completion": True,
             "real_time_syntax_check": True,
@@ -382,15 +387,26 @@ class ThemeManager:
 
             style.map(
                 "Modern.TButton",
-                background=[("active", colors["button_hover"]), ("pressed", colors["accent_secondary"])],
+                background=[
+                    ("active", colors["button_hover"]),
+                    ("pressed", colors["accent_secondary"]),
+                ],
             )
 
             # Configure modern frame style
-            style.configure("Modern.TFrame", background=colors["bg_secondary"], relief="flat", borderwidth=1)
+            style.configure(
+                "Modern.TFrame",
+                background=colors["bg_secondary"],
+                relief="flat",
+                borderwidth=1,
+            )
 
             # Configure modern notebook (tab) style
             style.configure(
-                "Modern.TNotebook", background=colors["bg_secondary"], borderwidth=0, tabmargins=[2, 5, 2, 0]
+                "Modern.TNotebook",
+                background=colors["bg_secondary"],
+                borderwidth=0,
+                tabmargins=[2, 5, 2, 0],
             )
 
             style.configure(
@@ -403,12 +419,19 @@ class ThemeManager:
 
             style.map(
                 "Modern.TNotebook.Tab",
-                background=[("selected", colors["accent"]), ("active", colors["accent_secondary"])],
+                background=[
+                    ("selected", colors["accent"]),
+                    ("active", colors["accent_secondary"]),
+                ],
                 foreground=[("selected", "white"), ("active", "white")],
             )
 
             # Configure modern label style
-            style.configure("Modern.TLabel", background=colors["bg_secondary"], foreground=colors["text_primary"])
+            style.configure(
+                "Modern.TLabel",
+                background=colors["bg_secondary"],
+                foreground=colors["text_primary"],
+            )
 
             # Configure modern entry style
             style.configure(

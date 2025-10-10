@@ -28,7 +28,12 @@ class BasePlugin:
         pass
 
     def get_info(self):
-        return {"name": self.name, "version": self.version, "author": self.author, "description": self.description}
+        return {
+            "name": self.name,
+            "version": self.version,
+            "author": self.author,
+            "description": self.description,
+        }
 
 
 class TimeWarpPlugin(BasePlugin):
@@ -39,7 +44,9 @@ class TimeWarpPlugin(BasePlugin):
         self.name = "Sample Plugin"
         self.version = "1.0.0"
         self.author = "TimeWarp Developer"
-        self.description = "A sample plugin demonstrating TimeWarp plugin system capabilities"
+        self.description = (
+            "A sample plugin demonstrating TimeWarp plugin system capabilities"
+        )
         self.menu_items = []
 
     def activate(self):
@@ -72,7 +79,9 @@ class TimeWarpPlugin(BasePlugin):
                 for i in range(self.ide.menubar.index("end") + 1):
                     try:
                         if self.ide.menubar.entryconfig(i, "label")[4][1] == "Tools":
-                            tools_menu = self.ide.menubar.nametowidget(self.ide.menubar.entryconfig(i, "menu")[4][1])
+                            tools_menu = self.ide.menubar.nametowidget(
+                                self.ide.menubar.entryconfig(i, "menu")[4][1]
+                            )
                             break
                     except:
                         continue
@@ -82,11 +91,21 @@ class TimeWarpPlugin(BasePlugin):
                     tools_menu.add_separator()
 
                     # Add plugin menu items
-                    tools_menu.add_command(label="🔧 Sample Action", command=self.sample_action)
-                    tools_menu.add_command(label="📝 Insert Template", command=self.insert_template)
-                    tools_menu.add_command(label="ℹ️ Plugin Info", command=self.show_plugin_info)
+                    tools_menu.add_command(
+                        label="🔧 Sample Action", command=self.sample_action
+                    )
+                    tools_menu.add_command(
+                        label="📝 Insert Template", command=self.insert_template
+                    )
+                    tools_menu.add_command(
+                        label="ℹ️ Plugin Info", command=self.show_plugin_info
+                    )
 
-                    self.menu_items = ["🔧 Sample Action", "📝 Insert Template", "ℹ️ Plugin Info"]
+                    self.menu_items = [
+                        "🔧 Sample Action",
+                        "📝 Insert Template",
+                        "ℹ️ Plugin Info",
+                    ]
 
         except Exception as e:
             print(f"Error adding menu items: {e}")
@@ -100,7 +119,9 @@ class TimeWarpPlugin(BasePlugin):
                 for i in range(self.ide.menubar.index("end") + 1):
                     try:
                         if self.ide.menubar.entryconfig(i, "label")[4][1] == "Tools":
-                            tools_menu = self.ide.menubar.nametowidget(self.ide.menubar.entryconfig(i, "menu")[4][1])
+                            tools_menu = self.ide.menubar.nametowidget(
+                                self.ide.menubar.entryconfig(i, "menu")[4][1]
+                            )
                             break
                     except:
                         continue
@@ -141,9 +162,13 @@ E:
             if hasattr(self.ide, "editor"):
                 # Insert template at cursor position
                 self.ide.editor.insert(tk.INSERT, template)
-                messagebox.showinfo("Template Inserted", "PILOT program template has been inserted!")
+                messagebox.showinfo(
+                    "Template Inserted", "PILOT program template has been inserted!"
+                )
             else:
-                messagebox.showwarning("No Editor", "No editor found to insert template")
+                messagebox.showwarning(
+                    "No Editor", "No editor found to insert template"
+                )
         except Exception as e:
             messagebox.showerror("Error", f"Could not insert template: {e}")
 

@@ -14,6 +14,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+
 def main():
     """Main entry point for the compiler CLI"""
     parser = argparse.ArgumentParser(
@@ -29,29 +30,25 @@ Supported languages:
   .bas    - BASIC programming language
   .logo   - Logo turtle graphics
   .pilot  - PILOT educational language
-        """
+        """,
     )
 
     parser.add_argument(
-        'input_file',
-        help='Source file to compile (.bas, .logo, .pilot)'
+        "input_file", help="Source file to compile (.bas, .logo, .pilot)"
     )
 
     parser.add_argument(
-        '-o', '--output',
-        help='Output executable name (default: same as input file)'
+        "-o", "--output", help="Output executable name (default: same as input file)"
     )
 
     parser.add_argument(
-        '--list-languages',
-        action='store_true',
-        help='List supported languages and exit'
+        "--list-languages",
+        action="store_true",
+        help="List supported languages and exit",
     )
 
     parser.add_argument(
-        '--version',
-        action='version',
-        version='TimeWarp Compiler 1.0.0'
+        "--version", action="version", version="TimeWarp Compiler 1.0.0"
     )
 
     args = parser.parse_args()
@@ -76,14 +73,17 @@ Supported languages:
 
     # Determine language from file extension
     ext = input_path.suffix.lower()
-    if ext == '.bas':
+    if ext == ".bas":
         from compilers.basic_compiler import BasicCompiler
+
         compiler = BasicCompiler()
-    elif ext == '.logo':
+    elif ext == ".logo":
         from compilers.logo_compiler import LogoCompiler
+
         compiler = LogoCompiler()
-    elif ext == '.pilot':
+    elif ext == ".pilot":
         from compilers.pilot_compiler import PilotCompiler
+
         compiler = PilotCompiler()
     else:
         print(f"Error: Unsupported file extension '{ext}'")
@@ -92,7 +92,7 @@ Supported languages:
 
     try:
         # Read source file
-        with open(input_path, 'r', encoding='utf-8') as f:
+        with open(input_path, "r", encoding="utf-8") as f:
             source = f.read()
 
         # Compile to executable
@@ -112,6 +112,7 @@ Supported languages:
     except (ImportError, FileNotFoundError, OSError) as e:
         print(f"❌ Compilation failed with error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

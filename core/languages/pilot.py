@@ -191,10 +191,14 @@ class PilotExecutor:
                             f"⚠️ Label '{label}' not found. Labels dict: {self.interpreter.labels}"
                         )
                 else:
-                    self.interpreter.debug_output(f"🚫 Condition '{condition}' is FALSE, continuing")
+                    self.interpreter.debug_output(
+                        f"🚫 Condition '{condition}' is FALSE, continuing"
+                    )
                 return "continue"
             except Exception as e:
-                self.interpreter.debug_output(f"❌ Error evaluating condition '{condition}': {e}")
+                self.interpreter.debug_output(
+                    f"❌ Error evaluating condition '{condition}': {e}"
+                )
                 return "continue"
 
         # If not conditional, treat as unconditional jump
@@ -281,13 +285,19 @@ class PilotExecutor:
                 try:
                     value = self.interpreter.evaluate_expression(expr)
                     # Remove quotes if the result is a quoted string
-                    if isinstance(value, str) and value.startswith('"') and value.endswith('"'):
+                    if (
+                        isinstance(value, str)
+                        and value.startswith('"')
+                        and value.endswith('"')
+                    ):
                         value = value[1:-1]
                     self.interpreter.variables[var_name] = value
                 except Exception as e:
                     # If evaluation fails, just store the raw text
                     self.interpreter.variables[var_name] = expr
-                    self.interpreter.debug_output(f"Error in assignment {assignment}: {e}")
+                    self.interpreter.debug_output(
+                        f"Error in assignment {assignment}: {e}"
+                    )
         return "continue"
 
     def _handle_runtime_command(self, command):
@@ -452,7 +462,10 @@ class PilotExecutor:
                 query = parts[1].strip('"')
                 query = self.interpreter.interpolate_text(query)
 
-                if hasattr(self.interpreter, "db_connections") and "current" in self.interpreter.db_connections:
+                if (
+                    hasattr(self.interpreter, "db_connections")
+                    and "current" in self.interpreter.db_connections
+                ):
                     try:
                         conn = self.interpreter.db_connections["current"]
                         cursor = conn.cursor()
@@ -478,7 +491,10 @@ class PilotExecutor:
 
                     query = f"INSERT INTO {table} ({columns}) VALUES ({values})"
 
-                    if hasattr(self.interpreter, "db_connections") and "current" in self.interpreter.db_connections:
+                    if (
+                        hasattr(self.interpreter, "db_connections")
+                        and "current" in self.interpreter.db_connections
+                    ):
                         try:
                             conn = self.interpreter.db_connections["current"]
                             cursor = conn.cursor()

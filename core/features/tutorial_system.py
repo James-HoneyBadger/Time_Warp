@@ -87,7 +87,9 @@ class TutorialSystem:
         self.output_callback: Optional[Callable[[str], None]] = None
         self.status_callback: Optional[Callable[[str], None]] = None
 
-    def set_callbacks(self, code_editor_cb: Callable, output_cb: Callable, status_cb: Callable):
+    def set_callbacks(
+        self, code_editor_cb: Callable, output_cb: Callable, status_cb: Callable
+    ):
         """Set callback functions for IDE integration"""
         self.code_editor_callback = code_editor_cb
         self.output_callback = output_cb
@@ -325,7 +327,9 @@ Your task: Print a welcome message and use a variable for your name.""",
 
     def get_tutorials_by_language(self, language: str) -> List[Tutorial]:
         """Get tutorials for a specific language"""
-        return [t for t in self.tutorials.values() if t.language.lower() == language.lower()]
+        return [
+            t for t in self.tutorials.values() if t.language.lower() == language.lower()
+        ]
 
     def start_tutorial(self, tutorial_id: str) -> bool:
         """Start a specific tutorial"""
@@ -416,8 +420,12 @@ Your task: Print a welcome message and use a variable for your name.""",
             # Convert tutorial progress to serializable format
             progress_data = {
                 "tutorials": {},
-                "current_tutorial": (self.current_tutorial.tutorial_id if self.current_tutorial else None),
-                "current_step": (self.current_step.step_id if self.current_step else None),
+                "current_tutorial": (
+                    self.current_tutorial.tutorial_id if self.current_tutorial else None
+                ),
+                "current_step": (
+                    self.current_step.step_id if self.current_step else None
+                ),
             }
 
             for tutorial_id, tutorial in self.tutorials.items():
@@ -453,5 +461,7 @@ Your task: Print a welcome message and use a variable for your name.""",
             "completed_tutorials": completed_tutorials,
             "total_steps": total_steps,
             "completed_steps": completed_steps,
-            "overall_progress": ((completed_steps / total_steps * 100) if total_steps > 0 else 0),
+            "overall_progress": (
+                (completed_steps / total_steps * 100) if total_steps > 0 else 0
+            ),
         }

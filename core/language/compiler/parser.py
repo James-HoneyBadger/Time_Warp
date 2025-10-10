@@ -50,7 +50,9 @@ class ASTNodeType(Enum):
 class ASTNode(ABC):
     """Base AST node"""
 
-    def __init__(self, node_type: ASTNodeType, location: Optional[SourceLocation] = None):
+    def __init__(
+        self, node_type: ASTNodeType, location: Optional[SourceLocation] = None
+    ):
         self.node_type = node_type
         self.location = location
         self.children: List["ASTNode"] = []
@@ -108,7 +110,13 @@ class BinaryOpNode(ASTNode):
     left: ASTNode
     right: ASTNode
 
-    def __init__(self, operator: str, left: ASTNode, right: ASTNode, location: Optional[SourceLocation] = None):
+    def __init__(
+        self,
+        operator: str,
+        left: ASTNode,
+        right: ASTNode,
+        location: Optional[SourceLocation] = None,
+    ):
         super().__init__(ASTNodeType.BINARY_OP, location)
         self.operator = operator
         self.left = left
@@ -127,7 +135,9 @@ class UnaryOpNode(ASTNode):
     operator: str
     operand: ASTNode
 
-    def __init__(self, operator: str, operand: ASTNode, location: Optional[SourceLocation] = None):
+    def __init__(
+        self, operator: str, operand: ASTNode, location: Optional[SourceLocation] = None
+    ):
         super().__init__(ASTNodeType.UNARY_OP, location)
         self.operator = operator
         self.operand = operand
@@ -144,7 +154,12 @@ class FunctionCallNode(ASTNode):
     name: str
     arguments: List[ASTNode]
 
-    def __init__(self, name: str, arguments: List[ASTNode], location: Optional[SourceLocation] = None):
+    def __init__(
+        self,
+        name: str,
+        arguments: List[ASTNode],
+        location: Optional[SourceLocation] = None,
+    ):
         super().__init__(ASTNodeType.FUNCTION_CALL, location)
         self.name = name
         self.arguments = arguments
@@ -162,7 +177,9 @@ class AssignmentNode(ASTNode):
     target: str
     value: ASTNode
 
-    def __init__(self, target: str, value: ASTNode, location: Optional[SourceLocation] = None):
+    def __init__(
+        self, target: str, value: ASTNode, location: Optional[SourceLocation] = None
+    ):
         super().__init__(ASTNodeType.ASSIGNMENT, location)
         self.target = target
         self.value = value
@@ -178,7 +195,9 @@ class ProgramNode(ASTNode):
 
     statements: List[ASTNode]
 
-    def __init__(self, statements: List[ASTNode], location: Optional[SourceLocation] = None):
+    def __init__(
+        self, statements: List[ASTNode], location: Optional[SourceLocation] = None
+    ):
         super().__init__(ASTNodeType.PROGRAM, location)
         self.statements = statements
         for stmt in statements:
@@ -218,7 +237,9 @@ class ParserState:
         current = self.current_token()
         return current is not None and current.type in token_types
 
-    def consume(self, token_type: TokenType, error_message: str = "") -> Optional[Token]:
+    def consume(
+        self, token_type: TokenType, error_message: str = ""
+    ) -> Optional[Token]:
         """Consume expected token or report error"""
         current = self.current_token()
         if current and current.type == token_type:
@@ -229,7 +250,10 @@ class ParserState:
 
         location = current.location if current else SourceLocation(0, 0)
         self.error_manager.add_error(
-            ErrorCode.UNEXPECTED_TOKEN, error_message, location, suggestions=[f"Add {token_type.name.lower()} token"]
+            ErrorCode.UNEXPECTED_TOKEN,
+            error_message,
+            location,
+            suggestions=[f"Add {token_type.name.lower()} token"],
         )
         return None
 
@@ -258,7 +282,9 @@ class EnhancedParser:
         except Exception as e:
             # Add error for unexpected parser failure
             self.state.error_manager.add_error(
-                ErrorCode.INVALID_SYNTAX, f"Parser error: {e}", SourceLocation(0, 0, filename)
+                ErrorCode.INVALID_SYNTAX,
+                f"Parser error: {e}",
+                SourceLocation(0, 0, filename),
             )
             return None
 
@@ -309,7 +335,9 @@ class EnhancedParser:
         if self.state is None:
             return None
 
-        identifier_token = self.state.consume(TokenType.IDENTIFIER, "Expected variable name")
+        identifier_token = self.state.consume(
+            TokenType.IDENTIFIER, "Expected variable name"
+        )
         if not identifier_token:
             return None
 
@@ -346,7 +374,9 @@ class EnhancedParser:
             right = self._parse_logical_and()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -361,7 +391,9 @@ class EnhancedParser:
             right = self._parse_equality()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -376,7 +408,9 @@ class EnhancedParser:
             right = self._parse_comparison()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -387,13 +421,18 @@ class EnhancedParser:
             return None
 
         while self.state and self.state.match(
-            TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL
+            TokenType.LESS_THAN,
+            TokenType.GREATER_THAN,
+            TokenType.LESS_EQUAL,
+            TokenType.GREATER_EQUAL,
         ):
             operator_token = self.state.advance()
             right = self._parse_addition()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -408,7 +447,9 @@ class EnhancedParser:
             right = self._parse_multiplication()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -418,18 +459,24 @@ class EnhancedParser:
         if not left:
             return None
 
-        while self.state and self.state.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO):
+        while self.state and self.state.match(
+            TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO
+        ):
             operator_token = self.state.advance()
             right = self._parse_unary()
             if not right:
                 return None
-            left = BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            left = BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
     def _parse_unary(self) -> Optional[ASTNode]:
         """Parse unary expression"""
-        if self.state and self.state.match(TokenType.NOT, TokenType.MINUS, TokenType.PLUS):
+        if self.state and self.state.match(
+            TokenType.NOT, TokenType.MINUS, TokenType.PLUS
+        ):
             operator_token = self.state.advance()
             operand = self._parse_unary()
             if not operand:
@@ -450,7 +497,9 @@ class EnhancedParser:
             right = self._parse_power()  # Right associative
             if not right:
                 return None
-            return BinaryOpNode(operator_token.value, left, right, operator_token.location)
+            return BinaryOpNode(
+                operator_token.value, left, right, operator_token.location
+            )
 
         return left
 
@@ -474,7 +523,9 @@ class EnhancedParser:
                 return LiteralNode(value, current.location)
             except ValueError:
                 self.state.error_manager.add_error(
-                    ErrorCode.INVALID_NUMBER, f"Invalid number: {current.value}", current.location
+                    ErrorCode.INVALID_NUMBER,
+                    f"Invalid number: {current.value}",
+                    current.location,
                 )
                 return None
 
@@ -506,7 +557,9 @@ class EnhancedParser:
             if not expr:
                 return None
 
-            if not self.state.consume(TokenType.RIGHT_PAREN, "Expected ')' after expression"):
+            if not self.state.consume(
+                TokenType.RIGHT_PAREN, "Expected ')' after expression"
+            ):
                 return None
 
             return expr
@@ -520,7 +573,9 @@ class EnhancedParser:
         )
         return None
 
-    def _parse_function_call(self, name: str, location: SourceLocation) -> Optional[FunctionCallNode]:
+    def _parse_function_call(
+        self, name: str, location: SourceLocation
+    ) -> Optional[FunctionCallNode]:
         """Parse function call"""
         if not self.state:
             return None
@@ -551,7 +606,11 @@ class EnhancedParser:
                 self.state.error_manager.add_error(
                     ErrorCode.UNEXPECTED_TOKEN,
                     "Expected ',' or ')' in function call",
-                    self.state.current_token().location if self.state.current_token() else location,
+                    (
+                        self.state.current_token().location
+                        if self.state.current_token()
+                        else location
+                    ),
                 )
                 return None
 

@@ -97,28 +97,42 @@ class EnhancedCodeEditor:
 
         self.auto_complete_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            toolbar, text="Auto Complete", variable=self.auto_complete_var, command=self.toggle_auto_complete
+            toolbar,
+            text="Auto Complete",
+            variable=self.auto_complete_var,
+            command=self.toggle_auto_complete,
         ).pack(side=tk.LEFT, padx=(0, 5))
 
         self.syntax_check_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            toolbar, text="Syntax Check", variable=self.syntax_check_var, command=self.toggle_syntax_check
+            toolbar,
+            text="Syntax Check",
+            variable=self.syntax_check_var,
+            command=self.toggle_syntax_check,
         ).pack(side=tk.LEFT, padx=(0, 5))
 
         self.auto_format_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(toolbar, text="Auto Format", variable=self.auto_format_var).pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Checkbutton(
+            toolbar, text="Auto Format", variable=self.auto_format_var
+        ).pack(side=tk.LEFT, padx=(0, 10))
 
         # Separator
         ttk.Separator(toolbar, orient="vertical").pack(side=tk.LEFT, padx=5, fill=tk.Y)
 
         # Compilation controls
         self.compile_button = ttk.Button(
-            toolbar, text="🔨 Compile", command=self.compile_current_file, state="disabled"
+            toolbar,
+            text="🔨 Compile",
+            command=self.compile_current_file,
+            state="disabled",
         )
         self.compile_button.pack(side=tk.LEFT, padx=2)
 
         self.compile_run_button = ttk.Button(
-            toolbar, text="🚀 Compile & Run", command=self.compile_and_run, state="disabled"
+            toolbar,
+            text="🚀 Compile & Run",
+            command=self.compile_and_run,
+            state="disabled",
         )
         self.compile_run_button.pack(side=tk.LEFT, padx=2)
 
@@ -126,9 +140,13 @@ class EnhancedCodeEditor:
         ttk.Separator(toolbar, orient="vertical").pack(side=tk.LEFT, padx=5, fill=tk.Y)
 
         # Formatting controls
-        ttk.Button(toolbar, text="🎨 Format", command=self.format_current_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="🎨 Format", command=self.format_current_file).pack(
+            side=tk.LEFT, padx=2
+        )
 
-        ttk.Button(toolbar, text="🔍 Check Syntax", command=self.check_syntax_now).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="🔍 Check Syntax", command=self.check_syntax_now).pack(
+            side=tk.LEFT, padx=2
+        )
 
     def create_editor_area(self):
         """Create the main editor area - clean editor without line numbers panel"""
@@ -161,7 +179,9 @@ class EnhancedCodeEditor:
         # Connect scrollbars to text editor
         v_scrollbar.configure(command=self.text_editor.yview)
         h_scrollbar.configure(command=self.text_editor.xview)
-        self.text_editor.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+        self.text_editor.configure(
+            yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set
+        )
 
         # Bind events
         self.text_editor.bind("<KeyPress>", self.on_key_press)
@@ -188,7 +208,9 @@ class EnhancedCodeEditor:
         self.status_label.pack(side=tk.LEFT, padx=5)
 
         # Language indicator
-        self.language_label = ttk.Label(status_frame, text=f"Language: {self.current_language.upper()}")
+        self.language_label = ttk.Label(
+            status_frame, text=f"Language: {self.current_language.upper()}"
+        )
         self.language_label.pack(side=tk.LEFT, padx=10)
 
         # Error count
@@ -206,7 +228,9 @@ class EnhancedCodeEditor:
     def setup_advanced_features(self):
         """Setup advanced editor features"""
         # Code completion
-        self.completion_engine = CodeCompletionEngine(self.text_editor, self.language_engine)
+        self.completion_engine = CodeCompletionEngine(
+            self.text_editor, self.language_engine
+        )
 
         # Syntax analyzer callback
         self.syntax_analyzer.set_error_callback(self.on_syntax_errors)
@@ -223,10 +247,14 @@ class EnhancedCodeEditor:
     def setup_syntax_tags(self):
         """Setup syntax highlighting tags"""
         # Keywords
-        self.text_editor.tag_configure("keyword", foreground="#0000FF", font=("Courier", 10, "bold"))
+        self.text_editor.tag_configure(
+            "keyword", foreground="#0000FF", font=("Courier", 10, "bold")
+        )
 
         # Comments
-        self.text_editor.tag_configure("comment", foreground="#008000", font=("Courier", 10, "italic"))
+        self.text_editor.tag_configure(
+            "comment", foreground="#008000", font=("Courier", 10, "italic")
+        )
 
         # Strings
         self.text_editor.tag_configure("string", foreground="#FF0000")
@@ -238,16 +266,22 @@ class EnhancedCodeEditor:
         self.text_editor.tag_configure("operator", foreground="#FF8000")
 
         # Errors
-        self.text_editor.tag_configure("error", background="#FFCCCC", foreground="#CC0000")
+        self.text_editor.tag_configure(
+            "error", background="#FFCCCC", foreground="#CC0000"
+        )
 
         # Warnings
-        self.text_editor.tag_configure("warning", background="#FFFFCC", foreground="#CC8800")
+        self.text_editor.tag_configure(
+            "warning", background="#FFFFCC", foreground="#CC8800"
+        )
 
         # Variables (PILOT)
         self.text_editor.tag_configure("variable", foreground="#8000FF")
 
         # Labels (PILOT)
-        self.text_editor.tag_configure("label", foreground="#FF0080", font=("Courier", 10, "bold"))
+        self.text_editor.tag_configure(
+            "label", foreground="#FF0080", font=("Courier", 10, "bold")
+        )
 
     def on_language_change(self, event=None):
         """Handle language change"""
@@ -320,7 +354,15 @@ class EnhancedCodeEditor:
             return
 
         # Clear existing tags
-        for tag in ["keyword", "comment", "string", "number", "operator", "variable", "label"]:
+        for tag in [
+            "keyword",
+            "comment",
+            "string",
+            "number",
+            "operator",
+            "variable",
+            "label",
+        ]:
             self.text_editor.tag_remove(tag, "1.0", tk.END)
 
         # Get text and highlights
@@ -349,7 +391,9 @@ class EnhancedCodeEditor:
     def check_syntax_now(self):
         """Check syntax immediately"""
         text = self.text_editor.get("1.0", tk.END)
-        errors = self.syntax_analyzer.analyze_syntax(text, self.current_language, immediate=True)
+        errors = self.syntax_analyzer.analyze_syntax(
+            text, self.current_language, immediate=True
+        )
         self.on_syntax_errors(errors)
 
     def on_syntax_errors(self, errors: List[EditorSyntaxError]):
@@ -415,7 +459,9 @@ class EnhancedCodeEditor:
         text = self.text_editor.get("1.0", tk.END)
         cursor_offset = len(self.text_editor.get("1.0", cursor_pos).encode("utf-8"))
 
-        formatted_text = self.code_formatter.format_on_type(text, cursor_offset, char, self.current_language)
+        formatted_text = self.code_formatter.format_on_type(
+            text, cursor_offset, char, self.current_language
+        )
 
         if formatted_text and formatted_text != text:
             # Replace text and restore cursor
@@ -440,7 +486,9 @@ class EnhancedCodeEditor:
                 return
 
         if self.current_file:
-            result = self.compiler_manager.compile_file(self.current_file, self.current_language)
+            result = self.compiler_manager.compile_file(
+                self.current_file, self.current_language
+            )
             if result.success:
                 self.update_status(f"Compilation successful: {result.executable_path}")
             else:
@@ -448,7 +496,9 @@ class EnhancedCodeEditor:
         else:
             # Compile text content
             text = self.text_editor.get("1.0", tk.END)
-            result = self.compiler_manager.compile_text(text, self.current_language, "temp")
+            result = self.compiler_manager.compile_text(
+                text, self.current_language, "temp"
+            )
             if result.success:
                 self.update_status(f"Compilation successful: {result.executable_path}")
             else:
@@ -490,7 +540,9 @@ class EnhancedCodeEditor:
     def update_compilation_buttons(self):
         """Update compilation button states"""
         # Check if buttons exist (they may not if toolbar is disabled)
-        if not hasattr(self, "compile_button") or not hasattr(self, "compile_run_button"):
+        if not hasattr(self, "compile_button") or not hasattr(
+            self, "compile_run_button"
+        ):
             return
 
         if self.compiler_manager.supports_language(self.current_language):
@@ -512,7 +564,15 @@ class EnhancedCodeEditor:
             self.update_status("Syntax highlighting enabled")
         else:
             # Clear all tags
-            for tag in ["keyword", "comment", "string", "number", "operator", "variable", "label"]:
+            for tag in [
+                "keyword",
+                "comment",
+                "string",
+                "number",
+                "operator",
+                "variable",
+                "label",
+            ]:
                 self.text_editor.tag_remove(tag, "1.0", tk.END)
             self.update_status("Syntax highlighting disabled")
 
@@ -561,7 +621,9 @@ class EnhancedCodeEditor:
         engine = self.language_engine.get_current_engine()
         if engine:
             extensions = engine.config.extensions
-            filetypes = [(f"{engine.config.name} Files", f"*{ext}") for ext in extensions]
+            filetypes = [
+                (f"{engine.config.name} Files", f"*{ext}") for ext in extensions
+            ]
             filetypes.append(("All Files", "*.*"))
         else:
             filetypes = [("All Files", "*.*")]
@@ -620,14 +682,18 @@ class EnhancedCodeEditor:
         engine = self.language_engine.get_current_engine()
         if engine:
             extensions = engine.config.extensions
-            filetypes = [(f"{engine.config.name} Files", f"*{ext}") for ext in extensions]
+            filetypes = [
+                (f"{engine.config.name} Files", f"*{ext}") for ext in extensions
+            ]
             filetypes.append(("All Files", "*.*"))
             default_ext = extensions[0] if extensions else ".txt"
         else:
             filetypes = [("All Files", "*.*")]
             default_ext = ".txt"
 
-        filename = filedialog.asksaveasfilename(filetypes=filetypes, defaultextension=default_ext)
+        filename = filedialog.asksaveasfilename(
+            filetypes=filetypes, defaultextension=default_ext
+        )
 
         if filename:
             try:
@@ -650,7 +716,8 @@ class EnhancedCodeEditor:
         """Confirm save changes dialog"""
         if self.is_modified:
             result = messagebox.askyesnocancel(
-                "Save Changes", "The current file has unsaved changes. Do you want to save them?"
+                "Save Changes",
+                "The current file has unsaved changes. Do you want to save them?",
             )
             if result is True:  # Yes
                 return self.save_file()

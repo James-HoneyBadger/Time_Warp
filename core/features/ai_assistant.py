@@ -105,7 +105,9 @@ class PilotAnalyzer:
 
         return issues
 
-    def suggest_completions(self, code: str, cursor_line: int, cursor_col: int) -> List[CodeSuggestion]:
+    def suggest_completions(
+        self, code: str, cursor_line: int, cursor_col: int
+    ) -> List[CodeSuggestion]:
         """Suggest code completions for PILOT"""
         suggestions = []
         lines = code.split("\n")
@@ -301,7 +303,9 @@ class AICodeAssistant:
             return self.analyzers[language].analyze_code(code)
         return []
 
-    def get_suggestions(self, code: str, language: str, cursor_line: int, cursor_col: int) -> List[CodeSuggestion]:
+    def get_suggestions(
+        self, code: str, language: str, cursor_line: int, cursor_col: int
+    ) -> List[CodeSuggestion]:
         """Get intelligent code suggestions"""
         language = language.lower()
         suggestions = []
@@ -309,7 +313,9 @@ class AICodeAssistant:
         if language in self.analyzers:
             analyzer = self.analyzers[language]
             if hasattr(analyzer, "suggest_completions"):
-                suggestions.extend(analyzer.suggest_completions(code, cursor_line, cursor_col))
+                suggestions.extend(
+                    analyzer.suggest_completions(code, cursor_line, cursor_col)
+                )
 
         # Add general suggestions
         suggestions.extend(self._get_general_suggestions(code, language))
@@ -339,13 +345,16 @@ class AICodeAssistant:
 
         return suggestions
 
-    def _get_general_suggestions(self, code: str, language: str) -> List[CodeSuggestion]:
+    def _get_general_suggestions(
+        self, code: str, language: str
+    ) -> List[CodeSuggestion]:
         """Get general suggestions applicable to any language"""
         suggestions = []
 
         # Suggest comments for complex code
         if len(code.split("\n")) > 10 and not any(
-            line.strip().startswith("#") or "comment" in line.lower() for line in code.split("\n")
+            line.strip().startswith("#") or "comment" in line.lower()
+            for line in code.split("\n")
         ):
             suggestions.append(
                 CodeSuggestion(
@@ -426,7 +435,9 @@ class AICodeAssistant:
             elif line.startswith("REPEAT"):
                 explanations.append("Repeat the following commands")
 
-        return "This Logo program makes the turtle:\n" + "\n".join(f"• {exp}" for exp in explanations)
+        return "This Logo program makes the turtle:\n" + "\n".join(
+            f"• {exp}" for exp in explanations
+        )
 
     def _suggest_pilot_refactoring(self, code: str) -> List[CodeSuggestion]:
         """Suggest PILOT code improvements"""
@@ -471,7 +482,9 @@ class AICodeAssistant:
                 "syntax error": "Check your BASIC syntax - lines should start with numbers, use PRINT for output",
                 "line number": "BASIC lines should start with line numbers like 10, 20, 30",
             },
-            "logo": {"unbalanced": "Make sure all brackets [ ] are properly matched in REPEAT commands"},
+            "logo": {
+                "unbalanced": "Make sure all brackets [ ] are properly matched in REPEAT commands"
+            },
         }
 
         if language in help_messages:

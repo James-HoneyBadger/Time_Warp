@@ -232,7 +232,9 @@ def create_syntax_error(
 
 
 def create_runtime_error(
-    message: str, location: Optional[SourceLocation] = None, suggestions: Optional[List[str]] = None
+    message: str,
+    location: Optional[SourceLocation] = None,
+    suggestions: Optional[List[str]] = None,
 ) -> TimeWarpError:
     """Create a runtime error"""
     return TimeWarpError(
@@ -244,13 +246,18 @@ def create_runtime_error(
     )
 
 
-def create_type_error(expected: str, actual: str, location: Optional[SourceLocation] = None) -> TimeWarpTypeError:
+def create_type_error(
+    expected: str, actual: str, location: Optional[SourceLocation] = None
+) -> TimeWarpTypeError:
     """Create a type mismatch error"""
     error = TimeWarpError(
         code=ErrorCode.TYPE_MISMATCH,
         severity=ErrorSeverity.ERROR,
         message=f"Expected {expected}, got {actual}",
         location=location,
-        suggestions=[f"Convert the value to {expected}", "Check your variable assignments"],
+        suggestions=[
+            f"Convert the value to {expected}",
+            "Check your variable assignments",
+        ],
     )
     return TimeWarpTypeError(error)

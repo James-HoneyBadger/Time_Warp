@@ -32,7 +32,12 @@ class TimeWarpPlugin:
 
     def get_info(self) -> Dict[str, Any]:
         """Get plugin information"""
-        return {"name": self.name, "version": self.version, "author": self.author, "description": self.description}
+        return {
+            "name": self.name,
+            "version": self.version,
+            "author": self.author,
+            "description": self.description,
+        }
 
 
 class PluginManager:
@@ -100,7 +105,9 @@ class PluginManager:
 
         try:
             # Load the plugin module
-            spec = importlib.util.spec_from_file_location(f"plugin_{plugin_name}", plugin_file)
+            spec = importlib.util.spec_from_file_location(
+                f"plugin_{plugin_name}", plugin_file
+            )
             if spec is None or spec.loader is None:
                 print(f"Could not load plugin spec for {plugin_name}")
                 return False
@@ -241,8 +248,12 @@ class PluginManagerDialog:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(header_frame, text="🔌 TimeWarp Plugin Manager", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
-        ttk.Button(header_frame, text="🔄 Refresh", command=self.refresh_plugins).pack(side=tk.RIGHT)
+        ttk.Label(
+            header_frame, text="🔌 TimeWarp Plugin Manager", font=("Arial", 16, "bold")
+        ).pack(side=tk.LEFT)
+        ttk.Button(header_frame, text="🔄 Refresh", command=self.refresh_plugins).pack(
+            side=tk.RIGHT
+        )
 
         # Create notebook for different plugin sections
         notebook = ttk.Notebook(main_frame)
@@ -277,7 +288,9 @@ class PluginManagerDialog:
 
         # Treeview for plugins
         columns = ("Name", "Version", "Status", "Description")
-        self.plugin_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
+        self.plugin_tree = ttk.Treeview(
+            list_frame, columns=columns, show="headings", height=15
+        )
 
         for col in columns:
             self.plugin_tree.heading(col, text=col)
@@ -285,7 +298,9 @@ class PluginManagerDialog:
 
         self.plugin_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        tree_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.plugin_tree.yview)
+        tree_scroll = ttk.Scrollbar(
+            list_frame, orient=tk.VERTICAL, command=self.plugin_tree.yview
+        )
         self.plugin_tree.config(yscrollcommand=tree_scroll.set)
         tree_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -293,8 +308,12 @@ class PluginManagerDialog:
         details_frame = ttk.LabelFrame(parent, text="Plugin Details")
         details_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.details_text = tk.Text(details_frame, height=6, font=("Arial", 10), wrap=tk.WORD)
-        details_scroll = ttk.Scrollbar(details_frame, orient=tk.VERTICAL, command=self.details_text.yview)
+        self.details_text = tk.Text(
+            details_frame, height=6, font=("Arial", 10), wrap=tk.WORD
+        )
+        details_scroll = ttk.Scrollbar(
+            details_frame, orient=tk.VERTICAL, command=self.details_text.yview
+        )
         self.details_text.config(yscrollcommand=details_scroll.set)
         self.details_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         details_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
@@ -303,9 +322,15 @@ class PluginManagerDialog:
         button_frame = ttk.Frame(parent)
         button_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(button_frame, text="✅ Enable", command=self.enable_plugin).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="❌ Disable", command=self.disable_plugin).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="🗑️ Uninstall", command=self.uninstall_plugin).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="✅ Enable", command=self.enable_plugin).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(button_frame, text="❌ Disable", command=self.disable_plugin).pack(
+            side=tk.LEFT, padx=5
+        )
+        ttk.Button(
+            button_frame, text="🗑️ Uninstall", command=self.uninstall_plugin
+        ).pack(side=tk.LEFT, padx=5)
 
         # Bind selection event
         self.plugin_tree.bind("<<TreeviewSelect>>", self.on_plugin_select)
@@ -317,16 +342,23 @@ class PluginManagerDialog:
         available_list_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         self.available_tree = ttk.Treeview(
-            available_list_frame, columns=("Name", "Version", "Author", "Description"), show="headings", height=12
+            available_list_frame,
+            columns=("Name", "Version", "Author", "Description"),
+            show="headings",
+            height=12,
         )
 
         for col in self.available_tree["columns"]:
             self.available_tree.heading(col, text=col)
             self.available_tree.column(col, width=150 if col != "Description" else 300)
 
-        self.available_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.available_tree.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
+        )
 
-        available_scroll = ttk.Scrollbar(available_list_frame, orient=tk.VERTICAL, command=self.available_tree.yview)
+        available_scroll = ttk.Scrollbar(
+            available_list_frame, orient=tk.VERTICAL, command=self.available_tree.yview
+        )
         self.available_tree.config(yscrollcommand=available_scroll.set)
         available_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=5)
 
@@ -334,17 +366,25 @@ class PluginManagerDialog:
         install_frame = ttk.Frame(parent)
         install_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        ttk.Button(install_frame, text="⬇️ Install Selected", command=self.install_plugin).pack(side=tk.LEFT, padx=5)
-        ttk.Button(install_frame, text="🔄 Refresh Available", command=self.load_available_plugins).pack(
-            side=tk.LEFT, padx=5
-        )
+        ttk.Button(
+            install_frame, text="⬇️ Install Selected", command=self.install_plugin
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            install_frame,
+            text="🔄 Refresh Available",
+            command=self.load_available_plugins,
+        ).pack(side=tk.LEFT, padx=5)
 
     def setup_create_tab(self, parent):
         """Setup the create plugin tab"""
-        ttk.Label(parent, text="Plugin Development Guide", font=("Arial", 14, "bold")).pack(pady=10)
+        ttk.Label(
+            parent, text="Plugin Development Guide", font=("Arial", 14, "bold")
+        ).pack(pady=10)
 
         guide_text = tk.Text(parent, height=25, font=("Arial", 10), wrap=tk.WORD)
-        guide_scroll = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=guide_text.yview)
+        guide_scroll = ttk.Scrollbar(
+            parent, orient=tk.VERTICAL, command=guide_text.yview
+        )
         guide_text.config(yscrollcommand=guide_scroll.set)
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
@@ -436,7 +476,11 @@ class TimeWarpPlugin(TimeWarpPlugin):
         for plugin_name in available_plugins:
             info = self.plugin_manager.get_plugin_info(plugin_name)
             if info:
-                status = "Active" if self.plugin_manager.is_plugin_active(plugin_name) else "Inactive"
+                status = (
+                    "Active"
+                    if self.plugin_manager.is_plugin_active(plugin_name)
+                    else "Inactive"
+                )
                 self.plugin_tree.insert(
                     "",
                     "end",
@@ -456,11 +500,36 @@ class TimeWarpPlugin(TimeWarpPlugin):
 
         # Sample available plugins
         available_plugins = [
-            ("Git Integration", "2.0.0", "DevTools Inc", "Git version control integration"),
-            ("AI Code Assistant", "1.3.1", "AI Labs", "AI-powered code suggestions and completion"),
-            ("Performance Profiler", "1.1.0", "SpeedTools", "Code performance analysis and optimization"),
-            ("Unit Test Generator", "0.8.2", "TestCorp", "Automatic unit test generation"),
-            ("Documentation Builder", "1.4.0", "DocMaker", "Generate documentation from code comments"),
+            (
+                "Git Integration",
+                "2.0.0",
+                "DevTools Inc",
+                "Git version control integration",
+            ),
+            (
+                "AI Code Assistant",
+                "1.3.1",
+                "AI Labs",
+                "AI-powered code suggestions and completion",
+            ),
+            (
+                "Performance Profiler",
+                "1.1.0",
+                "SpeedTools",
+                "Code performance analysis and optimization",
+            ),
+            (
+                "Unit Test Generator",
+                "0.8.2",
+                "TestCorp",
+                "Automatic unit test generation",
+            ),
+            (
+                "Documentation Builder",
+                "1.4.0",
+                "DocMaker",
+                "Generate documentation from code comments",
+            ),
         ]
 
         for plugin in available_plugins:
@@ -501,10 +570,15 @@ Description:
                 info = self.plugin_manager.get_plugin_info(name)
                 if info and info.get("name") == plugin_display_name:
                     if self.plugin_manager.activate_plugin(name):
-                        messagebox.showinfo("Plugin Enabled", f"Plugin '{plugin_display_name}' has been enabled")
+                        messagebox.showinfo(
+                            "Plugin Enabled",
+                            f"Plugin '{plugin_display_name}' has been enabled",
+                        )
                         self.refresh_plugins()
                     else:
-                        messagebox.showerror("Error", f"Failed to enable plugin '{plugin_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to enable plugin '{plugin_display_name}'"
+                        )
                     break
 
     def disable_plugin(self):
@@ -519,10 +593,15 @@ Description:
                 info = self.plugin_manager.get_plugin_info(name)
                 if info and info.get("name") == plugin_display_name:
                     if self.plugin_manager.deactivate_plugin(name):
-                        messagebox.showinfo("Plugin Disabled", f"Plugin '{plugin_display_name}' has been disabled")
+                        messagebox.showinfo(
+                            "Plugin Disabled",
+                            f"Plugin '{plugin_display_name}' has been disabled",
+                        )
                         self.refresh_plugins()
                     else:
-                        messagebox.showerror("Error", f"Failed to disable plugin '{plugin_display_name}'")
+                        messagebox.showerror(
+                            "Error", f"Failed to disable plugin '{plugin_display_name}'"
+                        )
                     break
 
     def uninstall_plugin(self):
@@ -532,18 +611,25 @@ Description:
             item = self.plugin_tree.item(selection[0])
             plugin_display_name = item["values"][0]
 
-            if messagebox.askyesno("Uninstall Plugin", f"Are you sure you want to uninstall '{plugin_display_name}'?"):
+            if messagebox.askyesno(
+                "Uninstall Plugin",
+                f"Are you sure you want to uninstall '{plugin_display_name}'?",
+            ):
                 # Find actual plugin name
                 for name in self.plugin_manager.list_available_plugins():
                     info = self.plugin_manager.get_plugin_info(name)
                     if info and info.get("name") == plugin_display_name:
                         if self.plugin_manager.unload_plugin(name):
                             messagebox.showinfo(
-                                "Plugin Uninstalled", f"Plugin '{plugin_display_name}' has been uninstalled"
+                                "Plugin Uninstalled",
+                                f"Plugin '{plugin_display_name}' has been uninstalled",
                             )
                             self.refresh_plugins()
                         else:
-                            messagebox.showerror("Error", f"Failed to uninstall plugin '{plugin_display_name}'")
+                            messagebox.showerror(
+                                "Error",
+                                f"Failed to uninstall plugin '{plugin_display_name}'",
+                            )
                         break
 
     def install_plugin(self):
@@ -552,8 +638,13 @@ Description:
         if selection:
             item = self.available_tree.item(selection[0])
             plugin_name = item["values"][0]
-            if messagebox.askyesno("Install Plugin", f"Install plugin '{plugin_name}'?"):
-                messagebox.showinfo("Plugin Installed", f"Plugin '{plugin_name}' has been installed successfully!")
+            if messagebox.askyesno(
+                "Install Plugin", f"Install plugin '{plugin_name}'?"
+            ):
+                messagebox.showinfo(
+                    "Plugin Installed",
+                    f"Plugin '{plugin_name}' has been installed successfully!",
+                )
                 self.refresh_plugins()
 
     def close(self):

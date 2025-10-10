@@ -186,10 +186,17 @@ class ToolPlugin(ABC):
         """Check if tool is initialized"""
         return self._initialized
 
-    def add_menu_item(self, menu_path: str, label: str, command: Callable, accelerator: str = None) -> None:
+    def add_menu_item(
+        self, menu_path: str, label: str, command: Callable, accelerator: str = None
+    ) -> None:
         """Add a menu item for this tool"""
         try:
-            menu_item = {"path": menu_path, "label": label, "command": command, "accelerator": accelerator}
+            menu_item = {
+                "path": menu_path,
+                "label": label,
+                "command": command,
+                "accelerator": accelerator,
+            }
             self._menu_items.append(menu_item)
 
             # Add to IDE menu system
@@ -199,10 +206,17 @@ class ToolPlugin(ABC):
         except Exception as e:
             print(f"Error adding menu item for {self.name}: {e}")
 
-    def add_toolbar_item(self, label: str, command: Callable, icon: str = None, tooltip: str = None) -> None:
+    def add_toolbar_item(
+        self, label: str, command: Callable, icon: str = None, tooltip: str = None
+    ) -> None:
         """Add a toolbar item for this tool"""
         try:
-            toolbar_item = {"label": label, "command": command, "icon": icon, "tooltip": tooltip}
+            toolbar_item = {
+                "label": label,
+                "command": command,
+                "icon": icon,
+                "tooltip": tooltip,
+            }
             self._toolbar_items.append(toolbar_item)
 
             # Add to IDE toolbar
@@ -480,7 +494,11 @@ class TimeWarpFramework:
                 with open(self._config_file, "r", encoding="utf-8") as f:
                     self._config = json.load(f)
             else:
-                self._config = {"active_tools": [], "tool_settings": {}, "framework_version": "1.0.0"}
+                self._config = {
+                    "active_tools": [],
+                    "tool_settings": {},
+                    "framework_version": "1.0.0",
+                }
                 self._save_config()
         except Exception as e:
             print(f"Error loading framework config: {e}")

@@ -35,7 +35,9 @@ class PluginRegistry:
         self.plugins_by_type[plugin_type].append(plugin)
 
         # Track dependencies
-        self.dependencies[plugin.metadata.name] = set(plugin.metadata.dependencies or [])
+        self.dependencies[plugin.metadata.name] = set(
+            plugin.metadata.dependencies or []
+        )
 
         return True
 
@@ -117,7 +119,9 @@ class PluginRegistry:
         """Get all plugins of a specific type"""
         return self.plugins_by_type.get(plugin_type, [])
 
-    def get_enabled_plugins_by_type(self, plugin_type: PluginType) -> List[PluginInterface]:
+    def get_enabled_plugins_by_type(
+        self, plugin_type: PluginType
+    ) -> List[PluginInterface]:
         """Get enabled plugins of a specific type"""
         return [p for p in self.get_plugins_by_type(plugin_type) if p.is_enabled]
 
@@ -157,7 +161,9 @@ class PluginRegistry:
 
         def visit(plugin_name: str):
             if plugin_name in temp_visited:
-                raise ValueError(f"Circular dependency detected involving {plugin_name}")
+                raise ValueError(
+                    f"Circular dependency detected involving {plugin_name}"
+                )
             if plugin_name in visited:
                 return
 
@@ -194,7 +200,10 @@ class PluginRegistry:
         by_type = {}
 
         for plugin_type, plugins in self.plugins_by_type.items():
-            by_type[plugin_type.value] = {"total": len(plugins), "enabled": len([p for p in plugins if p.is_enabled])}
+            by_type[plugin_type.value] = {
+                "total": len(plugins),
+                "enabled": len([p for p in plugins if p.is_enabled]),
+            }
 
         return {
             "total_plugins": total,

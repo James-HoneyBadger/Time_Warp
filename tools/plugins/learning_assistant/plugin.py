@@ -116,7 +116,12 @@ class CodeAnalyzer:
         else:
             quality = "needs improvement"
 
-        return {"score": max(0, score), "quality": quality, "suggestions": suggestions, "language": language}
+        return {
+            "score": max(0, score),
+            "quality": quality,
+            "suggestions": suggestions,
+            "language": language,
+        }
 
     def _pilot_rules(self) -> List[Dict]:
         """PILOT language analysis rules"""
@@ -125,7 +130,10 @@ class CodeAnalyzer:
                 "name": "comments",
                 "type": "documentation",
                 "penalty": 10,
-                "check": lambda code: {"passed": "R:" in code, "message": "Add comments to explain your code"},
+                "check": lambda code: {
+                    "passed": "R:" in code,
+                    "message": "Add comments to explain your code",
+                },
                 "suggestion": "Use R: to add comments explaining what your program does",
             },
             {
@@ -142,7 +150,10 @@ class CodeAnalyzer:
                 "name": "user_interaction",
                 "type": "functionality",
                 "penalty": 5,
-                "check": lambda code: {"passed": "A:" in code or "T:" in code, "message": "Include user interaction"},
+                "check": lambda code: {
+                    "passed": "A:" in code or "T:" in code,
+                    "message": "Include user interaction",
+                },
                 "suggestion": "Use T: to display messages and A: to get input from users",
             },
         ]
@@ -186,14 +197,20 @@ class CodeAnalyzer:
                 "name": "procedures",
                 "type": "organization",
                 "penalty": 15,
-                "check": lambda code: {"passed": "TO " in code.upper(), "message": "Break code into procedures"},
+                "check": lambda code: {
+                    "passed": "TO " in code.upper(),
+                    "message": "Break code into procedures",
+                },
                 "suggestion": "Create procedures with TO/END for reusable code blocks",
             },
             {
                 "name": "comments",
                 "type": "documentation",
                 "penalty": 10,
-                "check": lambda code: {"passed": ";" in code, "message": "Add comments to explain your drawings"},
+                "check": lambda code: {
+                    "passed": ";" in code,
+                    "message": "Add comments to explain your drawings",
+                },
                 "suggestion": "Use ; to add comments explaining your turtle graphics",
             },
             {
@@ -359,7 +376,11 @@ class TutorialManager:
 
     def get_tutorials_for_language(self, language: str) -> List[Dict]:
         """Get all tutorials for a specific language"""
-        return [{"id": tid, **tutorial} for tid, tutorial in self.tutorials.items() if tutorial["language"] == language]
+        return [
+            {"id": tid, **tutorial}
+            for tid, tutorial in self.tutorials.items()
+            if tutorial["language"] == language
+        ]
 
 
 class LearningAssistantPlugin(ToolPlugin):
@@ -369,7 +390,9 @@ class LearningAssistantPlugin(ToolPlugin):
         super().__init__(ide_instance, framework)
         self.name = "Learning Assistant"
         self.version = "1.0.0"
-        self.description = "Educational plugin with tutorials, code analysis, and progress tracking"
+        self.description = (
+            "Educational plugin with tutorials, code analysis, and progress tracking"
+        )
 
         # Core components
         self.code_analyzer = CodeAnalyzer()
@@ -451,7 +474,9 @@ class LearningAssistantPlugin(ToolPlugin):
         left_panel = ttk.Frame(tutorial_frame)
         left_panel.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 5))
 
-        ttk.Label(left_panel, text="Available Tutorials", font=("Arial", 12, "bold")).pack(pady=(0, 10))
+        ttk.Label(
+            left_panel, text="Available Tutorials", font=("Arial", 12, "bold")
+        ).pack(pady=(0, 10))
 
         # Language filter
         filter_frame = ttk.Frame(left_panel)
@@ -482,7 +507,9 @@ class LearningAssistantPlugin(ToolPlugin):
         info_frame = ttk.LabelFrame(right_panel, text="Tutorial Information")
         info_frame.pack(fill=tk.X, pady=(0, 10))
 
-        self.tutorial_title_label = ttk.Label(info_frame, text="Select a tutorial", font=("Arial", 14, "bold"))
+        self.tutorial_title_label = ttk.Label(
+            info_frame, text="Select a tutorial", font=("Arial", 14, "bold")
+        )
         self.tutorial_title_label.pack(anchor=tk.W, padx=10, pady=5)
 
         self.tutorial_info_label = ttk.Label(info_frame, text="", wraplength=400)
@@ -496,17 +523,23 @@ class LearningAssistantPlugin(ToolPlugin):
         nav_frame = ttk.Frame(content_frame)
         nav_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        self.prev_button = ttk.Button(nav_frame, text="◀ Previous", command=self.prev_tutorial_step)
+        self.prev_button = ttk.Button(
+            nav_frame, text="◀ Previous", command=self.prev_tutorial_step
+        )
         self.prev_button.pack(side=tk.LEFT)
 
         self.step_label = ttk.Label(nav_frame, text="Step 1 of 1")
         self.step_label.pack(side=tk.LEFT, padx=20)
 
-        self.next_button = ttk.Button(nav_frame, text="Next ▶", command=self.next_tutorial_step)
+        self.next_button = ttk.Button(
+            nav_frame, text="Next ▶", command=self.next_tutorial_step
+        )
         self.next_button.pack(side=tk.LEFT)
 
         # Content area
-        self.tutorial_content_text = tk.Text(content_frame, height=8, wrap=tk.WORD, state=tk.DISABLED)
+        self.tutorial_content_text = tk.Text(
+            content_frame, height=8, wrap=tk.WORD, state=tk.DISABLED
+        )
         self.tutorial_content_text.pack(fill=tk.X, padx=10, pady=5)
 
         # Code area
@@ -520,11 +553,15 @@ class LearningAssistantPlugin(ToolPlugin):
         action_frame = ttk.Frame(content_frame)
         action_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        ttk.Button(action_frame, text="📝 Try This Code", command=self.try_tutorial_code).pack(side=tk.LEFT, padx=5)
-        ttk.Button(action_frame, text="✅ Mark Complete", command=self.complete_tutorial_step).pack(
-            side=tk.LEFT, padx=5
-        )
-        ttk.Button(action_frame, text="💡 Get Hint", command=self.get_tutorial_hint).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            action_frame, text="📝 Try This Code", command=self.try_tutorial_code
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            action_frame, text="✅ Mark Complete", command=self.complete_tutorial_step
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            action_frame, text="💡 Get Hint", command=self.get_tutorial_hint
+        ).pack(side=tk.LEFT, padx=5)
 
         # Populate tutorial list
         self.populate_tutorial_list()
@@ -553,8 +590,12 @@ class LearningAssistantPlugin(ToolPlugin):
         )
         lang_combo.pack(side=tk.LEFT, padx=(5, 20))
 
-        ttk.Button(lang_frame, text="🔍 Analyze Code", command=self.analyze_current_code).pack(side=tk.LEFT)
-        ttk.Button(lang_frame, text="📁 Load from File", command=self.load_code_file).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            lang_frame, text="🔍 Analyze Code", command=self.analyze_current_code
+        ).pack(side=tk.LEFT)
+        ttk.Button(
+            lang_frame, text="📁 Load from File", command=self.load_code_file
+        ).pack(side=tk.LEFT, padx=5)
 
         # Code input
         self.analysis_code_text = tk.Text(input_frame, height=12, font=("Courier", 10))
@@ -568,14 +609,18 @@ class LearningAssistantPlugin(ToolPlugin):
         score_frame = ttk.Frame(results_frame)
         score_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        self.score_label = ttk.Label(score_frame, text="Code Quality Score: --", font=("Arial", 12, "bold"))
+        self.score_label = ttk.Label(
+            score_frame, text="Code Quality Score: --", font=("Arial", 12, "bold")
+        )
         self.score_label.pack(side=tk.LEFT)
 
         self.quality_label = ttk.Label(score_frame, text="", font=("Arial", 12))
         self.quality_label.pack(side=tk.LEFT, padx=20)
 
         # Suggestions list
-        self.analysis_results_text = tk.Text(results_frame, height=8, wrap=tk.WORD, state=tk.DISABLED)
+        self.analysis_results_text = tk.Text(
+            results_frame, height=8, wrap=tk.WORD, state=tk.DISABLED
+        )
         self.analysis_results_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
     def create_progress_tab(self):
@@ -596,7 +641,9 @@ class LearningAssistantPlugin(ToolPlugin):
 
         # Progress tree
         self.progress_tree = ttk.Treeview(
-            detail_frame, columns=("Status", "Score", "Last Activity"), show="tree headings"
+            detail_frame,
+            columns=("Status", "Score", "Last Activity"),
+            show="tree headings",
         )
         self.progress_tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
@@ -617,7 +664,11 @@ class LearningAssistantPlugin(ToolPlugin):
         selection_frame = ttk.Frame(paths_frame)
         selection_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        ttk.Label(selection_frame, text="Choose your learning path:", font=("Arial", 12, "bold")).pack(anchor=tk.W)
+        ttk.Label(
+            selection_frame,
+            text="Choose your learning path:",
+            font=("Arial", 12, "bold"),
+        ).pack(anchor=tk.W)
 
         # Path options
         self.create_default_learning_paths()
@@ -637,20 +688,24 @@ class LearningAssistantPlugin(ToolPlugin):
         right_paths_frame = ttk.Frame(paths_list_frame)
         right_paths_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        self.path_details_text = tk.Text(right_paths_frame, wrap=tk.WORD, state=tk.DISABLED)
+        self.path_details_text = tk.Text(
+            right_paths_frame, wrap=tk.WORD, state=tk.DISABLED
+        )
         self.path_details_text.pack(fill=tk.BOTH, expand=True)
 
         # Path actions
         path_actions_frame = ttk.Frame(paths_frame)
         path_actions_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        ttk.Button(path_actions_frame, text="🚀 Start Path", command=self.start_learning_path).pack(
-            side=tk.LEFT, padx=5
-        )
-        ttk.Button(path_actions_frame, text="📈 View Progress", command=self.view_path_progress).pack(
-            side=tk.LEFT, padx=5
-        )
-        ttk.Button(path_actions_frame, text="⏸️ Pause Path", command=self.pause_learning_path).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            path_actions_frame, text="🚀 Start Path", command=self.start_learning_path
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            path_actions_frame, text="📈 View Progress", command=self.view_path_progress
+        ).pack(side=tk.LEFT, padx=5)
+        ttk.Button(
+            path_actions_frame, text="⏸️ Pause Path", command=self.pause_learning_path
+        ).pack(side=tk.LEFT, padx=5)
 
         self.populate_learning_paths()
 
@@ -677,10 +732,14 @@ class LearningAssistantPlugin(ToolPlugin):
         # Achievements display
         self.achievements_canvas = tk.Canvas(achievements_frame, bg="white")
         achievements_scroll = ttk.Scrollbar(
-            achievements_frame, orient=tk.VERTICAL, command=self.achievements_canvas.yview
+            achievements_frame,
+            orient=tk.VERTICAL,
+            command=self.achievements_canvas.yview,
         )
 
-        self.achievements_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=5)
+        self.achievements_canvas.pack(
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=5
+        )
         achievements_scroll.pack(side=tk.RIGHT, fill=tk.Y)
 
         self.achievements_canvas.configure(yscrollcommand=achievements_scroll.set)
@@ -718,7 +777,11 @@ class LearningAssistantPlugin(ToolPlugin):
         selected_lang = self.tutorial_language_var.get()
 
         if selected_lang != "all":
-            tutorial_ids = [tid for tid, t in self.tutorial_manager.tutorials.items() if t["language"] == selected_lang]
+            tutorial_ids = [
+                tid
+                for tid, t in self.tutorial_manager.tutorials.items()
+                if t["language"] == selected_lang
+            ]
 
         if selection[0] < len(tutorial_ids):
             tutorial_id = tutorial_ids[selection[0]]
@@ -759,15 +822,20 @@ class LearningAssistantPlugin(ToolPlugin):
         step = tutorial["steps"][step_index]
 
         # Update step navigation
-        self.step_label.config(text=f"Step {step_index + 1} of {len(tutorial['steps'])}")
+        self.step_label.config(
+            text=f"Step {step_index + 1} of {len(tutorial['steps'])}"
+        )
         self.prev_button.config(state=tk.NORMAL if step_index > 0 else tk.DISABLED)
-        self.next_button.config(state=tk.NORMAL if step_index < len(tutorial["steps"]) - 1 else tk.DISABLED)
+        self.next_button.config(
+            state=tk.NORMAL if step_index < len(tutorial["steps"]) - 1 else tk.DISABLED
+        )
 
         # Update content
         self.tutorial_content_text.config(state=tk.NORMAL)
         self.tutorial_content_text.delete(1.0, tk.END)
         self.tutorial_content_text.insert(
-            tk.END, f"{step['title']}\n\n{step['content']}\n\n{step['explanation']}\n\nYour task: {step['task']}"
+            tk.END,
+            f"{step['title']}\n\n{step['content']}\n\n{step['explanation']}\n\nYour task: {step['task']}",
         )
         self.tutorial_content_text.config(state=tk.DISABLED)
 
@@ -800,7 +868,9 @@ class LearningAssistantPlugin(ToolPlugin):
         code = self.tutorial_code_text.get(1.0, tk.END).strip()
         if code:
             # This would integrate with the main TimeWarp editor
-            messagebox.showinfo("Code Sent", "Tutorial code has been sent to the main editor!")
+            messagebox.showinfo(
+                "Code Sent", "Tutorial code has been sent to the main editor!"
+            )
 
     def complete_tutorial_step(self):
         """Mark current tutorial step as complete"""
@@ -814,7 +884,9 @@ class LearningAssistantPlugin(ToolPlugin):
 
             self.user_progress[tutorial_id]["completed_steps"].add(step_index)
 
-            messagebox.showinfo("Step Complete", "Great job! Tutorial step marked as complete.")
+            messagebox.showinfo(
+                "Step Complete", "Great job! Tutorial step marked as complete."
+            )
             self.update_progress_display()
 
     def get_tutorial_hint(self):
@@ -850,22 +922,36 @@ class LearningAssistantPlugin(ToolPlugin):
         self.quality_label.config(text=f"Quality: {results['quality'].title()}")
 
         # Color code the quality
-        quality_colors = {"excellent": "green", "good": "blue", "fair": "orange", "needs improvement": "red"}
-        self.quality_label.config(foreground=quality_colors.get(results["quality"], "black"))
+        quality_colors = {
+            "excellent": "green",
+            "good": "blue",
+            "fair": "orange",
+            "needs improvement": "red",
+        }
+        self.quality_label.config(
+            foreground=quality_colors.get(results["quality"], "black")
+        )
 
         # Display suggestions
         self.analysis_results_text.config(state=tk.NORMAL)
         self.analysis_results_text.delete(1.0, tk.END)
 
         if results["suggestions"]:
-            self.analysis_results_text.insert(tk.END, "📋 Suggestions for Improvement:\n\n")
+            self.analysis_results_text.insert(
+                tk.END, "📋 Suggestions for Improvement:\n\n"
+            )
 
             for i, suggestion in enumerate(results["suggestions"], 1):
-                self.analysis_results_text.insert(tk.END, f"{i}. {suggestion['message']}\n")
-                self.analysis_results_text.insert(tk.END, f"   💡 {suggestion['suggestion']}\n\n")
+                self.analysis_results_text.insert(
+                    tk.END, f"{i}. {suggestion['message']}\n"
+                )
+                self.analysis_results_text.insert(
+                    tk.END, f"   💡 {suggestion['suggestion']}\n\n"
+                )
         else:
             self.analysis_results_text.insert(
-                tk.END, "🎉 Excellent! Your code looks great. No suggestions at this time."
+                tk.END,
+                "🎉 Excellent! Your code looks great. No suggestions at this time.",
             )
 
         self.analysis_results_text.config(state=tk.DISABLED)
@@ -891,7 +977,12 @@ class LearningAssistantPlugin(ToolPlugin):
 
                 # Auto-detect language from extension
                 ext = os.path.splitext(filename)[1].lower()
-                lang_map = {".pilot": "pilot", ".bas": "basic", ".logo": "logo", ".py": "python"}
+                lang_map = {
+                    ".pilot": "pilot",
+                    ".bas": "basic",
+                    ".logo": "logo",
+                    ".py": "python",
+                }
                 if ext in lang_map:
                     self.analysis_language_var.set(lang_map[ext])
 
@@ -906,37 +997,55 @@ class LearningAssistantPlugin(ToolPlugin):
         stats_frame.pack(fill=tk.X, padx=5, pady=5)
 
         # Tutorials completed
-        ttk.Label(stats_frame, text="Tutorials Completed:").grid(row=0, column=0, sticky=tk.W, padx=5)
-        self.tutorials_progress_bar = ttk.Progressbar(stats_frame, length=200, mode="determinate")
+        ttk.Label(stats_frame, text="Tutorials Completed:").grid(
+            row=0, column=0, sticky=tk.W, padx=5
+        )
+        self.tutorials_progress_bar = ttk.Progressbar(
+            stats_frame, length=200, mode="determinate"
+        )
         self.tutorials_progress_bar.grid(row=0, column=1, padx=5)
         self.tutorials_count_label = ttk.Label(stats_frame, text="0/0")
         self.tutorials_count_label.grid(row=0, column=2, padx=5)
 
         # Code quality average
-        ttk.Label(stats_frame, text="Average Code Quality:").grid(row=1, column=0, sticky=tk.W, padx=5)
-        self.quality_progress_bar = ttk.Progressbar(stats_frame, length=200, mode="determinate")
+        ttk.Label(stats_frame, text="Average Code Quality:").grid(
+            row=1, column=0, sticky=tk.W, padx=5
+        )
+        self.quality_progress_bar = ttk.Progressbar(
+            stats_frame, length=200, mode="determinate"
+        )
         self.quality_progress_bar.grid(row=1, column=1, padx=5)
         self.quality_score_label = ttk.Label(stats_frame, text="--")
         self.quality_score_label.grid(row=1, column=2, padx=5)
 
         # Learning streak
-        ttk.Label(stats_frame, text="Learning Streak:").grid(row=2, column=0, sticky=tk.W, padx=5)
-        self.streak_label = ttk.Label(stats_frame, text="0 days", font=("Arial", 10, "bold"))
+        ttk.Label(stats_frame, text="Learning Streak:").grid(
+            row=2, column=0, sticky=tk.W, padx=5
+        )
+        self.streak_label = ttk.Label(
+            stats_frame, text="0 days", font=("Arial", 10, "bold")
+        )
         self.streak_label.grid(row=2, column=1, sticky=tk.W, padx=5)
 
     def update_progress_display(self):
         """Update the progress display"""
         # Calculate statistics
         total_tutorials = len(self.tutorial_manager.tutorials)
-        completed_tutorials = len([t for t in self.user_progress.values() if t.get("completed_steps")])
+        completed_tutorials = len(
+            [t for t in self.user_progress.values() if t.get("completed_steps")]
+        )
 
         if total_tutorials > 0:
             tutorial_progress = (completed_tutorials / total_tutorials) * 100
             self.tutorials_progress_bar["value"] = tutorial_progress
-            self.tutorials_count_label.config(text=f"{completed_tutorials}/{total_tutorials}")
+            self.tutorials_count_label.config(
+                text=f"{completed_tutorials}/{total_tutorials}"
+            )
 
         # Average code quality
-        quality_scores = [p.get("score", 0) for p in self.user_progress.values() if "score" in p]
+        quality_scores = [
+            p.get("score", 0) for p in self.user_progress.values() if "score" in p
+        ]
         if quality_scores:
             avg_quality = sum(quality_scores) / len(quality_scores)
             self.quality_progress_bar["value"] = avg_quality
@@ -952,16 +1061,27 @@ class LearningAssistantPlugin(ToolPlugin):
             self.progress_tree.delete(item)
 
         # Add tutorial progress
-        tutorials_node = self.progress_tree.insert("", "end", text="Tutorials", values=("In Progress", "--", "--"))
+        tutorials_node = self.progress_tree.insert(
+            "", "end", text="Tutorials", values=("In Progress", "--", "--")
+        )
 
         for tutorial_id, tutorial in self.tutorial_manager.tutorials.items():
             progress = self.user_progress.get(tutorial_id, {})
             completed_steps = len(progress.get("completed_steps", set()))
             total_steps = len(tutorial["steps"])
 
-            status = "Completed" if completed_steps == total_steps else f"{completed_steps}/{total_steps}"
+            status = (
+                "Completed"
+                if completed_steps == total_steps
+                else f"{completed_steps}/{total_steps}"
+            )
 
-            self.progress_tree.insert(tutorials_node, "end", text=tutorial["title"], values=(status, "--", "Recently"))
+            self.progress_tree.insert(
+                tutorials_node,
+                "end",
+                text=tutorial["title"],
+                values=(status, "--", "Recently"),
+            )
 
     # Learning paths methods
     def create_default_learning_paths(self):
@@ -972,29 +1092,73 @@ class LearningAssistantPlugin(ToolPlugin):
                 "Start from scratch and learn programming fundamentals",
                 [
                     {"type": "tutorial", "id": "pilot_basics", "title": "PILOT Basics"},
-                    {"type": "practice", "id": "pilot_exercises", "title": "PILOT Practice"},
-                    {"type": "tutorial", "id": "basic_fundamentals", "title": "BASIC Fundamentals"},
-                    {"type": "project", "id": "simple_calculator", "title": "Build a Calculator"},
+                    {
+                        "type": "practice",
+                        "id": "pilot_exercises",
+                        "title": "PILOT Practice",
+                    },
+                    {
+                        "type": "tutorial",
+                        "id": "basic_fundamentals",
+                        "title": "BASIC Fundamentals",
+                    },
+                    {
+                        "type": "project",
+                        "id": "simple_calculator",
+                        "title": "Build a Calculator",
+                    },
                 ],
             ),
             "graphics_explorer": LearningPath(
                 "Graphics and Art",
                 "Learn to create graphics and visual art with programming",
                 [
-                    {"type": "tutorial", "id": "logo_graphics", "title": "Logo Turtle Graphics"},
-                    {"type": "project", "id": "geometric_art", "title": "Geometric Art Project"},
-                    {"type": "tutorial", "id": "advanced_graphics", "title": "Advanced Graphics"},
-                    {"type": "project", "id": "animation", "title": "Create Animations"},
+                    {
+                        "type": "tutorial",
+                        "id": "logo_graphics",
+                        "title": "Logo Turtle Graphics",
+                    },
+                    {
+                        "type": "project",
+                        "id": "geometric_art",
+                        "title": "Geometric Art Project",
+                    },
+                    {
+                        "type": "tutorial",
+                        "id": "advanced_graphics",
+                        "title": "Advanced Graphics",
+                    },
+                    {
+                        "type": "project",
+                        "id": "animation",
+                        "title": "Create Animations",
+                    },
                 ],
             ),
             "python_pathway": LearningPath(
                 "Modern Python",
                 "Learn contemporary Python programming",
                 [
-                    {"type": "tutorial", "id": "python_basics", "title": "Python Fundamentals"},
-                    {"type": "practice", "id": "python_exercises", "title": "Python Practice"},
-                    {"type": "project", "id": "text_adventure", "title": "Text Adventure Game"},
-                    {"type": "project", "id": "data_analysis", "title": "Data Analysis Project"},
+                    {
+                        "type": "tutorial",
+                        "id": "python_basics",
+                        "title": "Python Fundamentals",
+                    },
+                    {
+                        "type": "practice",
+                        "id": "python_exercises",
+                        "title": "Python Practice",
+                    },
+                    {
+                        "type": "project",
+                        "id": "text_adventure",
+                        "title": "Text Adventure Game",
+                    },
+                    {
+                        "type": "project",
+                        "id": "data_analysis",
+                        "title": "Data Analysis Project",
+                    },
                 ],
             ),
         }
@@ -1038,7 +1202,9 @@ class LearningAssistantPlugin(ToolPlugin):
 
     def start_learning_path(self):
         """Start selected learning path"""
-        messagebox.showinfo("Path Started", "Learning path started! Your progress will be tracked.")
+        messagebox.showinfo(
+            "Path Started", "Learning path started! Your progress will be tracked."
+        )
 
     def view_path_progress(self):
         """View detailed progress for selected path"""
@@ -1053,15 +1219,42 @@ class LearningAssistantPlugin(ToolPlugin):
         """Create achievements display content"""
         # This would create a scrollable frame with achievement badges
         achievements_frame = ttk.Frame(self.achievements_canvas)
-        self.achievements_canvas.create_window((0, 0), window=achievements_frame, anchor="nw")
+        self.achievements_canvas.create_window(
+            (0, 0), window=achievements_frame, anchor="nw"
+        )
 
         # Sample achievements
         achievements = [
-            {"name": "First Steps", "description": "Complete your first tutorial", "icon": "👶", "earned": True},
-            {"name": "Code Analyzer", "description": "Analyze 10 code samples", "icon": "🔍", "earned": False},
-            {"name": "Quality Coder", "description": "Achieve 90+ code quality score", "icon": "⭐", "earned": False},
-            {"name": "Explorer", "description": "Try all programming languages", "icon": "🚀", "earned": False},
-            {"name": "Persistent Learner", "description": "7-day learning streak", "icon": "🔥", "earned": False},
+            {
+                "name": "First Steps",
+                "description": "Complete your first tutorial",
+                "icon": "👶",
+                "earned": True,
+            },
+            {
+                "name": "Code Analyzer",
+                "description": "Analyze 10 code samples",
+                "icon": "🔍",
+                "earned": False,
+            },
+            {
+                "name": "Quality Coder",
+                "description": "Achieve 90+ code quality score",
+                "icon": "⭐",
+                "earned": False,
+            },
+            {
+                "name": "Explorer",
+                "description": "Try all programming languages",
+                "icon": "🚀",
+                "earned": False,
+            },
+            {
+                "name": "Persistent Learner",
+                "description": "7-day learning streak",
+                "icon": "🔥",
+                "earned": False,
+            },
         ]
 
         for i, achievement in enumerate(achievements):
@@ -1069,7 +1262,9 @@ class LearningAssistantPlugin(ToolPlugin):
 
         # Update scroll region
         achievements_frame.update_idletasks()
-        self.achievements_canvas.configure(scrollregion=self.achievements_canvas.bbox("all"))
+        self.achievements_canvas.configure(
+            scrollregion=self.achievements_canvas.bbox("all")
+        )
 
     def create_achievement_badge(self, parent, achievement, row):
         """Create an individual achievement badge"""
@@ -1081,7 +1276,9 @@ class LearningAssistantPlugin(ToolPlugin):
         icon_label.pack()
 
         # Name
-        name_label = ttk.Label(frame, text=achievement["name"], font=("Arial", 12, "bold"))
+        name_label = ttk.Label(
+            frame, text=achievement["name"], font=("Arial", 12, "bold")
+        )
         name_label.pack()
 
         # Description
@@ -1106,7 +1303,9 @@ class LearningAssistantPlugin(ToolPlugin):
     def _load_user_data(self):
         """Load user progress and settings"""
         try:
-            data_file = os.path.join(os.path.expanduser("~"), ".james", "learning_assistant.json")
+            data_file = os.path.join(
+                os.path.expanduser("~"), ".james", "learning_assistant.json"
+            )
             if os.path.exists(data_file):
                 with open(data_file, "r") as f:
                     data = json.load(f)
@@ -1129,7 +1328,10 @@ class LearningAssistantPlugin(ToolPlugin):
             # Prepare data
             data = {
                 "progress": self.user_progress,
-                "learning_paths": {path_id: path.to_dict() for path_id, path in self.learning_paths.items()},
+                "learning_paths": {
+                    path_id: path.to_dict()
+                    for path_id, path in self.learning_paths.items()
+                },
                 "last_saved": datetime.datetime.now().isoformat(),
             }
 

@@ -102,7 +102,9 @@ class BaseCompiler(ABC):
         """Parse source code into statements"""
         raise NotImplementedError
 
-    def compile_file(self, input_file: str, output_file: Optional[str] = None) -> CompilerResult:
+    def compile_file(
+        self, input_file: str, output_file: Optional[str] = None
+    ) -> CompilerResult:
         """Compile source file to executable"""
         try:
             # Read source
@@ -122,7 +124,9 @@ class BaseCompiler(ABC):
     def compile_source(self, source: str, output_file: str) -> CompilerResult:
         """Compile source code to executable"""
         try:
-            print(f"🔧 Compiling {self.language.value.upper()} source to executable: {output_file}")
+            print(
+                f"🔧 Compiling {self.language.value.upper()} source to executable: {output_file}"
+            )
 
             # Parse source
             print("📝 Step 1: Parsing source...")
@@ -149,10 +153,14 @@ class BaseCompiler(ABC):
                 os.chmod(output_file, 0o755)
                 return CompilerResult(success=True, executable_path=output_file)
             else:
-                return CompilerResult(success=False, error_message="C compilation failed")
+                return CompilerResult(
+                    success=False, error_message="C compilation failed"
+                )
 
         except (ValueError, RuntimeError) as e:
-            return CompilerResult(success=False, error_message=f"Compilation failed: {str(e)}")
+            return CompilerResult(
+                success=False, error_message=f"Compilation failed: {str(e)}"
+            )
 
     def build_executable(self, c_code: str, output_file: str) -> bool:
         """Compile C code to executable"""
@@ -171,7 +179,9 @@ class BaseCompiler(ABC):
                 else:
                     cmd.extend(["-g"])  # Debug symbols
 
-                result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, check=False
+                )
 
                 if result.returncode == 0:
                     print("   C compilation successful")

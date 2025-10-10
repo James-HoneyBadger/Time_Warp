@@ -28,7 +28,9 @@ class RPiController:
             # RPi.GPIO not available or failed to initialize - use simulation mode
             self.GPIO = None
             self.gpio_available = False
-            print("🤖 Hardware: Raspberry Pi GPIO simulation mode (RPi.GPIO not available)")
+            print(
+                "🤖 Hardware: Raspberry Pi GPIO simulation mode (RPi.GPIO not available)"
+            )
         # Continue in simulation mode if hardware not available
 
     def set_pin_mode(self, pin, mode):
@@ -136,7 +138,14 @@ class SensorVisualizer:
         )
 
         # Y-axis
-        self.canvas.create_line(margin, margin, margin, canvas_height - margin, fill="black", tags="sensor_chart")
+        self.canvas.create_line(
+            margin,
+            margin,
+            margin,
+            canvas_height - margin,
+            fill="black",
+            tags="sensor_chart",
+        )
 
         # Plot data for each sensor
         color_index = 0
@@ -155,16 +164,26 @@ class SensorVisualizer:
             points = []
             for i, value in enumerate(data):
                 x = margin + (i / (len(data) - 1)) * chart_width
-                y = canvas_height - margin - ((value - min_val) / val_range) * chart_height
+                y = (
+                    canvas_height
+                    - margin
+                    - ((value - min_val) / val_range) * chart_height
+                )
                 points.extend([x, y])
 
             if len(points) >= 4:
-                self.canvas.create_line(*points, fill=color, width=2, tags="sensor_chart", smooth=True)
+                self.canvas.create_line(
+                    *points, fill=color, width=2, tags="sensor_chart", smooth=True
+                )
 
             # Add legend
             legend_y = margin + color_index * 20
             self.canvas.create_text(
-                canvas_width - margin - 60, legend_y, text=sensor_name, fill=color, tags="sensor_chart"
+                canvas_width - margin - 60,
+                legend_y,
+                text=sensor_name,
+                fill=color,
+                tags="sensor_chart",
             )
 
 

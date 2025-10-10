@@ -128,7 +128,9 @@ class PluginLoader:
 
         return plugins
 
-    def _create_function_plugin(self, module: ModuleType, metadata_dict: Dict[str, Any]) -> Optional[PluginInterface]:
+    def _create_function_plugin(
+        self, module: ModuleType, metadata_dict: Dict[str, Any]
+    ) -> Optional[PluginInterface]:
         """Create a plugin from module-level functions"""
         try:
             # Create metadata
@@ -172,7 +174,9 @@ class PluginLoader:
                     for attr_name in dir(self.module):
                         attr = getattr(self.module, attr_name)
                         if hasattr(attr, "_plugin_constant_name"):
-                            constants[attr._plugin_constant_name] = attr._plugin_constant_value
+                            constants[attr._plugin_constant_name] = (
+                                attr._plugin_constant_value
+                            )
                     return constants
 
             return DynamicPlugin(module)
@@ -226,7 +230,9 @@ class PluginLoader:
             print(f"Error reloading plugin {plugin_name}: {e}")
             return False
 
-    def create_plugin_template(self, filepath: str, plugin_type: PluginType = PluginType.FUNCTION_LIBRARY):
+    def create_plugin_template(
+        self, filepath: str, plugin_type: PluginType = PluginType.FUNCTION_LIBRARY
+    ):
         """Create a plugin template file"""
         template = f'''"""
 Example TimeWarp IDE Plugin
