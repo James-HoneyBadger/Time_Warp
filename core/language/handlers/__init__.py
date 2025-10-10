@@ -6,9 +6,4 @@ from .pilot_handler import PilotHandler
 from .logo_handler import LogoHandler
 from .python_handler import PythonHandler, BasicHandler
 
-__all__ = [
-    'PilotHandler',
-    'LogoHandler', 
-    'PythonHandler',
-    'BasicHandler'
-]
+__all__ = ["PilotHandler", "LogoHandler", "PythonHandler", "BasicHandler"]

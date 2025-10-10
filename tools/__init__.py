@@ -3,7 +3,7 @@ TimeWarp Tools Module
 ==================
 
 Additional tools and integrations:
-- Virtual environment management  
+- Virtual environment management
 - Package manager
 - External tool integrations
 """

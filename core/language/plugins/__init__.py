@@ -8,11 +8,4 @@ from .base import Plugin, PluginInterface, PluginType
 from .loader import PluginLoader
 from .registry import PluginRegistry
 
-__all__ = [
-    'PluginManager',
-    'Plugin',
-    'PluginInterface',
-    'PluginType',
-    'PluginLoader',
-    'PluginRegistry'
-]
+__all__ = ["PluginManager", "Plugin", "PluginInterface", "PluginType", "PluginLoader", "PluginRegistry"]

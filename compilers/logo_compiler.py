@@ -231,10 +231,10 @@ class LogoCodeGenerator(CodeGenerator):
             "}",
             "",
             "void save_image(const char* filename) {",
-            "    FILE* fp = fopen(filename, \"wb\");",
+            '    FILE* fp = fopen(filename, "wb");',
             "    if (!fp) return;",
             "    ",
-            "    fprintf(fp, \"P6\\n%d %d\\n255\\n\", WIDTH, HEIGHT);",
+            '    fprintf(fp, "P6\\n%d %d\\n255\\n", WIDTH, HEIGHT);',
             "    fwrite(image, 1, WIDTH * HEIGHT * 3, fp);",
             "    fclose(fp);",
             "}",
@@ -268,85 +268,87 @@ class LogoCodeGenerator(CodeGenerator):
             lines.extend(self.generate_statement(stmt))
 
         # Save the image at the end
-        lines.extend([
-            "",
-            "    save_image(\"logo_output.ppm\");",
-            "    printf(\"Logo graphics saved to logo_output.ppm\\n\");",
-            "    return 0;",
-            "}",
-        ])
+        lines.extend(
+            [
+                "",
+                '    save_image("logo_output.ppm");',
+                '    printf("Logo graphics saved to logo_output.ppm\\n");',
+                "    return 0;",
+                "}",
+            ]
+        )
 
         return lines
 
     def generate_statement(self, stmt: Dict) -> List[str]:
         """Generate C code for a Logo statement"""
-        stmt_type = stmt.get('type')
-        args = stmt.get('args', {})
+        stmt_type = stmt.get("type")
+        args = stmt.get("args", {})
 
-        if stmt_type == 'FORWARD':
+        if stmt_type == "FORWARD":
             return self.generate_forward(args)
-        elif stmt_type == 'BACK':
+        elif stmt_type == "BACK":
             return self.generate_back(args)
-        elif stmt_type == 'LEFT':
+        elif stmt_type == "LEFT":
             return self.generate_left(args)
-        elif stmt_type == 'RIGHT':
+        elif stmt_type == "RIGHT":
             return self.generate_right(args)
-        elif stmt_type == 'PENUP':
+        elif stmt_type == "PENUP":
             return ["    penup();"]
-        elif stmt_type == 'PENDOWN':
+        elif stmt_type == "PENDOWN":
             return ["    pendown();"]
-        elif stmt_type == 'SETXY':
+        elif stmt_type == "SETXY":
             return self.generate_setxy(args)
-        elif stmt_type == 'HOME':
+        elif stmt_type == "HOME":
             return ["    home();"]
-        elif stmt_type == 'CLEAN':
+        elif stmt_type == "CLEAN":
             return ["    clean();"]
-        elif stmt_type == 'REPEAT':
+        elif stmt_type == "REPEAT":
             return self.generate_repeat(args)
-        elif stmt_type == 'MAKE':
+        elif stmt_type == "MAKE":
             return self.generate_make(args)
-        elif stmt_type == 'IF':
+        elif stmt_type == "IF":
             return self.generate_if(args)
-        elif stmt_type == 'TO':
+        elif stmt_type == "TO":
             return self.generate_to(args)
-        elif stmt_type == 'END':
+        elif stmt_type == "END":
             return ["    // END procedure"]
         else:
             return [f"    // Unknown statement: {stmt_type}"]
 
     def generate_forward(self, args: Dict) -> List[str]:
         """Generate FORWARD statement"""
-        distance = args.get('distance', '10')
-        return [f"    forward(evaluate_expression(\"{distance}\"));"]
+        distance = args.get("distance", "10")
+        return [f'    forward(evaluate_expression("{distance}"));']
 
     def generate_back(self, args: Dict) -> List[str]:
         """Generate BACK statement"""
-        distance = args.get('distance', '10')
-        return [f"    backward(evaluate_expression(\"{distance}\"));"]
+        distance = args.get("distance", "10")
+        return [f'    backward(evaluate_expression("{distance}"));']
 
     def generate_left(self, args: Dict) -> List[str]:
         """Generate LEFT statement"""
-        angle = args.get('angle', '90')
-        return [f"    left(evaluate_expression(\"{angle}\"));"]
+        angle = args.get("angle", "90")
+        return [f'    left(evaluate_expression("{angle}"));']
 
     def generate_right(self, args: Dict) -> List[str]:
         """Generate RIGHT statement"""
-        angle = args.get('angle', '90')
-        return [f"    right(evaluate_expression(\"{angle}\"));"]
+        angle = args.get("angle", "90")
+        return [f'    right(evaluate_expression("{angle}"));']
 
     def generate_setxy(self, args: Dict) -> List[str]:
         """Generate SETXY statement"""
-        x = args.get('x', '0')
-        y = args.get('y', '0')
-        return [f"    setxy(evaluate_expression(\"{x}\"), evaluate_expression(\"{y}\"));"]
+        x = args.get("x", "0")
+        y = args.get("y", "0")
+        return [f'    setxy(evaluate_expression("{x}"), evaluate_expression("{y}"));']
 
     def generate_repeat(self, args: Dict) -> List[str]:
         """Generate REPEAT statement"""
-        count = args.get('count', '1')
-        statements = args.get('statements', [])
+        count = args.get("count", "1")
+        statements = args.get("statements", [])
 
         lines = [
-            f"    for (int i = 0; i < (int)evaluate_expression(\"{count}\"); i++) {{",
+            f'    for (int i = 0; i < (int)evaluate_expression("{count}"); i++) {{',
         ]
 
         for stmt in statements:
@@ -357,17 +359,17 @@ class LogoCodeGenerator(CodeGenerator):
 
     def generate_make(self, args: Dict) -> List[str]:
         """Generate MAKE statement"""
-        variable = args.get('variable', '')
-        value = args.get('value', '0')
-        return [f"    set_variable(\"{variable}\", evaluate_expression(\"{value}\"));"]
+        variable = args.get("variable", "")
+        value = args.get("value", "0")
+        return [f'    set_variable("{variable}", evaluate_expression("{value}"));']
 
     def generate_if(self, args: Dict) -> List[str]:
         """Generate IF statement"""
-        condition = args.get('condition', '')
-        statements = args.get('statements', [])
+        condition = args.get("condition", "")
+        statements = args.get("statements", [])
 
         lines = [
-            f"    if (evaluate_expression(\"{condition}\") != 0.0) {{",
+            f'    if (evaluate_expression("{condition}") != 0.0) {{',
         ]
 
         for stmt in statements:
@@ -378,9 +380,9 @@ class LogoCodeGenerator(CodeGenerator):
 
     def generate_to(self, args: Dict) -> List[str]:
         """Generate TO procedure definition"""
-        name = args.get('name', '')
+        name = args.get("name", "")
         # params = args.get('params', [])  # Not used in simplified implementation
-        statements = args.get('statements', [])
+        statements = args.get("statements", [])
 
         # For now, just execute the statements inline
         lines = [f"    // Procedure {name}"]
@@ -395,7 +397,7 @@ class LogoCodeGenerator(CodeGenerator):
         lines.extend(self.generate_header())
         lines.extend(self.generate_runtime())
         lines.extend(self.generate_main(statements))
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
 
 class LogoCompiler(BaseCompiler):
@@ -411,7 +413,7 @@ class LogoCompiler(BaseCompiler):
     def parse_source(self, source: str) -> List[Dict]:
         """Parse Logo source into statements"""
         statements = []
-        lines = source.strip().split('\n')
+        lines = source.strip().split("\n")
 
         for line in lines:
             line = line.strip()
@@ -421,108 +423,87 @@ class LogoCompiler(BaseCompiler):
             # Parse different Logo statements
             line_upper = line.upper()
 
-            if line_upper.startswith('FORWARD ') or line_upper.startswith('FD '):
+            if line_upper.startswith("FORWARD ") or line_upper.startswith("FD "):
                 statements.append(self.parse_forward(line))
-            elif line_upper.startswith('BACK ') or line_upper.startswith('BK '):
+            elif line_upper.startswith("BACK ") or line_upper.startswith("BK "):
                 statements.append(self.parse_back(line))
-            elif line_upper.startswith('LEFT ') or line_upper.startswith('LT '):
+            elif line_upper.startswith("LEFT ") or line_upper.startswith("LT "):
                 statements.append(self.parse_left(line))
-            elif line_upper.startswith('RIGHT ') or line_upper.startswith('RT '):
+            elif line_upper.startswith("RIGHT ") or line_upper.startswith("RT "):
                 statements.append(self.parse_right(line))
-            elif line_upper == 'PENUP' or line_upper == 'PU':
-                statements.append({'type': 'PENUP', 'args': {}})
-            elif line_upper == 'PENDOWN' or line_upper == 'PD':
-                statements.append({'type': 'PENDOWN', 'args': {}})
-            elif line_upper.startswith('SETXY ') or line_upper.startswith('SETPOS '):
+            elif line_upper == "PENUP" or line_upper == "PU":
+                statements.append({"type": "PENUP", "args": {}})
+            elif line_upper == "PENDOWN" or line_upper == "PD":
+                statements.append({"type": "PENDOWN", "args": {}})
+            elif line_upper.startswith("SETXY ") or line_upper.startswith("SETPOS "):
                 statements.append(self.parse_setxy(line))
-            elif line_upper == 'HOME':
-                statements.append({'type': 'HOME', 'args': {}})
-            elif line_upper == 'CLEAN' or line_upper == 'CS':
-                statements.append({'type': 'CLEAN', 'args': {}})
-            elif line_upper == 'HIDETURTLE' or line_upper == 'HT':
-                statements.append({'type': 'HIDETURTLE', 'args': {}})
-            elif line_upper == 'SHOWTURTLE' or line_upper == 'ST':
-                statements.append({'type': 'SHOWTURTLE', 'args': {}})
-            elif line_upper.startswith('REPEAT '):
+            elif line_upper == "HOME":
+                statements.append({"type": "HOME", "args": {}})
+            elif line_upper == "CLEAN" or line_upper == "CS":
+                statements.append({"type": "CLEAN", "args": {}})
+            elif line_upper == "HIDETURTLE" or line_upper == "HT":
+                statements.append({"type": "HIDETURTLE", "args": {}})
+            elif line_upper == "SHOWTURTLE" or line_upper == "ST":
+                statements.append({"type": "SHOWTURTLE", "args": {}})
+            elif line_upper.startswith("REPEAT "):
                 statements.append(self.parse_repeat(line))
-            elif line_upper.startswith('MAKE ') or line_upper.startswith('SET '):
+            elif line_upper.startswith("MAKE ") or line_upper.startswith("SET "):
                 statements.append(self.parse_make(line))
-            elif line_upper.startswith('IF '):
+            elif line_upper.startswith("IF "):
                 statements.append(self.parse_if(line))
-            elif line_upper.startswith('TO '):
+            elif line_upper.startswith("TO "):
                 statements.append(self.parse_to(line))
-            elif line_upper == 'END':
-                statements.append({'type': 'END', 'args': {}})
+            elif line_upper == "END":
+                statements.append({"type": "END", "args": {}})
             else:
-                statements.append({'type': 'UNKNOWN', 'args': {'text': line}})
+                statements.append({"type": "UNKNOWN", "args": {"text": line}})
 
         return statements
 
     def parse_forward(self, line: str) -> Dict:
         """Parse FORWARD/FD statement"""
-        match = re.search(r'(?:FORWARD|FD)\s+(.+)', line, re.IGNORECASE)
-        distance = match.group(1).strip() if match else '10'
-        return {
-            'type': 'FORWARD',
-            'args': {'distance': distance}
-        }
+        match = re.search(r"(?:FORWARD|FD)\s+(.+)", line, re.IGNORECASE)
+        distance = match.group(1).strip() if match else "10"
+        return {"type": "FORWARD", "args": {"distance": distance}}
 
     def parse_back(self, line: str) -> Dict:
         """Parse BACK/BK statement"""
-        match = re.search(r'(?:BACK|BK)\s+(.+)', line, re.IGNORECASE)
-        distance = match.group(1).strip() if match else '10'
-        return {
-            'type': 'BACK',
-            'args': {'distance': distance}
-        }
+        match = re.search(r"(?:BACK|BK)\s+(.+)", line, re.IGNORECASE)
+        distance = match.group(1).strip() if match else "10"
+        return {"type": "BACK", "args": {"distance": distance}}
 
     def parse_left(self, line: str) -> Dict:
         """Parse LEFT/LT statement"""
-        match = re.search(r'(?:LEFT|LT)\s+(.+)', line, re.IGNORECASE)
-        angle = match.group(1).strip() if match else '90'
-        return {
-            'type': 'LEFT',
-            'args': {'angle': angle}
-        }
+        match = re.search(r"(?:LEFT|LT)\s+(.+)", line, re.IGNORECASE)
+        angle = match.group(1).strip() if match else "90"
+        return {"type": "LEFT", "args": {"angle": angle}}
 
     def parse_right(self, line: str) -> Dict:
         """Parse RIGHT/RT statement"""
-        match = re.search(r'(?:RIGHT|RT)\s+(.+)', line, re.IGNORECASE)
-        angle = match.group(1).strip() if match else '90'
-        return {
-            'type': 'RIGHT',
-            'args': {'angle': angle}
-        }
+        match = re.search(r"(?:RIGHT|RT)\s+(.+)", line, re.IGNORECASE)
+        angle = match.group(1).strip() if match else "90"
+        return {"type": "RIGHT", "args": {"angle": angle}}
 
     def parse_setxy(self, line: str) -> Dict:
         """Parse SETXY/SETPOS statement"""
-        match = re.search(r'(?:SETXY|SETPOS)\s+(.+)', line, re.IGNORECASE)
+        match = re.search(r"(?:SETXY|SETPOS)\s+(.+)", line, re.IGNORECASE)
         if match:
             coords = match.group(1).strip().split()
             if len(coords) >= 2:
-                return {
-                    'type': 'SETXY',
-                    'args': {'x': coords[0], 'y': coords[1]}
-                }
-        return {
-            'type': 'SETXY',
-            'args': {'x': '0', 'y': '0'}
-        }
+                return {"type": "SETXY", "args": {"x": coords[0], "y": coords[1]}}
+        return {"type": "SETXY", "args": {"x": "0", "y": "0"}}
 
     def parse_repeat(self, line: str) -> Dict:
         """Parse REPEAT statement"""
         # This is a simplified parser - in a real implementation,
         # we'd need to parse nested structures properly
-        match = re.search(r'REPEAT\s+(\d+)', line, re.IGNORECASE)
-        count = match.group(1) if match else '1'
+        match = re.search(r"REPEAT\s+(\d+)", line, re.IGNORECASE)
+        count = match.group(1) if match else "1"
 
         # For now, just return a simple repeat
         return {
-            'type': 'REPEAT',
-            'args': {
-                'count': count,
-                'statements': []  # Would need proper parsing for nested statements
-            }
+            "type": "REPEAT",
+            "args": {"count": count, "statements": []},  # Would need proper parsing for nested statements
         }
 
     def parse_make(self, line: str) -> Dict:
@@ -531,40 +512,21 @@ class LogoCompiler(BaseCompiler):
         if match:
             variable = match.group(1)
             value = match.group(2).strip()
-            return {
-                'type': 'MAKE',
-                'args': {'variable': variable, 'value': value}
-            }
-        return {
-            'type': 'MAKE',
-            'args': {'variable': '', 'value': '0'}
-        }
+            return {"type": "MAKE", "args": {"variable": variable, "value": value}}
+        return {"type": "MAKE", "args": {"variable": "", "value": "0"}}
 
     def parse_if(self, line: str) -> Dict:
         """Parse IF statement"""
         # Simplified IF parsing
-        match = re.search(r'IF\s+(.+)', line, re.IGNORECASE)
-        condition = match.group(1).strip() if match else '0'
+        match = re.search(r"IF\s+(.+)", line, re.IGNORECASE)
+        condition = match.group(1).strip() if match else "0"
 
-        return {
-            'type': 'IF',
-            'args': {
-                'condition': condition,
-                'statements': []  # Would need proper parsing
-            }
-        }
+        return {"type": "IF", "args": {"condition": condition, "statements": []}}  # Would need proper parsing
 
     def parse_to(self, line: str) -> Dict:
         """Parse TO procedure definition"""
         # Simplified TO parsing
-        match = re.search(r'TO\s+(\w+)', line, re.IGNORECASE)
-        name = match.group(1) if match else 'procedure'
+        match = re.search(r"TO\s+(\w+)", line, re.IGNORECASE)
+        name = match.group(1) if match else "procedure"
 
-        return {
-            'type': 'TO',
-            'args': {
-                'name': name,
-                'params': [],
-                'statements': []  # Would need proper parsing
-            }
-        }
+        return {"type": "TO", "args": {"name": name, "params": [], "statements": []}}  # Would need proper parsing

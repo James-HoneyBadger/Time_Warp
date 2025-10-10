@@ -11,10 +11,10 @@ from .test_plugins import TestPluginSystem
 from .test_integration import TestIntegration
 
 __all__ = [
-    'TestErrorManager',
-    'TestStandardLibrary', 
-    'TestRuntimeEngine',
-    'TestCompiler',
-    'TestPluginSystem',
-    'TestIntegration'
+    "TestErrorManager",
+    "TestStandardLibrary",
+    "TestRuntimeEngine",
+    "TestCompiler",
+    "TestPluginSystem",
+    "TestIntegration",
 ]

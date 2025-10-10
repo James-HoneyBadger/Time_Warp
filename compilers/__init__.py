@@ -26,12 +26,12 @@ def create_compiler(language: Language) -> BaseCompiler:
 
 
 __all__ = [
-    'BaseCompiler',
-    'CodeGenerator',
-    'CompilerResult',
-    'Language',
-    'create_compiler',
-    'BasicCompiler',
-    'LogoCompiler',
-    'PilotCompiler',
+    "BaseCompiler",
+    "CodeGenerator",
+    "CompilerResult",
+    "Language",
+    "create_compiler",
+    "BasicCompiler",
+    "LogoCompiler",
+    "PilotCompiler",
 ]

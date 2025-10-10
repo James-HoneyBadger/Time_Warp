@@ -11,45 +11,46 @@ import sys
 from typing import Any, Dict, Callable, Union, Optional
 from ..errors.error_manager import TimeWarpRuntimeError, TimeWarpTypeError, create_runtime_error, create_type_error
 
+
 class StandardLibrary:
     """Registry for built-in functions and constants"""
-    
+
     def __init__(self):
         self.functions: Dict[str, Callable] = {}
         self.constants: Dict[str, Any] = {}
         self._register_core_functions()
         self._register_constants()
-    
+
     def register_function(self, name: str, func: Callable, overwrite: bool = False):
         """Register a built-in function"""
         if name in self.functions and not overwrite:
             raise ValueError(f"Function '{name}' already registered")
         self.functions[name] = func
-    
+
     def register_constant(self, name: str, value: Any, overwrite: bool = False):
         """Register a built-in constant"""
         if name in self.constants and not overwrite:
             raise ValueError(f"Constant '{name}' already registered")
         self.constants[name] = value
-    
+
     def get_function(self, name: str) -> Optional[Callable]:
         """Get a built-in function"""
         return self.functions.get(name)
-    
+
     def get_constant(self, name: str) -> Any:
         """Get a built-in constant"""
         if name not in self.constants:
             error = create_runtime_error(f"Undefined constant '{name}'")
             raise TimeWarpRuntimeError(error)
         return self.constants[name]
-    
+
     def get_all_names(self) -> list:
         """Get all registered names"""
         return list(self.functions.keys()) + list(self.constants.keys())
-    
+
     def _register_core_functions(self):
         """Register core mathematical and utility functions"""
-        
+
         # Mathematical functions
         self.register_function("SIN", self._safe_math_func(math.sin))
         self.register_function("COS", self._safe_math_func(math.cos))
@@ -69,12 +70,12 @@ class StandardLibrary:
         self.register_function("POW", pow)
         self.register_function("MIN", min)
         self.register_function("MAX", max)
-        
+
         # Random functions
         self.register_function("RND", lambda: random.random())
         self.register_function("RANDINT", lambda a, b: random.randint(int(a), int(b)))
         self.register_function("CHOICE", lambda lst: random.choice(list(lst)))
-        
+
         # String functions
         self.register_function("LEN", len)
         self.register_function("LEFT$", self._left_string)
@@ -87,27 +88,27 @@ class StandardLibrary:
         self.register_function("FIND", lambda s, sub: str(s).find(str(sub)))
         self.register_function("SPLIT$", lambda s, sep=" ": str(s).split(str(sep)))
         self.register_function("JOIN$", lambda lst, sep="": str(sep).join(str(x) for x in lst))
-        
+
         # Type conversion functions
         self.register_function("STR$", str)
         self.register_function("VAL", self._safe_val)
         self.register_function("CHR$", chr)
         self.register_function("ASC", ord)
-        
+
         # System functions
         self.register_function("TIME$", lambda: time.strftime("%H:%M:%S"))
         self.register_function("DATE$", lambda: time.strftime("%Y-%m-%d"))
         self.register_function("DATETIME$", lambda: time.strftime("%Y-%m-%d %H:%M:%S"))
         self.register_function("TIMESTAMP", lambda: int(time.time()))
         self.register_function("SLEEP", time.sleep)
-        
+
         # File system functions
         self.register_function("EXISTS", os.path.exists)
         self.register_function("ISFILE", os.path.isfile)
         self.register_function("ISDIR", os.path.isdir)
         self.register_function("GETCWD", os.getcwd)
         self.register_function("LISTDIR", os.listdir)
-        
+
         # Array/List functions
         self.register_function("APPEND", lambda lst, item: list(lst).append(item))
         self.register_function("REMOVE", lambda lst, item: list(lst).remove(item))
@@ -115,7 +116,7 @@ class StandardLibrary:
         self.register_function("COUNT", lambda lst, item: list(lst).count(item))
         self.register_function("REVERSE", lambda lst: list(reversed(lst)))
         self.register_function("SORT", lambda lst: sorted(lst))
-        
+
     def _register_constants(self):
         """Register mathematical and system constants"""
         self.register_constant("PI", math.pi)
@@ -126,18 +127,20 @@ class StandardLibrary:
         self.register_constant("TRUE", True)
         self.register_constant("FALSE", False)
         self.register_constant("NULL", None)
-        
+
     # Safe wrapper functions with error handling
     def _safe_math_func(self, func):
         """Wrapper for math functions with error handling"""
+
         def wrapper(x):
             try:
                 return func(float(x))
             except (ValueError, TypeError) as e:
                 error = create_runtime_error(f"Math error: {e}")
                 raise TimeWarpRuntimeError(error)
+
         return wrapper
-    
+
     def _safe_sqrt(self, x):
         """Safe square root function"""
         try:
@@ -149,7 +152,7 @@ class StandardLibrary:
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Math error: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _safe_log(self, x, base=math.e):
         """Safe logarithm function"""
         try:
@@ -166,7 +169,7 @@ class StandardLibrary:
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Math error: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _safe_int(self, x):
         """Safe integer conversion"""
         try:
@@ -176,7 +179,7 @@ class StandardLibrary:
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Cannot convert to integer: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _safe_round(self, x, digits=0):
         """Safe rounding function"""
         try:
@@ -184,7 +187,7 @@ class StandardLibrary:
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Rounding error: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _safe_val(self, s):
         """Safe value conversion from string"""
         try:
@@ -192,22 +195,22 @@ class StandardLibrary:
             if not s:
                 return 0
             # Try integer first
-            if '.' not in s and 'e' not in s.lower():
+            if "." not in s and "e" not in s.lower():
                 return int(s)
             else:
                 return float(s)
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Cannot convert '{s}' to number")
             raise TimeWarpRuntimeError(error)
-    
+
     def _left_string(self, s, n):
         """Get leftmost n characters"""
         try:
-            return str(s)[:int(n)]
+            return str(s)[: int(n)]
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _right_string(self, s, n):
         """Get rightmost n characters"""
         try:
@@ -216,7 +219,7 @@ class StandardLibrary:
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
             raise TimeWarpRuntimeError(error)
-    
+
     def _mid_string(self, s, start, length=None):
         """Get substring starting at position"""
         try:
@@ -228,10 +231,11 @@ class StandardLibrary:
                 return s[start:]
             else:
                 length = int(length)
-                return s[start:start + length]
+                return s[start : start + length]
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
             raise TimeWarpRuntimeError(error)
+
 
 # Global instance
 std_lib = StandardLibrary()

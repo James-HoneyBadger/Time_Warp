@@ -24,6 +24,7 @@ from enum import Enum
 
 class Language(Enum):
     """Supported programming languages"""
+
     BASIC = "basic"
     LOGO = "logo"
     PILOT = "pilot"
@@ -32,6 +33,7 @@ class Language(Enum):
 @dataclass
 class CompilerResult:
     """Result of compilation process"""
+
     success: bool
     executable_path: Optional[str] = None
     error_message: Optional[str] = None
@@ -104,7 +106,7 @@ class BaseCompiler(ABC):
         """Compile source file to executable"""
         try:
             # Read source
-            with open(input_file, 'r', encoding='utf-8') as f:
+            with open(input_file, "r", encoding="utf-8") as f:
                 source = f.read()
 
             # Determine output filename
@@ -115,10 +117,7 @@ class BaseCompiler(ABC):
             return self.compile_source(source, output_file)
 
         except (IOError, OSError) as e:
-            return CompilerResult(
-                success=False,
-                error_message=f"File error: {str(e)}"
-            )
+            return CompilerResult(success=False, error_message=f"File error: {str(e)}")
 
     def compile_source(self, source: str, output_file: str) -> CompilerResult:
         """Compile source code to executable"""
@@ -150,33 +149,27 @@ class BaseCompiler(ABC):
                 os.chmod(output_file, 0o755)
                 return CompilerResult(success=True, executable_path=output_file)
             else:
-                return CompilerResult(
-                    success=False,
-                    error_message="C compilation failed"
-                )
+                return CompilerResult(success=False, error_message="C compilation failed")
 
         except (ValueError, RuntimeError) as e:
-            return CompilerResult(
-                success=False,
-                error_message=f"Compilation failed: {str(e)}"
-            )
+            return CompilerResult(success=False, error_message=f"Compilation failed: {str(e)}")
 
     def build_executable(self, c_code: str, output_file: str) -> bool:
         """Compile C code to executable"""
         try:
             # Create temporary C file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.c', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".c", delete=False) as f:
                 f.write(c_code)
                 c_file = f.name
 
             try:
                 # Compile with gcc
-                cmd = ['gcc', '-o', output_file, c_file, '-lm']
+                cmd = ["gcc", "-o", output_file, c_file, "-lm"]
 
                 if self.optimize:
-                    cmd.extend(['-O2'])
+                    cmd.extend(["-O2"])
                 else:
-                    cmd.extend(['-g'])  # Debug symbols
+                    cmd.extend(["-g"])  # Debug symbols
 
                 result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 

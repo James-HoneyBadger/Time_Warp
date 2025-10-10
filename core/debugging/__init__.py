@@ -9,16 +9,16 @@ from .test_framework import TestRunner, TestDiscovery, CoverageAnalyzer
 from .error_analyzer import ErrorAnalyzer, StackTraceVisualizer, ErrorPatternMatcher
 
 __all__ = [
-    'VisualDebugger',
-    'BreakpointManager', 
-    'VariableInspector',
-    'PerformanceMonitor',
-    'MemoryAnalyzer',
-    'ProfilerInterface',
-    'TestRunner',
-    'TestDiscovery', 
-    'CoverageAnalyzer',
-    'ErrorAnalyzer',
-    'StackTraceVisualizer',
-    'ErrorPatternMatcher'
+    "VisualDebugger",
+    "BreakpointManager",
+    "VariableInspector",
+    "PerformanceMonitor",
+    "MemoryAnalyzer",
+    "ProfilerInterface",
+    "TestRunner",
+    "TestDiscovery",
+    "CoverageAnalyzer",
+    "ErrorAnalyzer",
+    "StackTraceVisualizer",
+    "ErrorPatternMatcher",
 ]

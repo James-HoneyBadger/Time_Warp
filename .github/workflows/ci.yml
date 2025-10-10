@@ -58,8 +58,8 @@ jobs:
         
     - name: Run Black formatter check
       run: |
-        black --check --diff --line-length=120 TimeWarp.py features/
+        black --check --diff --line-length=120 TimeWarp.py core/
         
     - name: Run Flake8 linting
       run: |
-        flake8 TimeWarp.py features/ core/interpreter.py --max-line-length=120 --extend-ignore=E203,W503,F401,E501,W293,W291,E128,E722,E306,E301,E713,F811,E402,E231,E701,F541,E261,E302,E303,W292
+        flake8 TimeWarp.py core/ --max-line-length=120 --extend-ignore=E203,W503,F401,E501,W293,W291,E128,E722,E306,E301,E713,F811,E402,E231,E701,F541,E261,E302,E303,W292

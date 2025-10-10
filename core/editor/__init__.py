@@ -9,10 +9,4 @@ from .syntax_analyzer import SyntaxAnalyzer
 from .code_completion import CodeCompletionEngine
 from .compiler_manager import CompilerManager
 
-__all__ = [
-    'LanguageEngine',
-    'CodeFormatter', 
-    'SyntaxAnalyzer',
-    'CodeCompletionEngine',
-    'CompilerManager'
-]
+__all__ = ["LanguageEngine", "CodeFormatter", "SyntaxAnalyzer", "CodeCompletionEngine", "CompilerManager"]

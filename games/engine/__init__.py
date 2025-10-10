@@ -8,4 +8,4 @@ from .game_renderer import GameRenderer
 from .game_manager import GameManager
 from .physics import PhysicsEngine
 
-__all__ = ['GameObject', 'Vector2D', 'GameRenderer', 'GameManager', 'PhysicsEngine']
+__all__ = ["GameObject", "Vector2D", "GameRenderer", "GameManager", "PhysicsEngine"]

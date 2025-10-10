@@ -9,4 +9,4 @@ from .timing import Timer
 from .particles import Particle
 from .hardware import ArduinoController
 
-__all__ = ['Mixer', 'Tween', 'EASE', 'Timer', 'Particle', 'ArduinoController']
+__all__ = ["Mixer", "Tween", "EASE", "Timer", "Particle", "ArduinoController"]
