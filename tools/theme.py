@@ -11,7 +11,7 @@ from pathlib import Path
 def get_config_dir():
     """Get the configuration directory for Time Warp"""
     home_dir = Path.home()
-    config_dir = home_dir / ".time_warp"
+    config_dir = home_dir / ".Time_Warp"
     config_dir.mkdir(exist_ok=True)
     return config_dir
 

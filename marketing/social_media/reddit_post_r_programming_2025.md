@@ -41,7 +41,7 @@ cd Time_Warp
 python Time_Warp.py
 
 # Or with auto-environment setup
-./start_timewarp.sh
+./scripts/start.sh
 ```
 
 ## Sample Programs Showcase
@@ -152,7 +152,7 @@ pip install -r requirements.txt
 python Time_Warp.py
 
 # Or use the shell script
-./start_timewarp.sh
+./scripts/start.sh
 ```
 
 **Dependencies:**

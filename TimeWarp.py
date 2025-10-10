@@ -735,7 +735,7 @@ class Time_WarpIDE:
             return "JavaScript"
         elif filename.endswith('.pl'):
             return "Perl"
-        elif filename.endswith('.jtc') or filename.endswith('.time_warp'):
+        elif filename.endswith('.jtc') or filename.endswith('.Time_Warp'):
             return "Time_Warp"
         else:
             return "Text"

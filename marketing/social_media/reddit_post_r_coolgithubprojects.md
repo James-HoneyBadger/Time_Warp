@@ -168,7 +168,7 @@ cd Time_Warp
 python Time_Warp.py
 
 # Or use the magic script
-./start_timewarp.sh  # Auto-creates Python environment!
+./scripts/start.sh  # Auto-creates Python environment!
 ```
 
 **Requirements:** Just Python 3.8+ (tkinter usually included)
