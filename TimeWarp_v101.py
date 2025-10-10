@@ -28,7 +28,13 @@ from plugins import PluginManager
 # v1.0.1 Enhanced components
 from gui.components.multi_tab_editor import MultiTabEditor
 from gui.components.file_explorer import FileExplorer
-from gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
+# PIL is optional for enhanced graphics
+try:
+    from gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
+    ENHANCED_GRAPHICS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Enhanced graphics not available: {e}")
+    ENHANCED_GRAPHICS_AVAILABLE = False
 from core.enhanced_error_handler import EnhancedErrorHandler, ErrorHighlighter
 
 # Feature modules
@@ -49,7 +55,11 @@ class TimeWarpIDE_v101:
         self.root = tk.Tk()
         self.root.title("⏰ TimeWarp IDE v1.0.1 - Enhanced Educational Programming")
         self.root.geometry("1600x1000")
-        self.root.minsize(1200, 800)
+        try:
+            self.root.minsize(1200, 800)
+        except:
+            # Fallback for older Tkinter versions
+            self.root.wm_minsize(1200, 800)
 
         # Initialize theme system
         self.theme_manager = ThemeManager()
@@ -103,15 +113,24 @@ class TimeWarpIDE_v101:
 
         # Left panel: File Explorer (250px width)
         self.left_panel = ttk.Frame(self.main_container, width=250)
-        self.main_container.add(self.left_panel, weight=0, minsize=200)
+        try:
+            self.main_container.add(self.left_panel, weight=0, minsize=200)
+        except:
+            self.main_container.add(self.left_panel, weight=0)
 
         # Center panel: Code Editor
         self.center_panel = ttk.Frame(self.main_container)
-        self.main_container.add(self.center_panel, weight=3, minsize=600)
+        try:
+            self.main_container.add(self.center_panel, weight=3, minsize=600)
+        except:
+            self.main_container.add(self.center_panel, weight=3)
 
         # Right panel: Graphics and Output
         self.right_panel = ttk.Frame(self.main_container, width=400)
-        self.main_container.add(self.right_panel, weight=1, minsize=350)
+        try:
+            self.main_container.add(self.right_panel, weight=1, minsize=350)
+        except:
+            self.main_container.add(self.right_panel, weight=1)
 
         # Setup components
         self.setup_menu()
@@ -245,17 +264,43 @@ class TimeWarpIDE_v101:
         self.right_notebook.add(graphics_frame, text="🎨 Graphics")
 
         # Enhanced graphics canvas
-        self.enhanced_graphics = EnhancedGraphicsCanvas(graphics_frame, 380, 300)
-
-        # Connect to interpreter (using available attributes)
-        try:
+        if ENHANCED_GRAPHICS_AVAILABLE:
+            self.enhanced_graphics = EnhancedGraphicsCanvas(graphics_frame, 380, 300)
+            
+            # Connect to interpreter (using available attributes)
+            try:
+                self.interpreter.turtle_graphics = {
+                    'canvas': self.enhanced_graphics.get_canvas(),
+                    'screen': self.enhanced_graphics.get_screen(),
+                    'turtle': self.enhanced_graphics.get_turtle()
+                }
+            except AttributeError:
+                print("⚠️ Turtle graphics integration needs updating")
+        else:
+            # Fallback to basic canvas
+            self.basic_canvas = tk.Canvas(
+                graphics_frame,
+                width=380,
+                height=300,
+                bg="white",
+                highlightthickness=1,
+                highlightbackground="#cccccc",
+            )
+            self.basic_canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+            
+            # Basic turtle setup
+            import turtle
+            screen = turtle.TurtleScreen(self.basic_canvas)
+            screen.bgcolor("white")
+            turtle_obj = turtle.RawTurtle(screen)
+            turtle_obj.speed(5)
+            turtle_obj.shape("turtle")
+            
             self.interpreter.turtle_graphics = {
-                'canvas': self.enhanced_graphics.get_canvas(),
-                'screen': self.enhanced_graphics.get_screen(),
-                'turtle': self.enhanced_graphics.get_turtle()
+                'canvas': self.basic_canvas,
+                'screen': screen,
+                'turtle': turtle_obj
             }
-        except AttributeError:
-            print("⚠️ Turtle graphics integration needs updating")
 
     def setup_keybindings(self):
         """Setup keyboard shortcuts"""
