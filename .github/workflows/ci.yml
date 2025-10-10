@@ -50,7 +50,7 @@ jobs:
         export SDL_VIDEODRIVER=dummy
         export SDL_AUDIODRIVER=dummy
         export PYGAME_HIDE_SUPPORT_PROMPT=1
-        xvfb-run -a python run_tests_minimal.py
+        xvfb-run -a python scripts/run_tests_minimal.py
         
     - name: Test Time_Warp IDE startup (fallback)
       run: |
