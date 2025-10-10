@@ -1,304 +1,391 @@
-# ⏰ TimeWarp Compiler
+# ⏰ TimeWarp IDE
 
-**Compile Educational Programming Languages to Native Executables**
+**A Multi-Language Educational Programming Environment**
 
-TimeWarp Compiler is a command-line tool that compiles educational programming languages (PILOT, BASIC, Logo) to native Linux executables. Transform your educational code into standalone programs that run without interpreters.
+TimeWarp IDE is a comprehensive educational programming environment that supports multiple classic and modern programming languages. Featuring an intuitive GUI interface, turtle graphics, interactive code execution, theme system, plugin architecture, and educational tools designed to make programming accessible and engaging.
 
-[![PyPI version](https://badge.fury.io/py/timewarp-ide.svg)](https://pypi.org/project/timewarp-ide/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](https://github.com/TimeWarpIDE/TimeWarp)
 
 ## ✨ Features
 
-### 🎯 Multi-Language Compilation
-Compile 3 educational programming languages to native executables:
+### 🎯 Multi-Language Support
+TimeWarp IDE supports six programming languages in one integrated environment:
 
-- **PILOT** - Educational language with turtle graphics (1960s)
-- **BASIC** - Classic line-numbered programming (1960s)
-- **Logo** - Educational turtle graphics language (1960s)
+- **PILOT** (1962) - Educational language with branching logic and turtle graphics
+- **BASIC** (1964) - Classic line-numbered programming with variables and loops  
+- **Logo** (1967) - Turtle graphics programming with procedures and recursion
+- **Python** (1991) - Modern high-level programming with full library support
+- **JavaScript** (1995) - Web scripting language with dynamic features
+- **Perl** (1987) - Text processing and system administration language
 
-### 🚀 Native Performance
-- **GCC Compilation** - Generate optimized C code and compile to native executables
-- **Cross-Platform** - Linux executables (easily extensible to other platforms)
-- **No Runtime Dependencies** - Standalone binaries that run anywhere
+### 🖥️ Integrated Development Environment
+- **Rich Text Editor** - Syntax highlighting, auto-completion, and code formatting
+- **Interactive Canvas** - Real-time turtle graphics and visual programming output
+- **Immediate Execution** - Run code instantly without compilation delays
+- **Multi-Pane Interface** - Code editor, output console, and graphics canvas
+- **File Management** - Open, save, and organize programs with proper file associations
 
-### 📚 Rich Sample Programs
-Comprehensive examples demonstrating language features:
-- **BASIC**: Hello world, arrays, functions, loops
-- **Logo**: Shapes, complex drawings, fractals
-- **PILOT**: Math quizzes, interactive adventures
+### 🎨 Customization & Themes
+- **8 Built-in Themes** - Dark and light themes optimized for different preferences
+  - Dark themes: Dracula, Monokai, Solarized Dark, Ocean
+  - Light themes: Spring, Sunset, Candy, Forest
+- **Persistent Settings** - Theme preferences saved between sessions
+- **Visual Polish** - Consistent styling across all UI components
+
+### 🧩 Plugin Architecture
+- **Extensible Framework** - Add custom functionality through plugins
+- **Built-in Plugins** - Code formatter, syntax highlighter, and development tools
+- **Plugin Manager** - Easy installation and management of extensions
+- **Sample Plugins** - Complete examples for plugin development
+
+### 🎮 Educational Features
+- **Tutorial System** - Interactive learning modules for each language
+- **AI Assistant** - Context-aware programming help and suggestions
+- **Gamification** - Achievement system and progress tracking
+- **Hardware Simulation** - Raspberry Pi GPIO simulation for IoT learning
+- **Audio Feedback** - Sound effects and music integration
+
+### 🔧 Advanced Capabilities
+- **Performance Monitoring** - Built-in benchmarking and profiling tools
+- **Collaboration Tools** - Share projects and code snippets
+- **Version Control** - Git integration for project management
+- **Cross-Platform** - Runs on Linux, macOS, and Windows
+- **No Dependencies** - Self-contained installation with all required libraries
 
 ## 🚀 Quick Start
 
-### Installation
-
-#### Option 1: PyPI (Recommended)
-```bash
-pip install timewarp-ide
-```
-
-#### Option 2: From Source
-```bash
-git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd Time_Warp
-pip install -e .
-```
-
 ### System Requirements
 - **Python**: 3.9 or higher
-- **GCC**: GNU C Compiler (build dependency)
-- **OS**: Linux (executables), macOS/Windows (compilation)
+- **Operating System**: Linux, macOS, or Windows
+- **Memory**: 512MB RAM minimum, 1GB recommended
+- **Storage**: 100MB free disk space
 
-## 📖 Usage
+### Installation
 
-### Basic Compilation
+#### Option 1: Quick Install (Recommended)
 ```bash
-# Compile a BASIC program
-timewarp-compiler hello.bas -o hello
-
-# Compile a Logo program
-timewarp-compiler drawing.logo -o logo_app
-
-# Compile a PILOT program
-timewarp-compiler quiz.pilot -o math_quiz
+git clone https://github.com/TimeWarpIDE/TimeWarp.git
+cd TimeWarp
+python TimeWarp.py
 ```
 
-### Command Line Options
+#### Option 2: Development Setup
 ```bash
-timewarp-compiler [OPTIONS] INPUT_FILE
-
-Options:
-  -o, --output OUTPUT    Output executable name (default: same as input)
-  --list-languages       List supported languages and exit
-  --version              Show version information
-  -h, --help             Show help message
+git clone https://github.com/TimeWarpIDE/TimeWarp.git
+cd TimeWarp
+pip install -r requirements.txt
+python TimeWarp.py
 ```
 
-### Supported File Extensions
-- `.bas` - BASIC programs
-- `.logo` - Logo programs
-- `.pilot` - PILOT programs
+#### Option 3: Virtual Environment
+```bash
+git clone https://github.com/TimeWarpIDE/TimeWarp.git
+cd TimeWarp
+python -m venv timewarp_env
+source timewarp_env/bin/activate  # On Windows: timewarp_env\\Scripts\\activate
+pip install -r requirements.txt
+python TimeWarp.py
+```
 
-## 📚 Sample Programs
+### First Launch
+1. Run `python TimeWarp.py`
+2. Choose your preferred theme from the Theme menu
+3. Select a programming language from the Language menu
+4. Start coding in the editor pane
+5. Click "Run" to execute your program
+6. View output in the console and graphics on the canvas
 
-### BASIC Examples
+## 💻 Programming Languages
 
-#### Hello World
+### PILOT Language
+Educational programming language designed for interactive learning:
+
+```pilot
+T: Welcome to PILOT programming!
+T: What is your name?
+A: #NAME
+T: Hello, #NAME! Let's do some math.
+T: What is 5 + 3?
+A: #ANSWER
+M: #ANSWER = 8
+J: *CORRECT
+T: Try again!
+J: *END
+
+*CORRECT
+T: Excellent! You got it right.
+
+*END
+T: Thanks for trying PILOT!
+```
+
+### BASIC Language
+Classic programming with line numbers and structured flow:
+
 ```basic
-10 PRINT "HELLO WORLD BASIC PROGRAM"
-20 PRINT "This demonstrates basic BASIC features"
-30 LET ANSWER = 21 * 2
-40 PRINT "The answer is: "; ANSWER
-50 INPUT "Enter your name"; NAME$
-60 PRINT "Hello, "; NAME$
-70 PRINT "Counting from 1 to 5:"
-80 FOR I = 1 TO 5
-90 PRINT I
-100 NEXT I
-110 PRINT "Done!"
-120 END
+10 PRINT "Welcome to BASIC programming!"
+20 INPUT "Enter your name: "; NAME$
+30 PRINT "Hello, "; NAME$
+40 FOR I = 1 TO 5
+50   PRINT "Counting: "; I
+60 NEXT I
+70 PRINT "Program complete!"
+80 END
 ```
 
-#### Array Operations
-```basic
-10 DIM SCORES(10)
-20 FOR I = 1 TO 10
-30 SCORES(I) = I * 10
-40 NEXT I
-50 PRINT "Scores:"
-60 FOR I = 1 TO 10
-70 PRINT "Score"; I; ": "; SCORES(I)
-80 NEXT I
-90 END
-```
+### Logo Language  
+Turtle graphics programming with procedures:
 
-### Logo Examples
-
-#### Simple Shapes
 ```logo
 TO SQUARE :SIZE
   REPEAT 4 [FORWARD :SIZE RIGHT 90]
 END
 
-TO TRIANGLE :SIZE
-  REPEAT 3 [FORWARD :SIZE RIGHT 120]
+TO FLOWER
+  REPEAT 8 [
+    SQUARE 50
+    RIGHT 45
+  ]
 END
 
-TO CIRCLE :RADIUS
-  REPEAT 36 [FORWARD (2 * 3.14159 * :RADIUS / 36) RIGHT 10]
-END
-
-SQUARE 100
-TRIANGLE 80
-CIRCLE 50
+CLEARSCREEN
+FLOWER
 ```
 
-#### Fractal Tree
-```logo
-TO TREE :SIZE
-  IF :SIZE < 5 [STOP]
-  FORWARD :SIZE
-  RIGHT 25
-  TREE :SIZE * 0.7
-  LEFT 50
-  TREE :SIZE * 0.7
-  RIGHT 25
-  BACK :SIZE
-END
+### Python Integration
+Full Python language support with TimeWarp IDE integration:
 
-TREE 100
+```python
+import math
+import random
+
+# TimeWarp IDE provides turtle graphics
+print("Python in TimeWarp IDE!")
+
+# Generate random numbers
+for i in range(5):
+    num = random.randint(1, 100)
+    sqrt_num = math.sqrt(num)
+    print(f"√{num} = {sqrt_num:.2f}")
 ```
 
-### PILOT Examples
+### JavaScript Support
+Modern JavaScript execution with console output:
 
-#### Math Quiz
-```pilot
-R: PILOT Math Quiz
-R: Test your arithmetic skills
+```javascript
+console.log("JavaScript in TimeWarp IDE!");
 
-*START
-T: Welcome to the Math Quiz!
-T: Answer the following questions:
+// Array manipulation
+const numbers = [1, 2, 3, 4, 5];
+const squared = numbers.map(n => n * n);
+console.log("Original:", numbers);
+console.log("Squared:", squared);
 
-T: What is 5 + 3?
-A: Your answer
-C: #CORRECT = 8
-J: (#ANS = #CORRECT) *CORRECT
-T: Sorry, 5 + 3 = 8
-J: *NEXT
+// Object-oriented programming
+class Student {
+    constructor(name, grade) {
+        this.name = name;
+        this.grade = grade;
+    }
+    
+    introduce() {
+        console.log(`Hi, I'm ${this.name} in grade ${this.grade}`);
+    }
+}
 
-*CORRECT
-T: Correct! 5 + 3 = 8
-
-*NEXT
-T: What is 10 - 4?
-A: Your answer
-C: #CORRECT = 6
-J: (#ANS = #CORRECT) *CORRECT2
-T: Sorry, 10 - 4 = 6
-J: *END
-
-*CORRECT2
-T: Excellent! 10 - 4 = 6
-
-*END
-T: Quiz complete!
-E:
+const student = new Student("Alice", 10);
+student.introduce();
 ```
 
-#### Interactive Story
-```pilot
-R: Choose Your Own Adventure
+### Perl Language
+Text processing and system scripting:
 
-*BEGIN
-T: You find yourself in a dark forest.
-T: Do you go LEFT or RIGHT?
+```perl
+#!/usr/bin/perl
+use strict;
+use warnings;
 
-A: Your choice (LEFT/RIGHT)
-J: (*ANS = LEFT) *LEFT_PATH
-J: (*ANS = RIGHT) *RIGHT_PATH
-T: Please choose LEFT or RIGHT
-J: *BEGIN
+print "Perl in TimeWarp IDE!\n";
 
-*LEFT_PATH
-T: You find a treasure chest!
-T: Congratulations!
-E:
+# Text processing example
+my $text = "Hello, World!";
+$text =~ s/World/TimeWarp/;
+print "$text\n";
 
-*RIGHT_PATH
-T: You encounter a dragon!
-T: Game Over!
-E:
+# Array operations
+my @numbers = (1, 2, 3, 4, 5);
+my @doubled = map { $_ * 2 } @numbers;
+print "Doubled: " . join(", ", @doubled) . "\n";
 ```
 
 ## 🏗️ Architecture
 
-### Compilation Pipeline
-1. **Parse Source** - Language-specific parsing of source code
-2. **Generate C Code** - Convert to optimized C with runtime libraries
-3. **Compile Executable** - GCC compilation to native binary
-4. **Standalone Binary** - No external dependencies required
+### Core Components
 
-### Language Compilers
-- **BaseCompiler** - Abstract framework for language implementations
-- **BasicCompiler** - Line-numbered BASIC with arrays and functions
-- **LogoCompiler** - Turtle graphics with procedures and recursion
-- **PilotCompiler** - Educational language with branching and variables
+#### TimeWarp Interpreter (`core/interpreter.py`)
+- Central execution engine that dispatches commands to language-specific executors
+- Manages program state, variables, and execution context
+- Provides unified interface for all supported languages
+- Handles turtle graphics, audio, and hardware simulation
 
-### Runtime Libraries
-Each language includes optimized C runtime libraries for:
-- String manipulation and I/O
-- Mathematical operations
-- Turtle graphics rendering (PPM format)
-- Variable management and scope
+#### Language Executors (`core/languages/`)
+- **PilotExecutor** - PILOT language implementation with branching logic
+- **BasicExecutor** - BASIC language with line numbers and traditional commands
+- **LogoExecutor** - Logo turtle graphics with procedures and functions
+- **PythonExecutor** - Python integration with full standard library
+- **JavaScriptExecutor** - JavaScript execution environment
+- **PerlExecutor** - Perl scripting and text processing
+
+#### GUI Framework (`gui/`)
+- **Main Interface** - Primary application window with menu system
+- **Code Editor** - Syntax-highlighted text editor with auto-completion
+- **Canvas System** - Turtle graphics rendering and display
+- **Component Library** - Reusable UI elements and dialogs
+
+#### Plugin System (`plugins/`)
+- **Plugin Manager** - Dynamic loading and management of extensions
+- **Base Framework** - Abstract classes for plugin development
+- **Sample Plugins** - Examples including code formatter and syntax highlighter
+
+### Directory Structure
+
+```
+TimeWarp/
+├── core/                   # Core interpreter and language engines
+├── gui/                    # User interface components  
+├── plugins/                # Plugin system and extensions
+├── tools/                  # Development and utility tools
+├── games/                  # Game engine and examples
+├── examples/               # Sample programs for all languages
+├── docs/                   # Comprehensive documentation
+├── testing/                # Test suite and quality assurance
+├── marketing/              # Promotional materials and outreach
+└── TimeWarp.py            # Main application entry point
+```
 
 ## 📚 Documentation
 
-### Language References
-- [BASIC Language Reference](docs/languages/basic.md)
-- [Logo Language Reference](docs/languages/logo.md)
-- [PILOT Language Reference](docs/languages/pilot.md)
+### User Guides
+- [Getting Started Guide](docs/getting-started.md) - First steps with TimeWarp IDE
+- [PILOT Language Reference](docs/languages/pilot.md) - Complete PILOT documentation
+- [BASIC Language Reference](docs/languages/basic.md) - BASIC programming guide
+- [Logo Language Reference](docs/languages/logo.md) - Logo turtle graphics manual
 
-### Compiler Documentation
-- [Compiler Usage Guide](docs/compiler.md)
+### Developer Documentation
+- [Architecture Overview](docs/MODULAR_ARCHITECTURE.md) - System design and structure
+- [Plugin Development](docs/plugin-development.md) - Creating custom extensions
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
+- [API Reference](docs/api-reference.md) - Complete API documentation
+
+### Educational Resources
+- [Teaching with TimeWarp](docs/education/teaching-guide.md) - Classroom integration
+- [Curriculum Integration](docs/education/curriculum.md) - Lesson plans and activities
+- [Student Projects](docs/education/projects.md) - Example assignments and exercises
+
+## 🎓 Educational Use
+
+TimeWarp IDE is designed specifically for educational environments:
+
+### Classroom Features
+- **Multi-Language Learning** - Introduce programming concepts across different languages
+- **Visual Programming** - Turtle graphics make abstract concepts concrete
+- **Immediate Feedback** - See results instantly without compilation delays
+- **Progressive Complexity** - Start with PILOT/BASIC, advance to Python/JavaScript
+- **Cross-Curricular** - Integrate math, art, and logic through programming
+
+### Age-Appropriate Progression
+1. **Elementary (Ages 8-11)**: Logo turtle graphics and simple PILOT programs
+2. **Middle School (Ages 12-14)**: BASIC programming with variables and loops
+3. **High School (Ages 15-18)**: Python and JavaScript for real-world applications
+4. **Advanced/College**: Full language features, plugins, and project development
+
+### Assessment Tools
+- **Progress Tracking** - Built-in gamification system tracks student achievement
+- **Code Analysis** - Automatic feedback on code quality and style
+- **Project Portfolio** - Save and organize student work over time
+- **Collaboration** - Share projects and learn from peers
 
 ## 🔧 Development
 
 ### Building from Source
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd Time_Warp
+cd TimeWarp
 
-# Install in development mode
-pip install -e .
+# Install development dependencies
+pip install -r requirements.txt
+
+# Run the application
+python TimeWarp.py
 
 # Run tests
-python -m pytest
+python -m pytest testing/
 
-# Build package
-python -m build
+# Generate documentation
+python -m sphinx docs/ docs/_build/
 ```
 
-### Testing Compilers
+### Testing
 ```bash
-# Test all compilers
-python -m pytest tests/
+# Run all tests
+python run_tests.py
 
-# Test specific language
-python -c "from timewarp_ide.compiler import compile_file; compile_file('samples/basic/hello.bas', 'test_output')"
+# Run specific test categories
+python -m pytest testing/tests/test_interpreters.py  # Language tests
+python -m pytest testing/tests/test_gui_components.py  # GUI tests
+python -m pytest testing/tests/test_plugins.py  # Plugin tests
+
+# Performance benchmarking
+python tools/benchmark_timewarp.py
+
+# Integration testing
+python scripts/integration_tests.py
 ```
 
-### Adding New Languages
-1. Create compiler class inheriting from `BaseCompiler`
-2. Implement `parse_source()` and `generate_c_code()` methods
-3. Add file extension mapping in `compiler.py`
-4. Include runtime library functions
-5. Add comprehensive tests
+### Contributing
 
-## 🤝 Contributing
+We welcome contributions from educators, students, and developers! Areas where you can help:
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
+- **Language Support** - Add new programming languages
+- **Educational Content** - Create tutorials, examples, and lesson plans
+- **Plugin Development** - Build extensions for specialized use cases
+- **Documentation** - Improve guides, references, and help content
+- **Testing** - Expand test coverage and quality assurance
+- **Localization** - Translate the interface to other languages
 
-### Areas for Contribution
-- **New Languages** - Add support for additional educational languages
-- **Performance** - Optimize compilation and runtime performance
-- **Platforms** - Extend support to Windows/macOS executables
-- **Features** - Enhanced language features and capabilities
-- **Documentation** - Improve guides and examples
+See our [Contributing Guide](CONTRIBUTING.md) for detailed information.
+
+## 🌟 Community
+
+### Getting Help
+- **GitHub Issues** - Report bugs and request features
+- **Discussions** - Ask questions and share ideas
+- **Discord Server** - Real-time chat with other users
+- **Educational Forum** - Teaching strategies and classroom experiences
+
+### Showcase
+- **Student Projects** - Share creative programs and artwork
+- **Classroom Success Stories** - How teachers use TimeWarp IDE
+- **Plugin Gallery** - Community-developed extensions
+- **Language Examples** - Advanced programming demonstrations
 
 ## 📄 License
 
-TimeWarp Compiler is open source software licensed under the MIT License. See [LICENSE](LICENSE) for details.
+TimeWarp IDE is open source software licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
-- **PILOT**: Inspired by the original educational programming language
-- **BASIC**: Based on classic BASIC implementations
-- **Logo**: Built on the turtle graphics paradigm
-- **GCC**: For the excellent C compilation toolchain
-- **Python Community**: For the robust packaging ecosystem
+- **Educational Programming Pioneer Languages** - PILOT, BASIC, Logo, and their creators
+- **Python Community** - For the robust ecosystem and libraries
+- **Tkinter** - GUI framework that makes TimeWarp IDE possible
+- **Open Source Contributors** - Everyone who has contributed to this project
+- **Educators Worldwide** - Teachers who inspire the next generation of programmers
 
 ---
 
-**⏰ TimeWarp Compiler** - Transform educational code into native executables.
+**⏰ TimeWarp IDE** - Where classic programming languages meet modern educational technology.
+
+*Journey through the history of programming while building skills for the future.*

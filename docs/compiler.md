@@ -1,33 +1,49 @@
-# TimeWarp Compiler Documentation
+# TimeWarp IDE - Language Compilation System
 
 ## Overview
 
-The TimeWarp Compiler is a command-line tool that compiles TimeWarp programs (PILOT, BASIC, Logo) into native Linux executables. This allows you to distribute your programs as standalone binaries without requiring the TimeWarp IDE to be installed.
+TimeWarp IDE includes both interactive execution and compilation capabilities for multiple programming languages (PILOT, BASIC, Logo, Python, JavaScript, Perl). The IDE provides real-time code execution with turtle graphics visualization, as well as standalone compilation for distribution of programs as native executables.
 
 ## Installation
 
-The compiler is included with TimeWarp IDE:
+TimeWarp IDE is available directly from GitHub:
 
 ```bash
-pip install timewarp-ide
+# Clone the repository
+git clone https://github.com/YourUsername/TimeWarp.git
+cd TimeWarp
+
+# Run TimeWarp IDE
+python TimeWarp.py
+```
+
+Or install dependencies manually:
+```bash
+pip install -r requirements.txt
+python TimeWarp.py
 ```
 
 ## Usage
 
-### Basic Compilation
+### Interactive Execution in TimeWarp IDE
+
+The primary way to run programs is through the TimeWarp IDE interface:
+
+1. **Launch TimeWarp IDE**: `python TimeWarp.py`
+2. **Select Language**: Choose from PILOT, BASIC, Logo, Python, JavaScript, or Perl
+3. **Write Code**: Use the built-in editor with syntax highlighting
+4. **Run Interactively**: Execute code with real-time turtle graphics visualization
+5. **Save Programs**: Save your work in the appropriate language format
+
+### Standalone Compilation
+
+For distribution, programs can be compiled to standalone executables:
 
 ```bash
-# Compile a BASIC program
-timewarp-compiler program.bas
-
-# Compile with custom output name
-timewarp-compiler program.bas -o myprogram
-
-# Compile a Logo program
-timewarp-compiler drawing.logo -o logo_app
-
-# Compile a PILOT program
-timewarp-compiler lesson.pilot -o quiz
+# Using the individual compilers
+python compilers/basic_compiler.py program.bas
+python compilers/logo_compiler.py drawing.logo  
+python compilers/pilot_compiler.py lesson.pilot
 ```
 
 ### Command Line Options
