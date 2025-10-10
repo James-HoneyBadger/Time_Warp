@@ -117,7 +117,7 @@ class PluginManager:
 
             # Create plugin instance
             if hasattr(plugin_module, "TimeWarpPlugin"):
-                plugin_instance = plugin_module.TimeWarpPlugin(self.ide)
+                plugin_instance = plugin_module.Time_WarpPlugin(self.ide)
 
                 # Set plugin info from manifest
                 if hasattr(plugin_instance, "name"):
