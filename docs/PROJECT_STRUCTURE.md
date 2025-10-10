@@ -6,7 +6,7 @@
 ```
 Time_Warp/
 ├── Time_Warp.py              # Main application entry point
-├── time_warp -> Time_Warp.py  # Symbolic link for convenience
+├── Time_Warp -> Time_Warp.py # Symbolic link for convenience
 ├── README.md                # Project documentation
 ├── requirements.txt         # Python dependencies
 ├── pyproject.toml          # Modern Python project configuration
@@ -85,8 +85,8 @@ scripts/                    # Development scripts
 ├── run_tests_ci.py         # CI/CD test runner
 ├── setup.py                # Installation script
 ├── launch.py               # Python launcher
-├── launch_timewarp.sh      # Shell launcher
-├── launch_timewarp.bat     # Windows launcher
+├── launch_Time_Warp.sh     # Shell launcher
+├── launch_Time_Warp.bat    # Windows launcher
 └── start.sh                # Quick start script
 
 tests/                      # Test suite
@@ -133,7 +133,7 @@ archive/                    # Archived/deprecated files
 
 ### Primary Entry Points
 - `Time_Warp.py` - Main GUI application
-- `time_warp` - Symbolic link for terminal usage
+- `Time_Warp` - Symbolic link for terminal usage
 - `scripts/launch.py` - Cross-platform launcher
 
 ### Configuration
@@ -150,7 +150,7 @@ archive/                    # Archived/deprecated files
 ### Direct Execution
 ```bash
 python3 Time_Warp.py        # Direct execution
-./time_warp                 # Via symbolic link
+./Time_Warp                # Via symbolic link
 ```
 
 ### Via Scripts

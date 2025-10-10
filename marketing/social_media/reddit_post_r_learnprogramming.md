@@ -232,7 +232,7 @@ cd Time_Warp
 python Time_Warp.py
 
 # Or use the auto-setup script
-./start_timewarp.sh
+./scripts/start.sh
 ```
 
 ## Join the Learning Community

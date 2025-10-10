@@ -32,7 +32,7 @@ Each language has dedicated executor classes in `core/languages/`:
 - **Compiled output**: `*_compiled` files for interpreter execution results
 
 ### Configuration Management
-- User settings stored in `~/.time_warp/config.json`
+- User settings stored in `~/.Time_Warp/config.json`
 - Theme preferences persist between sessions
 - Virtual environment auto-created in `.Time_Warp/`
 
@@ -56,7 +56,7 @@ except Exception as e:
 python Time_Warp.py
 
 # Alternative with shell script
-./start_timewarp.sh
+./scripts/start.sh
 ```
 
 ### Testing

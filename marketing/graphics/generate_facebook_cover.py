@@ -216,7 +216,7 @@ def main():
     cover_img = create_facebook_cover()
 
     # Save as PNG first (better quality)
-    png_path = "timewarp_facebook_cover.png"
+    png_path = "Time_Warp_facebook_cover.png"
     cover_img.save(png_path, "PNG")
     print(f"✅ PNG version saved as: {png_path}")
 
@@ -227,7 +227,7 @@ def main():
         cover_img, mask=cover_img.split()[-1] if cover_img.mode == "RGBA" else None
     )
 
-    jpg_path = "timewarp_facebook_cover.jpg"
+    jpg_path = "Time_Warp_facebook_cover.jpg"
     rgb_img.save(jpg_path, "JPEG", quality=95)
     print(f"✅ JPG version saved as: {jpg_path}")
 

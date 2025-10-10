@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "name": "TimeWarp IDE",
+            "name": "Time_Warp IDE",
             "path": "."
         }
     ],
@@ -20,7 +20,7 @@
             "*.basic": "plaintext",
             "*.logo": "plaintext",
             "*.jtc": "plaintext",
-            "*.timewarp": "plaintext"
+            "*.Time_Warp": "plaintext"
         },
         "git.autofetch": true,
         "git.enableSmartCommit": true,
@@ -29,9 +29,8 @@
             "**/__pycache__": true,
             "**/*.pyc": true,
             "**/.Time_Warp": false,
-            "**/timewarp_env": true,
-            "**/timewarp_venv": true,
-            "**/.timewarp": true,
+            "**/Time_Warp_env": true,
+            "**/Time_Warp_venv": true,
             "**/.pytest_cache": true,
             "**/debug_*.py": true,
             "**/test_*.py": true,
@@ -62,10 +61,10 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "▶️ Run TimeWarp IDE (No Debug)",
+                "name": "▶️ Run Time_Warp IDE (No Debug)",
                 "type": "debugpy",
                 "request": "launch",
-                "program": "${workspaceFolder}/TimeWarp.py",
+                "program": "${workspaceFolder}/Time_Warp.py",
                 "console": "integratedTerminal",
                 "cwd": "${workspaceFolder}",
                 "env": {
@@ -76,10 +75,10 @@
                 "args": []
             },
             {
-                "name": "🐛 Debug TimeWarp IDE",
+                "name": "🐛 Debug Time_Warp IDE",
                 "type": "debugpy",
                 "request": "launch",
-                "program": "${workspaceFolder}/TimeWarp.py",
+                "program": "${workspaceFolder}/Time_Warp.py",
                 "console": "integratedTerminal",
                 "cwd": "${workspaceFolder}",
                 "env": {
@@ -90,7 +89,7 @@
                 "args": []
             },
             {
-                "name": "🧪 Run TimeWarp Tests",
+                "name": "🧪 Run Time_Warp Tests",
                 "type": "debugpy",
                 "request": "launch",
                 "program": "${workspaceFolder}/run_tests.py",
@@ -105,10 +104,10 @@
         "version": "2.0.0",
         "tasks": [
             {
-                "label": "🚀 Run TimeWarp IDE",
+                "label": "🚀 Run Time_Warp IDE",
                 "type": "shell",
                 "command": "python3",
-                "args": ["TimeWarp.py"],
+                "args": ["Time_Warp.py"],
                 "group": {
                     "kind": "build",
                     "isDefault": true
