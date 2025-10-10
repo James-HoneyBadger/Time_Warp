@@ -13,7 +13,7 @@ authors = [
     {name = "TimeWarp Development Team", email = "info@timewarp-ide.org"},
 ]
 maintainers = [
-    {name = "James-HoneyBadger", email = "timewarp-ide@example.com"},
+    {name = "TimeWarp IDE Team", email = "timewarp-ide@example.com"},
 ]
 keywords = [
     "education",
