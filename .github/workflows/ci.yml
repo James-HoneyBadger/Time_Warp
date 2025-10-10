@@ -25,6 +25,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-tk xvfb
+        sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+        sudo apt-get install -y libfreetype6-dev libportmidi-dev libjpeg-dev python3-dev
         
     - name: Install Python dependencies
       run: |
@@ -33,11 +35,15 @@ jobs:
         
     - name: Run tests with xvfb (virtual display)
       run: |
-        xvfb-run -a python run_tests.py
+        export SDL_VIDEODRIVER=dummy
+        export SDL_AUDIODRIVER=dummy
+        xvfb-run -a python run_tests_ci.py
         
     - name: Test TimeWarp IDE startup
       run: |
         # Test that TimeWarp can import without GUI
+        export SDL_VIDEODRIVER=dummy
+        export SDL_AUDIODRIVER=dummy
         python -c "import sys; sys.path.append('.'); from core.interpreter import TimeWarpInterpreter; print('✅ TimeWarp core imports successfully')"
 
   lint:
@@ -50,6 +56,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk xvfb
+        sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+        sudo apt-get install -y libfreetype6-dev libportmidi-dev libjpeg-dev python3-dev
         
     - name: Install dependencies
       run: |
