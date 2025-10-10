@@ -1,0 +1,68 @@
+🚀 Just released TimeWarp IDE v1.0.0!
+
+Transforming 1960s educational programming languages into modern native executables! No interpreters - just GCC-compiled binaries that run anywhere.
+
+Supported languages:
+• PILOT (educational branching)
+• BASIC (line-numbered with arrays)
+• Logo (turtle graphics)
+
+Key features:
+✅ Native compilation
+✅ Zero runtime dependencies
+✅ Rich educational examples
+✅ Open source & free
+
+Perfect for:
+• CS education
+• Programming nostalgia
+• Compiler study
+• Standalone app creation
+
+Install: pip install timewarp-ide
+
+Demo compilation:
+timewarp-compiler hello.bas -o hello
+./hello
+
+GitHub: https://github.com/James-HoneyBadger/Time_Warp
+PyPI: https://pypi.org/project/timewarp-ide/
+
+#programming #opensource #education #BASIC #Logo #PILOT #retrocomputing #compsci
+
+1/2
+
+---
+
+Example programs included:
+
+BASIC arrays:
+10 DIM SCORES(10)
+20 FOR I=1 TO 10: SCORES(I)=I*10: NEXT I
+50 FOR I=1 TO 10: PRINT "Score";I;":";SCORES(I): NEXT I
+
+Logo graphics:
+TO TREE :SIZE
+  IF :SIZE<5 [STOP]
+  FORWARD :SIZE RIGHT 25
+  TREE :SIZE*0.7 LEFT 50
+  TREE :SIZE*0.7 RIGHT 25
+  BACK :SIZE
+END
+TREE 100
+
+PILOT quiz:
+R: Math Quiz
+*START T: What is 5+3?
+A: Your answer
+C: #CORRECT=8
+J:(#ANS=#CORRECT)*CORRECT
+T: Sorry, 5+3=8
+
+*CORRECT T: Correct!
+
+Why this matters: Bridges classic educational languages with modern executable generation. Students learn fundamentals while creating distributable programs!
+
+#edtech #programmingeducation
+
+2/2

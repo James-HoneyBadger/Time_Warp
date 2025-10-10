@@ -1,0 +1,20 @@
+Title: Show HN: TimeWarp IDE - Compile 1960s Educational Languages to Native Executables
+
+Text:
+TimeWarp IDE compiles three classic educational programming languages (PILOT, BASIC, Logo) from the 1960s into modern native Linux executables using GCC. No interpreters or emulators - generates standalone binaries with zero runtime dependencies.
+
+Why it matters:
+• Educational languages designed for teaching (not just programming)
+• Native performance vs interpreted execution
+• Preserves classic syntax while enabling modern distribution
+• Perfect for computer science education and retro computing
+
+Quick demo:
+pip install timewarp-ide
+timewarp-compiler hello.bas -o hello && ./hello
+
+The compiler generates optimized C code with custom runtime libraries for each language. PILOT handles branching and text interaction, BASIC supports arrays and line-numbered programming, Logo creates turtle graphics output.
+
+Open source, MIT licensed. Built in Python with comprehensive documentation and sample programs.
+
+https://github.com/James-HoneyBadger/Time_Warp
