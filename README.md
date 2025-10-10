@@ -89,8 +89,31 @@ pip install -r requirements.txt
 python TimeWarp.py
 ```
 
+### VS Code Integration (Recommended)
+If you're using Visual Studio Code, TimeWarp includes pre-configured launch and task configurations:
+
+#### Quick Launch Options:
+- **Ctrl+Shift+R** - Run TimeWarp IDE without debugging
+- **F5** - Run TimeWarp IDE with debugging (when TimeWarp.py is open)
+- **Ctrl+F5** - Run TimeWarp IDE without debugging (when TimeWarp.py is open)
+
+#### Using Command Palette:
+1. Press **Ctrl+Shift+P** (Cmd+Shift+P on macOS)
+2. Type "Tasks: Run Task"
+3. Select "🚀 Run TimeWarp IDE"
+
+#### Using Run and Debug Panel:
+1. Open the Run and Debug panel (Ctrl+Shift+D)
+2. Select "▶️ Run TimeWarp IDE" from the dropdown
+3. Click the play button or press F5
+
+#### Available Configurations:
+- **▶️ Run TimeWarp IDE** - Standard execution without debugging
+- **🐛 Debug TimeWarp IDE** - Full debugging with breakpoints
+- **🧪 Run TimeWarp Tests** - Execute the test suite
+
 ### First Launch
-1. Run `python TimeWarp.py`
+1. Run `python TimeWarp.py` (or use VS Code integration above)
 2. Choose your preferred theme from the Theme menu
 3. Select a programming language from the Language menu
 4. Start coding in the editor pane

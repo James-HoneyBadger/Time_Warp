@@ -6,17 +6,21 @@
         }
     ],
     "settings": {
-        "python.defaultInterpreterPath": "./.Time_Warp/bin/python",
+        "python.defaultInterpreterPath": "python3",
+        "python.terminal.activateEnvironment": true,
         "python.linting.enabled": true,
         "python.linting.flake8Enabled": true,
         "python.linting.pylintEnabled": false,
         "python.formatting.provider": "black",
         "python.analysis.typeCheckingMode": "basic",
+        "python.analysis.autoImportCompletions": true,
         "files.associations": {
-
             "*.pilot": "plaintext",
-            "*.bas": "basic",
-            "*.logo": "lisp"
+            "*.bas": "plaintext", 
+            "*.basic": "plaintext",
+            "*.logo": "plaintext",
+            "*.jtc": "plaintext",
+            "*.timewarp": "plaintext"
         },
         "git.autofetch": true,
         "git.enableSmartCommit": true,
@@ -58,22 +62,69 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Launch TimeWarp IDE",
+                "name": "▶️ Run TimeWarp IDE (No Debug)",
                 "type": "debugpy",
                 "request": "launch",
-                "program": "TimeWarp.py",
+                "program": "${workspaceFolder}/TimeWarp.py",
                 "console": "integratedTerminal",
                 "cwd": "${workspaceFolder}",
                 "env": {
                     "PYTHONPATH": "${workspaceFolder}"
-                }
+                },
+                "justMyCode": true,
+                "stopOnEntry": false,
+                "args": []
             },
             {
-                "name": "Run Tests",
+                "name": "🐛 Debug TimeWarp IDE",
                 "type": "debugpy",
                 "request": "launch",
-                "program": "run_tests.py",
-                "console": "integratedTerminal"
+                "program": "${workspaceFolder}/TimeWarp.py",
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PYTHONPATH": "${workspaceFolder}"
+                },
+                "justMyCode": false,
+                "stopOnEntry": false,
+                "args": []
+            },
+            {
+                "name": "🧪 Run TimeWarp Tests",
+                "type": "debugpy",
+                "request": "launch",
+                "program": "${workspaceFolder}/run_tests.py",
+                "console": "integratedTerminal",
+                "cwd": "${workspaceFolder}",
+                "justMyCode": true,
+                "stopOnEntry": false
+            }
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🚀 Run TimeWarp IDE",
+                "type": "shell",
+                "command": "python3",
+                "args": ["TimeWarp.py"],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "new",
+                    "showReuseMessage": true,
+                    "clear": false
+                },
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                },
+                "problemMatcher": []
             }
         ]
     }
