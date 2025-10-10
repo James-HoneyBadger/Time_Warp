@@ -17,4 +17,4 @@ The compiler generates optimized C code with custom runtime libraries for each l
 
 Open source, MIT licensed. Built in Python with comprehensive documentation and sample programs.
 
-https://github.com/James-HoneyBadger/Time_Warp
+https://github.com/TimeWarpIDE/TimeWarp

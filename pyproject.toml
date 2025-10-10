@@ -68,11 +68,11 @@ hardware = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/James-HoneyBadger/Time_Warp"
+Homepage = "https://github.com/TimeWarpIDE/TimeWarp"
 Documentation = "https://timewarp-ide.readthedocs.io/"
-Repository = "https://github.com/James-HoneyBadger/Time_Warp"
-Issues = "https://github.com/James-HoneyBadger/Time_Warp/issues"
-Changelog = "https://github.com/James-HoneyBadger/Time_Warp/blob/main/CHANGELOG.md"
+Repository = "https://github.com/TimeWarpIDE/TimeWarp"
+Issues = "https://github.com/TimeWarpIDE/TimeWarp/issues"
+Changelog = "https://github.com/TimeWarpIDE/TimeWarp/blob/main/CHANGELOG.md"
 
 [project.scripts]
 timewarp = "timewarp_ide.main:main"

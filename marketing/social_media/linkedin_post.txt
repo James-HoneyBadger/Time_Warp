@@ -25,7 +25,7 @@ TimeWarp IDE compiles three foundational programming languages from the 1960s (P
 The project represents a unique intersection of computer history and modern software engineering, making foundational programming concepts accessible through contemporary development practices.
 
 Available now on PyPI: pip install timewarp-ide
-GitHub: https://github.com/James-HoneyBadger/Time_Warp
+GitHub: https://github.com/TimeWarpIDE/TimeWarp
 
 #ComputerScience #Education #OpenSource #Programming #EdTech #SoftwareEngineering
 

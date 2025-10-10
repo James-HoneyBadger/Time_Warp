@@ -59,7 +59,7 @@ class SourceLocation:
         return location
 
 @dataclass
-class JAMESError:
+class TimeWarpError:
     """Structured error information"""
     code: ErrorCode
     severity: ErrorSeverity
@@ -85,17 +85,17 @@ class ErrorManager:
     """Centralized error management"""
     
     def __init__(self):
-        self.errors: List[JAMESError] = []
-        self.warnings: List[JAMESError] = []
+        self.errors: List[TimeWarpError] = []
+        self.warnings: List[TimeWarpError] = []
         
     def add_error(self, 
                   code: ErrorCode, 
                   message: str,
                   location: Optional[SourceLocation] = None,
                   context: Optional[Dict[str, Any]] = None,
-                  suggestions: Optional[List[str]] = None) -> JAMESError:
+                  suggestions: Optional[List[str]] = None) -> TimeWarpError:
         """Add an error"""
-        error = JAMESError(
+        error = TimeWarpError(
             code=code,
             severity=ErrorSeverity.ERROR,
             message=message,
@@ -111,9 +111,9 @@ class ErrorManager:
                     message: str,
                     location: Optional[SourceLocation] = None,
                     context: Optional[Dict[str, Any]] = None,
-                    suggestions: Optional[List[str]] = None) -> JAMESError:
+                    suggestions: Optional[List[str]] = None) -> TimeWarpError:
         """Add a warning"""
-        warning = JAMESError(
+        warning = TimeWarpError(
             code=code,
             severity=ErrorSeverity.WARNING,
             message=message,
@@ -132,7 +132,7 @@ class ErrorManager:
         """Check if there are any warnings"""
         return len(self.warnings) > 0
     
-    def get_all_issues(self) -> List[JAMESError]:
+    def get_all_issues(self) -> List[TimeWarpError]:
         """Get all errors and warnings"""
         return self.errors + self.warnings
     
@@ -164,47 +164,47 @@ class ErrorManager:
         return "\n".join(lines)
 
 # Exception classes for different error types
-class JAMESBaseException(Exception):
-    """Base exception for all JAMES errors"""
-    def __init__(self, error: JAMESError):
+class TimeWarpBaseException(Exception):
+    """Base exception for all TimeWarp errors"""
+    def __init__(self, error: TimeWarpError):
         self.error = error
         super().__init__(str(error))
 
-class JAMESLexicalError(JAMESBaseException):
+class TimeWarpLexicalError(TimeWarpBaseException):
     """Lexical analysis error"""
     pass
 
-class JAMESSyntaxError(JAMESBaseException):
+class TimeWarpSyntaxError(TimeWarpBaseException):
     """Syntax parsing error"""
     pass
 
-class JAMESRuntimeError(JAMESBaseException):
+class TimeWarpRuntimeError(TimeWarpBaseException):
     """Runtime execution error"""
     pass
 
-class JAMESTypeError(JAMESRuntimeError):
+class TimeWarpTypeError(TimeWarpRuntimeError):
     """Type-related runtime error"""
     pass
 
-class JAMESNameError(JAMESRuntimeError):
+class TimeWarpNameError(TimeWarpRuntimeError):
     """Name/variable-related runtime error"""
     pass
 
 # Utility functions for common error scenarios
-def create_syntax_error(message: str, location: SourceLocation, suggestions: Optional[List[str]] = None) -> JAMESSyntaxError:
+def create_syntax_error(message: str, location: SourceLocation, suggestions: Optional[List[str]] = None) -> TimeWarpSyntaxError:
     """Create a syntax error with location"""
-    error = JAMESError(
+    error = TimeWarpError(
         code=ErrorCode.INVALID_SYNTAX,
         severity=ErrorSeverity.ERROR,
         message=message,
         location=location,
         suggestions=suggestions
     )
-    return JAMESSyntaxError(error)
+    return TimeWarpSyntaxError(error)
 
-def create_runtime_error(message: str, location: Optional[SourceLocation] = None, suggestions: Optional[List[str]] = None) -> JAMESError:
+def create_runtime_error(message: str, location: Optional[SourceLocation] = None, suggestions: Optional[List[str]] = None) -> TimeWarpError:
     """Create a runtime error"""
-    return JAMESError(
+    return TimeWarpError(
         code=ErrorCode.UNDEFINED_VARIABLE,  # Default, should be overridden
         severity=ErrorSeverity.ERROR,
         message=message,
@@ -212,13 +212,13 @@ def create_runtime_error(message: str, location: Optional[SourceLocation] = None
         suggestions=suggestions
     )
 
-def create_type_error(expected: str, actual: str, location: Optional[SourceLocation] = None) -> JAMESTypeError:
+def create_type_error(expected: str, actual: str, location: Optional[SourceLocation] = None) -> TimeWarpTypeError:
     """Create a type mismatch error"""
-    error = JAMESError(
+    error = TimeWarpError(
         code=ErrorCode.TYPE_MISMATCH,
         severity=ErrorSeverity.ERROR,
         message=f"Expected {expected}, got {actual}",
         location=location,
         suggestions=[f"Convert the value to {expected}", "Check your variable assignments"]
     )
-    return JAMESTypeError(error)
+    return TimeWarpTypeError(error)

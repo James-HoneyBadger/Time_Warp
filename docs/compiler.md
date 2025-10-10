@@ -298,4 +298,4 @@ To add support for new languages:
 - [TimeWarp IDE User Guide](user_guide.md)
 - [Language Reference](languages/)
 - [API Documentation](api/)
-- [GitHub Repository](https://github.com/James-HoneyBadger/Time_Warp)
+- [GitHub Repository](https://github.com/TimeWarpIDE/TimeWarp)

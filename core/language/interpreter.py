@@ -10,35 +10,35 @@ import time
 import os
 from typing import Any, Dict, List, Optional, Callable, Union
 from .parser import *
-from .lexer import JAMESLexer, Token
+from .lexer import TimeWarpLexer, Token
 
-class JAMESError(Exception):
-    """Base exception for JAMES runtime errors"""
+class TimeWarpError(Exception):
+    """Base exception for TimeWarp language errors"""
     pass
 
-class JAMESTypeError(JAMESError):
-    """Type error in JAMES program"""
+class TimeWarpTypeError(TimeWarpError):
+    """Type error in TimeWarp code"""
     pass
 
-class JAMESNameError(JAMESError):
-    """Name error in JAMES program"""
+class TimeWarpNameError(TimeWarpError):
+    """Name error in TimeWarp code"""
     pass
 
-class JAMESRuntimeError(JAMESError):
-    """Runtime error in JAMES program"""
+class TimeWarpRuntimeError(TimeWarpError):
+    """Runtime error in TimeWarp code"""
     pass
 
-class JAMESReturnValue(Exception):
-    """Exception used for function returns"""
+class TimeWarpReturnValue(Exception):
+    """Used for function returns"""
     def __init__(self, value):
         self.value = value
 
-class JAMESBreak(Exception):
-    """Exception used for breaking out of loops"""
+class TimeWarpBreak(Exception):
+    """Used for break statements"""
     pass
 
-class JAMESContinue(Exception):
-    """Exception used for continuing loops"""
+class TimeWarpContinue(Exception):
+    """Used for continue statements"""
     pass
 
 class Environment:
@@ -58,7 +58,7 @@ class Environment:
             return self.variables[name]
         if self.parent:
             return self.parent.get(name)
-        raise JAMESNameError(f"Undefined variable '{name}'")
+        raise TimeWarpNameError(f"Undefined variable '{name}'")
     
     def set(self, name: str, value: Any):
         """Set a variable in this environment or parent"""
@@ -69,22 +69,22 @@ class Environment:
             try:
                 self.parent.set(name, value)
                 return
-            except JAMESNameError:
+            except TimeWarpNameError:
                 pass
         # If not found anywhere, create in current scope
         self.variables[name] = value
 
-class JAMESFunction:
+class TimeWarpFunction:
     """Represents a user-defined function"""
     
     def __init__(self, declaration: FunctionDefNode, closure: Environment):
         self.declaration = declaration
         self.closure = closure
     
-    def call(self, interpreter: 'JAMESInterpreter', arguments: List[Any]) -> Any:
+    def call(self, interpreter: 'TimeWarpInterpreter', arguments: List[Any]) -> Any:
         """Call the function with given arguments"""
         if len(arguments) != len(self.declaration.parameters):
-            raise JAMESRuntimeError(f"Expected {len(self.declaration.parameters)} arguments but got {len(arguments)}")
+            raise TimeWarpRuntimeError(f"Expected {len(self.declaration.parameters)} arguments but got {len(arguments)}")
         
         # Create new environment for function
         environment = Environment(self.closure)
@@ -101,14 +101,14 @@ class JAMESFunction:
             for stmt in self.declaration.statements:
                 interpreter.execute(stmt)
         
-        except JAMESReturnValue as return_val:
+        except TimeWarpReturnValue as return_val:
             return return_val.value
         finally:
             interpreter.environment = previous
         
         return None  # No explicit return
 
-class JAMESInterpreter:
+class TimeWarpInterpreter:
     """Main interpreter for TimeWarp IDE programs"""
     
     def __init__(self):
@@ -122,7 +122,7 @@ class JAMESInterpreter:
         
         # Python integration globals
         self.python_globals = {
-            'JAMES': self._create_james_interface()
+            'TimeWarp': self._create_james_interface()
         }
     
     def _init_builtins(self):
@@ -156,40 +156,40 @@ class JAMESInterpreter:
         self.globals.define("E", math.e)
     
     def _create_james_interface(self):
-        """Create JAMES interface for Python integration"""
-        class JAMESInterface:
+        """Create TimeWarp interface for Python integration"""
+        class TimeWarpInterface:
             def __init__(self, interpreter):
                 self.interpreter = interpreter
             
             def GET(self, name: str) -> Any:
-                """Get JAMES variable from Python"""
+                """Get TimeWarp variable from Python"""
                 return self.interpreter.environment.get(name)
             
             def SET(self, name: str, value: Any):
-                """Set JAMES variable from Python"""
+                """Set TimeWarp variable from Python"""
                 self.interpreter.environment.set(name, value)
             
             def CALL(self, name: str, *args) -> Any:
-                """Call JAMES function from Python"""
+                """Call TimeWarp function from Python"""
                 func = self.interpreter.environment.get(name)
-                if isinstance(func, JAMESFunction):
+                if isinstance(func, TimeWarpFunction):
                     return func.call(self.interpreter, list(args))
                 elif callable(func):
                     return func(*args)
                 else:
-                    raise JAMESRuntimeError(f"'{name}' is not callable")
+                    raise TimeWarpRuntimeError(f"'{name}' is not callable")
         
-        return JAMESInterface(self)
+        return TimeWarpInterface(self)
     
     def interpret(self, program: ProgramNode) -> List[str]:
-        """Interpret a JAMES program"""
+        """Interpret a TimeWarp program"""
         self.output_buffer = []
         
         try:
             for statement in program.statements:
                 if statement:
                     self.execute(statement)
-        except JAMESError as e:
+        except TimeWarpError as e:
             self.output_buffer.append(f"Error: {e}")
         
         return self.output_buffer
@@ -202,7 +202,7 @@ class JAMESInterpreter:
     
     def generic_execute(self, node: ASTNode):
         """Generic execution for unknown node types"""
-        raise JAMESRuntimeError(f"No execution method for {type(node).__name__}")
+        raise TimeWarpRuntimeError(f"No execution method for {type(node).__name__}")
     
     def execute_NumberNode(self, node: NumberNode) -> Union[int, float]:
         """Execute number literal"""
@@ -229,7 +229,7 @@ class JAMESInterpreter:
             return left * right
         elif node.operator == '/':
             if right == 0:
-                raise JAMESRuntimeError("Division by zero")
+                raise TimeWarpRuntimeError("Division by zero")
             return left / right
         elif node.operator == '^':
             return left ** right
@@ -250,7 +250,7 @@ class JAMESInterpreter:
         elif node.operator.upper() == 'OR':
             return self._is_truthy(left) or self._is_truthy(right)
         else:
-            raise JAMESRuntimeError(f"Unknown binary operator: {node.operator}")
+            raise TimeWarpRuntimeError(f"Unknown binary operator: {node.operator}")
     
     def execute_UnaryOpNode(self, node: UnaryOpNode) -> Any:
         """Execute unary operation"""
@@ -261,7 +261,7 @@ class JAMESInterpreter:
         elif node.operator.upper() == 'NOT':
             return not self._is_truthy(operand)
         else:
-            raise JAMESRuntimeError(f"Unknown unary operator: {node.operator}")
+            raise TimeWarpRuntimeError(f"Unknown unary operator: {node.operator}")
     
     def execute_AssignmentNode(self, node: AssignmentNode):
         """Execute assignment"""
@@ -335,9 +335,9 @@ class JAMESInterpreter:
             try:
                 for stmt in node.statements:
                     self.execute(stmt)
-            except JAMESBreak:
+            except TimeWarpBreak:
                 break
-            except JAMESContinue:
+            except TimeWarpContinue:
                 pass
             
             current += step
@@ -348,14 +348,14 @@ class JAMESInterpreter:
             try:
                 for stmt in node.statements:
                     self.execute(stmt)
-            except JAMESBreak:
+            except TimeWarpBreak:
                 break
-            except JAMESContinue:
+            except TimeWarpContinue:
                 continue
     
     def execute_FunctionDefNode(self, node: FunctionDefNode):
         """Execute function definition"""
-        function = JAMESFunction(node, self.environment)
+        function = TimeWarpFunction(node, self.environment)
         self.environment.define(node.name, function)
         return function
     
@@ -364,19 +364,19 @@ class JAMESInterpreter:
         function = self.environment.get(node.name)
         arguments = [self.execute(arg) for arg in node.arguments]
         
-        if isinstance(function, JAMESFunction):
+        if isinstance(function, TimeWarpFunction):
             return function.call(self, arguments)
         elif callable(function):
             return function(*arguments)
         else:
-            raise JAMESRuntimeError(f"'{node.name}' is not callable")
+            raise TimeWarpRuntimeError(f"'{node.name}' is not callable")
     
     def execute_ReturnNode(self, node: ReturnNode):
         """Execute RETURN statement"""
         value = None
         if node.value:
             value = self.execute(node.value)
-        raise JAMESReturnValue(value)
+        raise TimeWarpReturnValue(value)
     
     def execute_PythonBlockNode(self, node: PythonBlockNode):
         """Execute Python code block"""
@@ -390,7 +390,7 @@ class JAMESInterpreter:
             
             return local_vars
         except Exception as e:
-            raise JAMESRuntimeError(f"Python execution error: {e}")
+            raise TimeWarpRuntimeError(f"Python execution error: {e}")
     
     def execute_ModeNode(self, node: ModeNode):
         """Execute mode switching"""
@@ -431,7 +431,7 @@ class JAMESInterpreter:
                     self.execute(stmt)
     
     def _is_truthy(self, value: Any) -> bool:
-        """Determine if a value is truthy in JAMES"""
+        """Determine if a value is truthy in TimeWarp"""
         if value is None:
             return False
         if isinstance(value, bool):

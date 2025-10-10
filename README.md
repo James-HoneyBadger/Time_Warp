@@ -39,7 +39,7 @@ pip install timewarp-ide
 
 #### Option 2: From Source
 ```bash
-git clone https://github.com/James-HoneyBadger/Time_Warp.git
+git clone https://github.com/TimeWarpIDE/TimeWarp.git
 cd Time_Warp
 pip install -e .
 ```
@@ -247,7 +247,7 @@ Each language includes optimized C runtime libraries for:
 ### Building from Source
 ```bash
 # Clone repository
-git clone https://github.com/James-HoneyBadger/Time_Warp.git
+git clone https://github.com/TimeWarpIDE/TimeWarp.git
 cd Time_Warp
 
 # Install in development mode

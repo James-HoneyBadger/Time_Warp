@@ -11,7 +11,7 @@ dist/
 build/
 
 # Virtual Environment
-james_venv/
+timewarp_venv/
 venv/
 env/
 ENV/
@@ -58,7 +58,7 @@ archive/
 *_pilot
 
 # Config files (user-specific)
-.james/
+.timewarp/
 config.json
 
 # Cache directories

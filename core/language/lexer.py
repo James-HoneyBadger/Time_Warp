@@ -122,7 +122,7 @@ class Token:
     line: int
     column: int
 
-class JAMESLexer:
+class TimeWarpLexer:
     """Lexical analyzer for TimeWarp IDE language"""
     
     def __init__(self):

@@ -164,7 +164,7 @@ We're excited to have you join our community of developers, educators, and retro
 • Get help in #help or #tutorials
 
 **Resources:**
-• Documentation: https://github.com/James-HoneyBadger/Time_Warp
+• Documentation: https://github.com/TimeWarpIDE/TimeWarp
 • Installation: pip install timewarp-ide
 • Discord: You're here! 🎉
 ```
@@ -231,7 +231,7 @@ We're excited to have you join our community of developers, educators, and retro
 Join our Discord community for discussions, support, and updates:
 https://discord.gg/timewarp-ide
 
-GitHub: https://github.com/James-HoneyBadger/Time_Warp
+GitHub: https://github.com/TimeWarpIDE/TimeWarp
 ```
 
 ### **Social Media Bios**

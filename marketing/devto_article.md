@@ -4,10 +4,10 @@
 
 Just released: A compiler that transforms classic ## Links
 
-- **GitHub Repository**: <https://github.com/James-HoneyBadger/Time_Warp>
+- **GitHub Repository**: <https://github.com/TimeWarpIDE/TimeWarp>
 - **PyPI Package**: <https://pypi.org/project/timewarp-ide/>
-- **Documentation**: <https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs>
-- **Release Notes**: <https://github.com/James-HoneyBadger/Time_Warp/releases/tag/v1.0.0>
+- **Documentation**: <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
+- **Release Notes**: <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
 
 ---
 
@@ -215,10 +215,10 @@ E:
 
 ## Links
 
-- **GitHub Repository**: <https://github.com/James-HoneyBadger/Time_Warp>
+- **GitHub Repository**: <https://github.com/TimeWarpIDE/TimeWarp>
 - **PyPI Package**: <https://pypi.org/project/timewarp-ide/>
-- **Documentation**: <https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs>
-- **Release Notes**: <https://github.com/James-HoneyBadger/Time_Warp/releases/tag/v1.0.0>
+- **Documentation**: <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
+- **Release Notes**: <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
 
 ---
 

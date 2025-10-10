@@ -9,7 +9,7 @@ import time
 import os
 import sys
 from typing import Any, Dict, Callable, Union, Optional
-from ..errors.error_manager import JAMESRuntimeError, JAMESTypeError, create_runtime_error, create_type_error
+from ..errors.error_manager import TimeWarpRuntimeError, TimeWarpTypeError, create_runtime_error, create_type_error
 
 class StandardLibrary:
     """Registry for built-in functions and constants"""
@@ -40,7 +40,7 @@ class StandardLibrary:
         """Get a built-in constant"""
         if name not in self.constants:
             error = create_runtime_error(f"Undefined constant '{name}'")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
         return self.constants[name]
     
     def get_all_names(self) -> list:
@@ -135,7 +135,7 @@ class StandardLibrary:
                 return func(float(x))
             except (ValueError, TypeError) as e:
                 error = create_runtime_error(f"Math error: {e}")
-                raise JAMESRuntimeError(error)
+                raise TimeWarpRuntimeError(error)
         return wrapper
     
     def _safe_sqrt(self, x):
@@ -144,11 +144,11 @@ class StandardLibrary:
             x = float(x)
             if x < 0:
                 error = create_runtime_error("Cannot take square root of negative number")
-                raise JAMESRuntimeError(error)
+                raise TimeWarpRuntimeError(error)
             return math.sqrt(x)
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Math error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _safe_log(self, x, base=math.e):
         """Safe logarithm function"""
@@ -158,14 +158,14 @@ class StandardLibrary:
                 base = float(base)
             if x <= 0:
                 error = create_runtime_error("Cannot take logarithm of non-positive number")
-                raise JAMESRuntimeError(error)
+                raise TimeWarpRuntimeError(error)
             if base != math.e and base <= 0:
                 error = create_runtime_error("Logarithm base must be positive")
-                raise JAMESRuntimeError(error)
+                raise TimeWarpRuntimeError(error)
             return math.log(x) if base == math.e else math.log(x, base)
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Math error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _safe_int(self, x):
         """Safe integer conversion"""
@@ -175,7 +175,7 @@ class StandardLibrary:
             return int(float(x))
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Cannot convert to integer: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _safe_round(self, x, digits=0):
         """Safe rounding function"""
@@ -183,7 +183,7 @@ class StandardLibrary:
             return round(float(x), int(digits))
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Rounding error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _safe_val(self, s):
         """Safe value conversion from string"""
@@ -198,7 +198,7 @@ class StandardLibrary:
                 return float(s)
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"Cannot convert '{s}' to number")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _left_string(self, s, n):
         """Get leftmost n characters"""
@@ -206,7 +206,7 @@ class StandardLibrary:
             return str(s)[:int(n)]
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _right_string(self, s, n):
         """Get rightmost n characters"""
@@ -215,7 +215,7 @@ class StandardLibrary:
             return str(s)[-n:] if n > 0 else ""
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
     
     def _mid_string(self, s, start, length=None):
         """Get substring starting at position"""
@@ -231,7 +231,7 @@ class StandardLibrary:
                 return s[start:start + length]
         except (ValueError, TypeError) as e:
             error = create_runtime_error(f"String function error: {e}")
-            raise JAMESRuntimeError(error)
+            raise TimeWarpRuntimeError(error)
 
 # Global instance
 std_lib = StandardLibrary()

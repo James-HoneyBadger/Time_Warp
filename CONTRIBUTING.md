@@ -13,7 +13,7 @@ Welcome to the TimeWarp IDE project! We're excited to have you contribute to thi
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/James-HoneyBadger/Time_Warp.git
+   git clone https://github.com/TimeWarpIDE/TimeWarp.git
    cd Time_Warp
    ```
 

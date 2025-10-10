@@ -28,8 +28,8 @@ timewarp-compiler hello.bas -o hello
 The project includes comprehensive documentation, sample programs, and language references. It's particularly valuable for computer science education, where understanding compilation and native executables is crucial.
 
 Links:
-- GitHub: https://github.com/James-HoneyBadger/Time_Warp
+- GitHub: https://github.com/TimeWarpIDE/TimeWarp
 - PyPI: https://pypi.org/project/timewarp-ide/
-- Release: https://github.com/James-HoneyBadger/Time_Warp/releases/tag/v1.0.0
+- Release: https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0
 
 Future plans include additional languages (Pascal, FORTRAN) and web IDE integration.

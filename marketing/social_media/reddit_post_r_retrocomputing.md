@@ -130,10 +130,10 @@ TimeWarp IDE is open source (MIT license) and welcomes contributions from the re
 
 ## Links
 
-- **GitHub Repository:** <https://github.com/James-HoneyBadger/Time_Warp>
+- **GitHub Repository:** <https://github.com/TimeWarpIDE/TimeWarp>
 - **PyPI Package:** <https://pypi.org/project/timewarp-ide/>
-- **Documentation:** <https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs>
-- **Release:** <https://github.com/James-HoneyBadger/Time_Warp/releases/tag/v1.0.0>
+- **Documentation:** <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
+- **Release:** <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
 
 ## Future Visions
 

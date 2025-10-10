@@ -1,7 +1,7 @@
-# JAMES Multi-Language Support Specification
+# TimeWarp Multi-Language Support Specification
 
 ## Overview
-JAMES IDE supports multiple distinct programming languages through separate interpreters: PILOT (text processing), BASIC (structured programming), Logo (turtle graphics), Python, JavaScript, and Perl. Each language operates independently with its own syntax and semantics.
+TimeWarp IDE supports multiple distinct programming languages through separate interpreters: PILOT (text processing), BASIC (structured programming), Logo (turtle graphics), Python, JavaScript, and Perl. Each language operates independently with its own syntax and semantics.
 
 ## Supported Languages
 
@@ -63,7 +63,7 @@ print "Square root is: $result\n";
 
 ## Language Independence
 
-Each language in JAMES operates independently:
+Each language in TimeWarp operates independently:
 
 ### Separate Interpreters
 - Each language has its own dedicated interpreter
@@ -122,7 +122,7 @@ Each language in JAMES operates independently:
 - Text processing capabilities
 - CPAN module system integration
 
-## JAMES IDE Features
+## TimeWarp IDE Features
 
 ### Multi-Language Editor
 - Syntax highlighting for each language

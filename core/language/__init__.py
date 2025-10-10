@@ -3,16 +3,16 @@ TimeWarp IDE Language Module
 Unified programming language combining PILOT, BASIC, Logo, and Python
 """
 
-from .lexer import JAMESLexer, Token, TokenType
-from .parser import JAMESParser, ProgramNode
-from .interpreter import JAMESInterpreter
-from .james_compiler import JAMESCompiler
+from .lexer import TimeWarpLexer, Token, TokenType
+from .parser import TimeWarpParser, ProgramNode
+from .interpreter import TimeWarpInterpreter
+from .timewarp_compiler import TimeWarpCompiler
 
 __all__ = [
-    'JAMESLexer', 'Token', 'TokenType',
-    'JAMESParser', 'ProgramNode', 
-    'JAMESInterpreter',
-    'JAMESCompiler'
+    'TimeWarpLexer', 'Token', 'TokenType',
+    'TimeWarpParser', 'ProgramNode', 
+    'TimeWarpInterpreter',
+    'TimeWarpCompiler'
 ]
 
 __version__ = "1.0.0"

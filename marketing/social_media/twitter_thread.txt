@@ -25,7 +25,7 @@ Demo compilation:
 timewarp-compiler hello.bas -o hello
 ./hello
 
-GitHub: https://github.com/James-HoneyBadger/Time_Warp
+GitHub: https://github.com/TimeWarpIDE/TimeWarp
 PyPI: https://pypi.org/project/timewarp-ide/
 
 #programming #opensource #education #BASIC #Logo #PILOT #retrocomputing #compsci

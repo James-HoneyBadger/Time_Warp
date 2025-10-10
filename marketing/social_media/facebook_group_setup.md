@@ -29,10 +29,10 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
 • Community events and coding challenges
 
 **Resources:**
-• GitHub: https://github.com/James-HoneyBadger/Time_Warp
+• GitHub: https://github.com/TimeWarpIDE/TimeWarp
 • PyPI: https://pypi.org/project/timewarp-ide/
 • Discord: [Add Discord invite link when created]
-• Documentation: https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs
+• Documentation: https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
 
 **Rules:** Be respectful, stay on topic, share knowledge, help others!
 ```

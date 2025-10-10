@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JAMES Core Framework - Base architecture for modular tool system
+TimeWarp Core Framework - Base architecture for modular tool system
 Provides event management, plugin interfaces, and standardized component registration
 """
 
@@ -96,7 +96,7 @@ class ComponentRegistry:
 
 
 class ToolPlugin(ABC):
-    """Base class for JAMES tool plugins with standardized lifecycle and UI integration"""
+    """Base class for TimeWarp tool plugins with standardized lifecycle and UI integration"""
     
     def __init__(self, ide_instance, framework):
         self.ide = ide_instance
@@ -279,7 +279,7 @@ class ToolPlugin(ABC):
         self._toolbar_items.clear()
 
 
-class JAMESFramework:
+class TimeWarpFramework:
     """Core framework for TimeWarp IDE - manages tools, events, and components"""
     
     def __init__(self, ide_instance):
@@ -299,7 +299,7 @@ class JAMESFramework:
         self._ensure_config_dir()
         self._load_config()
         
-        print("🚀 JAMES Framework initialized")
+        print("🚀 TimeWarp Framework initialized")
     
     def register_tool(self, tool: ToolPlugin) -> bool:
         """Register a tool plugin"""
@@ -519,7 +519,7 @@ class JAMESFramework:
     
     def shutdown(self) -> None:
         """Shutdown the framework"""
-        print("🛑 Shutting down JAMES Framework...")
+        print("🛑 Shutting down TimeWarp Framework...")
         
         # Deactivate all active tools
         for tool_name in self.list_active_tools():
@@ -535,4 +535,4 @@ class JAMESFramework:
         # Clear registry
         self.registry._components.clear()
         
-        print("✅ JAMES Framework shutdown complete")
+        print("✅ TimeWarp Framework shutdown complete")

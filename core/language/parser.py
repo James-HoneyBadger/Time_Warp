@@ -6,7 +6,7 @@ Parses tokenized TimeWarp IDE source code into an Abstract Syntax Tree (AST)
 from typing import List, Optional, Union, Any
 from dataclasses import dataclass
 from enum import Enum
-from .lexer import Token, TokenType, JAMESLexer
+from .lexer import Token, TokenType, TimeWarpLexer
 
 # AST Node Types
 @dataclass
@@ -241,7 +241,7 @@ class ParseError(Exception):
     """Parser error"""
     pass
 
-class JAMESParser:
+class TimeWarpParser:
     """Parser for TimeWarp IDE language"""
     
     def __init__(self):

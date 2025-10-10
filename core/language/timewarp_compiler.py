@@ -6,20 +6,20 @@ Main interface for compiling and executing TimeWarp IDE programs
 import os
 import sys
 from typing import List, Optional, Dict, Any, Callable, Union
-from .lexer import JAMESLexer, Token
-from .parser import JAMESParser, ProgramNode
-from .interpreter import JAMESInterpreter
+from .lexer import TimeWarpLexer, Token
+from .parser import TimeWarpParser, ProgramNode
+from .interpreter import TimeWarpInterpreter
 from .handlers.pilot_handler import PilotHandler
 from .handlers.logo_handler import LogoHandler
 from .handlers.python_handler import PythonHandler, BasicHandler
 
-class JAMESCompiler:
+class TimeWarpCompiler:
     """Main TimeWarp IDE compiler/interpreter"""
     
     def __init__(self):
-        self.lexer = JAMESLexer()
-        self.parser = JAMESParser()
-        self.interpreter = JAMESInterpreter()
+        self.lexer = TimeWarpLexer()
+        self.parser = TimeWarpParser()
+        self.interpreter = TimeWarpInterpreter()
         
         # Initialize handlers
         self.pilot_handler = PilotHandler(self.interpreter)
@@ -264,7 +264,7 @@ def main():
     
     args = parser.parse_args()
     
-    compiler = JAMESCompiler()
+    compiler = TimeWarpCompiler()
     
     if args.debug:
         compiler.set_debug_mode(True)

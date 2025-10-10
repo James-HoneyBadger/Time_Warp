@@ -24,9 +24,9 @@ TimeWarp IDE is a revolutionary educational compiler that transforms 1960s progr
 • Community events and coding challenges
 
 **📚 Resources:**
-• **GitHub:** https://github.com/James-HoneyBadger/Time_Warp
+• **GitHub:** https://github.com/TimeWarpIDE/TimeWarp
 • **PyPI:** https://pypi.org/project/timewarp-ide/
-• **Documentation:** https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs
+• **Documentation:** https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
 • **Discord:** [Coming Soon]
 
 **📜 Group Rules:**
@@ -50,7 +50,7 @@ Be respectful, stay on topic, share knowledge, help others!
 pip install timewarp-ide
 
 # Or clone from GitHub
-git clone https://github.com/James-HoneyBadger/Time_Warp
+git clone https://github.com/TimeWarpIDE/TimeWarp
 cd Time_Warp
 pip install -e .
 ```
@@ -92,10 +92,10 @@ timewarp-compiler hello.bas -o hello
 🔗 **TimeWarp IDE Resources & Links**
 
 **📖 Official Resources**
-• **GitHub Repository:** https://github.com/James-HoneyBadger/Time_Warp
+• **GitHub Repository:** https://github.com/TimeWarpIDE/TimeWarp
 • **PyPI Package:** https://pypi.org/project/timewarp-ide/
-• **Documentation:** https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs
-• **Issue Tracker:** https://github.com/James-HoneyBadger/Time_Warp/issues
+• **Documentation:** https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
+• **Issue Tracker:** https://github.com/TimeWarpIDE/TimeWarp/issues
 
 **💬 Community**
 • **Facebook Group:** [This Group]
@@ -112,9 +112,9 @@ timewarp-compiler hello.bas -o hello
 • **Tutorials:** Check pinned tutorials in this group
 
 **🛠️ Development**
-• **Contributing Guide:** https://github.com/James-HoneyBadger/Time_Warp/blob/main/CONTRIBUTING.md
-• **Code of Conduct:** https://github.com/James-HoneyBadger/Time_Warp/blob/main/CODE_OF_CONDUCT.md
-• **Release Notes:** https://github.com/James-HoneyBadger/Time_Warp/releases
+• **Contributing Guide:** https://github.com/TimeWarpIDE/TimeWarp/blob/main/CONTRIBUTING.md
+• **Code of Conduct:** https://github.com/TimeWarpIDE/TimeWarp/blob/main/CODE_OF_CONDUCT.md
+• **Release Notes:** https://github.com/TimeWarpIDE/TimeWarp/releases
 
 **📢 Stay Updated**
 • Follow GitHub for releases
@@ -189,7 +189,7 @@ A: See CONTRIBUTING.md on GitHub. Bug reports, features, docs welcome!
 A: Yes! The plugin system supports extending TimeWarp.
 
 **Q: Where do I report bugs?**
-A: GitHub Issues: https://github.com/James-HoneyBadger/Time_Warp/issues
+A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 
 **💡 Pro Tips**
 - Use `timewarp-compiler --help` for all options
@@ -356,7 +356,7 @@ A revolutionary compiler that bridges 1960s educational programming with modern 
 
 **🔗 Quick Links:**
 • **Install:** `pip install timewarp-ide`
-• **GitHub:** https://github.com/James-HoneyBadger/Time_Warp
+• **GitHub:** https://github.com/TimeWarpIDE/TimeWarp
 • **Examples:** Check the /examples folder
 
 **📌 Pinned Posts:** Check the posts above for getting started guides, resources, and FAQs!
