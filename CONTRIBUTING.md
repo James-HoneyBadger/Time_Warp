@@ -99,7 +99,7 @@ pre-commit run --all-files
 
 ### File Organization
 - **Test files**: `test_*.py` for unit tests, `*_test.py` for integration tests
-- **Language demos**: Use appropriate extensions (`.pilot`, `.bas`, `.logo`, `.timewarp`)
+- **Language demos**: Use appropriate extensions (`.pilot`, `.bas`, `.logo`)
 - **Documentation**: Use Markdown for all documentation files
 
 ### Commit Messages

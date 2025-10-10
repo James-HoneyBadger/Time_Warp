@@ -12,7 +12,7 @@ recursive-include examples *.logo
 recursive-include examples *.py
 recursive-include examples *.js
 recursive-include examples *.pl
-recursive-include examples *.timewarp
+
 
 # Include sample programs
 recursive-include samples *.pilot
@@ -21,7 +21,7 @@ recursive-include samples *.logo
 recursive-include samples *.py
 recursive-include samples *.js
 recursive-include samples *.pl
-recursive-include samples *.timewarp
+
 
 # Include documentation
 recursive-include docs *.md

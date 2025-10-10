@@ -1,6 +1,0 @@
-// Test basic turtle graphics
-FORWARD 50
-RIGHT 90  
-FORWARD 50
-LEFT 45
-CIRCLE 25

@@ -28,9 +28,8 @@ Each language has dedicated executor classes in `core/languages/`:
 
 ### File Naming Conventions
 - **Test files**: `test_*.py` for unit tests, `*_test.py` for integration tests
-- **Language demos**: `*.pilot`, `*.bas`, `*.logo`, `*.timewarp` for example programs
+- **Language demos**: `*.pilot`, `*.bas`, `*.logo` for example programs
 - **Compiled output**: `*_compiled` files for interpreter execution results
-- **TimeWarp files**: `.timewarp` extension for multi-language test cases
 
 ### Configuration Management
 - User settings stored in `~/.timewarp/config.json`

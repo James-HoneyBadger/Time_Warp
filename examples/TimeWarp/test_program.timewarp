@@ -1,8 +1,0 @@
-REM Test TimeWarp Program
-REM Simple BASIC program to test file loading
-
-10 PRINT "Hello from TimeWarp!"
-20 PRINT "This program was loaded from a file."
-30 LET X = 42
-40 PRINT "The answer is: " + STR$(X)
-50 END

@@ -56,7 +56,7 @@ The `.vscode/settings.json` is configured for:
 ## VS Code Workspace Features
 
 ### Custom File Types:
-- `.timewarp` files → Python syntax highlighting
+
 - `.pilot` files → Custom PILOT language
 - `.bas` files → BASIC language
 - `.logo` files → Logo/Lisp syntax

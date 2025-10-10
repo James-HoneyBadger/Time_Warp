@@ -13,7 +13,7 @@
         "python.formatting.provider": "black",
         "python.analysis.typeCheckingMode": "basic",
         "files.associations": {
-            "*.timewarp": "python",
+
             "*.pilot": "plaintext",
             "*.bas": "basic",
             "*.logo": "lisp"

@@ -1,9 +1,0 @@
-// Simple turtle graphics test in TimeWarp
-FORWARD 100
-RIGHT 90
-FORWARD 100
-RIGHT 90
-FORWARD 100
-RIGHT 90
-FORWARD 100
-// Draw a square
