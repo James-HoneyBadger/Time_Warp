@@ -1,8 +1,8 @@
-Title: TimeWarp IDE v1.0.0: Compile PILOT, BASIC, and Logo to Native Executables
+Title: Time_Warp IDE v1.0.0: Compile PILOT, BASIC, and Logo to Native Executables
 
 Show HN: I built a compiler that transforms 1960s educational programming languages into modern native binaries.
 
-TimeWarp IDE is an educational programming compiler that takes three classic languages and compiles them to standalone Linux executables using GCC. Unlike most educational tools that use interpreters or web environments, this generates actual native binaries with zero runtime dependencies.
+Time_Warp IDE is an educational programming compiler that takes three classic languages and compiles them to standalone Linux executables using GCC. Unlike most educational tools that use interpreters or web environments, this generates actual native binaries with zero runtime dependencies.
 
 Supported Languages:
 - PILOT: Educational language with turtle graphics and conditional branching
@@ -16,20 +16,20 @@ Technical Details:
 - Cross-platform architecture (currently Linux, expanding to Windows/macOS)
 
 Why This Matters:
-Most programming education today uses high-level interpreted languages or web-based tools. TimeWarp IDE lets students work with proven educational languages while learning about compilation, native performance, and software distribution.
+Most programming education today uses high-level interpreted languages or web-based tools. Time_Warp IDE lets students work with proven educational languages while learning about compilation, native performance, and software distribution.
 
 Example Usage:
 ```
-pip install timewarp-ide
-timewarp-compiler hello.bas -o hello
+pip install time_warp-ide
+time_warp-compiler hello.bas -o hello
 ./hello  # Runs natively, no interpreter needed
 ```
 
 The project includes comprehensive documentation, sample programs, and language references. It's particularly valuable for computer science education, where understanding compilation and native executables is crucial.
 
 Links:
-- GitHub: https://github.com/TimeWarpIDE/TimeWarp
-- PyPI: https://pypi.org/project/timewarp-ide/
-- Release: https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0
+- GitHub: https://github.com/Time_WarpIDE/Time_Warp
+- PyPI: https://pypi.org/project/time_warp-ide/
+- Release: https://github.com/Time_WarpIDE/Time_Warp/releases/tag/v1.0.0
 
 Future plans include additional languages (Pascal, FORTRAN) and web IDE integration.

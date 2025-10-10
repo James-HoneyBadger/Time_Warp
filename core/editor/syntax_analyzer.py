@@ -1,5 +1,5 @@
 """
-Syntax Analyzer for TimeWarp IDE
+Syntax Analyzer for Time_Warp IDE
 Provides real-time syntax checking and error reporting
 """
 

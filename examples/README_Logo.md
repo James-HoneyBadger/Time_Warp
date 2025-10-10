@@ -1,4 +1,4 @@
-# TimeWarp IDE - Comprehensive Logo Examples
+# Time_Warp IDE - Comprehensive Logo Examples
 
 This directory contains comprehensive Logo programming examples that demonstrate
 various commands, features, and programming concepts in the Logo language.
@@ -497,9 +497,9 @@ END
 
 ## Running the Examples
 
-To run these examples in TimeWarp IDE:
+To run these examples in Time_Warp IDE:
 
-1. Launch TimeWarp IDE
+1. Launch Time_Warp IDE
 2. Select "Logo" from the language menu
 3. Copy and paste any example code
 4. Click Run → Execute

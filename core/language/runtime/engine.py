@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Runtime Engine
+Time_Warp IDE Runtime Engine
 Core execution environment and context management
 """
 
@@ -21,7 +21,7 @@ from ..stdlib.core import StandardLibrary
 
 
 class ExecutionMode(Enum):
-    """Execution modes for TimeWarp IDE"""
+    """Execution modes for Time_Warp IDE"""
 
     BASIC = "basic"
     PILOT = "pilot"

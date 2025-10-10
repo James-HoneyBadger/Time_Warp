@@ -1,5 +1,5 @@
 """
-TimeWarp Game Development Module
+Time_Warp Game Development Module
 ============================
 
 Game development tools and engine:
@@ -10,7 +10,7 @@ Game development tools and engine:
 """
 
 __version__ = "2.0.0"
-__author__ = "TimeWarp Development Team"
+__author__ = "Time_Warp Development Team"
 
 from . import engine
 

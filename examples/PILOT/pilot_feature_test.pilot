@@ -1,9 +1,9 @@
-# TimeWarp IDE - PILOT Language Feature Test
+# Time_Warp IDE - PILOT Language Feature Test
 # This program demonstrates the new command features added to PILOT
 
 # Test File I/O Commands
 10 PRINT "=== Testing File I/O Commands ==="
-20 F:WRITE test.txt "Hello, TimeWarp IDE!"
+20 F:WRITE test.txt "Hello, Time_Warp IDE!"
 30 F:READ test.txt FILE_CONTENT
 40 PRINT "File content: " FILE_CONTENT
 50 F:APPEND test.txt " More text added."
@@ -14,7 +14,7 @@
 
 # Test String Processing Commands
 100 PRINT "=== Testing String Processing ==="
-110 LET TEXT = "Hello World from TimeWarp"
+110 LET TEXT = "Hello World from Time_Warp"
 120 S:LENGTH TEXT TEXT_LEN
 130 PRINT "Text length: " TEXT_LEN
 140 S:UPPER TEXT TEXT_UPPER

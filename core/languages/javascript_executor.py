@@ -1,10 +1,10 @@
 """
-JavaScript Language Executor for TimeWarp IDE
+JavaScript Language Executor for Time_Warp IDE
 ==============================================
 
 JavaScript is a high-level, dynamic programming language.
 
-This module handles JavaScript script execution for the TimeWarp IDE using Node.js.
+This module handles JavaScript script execution for the Time_Warp IDE using Node.js.
 """
 
 import subprocess

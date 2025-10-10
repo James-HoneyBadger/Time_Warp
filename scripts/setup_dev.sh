@@ -1,13 +1,13 @@
 #!/bin/bash
-# Development Setup Script for TimeWarp IDE
+# Development Setup Script for Time_Warp IDE
 
 set -e
 
-echo "🚀 Setting up TimeWarp IDE development environment..."
+echo "🚀 Setting up Time_Warp IDE development environment..."
 
 # Check if we're in the right directory
-if [ ! -f "TimeWarp.py" ]; then
-    echo "❌ Error: TimeWarp.py not found. Are you in the right directory?"
+if [ ! -f "Time_Warp.py" ]; then
+    echo "❌ Error: Time_Warp.py not found. Are you in the right directory?"
     exit 1
 fi
 
@@ -37,16 +37,16 @@ pre-commit install
 echo "🧪 Running initial tests..."
 python run_tests.py
 
-# Check if TimeWarp can be imported
-echo "✅ Testing TimeWarp import..."
-python -c "from core.interpreter import TimeWarpInterpreter; print('TimeWarp core imported successfully!')"
+# Check if Time_Warp can be imported
+echo "✅ Testing Time_Warp import..."
+python -c "from core.interpreter import Time_WarpInterpreter; print('Time_Warp core imported successfully!')"
 
 echo ""
 echo "🎉 Development environment setup complete!"
 echo ""
 echo "To get started:"
 echo "  1. Activate the virtual environment: source .Time_Warp/bin/activate"
-echo "  2. Run TimeWarp IDE: python TimeWarp.py"
+echo "  2. Run Time_Warp IDE: python Time_Warp.py"
 echo "  3. Run tests: python run_tests.py"
 echo "  4. Format code: black ."
 echo "  5. Lint code: flake8 ."

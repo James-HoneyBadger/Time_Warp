@@ -1,10 +1,10 @@
-# TimeWarp IDE: Multi-Language Educational Programming Environment - Learn coding through 1960s classics (PILOT, BASIC, Logo) to modern Python!
+# Time_Warp IDE: Multi-Language Educational Programming Environment - Learn coding through 1960s classics (PILOT, BASIC, Logo) to modern Python!
 
 **Cool Project Alert!** 🚀 Built a unique IDE that lets you experience programming language evolution firsthand - from 1960s educational languages to modern development!
 
 ## What Makes This Project Cool?
 
-TimeWarp IDE isn't just another code editor - it's a **time machine for programming languages**! Experience how programming education evolved by coding in the same languages that taught the first generation of programmers, all within a modern, polished IDE.
+Time_Warp IDE isn't just another code editor - it's a **time machine for programming languages**! Experience how programming education evolved by coding in the same languages that taught the first generation of programmers, all within a modern, polished IDE.
 
 ### **🕰️ Time Travel Through Programming History**
 - **PILOT (1962)** - The original educational programming language
@@ -165,7 +165,7 @@ DRAGON_CURVE 5 10 1  # Creates the famous Dragon Curve fractal!
 # One command to rule them all
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python TimeWarp.py
+python Time_Warp.py
 
 # Or use the magic script
 ./start_timewarp.sh  # Auto-creates Python environment!
@@ -218,7 +218,7 @@ This project is **100% open source** and welcomes contributors! Areas where you 
 ## 🗺️ Roadmap - What's Coming Next
 
 ### **Phase 1: Core Expansion** 
-- **Web IDE Version** - Run TimeWarp in your browser
+- **Web IDE Version** - Run Time_Warp in your browser
 - **Additional Languages** - Pascal, FORTRAN, and more classics
 - **Enhanced Debugger** - Step-through debugging for all languages
 - **Mobile Companion** - Code on the go
@@ -240,7 +240,7 @@ This project is **100% open source** and welcomes contributors! Areas where you 
 Don't just read about it - **experience programming history firsthand**! 
 
 1. **Clone the repo** → `git clone https://github.com/James-HoneyBadger/Time_Warp.git`
-2. **Run the IDE** → `python TimeWarp.py`
+2. **Run the IDE** → `python Time_Warp.py`
 3. **Start with PILOT** → Try the simple interactive examples
 4. **Create Logo art** → Draw beautiful fractals and patterns
 5. **Explore BASIC** → Write classic programs with arrays and loops
@@ -248,13 +248,13 @@ Don't just read about it - **experience programming history firsthand**!
 
 ## 💫 Why This Project Matters
 
-In an era of complex frameworks and overwhelming choices, TimeWarp IDE brings back the **joy of learning programming fundamentals**. It's not just nostalgia - it's about understanding **where we came from** to better appreciate **where we're going**.
+In an era of complex frameworks and overwhelming choices, Time_Warp IDE brings back the **joy of learning programming fundamentals**. It's not just nostalgia - it's about understanding **where we came from** to better appreciate **where we're going**.
 
-Every modern programmer should experience the elegance of Logo's turtle graphics, the directness of BASIC's line numbers, and the educational clarity of PILOT's simple commands. TimeWarp IDE makes this possible while providing all the modern conveniences developers expect.
+Every modern programmer should experience the elegance of Logo's turtle graphics, the directness of BASIC's line numbers, and the educational clarity of PILOT's simple commands. Time_Warp IDE makes this possible while providing all the modern conveniences developers expect.
 
 ---
 
-**🚀 TimeWarp IDE** - Where programming history meets modern innovation! Experience the evolution of coding in one amazing educational environment.
+**🚀 Time_Warp IDE** - Where programming history meets modern innovation! Experience the evolution of coding in one amazing educational environment.
 
 **Star it, fork it, contribute to it** - help preserve programming education for the next generation! ⭐
 

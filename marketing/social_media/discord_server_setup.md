@@ -1,4 +1,4 @@
-# TimeWarp IDE Discord Server Setup Guide
+# Time_Warp IDE Discord Server Setup Guide
 
 ## 🚀 **Creating Your Discord Server**
 
@@ -6,12 +6,12 @@
 1. **Open Discord** and click the "+" icon in the server list
 2. **Select "Create My Own"**
 3. **Choose "For a club or community"**
-4. **Name:** "TimeWarp IDE"
+4. **Name:** "Time_Warp IDE"
 5. **Upload Icon:** Use a simple logo (can create one later)
 6. **Click "Create"**
 
 ### **Step 2: Server Settings**
-- **Server Description:** "Community for TimeWarp IDE - Compile 1960s educational languages to native executables"
+- **Server Description:** "Community for Time_Warp IDE - Compile 1960s educational languages to native executables"
 - **Server Banner:** Add an attractive banner image
 - **Verification Level:** Medium (requires email verification)
 - **Default Notifications:** Only @mentions
@@ -34,7 +34,7 @@
 - **#help** - Installation and usage questions
 - **#bug-reports** - Report bugs and issues
 - **#feature-requests** - Suggest new features
-- **#showcase** - Share projects built with TimeWarp
+- **#showcase** - Share projects built with Time_Warp
 
 #### **💻 Development**
 - **#development** - Development discussions, roadmap
@@ -104,7 +104,7 @@
 
 ### **Server Rules (Pin in #rules)**
 ```
-🏠 **TimeWarp IDE Community Guidelines**
+🏠 **Time_Warp IDE Community Guidelines**
 
 **1. Be Respectful**
    - Treat all members with respect and kindness
@@ -143,18 +143,18 @@
 ### **Channel-Specific Rules**
 - **#help:** Search before asking, provide error messages
 - **#development:** Technical discussions only
-- **#showcase:** Share your TimeWarp projects!
+- **#showcase:** Share your Time_Warp projects!
 
 ## 🎨 **Server Customization**
 
 ### **Theme and Branding**
 - **Colors:** Retro-inspired (teal, purple, orange)
 - **Emojis:** Custom emojis for programming, retro computing
-- **Banner:** TimeWarp IDE logo with tagline
+- **Banner:** Time_Warp IDE logo with tagline
 
 ### **Welcome Screen**
 ```
-🎉 **Welcome to TimeWarp IDE!**
+🎉 **Welcome to Time_Warp IDE!**
 
 We're excited to have you join our community of developers, educators, and retro computing enthusiasts working with classic programming languages.
 
@@ -164,8 +164,8 @@ We're excited to have you join our community of developers, educators, and retro
 • Get help in #help or #tutorials
 
 **Resources:**
-• Documentation: https://github.com/TimeWarpIDE/TimeWarp
-• Installation: pip install timewarp-ide
+• Documentation: https://github.com/Time_WarpIDE/Time_Warp
+• Installation: pip install time_warp-ide
 • Discord: You're here! 🎉
 ```
 
@@ -229,13 +229,13 @@ We're excited to have you join our community of developers, educators, and retro
 ```markdown
 ## Community
 Join our Discord community for discussions, support, and updates:
-https://discord.gg/timewarp-ide
+https://discord.gg/time_warp-ide
 
-GitHub: https://github.com/TimeWarpIDE/TimeWarp
+GitHub: https://github.com/Time_WarpIDE/Time_Warp
 ```
 
 ### **Social Media Bios**
-- Twitter: "TimeWarp IDE Community: discord.gg/timewarp-ide"
+- Twitter: "Time_Warp IDE Community: discord.gg/time_warp-ide"
 - LinkedIn: Include Discord link in about section
 
 ## 🎯 **Launch Checklist**
@@ -253,6 +253,6 @@ GitHub: https://github.com/TimeWarpIDE/TimeWarp
 
 ---
 
-**Your TimeWarp IDE Discord server is ready to launch!** 🚀
+**Your Time_Warp IDE Discord server is ready to launch!** 🚀
 
 Start by inviting a few initial members (contributors, early supporters) to help build momentum, then open it up to the public with your announcement posts.

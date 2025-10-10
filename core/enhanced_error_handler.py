@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Error Handler for TimeWarp IDE
+Enhanced Error Handler for Time_Warp IDE
 Educational error messages with suggestions and location highlighting
 """
 

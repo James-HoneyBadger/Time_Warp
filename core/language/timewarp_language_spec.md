@@ -1,7 +1,7 @@
-# TimeWarp Multi-Language Support Specification
+# Time_Warp Multi-Language Support Specification
 
 ## Overview
-TimeWarp IDE supports multiple distinct programming languages through separate interpreters: PILOT (text processing), BASIC (structured programming), Logo (turtle graphics), Python, JavaScript, and Perl. Each language operates independently with its own syntax and semantics.
+Time_Warp IDE supports multiple distinct programming languages through separate interpreters: PILOT (text processing), BASIC (structured programming), Logo (turtle graphics), Python, JavaScript, and Perl. Each language operates independently with its own syntax and semantics.
 
 ## Supported Languages
 
@@ -63,7 +63,7 @@ print "Square root is: $result\n";
 
 ## Language Independence
 
-Each language in TimeWarp operates independently:
+Each language in Time_Warp operates independently:
 
 ### Separate Interpreters
 - Each language has its own dedicated interpreter
@@ -122,7 +122,7 @@ Each language in TimeWarp operates independently:
 - Text processing capabilities
 - CPAN module system integration
 
-## TimeWarp IDE Features
+## Time_Warp IDE Features
 
 ### Multi-Language Editor
 - Syntax highlighting for each language

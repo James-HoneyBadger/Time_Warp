@@ -1,5 +1,5 @@
 """
-Game Manager for TimeWarp Game Engine
+Game Manager for Time_Warp Game Engine
 Main game management system with game loop and object management.
 """
 

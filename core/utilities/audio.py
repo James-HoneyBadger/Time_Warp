@@ -1,5 +1,5 @@
 """
-Audio utilities for TimeWarp
+Audio utilities for Time_Warp
 Handles sound mixing and playback functionality.
 """
 

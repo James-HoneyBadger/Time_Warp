@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Enhanced Parser
+Time_Warp IDE Enhanced Parser
 Improved AST generation with better error handling
 """
 

@@ -1,6 +1,6 @@
 """
-TimeWarp IDE Runtime Engine
-Executes TimeWarp IDE programs by interpreting the Abstract Syntax Tree
+Time_Warp IDE Runtime Engine
+Executes Time_Warp IDE programs by interpreting the Abstract Syntax Tree
 """
 
 import sys
@@ -14,25 +14,25 @@ from .lexer import TimeWarpLexer, Token
 
 
 class TimeWarpError(Exception):
-    """Base exception for TimeWarp language errors"""
+    """Base exception for Time_Warp language errors"""
 
     pass
 
 
 class TimeWarpTypeError(TimeWarpError):
-    """Type error in TimeWarp code"""
+    """Type error in Time_Warp code"""
 
     pass
 
 
 class TimeWarpNameError(TimeWarpError):
-    """Name error in TimeWarp code"""
+    """Name error in Time_Warp code"""
 
     pass
 
 
 class TimeWarpRuntimeError(TimeWarpError):
-    """Runtime error in TimeWarp code"""
+    """Runtime error in Time_Warp code"""
 
     pass
 
@@ -97,7 +97,7 @@ class TimeWarpFunction:
         self.declaration = declaration
         self.closure = closure
 
-    def call(self, interpreter: "TimeWarpInterpreter", arguments: List[Any]) -> Any:
+    def call(self, interpreter: "Time_WarpInterpreter", arguments: List[Any]) -> Any:
         """Call the function with given arguments"""
         if len(arguments) != len(self.declaration.parameters):
             raise TimeWarpRuntimeError(
@@ -127,8 +127,8 @@ class TimeWarpFunction:
         return None  # No explicit return
 
 
-class TimeWarpInterpreter:
-    """Main interpreter for TimeWarp IDE programs"""
+class Time_WarpInterpreter:
+    """Main interpreter for Time_Warp IDE programs"""
 
     def __init__(self):
         self.globals = Environment()
@@ -140,7 +140,7 @@ class TimeWarpInterpreter:
         self._init_builtins()
 
         # Python integration globals
-        self.python_globals = {"TimeWarp": self._create_timewarp_interface()}
+        self.python_globals = {"Time_Warp": self._create_timewarp_interface()}
 
     def _init_builtins(self):
         """Initialize built-in functions and constants"""
@@ -179,22 +179,22 @@ class TimeWarpInterpreter:
         self.globals.define("E", math.e)
 
     def _create_timewarp_interface(self):
-        """Create TimeWarp interface for Python integration"""
+        """Create Time_Warp interface for Python integration"""
 
         class TimeWarpInterface:
             def __init__(self, interpreter):
                 self.interpreter = interpreter
 
             def GET(self, name: str) -> Any:
-                """Get TimeWarp variable from Python"""
+                """Get Time_Warp variable from Python"""
                 return self.interpreter.environment.get(name)
 
             def SET(self, name: str, value: Any):
-                """Set TimeWarp variable from Python"""
+                """Set Time_Warp variable from Python"""
                 self.interpreter.environment.set(name, value)
 
             def CALL(self, name: str, *args) -> Any:
-                """Call TimeWarp function from Python"""
+                """Call Time_Warp function from Python"""
                 func = self.interpreter.environment.get(name)
                 if isinstance(func, TimeWarpFunction):
                     return func.call(self.interpreter, list(args))
@@ -206,7 +206,7 @@ class TimeWarpInterpreter:
         return TimeWarpInterface(self)
 
     def interpret(self, program: ProgramNode) -> List[str]:
-        """Interpret a TimeWarp program"""
+        """Interpret a Time_Warp program"""
         self.output_buffer = []
 
         try:
@@ -455,7 +455,7 @@ class TimeWarpInterpreter:
                     self.execute(stmt)
 
     def _is_truthy(self, value: Any) -> bool:
-        """Determine if a value is truthy in TimeWarp"""
+        """Determine if a value is truthy in Time_Warp"""
         if value is None:
             return False
         if isinstance(value, bool):

@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Errors Module
+Time_Warp IDE Errors Module
 """
 
 from .error_manager import (

@@ -1,5 +1,5 @@
 """
-PILOT Language Handler for TimeWarp IDE
+PILOT Language Handler for Time_Warp IDE
 Implements PILOT-style text processing and pattern matching
 """
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE Dependency Installer
-Installs all required and optional dependencies for TimeWarp IDE
+Time_Warp IDE Dependency Installer
+Installs all required and optional dependencies for Time_Warp IDE
 """
 
 import subprocess
@@ -21,8 +21,8 @@ def install_package(package):
 
 
 def main():
-    """Install all TimeWarp IDE dependencies"""
-    print("🔧 Installing TimeWarp IDE Dependencies")
+    """Install all Time_Warp IDE dependencies"""
+    print("🔧 Installing Time_Warp IDE Dependencies")
     print("=" * 40)
 
     # Required dependencies
@@ -58,7 +58,7 @@ def main():
     print("\n" + "=" * 40)
     if required_success == len(required_packages):
         print("✅ All required dependencies installed successfully!")
-        print("🚀 TimeWarp IDE is ready to use!")
+        print("🚀 Time_Warp IDE is ready to use!")
     else:
         print("⚠️  Some required dependencies failed to install")
         print("Please check the error messages above")

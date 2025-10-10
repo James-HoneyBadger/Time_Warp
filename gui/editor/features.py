@@ -1,6 +1,6 @@
 """
 Advanced Code Editor Features
-Syntax highlighting, auto-completion, and intelligent code editing for TimeWarp.
+Syntax highlighting, auto-completion, and intelligent code editing for Time_Warp.
 """
 
 import re
@@ -340,7 +340,7 @@ class AdvancedSyntaxHighlighter:
 
 
 class AutoCompletionEngine:
-    """Auto-completion system for TimeWarp languages"""
+    """Auto-completion system for Time_Warp languages"""
 
     def __init__(self, text_widget):
         self.text_widget = text_widget

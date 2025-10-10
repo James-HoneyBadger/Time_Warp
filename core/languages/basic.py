@@ -1,5 +1,5 @@
 """
-BASIC Language Executor for TimeWarp IDE
+BASIC Language Executor for Time_Warp IDE
 ========================================
 
 BASIC (Beginner's All-purpose Symbolic Instruction Code) is a family of general-purpose,
@@ -455,7 +455,7 @@ class BasicExecutor:
                     title = (
                         " ".join(parts[3:]).strip('"')
                         if len(parts) > 3
-                        else "TimeWarp Game Window"
+                        else "Time_Warp Game Window"
                     )
                     self.interpreter.log_output(
                         f"🎮 Game screen initialized: {width}x{height} - {title}"

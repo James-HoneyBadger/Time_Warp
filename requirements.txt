@@ -1,4 +1,4 @@
-# TimeWarp IDE Requirements
+# Time_Warp IDE Requirements
 # Core dependencies for the Educational Programming IDE
 
 # Runtime dependencies (most included with Python standard library)

@@ -1,6 +1,6 @@
 """
-Project Explorer for TimeWarp IDE
-File tree view for managing TimeWarp projects and files.
+Project Explorer for Time_Warp IDE
+File tree view for managing Time_Warp projects and files.
 """
 
 import os
@@ -9,7 +9,7 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 
 
 class ProjectExplorer:
-    """File tree view for managing TimeWarp projects and files"""
+    """File tree view for managing Time_Warp projects and files"""
 
     def __init__(self, ide):
         self.ide = ide
@@ -84,7 +84,7 @@ class ProjectExplorer:
 
         # Tree widget with scrollbars
         self.tree_widget = ttk.Treeview(tree_frame, show="tree headings")
-        self.tree_widget.heading("#0", text="TimeWarp Files", anchor=tk.W)
+        self.tree_widget.heading("#0", text="Time_Warp Files", anchor=tk.W)
 
         # Scrollbars
         v_scrollbar = ttk.Scrollbar(
@@ -176,7 +176,7 @@ class ProjectExplorer:
         """Get icon for file based on extension"""
         ext = filename.lower().split(".")[-1] if "." in filename else ""
         icons = {
-            "spt": "🎯",  # TimeWarp files
+            "spt": "🎯",  # Time_Warp files
             "pil": "✈️",  # PILOT files
             "pilot": "✈️",  # PILOT files
             "logo": "🐢",  # Logo files
@@ -230,7 +230,7 @@ class ProjectExplorer:
 
             # Update IDE title and status
             filename = os.path.basename(file_path)
-            self.ide.root.title(f"TimeWarp - {filename}")
+            self.ide.root.title(f"Time_Warp - {filename}")
 
             if hasattr(self.ide, "status_label"):
                 self.ide.status_label.config(text=f"📂 Opened: {filename}")
@@ -242,7 +242,7 @@ class ProjectExplorer:
             messagebox.showerror("Error", f"Could not open file:\n{str(e)}")
 
     def new_file(self):
-        """Create a new TimeWarp file"""
+        """Create a new Time_Warp file"""
         if not self.current_project_path:
             messagebox.showwarning("Warning", "Please open a project folder first")
             return
@@ -258,8 +258,8 @@ class ProjectExplorer:
 
             try:
                 # Create empty file with basic template
-                template_content = """T:Welcome to TimeWarp!
-T:This is a new TimeWarp program.
+                template_content = """T:Welcome to Time_Warp!
+T:This is a new Time_Warp program.
 T:Start coding here...
 E:
 """

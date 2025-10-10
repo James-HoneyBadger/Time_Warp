@@ -2,7 +2,7 @@
 
 ## Overview
 
-BASIC (Beginners All-purpose Symbolic Instruction Code) is a classic programming language designed for simplicity and ease of learning. TimeWarp IDE implements a comprehensive BASIC dialect with modern enhancements.
+BASIC (Beginners All-purpose Symbolic Instruction Code) is a classic programming language designed for simplicity and ease of learning. Time_Warp IDE implements a comprehensive BASIC dialect with modern enhancements.
 
 ## Program Structure
 
@@ -269,7 +269,7 @@ BASIC programs will display runtime errors:
 
 ## Compatibility
 
-TimeWarp BASIC is compatible with classic BASIC while adding modern enhancements:
+Time_Warp BASIC is compatible with classic BASIC while adding modern enhancements:
 - Long variable names
 - Nested IF statements
 - WHILE loops
@@ -279,5 +279,5 @@ TimeWarp BASIC is compatible with classic BASIC while adding modern enhancements
 ## See Also
 
 - [BASIC Sample Programs](../../samples/basic/)
-- [TimeWarp IDE User Guide](../user_guide.md)
+- [Time_Warp IDE User Guide](../user_guide.md)
 - [Compiler Documentation](../compiler.md)

@@ -1,5 +1,5 @@
 """
-AI Code Assistant for TimeWarp IDE
+AI Code Assistant for Time_Warp IDE
 Provides intelligent code suggestions, bug detection, explanations, and refactoring
 """
 
@@ -285,7 +285,7 @@ class LogoAnalyzer:
 
 
 class AICodeAssistant:
-    """Main AI Code Assistant for TimeWarp IDE"""
+    """Main AI Code Assistant for Time_Warp IDE"""
 
     def __init__(self):
         self.analyzers = {

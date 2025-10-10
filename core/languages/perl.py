@@ -1,10 +1,10 @@
 """
-Perl Language Executor for TimeWarp IDE
+Perl Language Executor for Time_Warp IDE
 =======================================
 
 Perl is a high-level, general-purpose, interpreted, dynamic programming language.
 
-This module handles Perl script execution for the TimeWarp IDE.
+This module handles Perl script execution for the Time_Warp IDE.
 """
 
 import subprocess

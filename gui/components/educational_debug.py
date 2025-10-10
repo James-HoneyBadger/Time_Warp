@@ -1,5 +1,5 @@
 """
-Educational and Debugging Components for TimeWarp IDE
+Educational and Debugging Components for Time_Warp IDE
 Contains tutorial, exercise, version control, and debugging functionality.
 """
 
@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 class EducationalTutorials:
-    """Provides guided tutorials for learning TimeWarp programming"""
+    """Provides guided tutorials for learning Time_Warp programming"""
 
     def __init__(self, ide):
         self.ide = ide
@@ -34,7 +34,7 @@ class ExerciseMode:
 
 
 class VersionControlSystem:
-    """Simple version control for TimeWarp projects"""
+    """Simple version control for Time_Warp projects"""
 
     def __init__(self, ide):
         self.ide = ide

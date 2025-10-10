@@ -1,17 +1,17 @@
-# TimeWarp IDE v1.0.0: Compiling 1960s Educational Languages to Native Executables
+# Time_Warp IDE v1.0.0: Compiling 1960s Educational Languages to Native Executables
 
-![TimeWarp IDE Logo](https://img.shields.io/badge/TimeWarp-IDE-blue)
+![Time_Warp IDE Logo](https://img.shields.io/badge/Time_Warp-IDE-blue)
 
 Just released: A compiler that transforms classic ## Links
 
-- **GitHub Repository**: <https://github.com/TimeWarpIDE/TimeWarp>
-- **PyPI Package**: <https://pypi.org/project/timewarp-ide/>
-- **Documentation**: <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
-- **Release Notes**: <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
+- **GitHub Repository**: <https://github.com/Time_WarpIDE/Time_Warp>
+- **PyPI Package**: <https://pypi.org/project/time_warp-ide/>
+- **Documentation**: <https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs>
+- **Release Notes**: <https://github.com/Time_WarpIDE/Time_Warp/releases/tag/v1.0.0>
 
 ---
 
-*TimeWarp IDE v1.0.0 - Bridging educational programming traditions with modern software engineering practices.*
+*Time_Warp IDE v1.0.0 - Bridging educational programming traditions with modern software engineering practices.*
 
 #programming #education #opensource #compiler #BASIC #Logo #PILOT #compsciprogramming languages into modern native binaries! 🚀
 
@@ -19,9 +19,9 @@ Just released: A compiler that transforms classic ## Links
 
 Most programming education today uses interpreted languages or web-based environments. While these are accessible, they often hide the realities of software compilation and distribution. What if students could learn with proven educational languages while understanding native executable generation?
 
-## The Solution: TimeWarp IDE
+## The Solution: Time_Warp IDE
 
-TimeWarp IDE is an educational programming compiler that takes three foundational languages from the 1960s and compiles them to standalone Linux executables. No interpreters required - just GCC-powered native performance.
+Time_Warp IDE is an educational programming compiler that takes three foundational languages from the 1960s and compiles them to standalone Linux executables. No interpreters required - just GCC-powered native performance.
 
 ## Supported Languages
 
@@ -90,12 +90,12 @@ TREE 80
 
 ```bash
 # Install from PyPI
-pip install timewarp-ide
+pip install time_warp-ide
 
 # Compile programs
-timewarp-compiler hello.bas -o hello
-timewarp-compiler drawing.logo -o logo_app
-timewarp-compiler quiz.pilot -o math_quiz
+time_warp-compiler hello.bas -o hello
+time_warp-compiler drawing.logo -o logo_app
+time_warp-compiler quiz.pilot -o math_quiz
 
 # Run native executables
 ./hello
@@ -208,20 +208,20 @@ E:
 
 ## Getting Started
 
-1. **Install**: `pip install timewarp-ide`
+1. **Install**: `pip install time_warp-ide`
 2. **Explore Samples**: Check out the `samples/` directory
 3. **Read Docs**: Comprehensive language references available
 4. **Contribute**: Open source and welcoming contributions!
 
 ## Links
 
-- **GitHub Repository**: <https://github.com/TimeWarpIDE/TimeWarp>
-- **PyPI Package**: <https://pypi.org/project/timewarp-ide/>
-- **Documentation**: <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
-- **Release Notes**: <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
+- **GitHub Repository**: <https://github.com/Time_WarpIDE/Time_Warp>
+- **PyPI Package**: <https://pypi.org/project/time_warp-ide/>
+- **Documentation**: <https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs>
+- **Release Notes**: <https://github.com/Time_WarpIDE/Time_Warp/releases/tag/v1.0.0>
 
 ---
 
-*TimeWarp IDE v1.0.0 - Bridging educational programming traditions with modern software engineering practices.*
+*Time_Warp IDE v1.0.0 - Bridging educational programming traditions with modern software engineering practices.*
 
 # programming #education #opensource #compiler #BASIC #Logo #PILOT #compsci

@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Mode Handling
+Time_Warp IDE Mode Handling
 Execution mode management and switching
 """
 

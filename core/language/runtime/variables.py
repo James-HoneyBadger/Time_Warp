@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Variable Management
+Time_Warp IDE Variable Management
 Runtime variable handling and scoping
 """
 

@@ -1,8 +1,8 @@
-# TimeWarp IDE Reddit Campaign - Execution Plan
+# Time_Warp IDE Reddit Campaign - Execution Plan
 
 ## Campaign Overview
 
-**Objective:** Launch TimeWarp IDE to key programming and educational communities on Reddit to build awareness, gather feedback, and grow the user base.
+**Objective:** Launch Time_Warp IDE to key programming and educational communities on Reddit to build awareness, gather feedback, and grow the user base.
 
 **Timeline:** Phased rollout over 1 week for maximum impact and engagement
 
@@ -17,20 +17,20 @@
 ### **Primary Target: r/programming**
 - **Post:** `reddit_post_r_programming_2025.md`
 - **Best Time:** 6:00 PM EDT (peak US engagement)
-- **Title:** "TimeWarp IDE: Educational Programming Environment with Multi-Language Support"
+- **Title:** "Time_Warp IDE: Educational Programming Environment with Multi-Language Support"
 - **Flair:** "Show HN" style announcement
 - **Strategy:** Technical focus, emphasize unique multi-language architecture
 
 ### **Educational Focus: r/learnprogramming**  
 - **Post:** `reddit_post_r_learnprogramming.md`
 - **Best Time:** 7:00 PM EDT (when learners are active)
-- **Title:** "Learn Programming Fundamentals with TimeWarp IDE - From 1960s Languages to Modern Python!"
+- **Title:** "Learn Programming Fundamentals with Time_Warp IDE - From 1960s Languages to Modern Python!"
 - **Strategy:** Emphasize progressive learning approach and beginner-friendliness
 
 ### **Retro Community: r/retrocomputing**
 - **Post:** `reddit_post_r_retrocomputing_2025.md`  
 - **Best Time:** 8:00 PM EDT (weekend evening engagement)
-- **Title:** "TimeWarp IDE: Experience Classic Computing in a Modern Educational Environment"
+- **Title:** "Time_Warp IDE: Experience Classic Computing in a Modern Educational Environment"
 - **Strategy:** Historical context, nostalgia factor, software preservation angle
 
 ## Phase 2: Academic and Specialized (Day 2-3)
@@ -38,13 +38,13 @@
 ### **Day 2 Morning: r/computerscience**
 - **Post:** `reddit_post_r_computerscience.md`
 - **Best Time:** 2:00 PM EDT (academic hours)
-- **Title:** "TimeWarp IDE: A Multi-Language Educational Programming Environment for CS Education"
+- **Title:** "Time_Warp IDE: A Multi-Language Educational Programming Environment for CS Education"
 - **Strategy:** Research focus, empirical studies, academic validation
 
 ### **Day 2 Evening: r/education**
 - **Post:** `reddit_post_r_education.md`  
 - **Best Time:** 7:30 PM EDT (when teachers are planning)
-- **Title:** "TimeWarp IDE: Revolutionary Programming Education Tool - From Simple to Complex"
+- **Title:** "Time_Warp IDE: Revolutionary Programming Education Tool - From Simple to Complex"
 - **Strategy:** Classroom application, curriculum integration, teacher testimonials
 
 ## Phase 3: Technical Communities (Day 4-5)
@@ -54,12 +54,12 @@
 #### **r/Python** (Morning)
 - **Time:** 10:00 AM EDT
 - **Adapted Content:** Focus on Python integration and tkinter implementation
-- **Title:** "Built TimeWarp IDE in Python - Educational Programming Environment with Multi-Language Support"
+- **Title:** "Built Time_Warp IDE in Python - Educational Programming Environment with Multi-Language Support"
 
 #### **r/opensource** (Afternoon)
 - **Time:** 3:00 PM EDT  
 - **Adapted Content:** Emphasize MIT license, contribution opportunities
-- **Title:** "TimeWarp IDE: Open Source Educational Programming Environment - Contributors Welcome!"
+- **Title:** "Time_Warp IDE: Open Source Educational Programming Environment - Contributors Welcome!"
 
 ### **Day 5: Language Communities**
 
@@ -179,7 +179,7 @@
 
 ---
 
-**Ready to launch!** All content is prepared, timing is optimized, and success metrics are defined. Let's introduce TimeWarp IDE to the Reddit programming community! 🚀
+**Ready to launch!** All content is prepared, timing is optimized, and success metrics are defined. Let's introduce Time_Warp IDE to the Reddit programming community! 🚀
 
 ## Quick Launch Checklist
 

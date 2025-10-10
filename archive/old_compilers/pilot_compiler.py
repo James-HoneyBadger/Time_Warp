@@ -8,7 +8,7 @@ programming language that produces standalone Linux executables.
 
 This compiler takes PILOT source code and generates native C code which
 is then compiled into a standalone Linux executable that can run without
-requiring Python or the TimeWarp IDE.
+requiring Python or the Time_Warp IDE.
 
 Architecture:
 1. Lexer: tokenizes PILOT source code

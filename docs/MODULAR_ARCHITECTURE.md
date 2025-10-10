@@ -1,8 +1,8 @@
-# TimeWarp IDE - Modular Architecture Documentation
+# Time_Warp IDE - Modular Architecture Documentation
 
 ## �️ Complete Modular Architecture Overview
 
-TimeWarp IDE features a sophisticated, professional modular architecture designed for educational programming, maintainability, and extensibility. The system supports 6 programming languages with a unified interface and comprehensive plugin system.
+Time_Warp IDE features a sophisticated, professional modular architecture designed for educational programming, maintainability, and extensibility. The system supports 6 programming languages with a unified interface and comprehensive plugin system.
 
 ## 🧩 Core Architecture Components
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Code Completion Engine for TimeWarp IDE
+Enhanced Code Completion Engine for Time_Warp IDE
 Provides intelligent code completion for all supported languages
 """
 

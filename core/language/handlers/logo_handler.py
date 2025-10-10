@@ -1,5 +1,5 @@
 """
-Logo Turtle Graphics Handler for TimeWarp IDE
+Logo Turtle Graphics Handler for Time_Warp IDE
 Implements Logo-style turtle graphics and geometric programming
 """
 

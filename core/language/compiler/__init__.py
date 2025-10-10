@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Compiler System
+Time_Warp IDE Compiler System
 Enhanced compilation with better error handling and optimization
 """
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-Tab Code Editor for TimeWarp IDE
+Multi-Tab Code Editor for Time_Warp IDE
 Enhanced editor with tabbed interface and file management
 """
 
@@ -148,8 +148,8 @@ class TabEditor:
                 '.basic': 'basic',
                 '.logo': 'logo',
                 '.pl': 'perl',
-                '.jtc': 'timewarp',
-                '.timewarp': 'timewarp'
+                '.jtc': 'time_warp',
+                '.time_warp': 'time_warp'
             }
             detected = language_map.get(ext, None)
             if detected:

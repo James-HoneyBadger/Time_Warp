@@ -1,5 +1,5 @@
 """
-Virtual Environment Management for TimeWarp
+Virtual Environment Management for Time_Warp
 Handles Python virtual environment creation and package management.
 """
 
@@ -10,7 +10,7 @@ import json
 
 
 class VirtualEnvironmentManager:
-    """Manages virtual environment for TimeWarp IDE and package installation"""
+    """Manages virtual environment for Time_Warp IDE and package installation"""
 
     def __init__(self, base_dir=None):
         self.base_dir = base_dir or os.path.dirname(os.path.abspath(__file__))
@@ -79,7 +79,7 @@ class VirtualEnvironmentManager:
             return False
 
     def initialize(self):
-        """Initialize virtual environment for TimeWarp"""
+        """Initialize virtual environment for Time_Warp"""
         if self.check_venv_exists():
             self.log_status("Virtual environment found")
             self.is_initialized = True
@@ -130,7 +130,7 @@ class VirtualEnvironmentManager:
             return False
 
     def install_james_dependencies(self):
-        """Install all dependencies needed for TimeWarp functionality"""
+        """Install all dependencies needed for Time_Warp functionality"""
         dependencies = [
             ("pandas", "2.1.0"),  # For data analysis features
             ("scikit-learn", "1.3.0"),  # For machine learning features
@@ -140,7 +140,7 @@ class VirtualEnvironmentManager:
             ("requests", "2.31.0"),  # For web operations
         ]
 
-        self.log_status("Installing TimeWarp dependencies...")
+        self.log_status("Installing Time_Warp dependencies...")
         success_count = 0
 
         for package, version in dependencies:

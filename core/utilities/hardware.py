@@ -1,5 +1,5 @@
 """
-Hardware integration utilities for TimeWarp
+Hardware integration utilities for Time_Warp
 Handles Arduino, GPIO, and sensor interfacing.
 """
 

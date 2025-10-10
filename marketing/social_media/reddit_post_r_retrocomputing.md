@@ -1,10 +1,10 @@
-# TimeWarp IDE: Modern Compiler for 1960s Educational Languages
+# Time_Warp IDE: Modern Compiler for 1960s Educational Languages
 
 **Bringing PILOT, BASIC, and Logo into the 21st Century!** 🕹️
 
 ## A Bridge Between Computing Eras
 
-Remember the early days of educational computing? TimeWarp IDE lets you compile programs written in three foundational languages from the 1960s into modern native executables. No emulators or interpreters required - just GCC-powered compilation that runs on contemporary Linux systems.
+Remember the early days of educational computing? Time_Warp IDE lets you compile programs written in three foundational languages from the 1960s into modern native executables. No emulators or interpreters required - just GCC-powered compilation that runs on contemporary Linux systems.
 
 ## The Classic Trio
 
@@ -12,14 +12,14 @@ Remember the early days of educational computing? TimeWarp IDE lets you compile 
 Designed by John Starkweather at the University of California, PILOT was created specifically for computer-assisted instruction. Its simple branching and text-based interaction made it perfect for early educational software.
 
 ### **BASIC (1964)** - The People's Programming Language
-Created by John Kemeny and Thomas Kurtz at Dartmouth, BASIC democratized programming by making it accessible to non-specialists. TimeWarp supports line-numbered BASIC with arrays, loops, and string operations.
+Created by John Kemeny and Thomas Kurtz at Dartmouth, BASIC democratized programming by making it accessible to non-specialists. Time_Warp supports line-numbered BASIC with arrays, loops, and string operations.
 
 ### **Logo (1967)** - Turtle Graphics Pioneer
 Developed by Seymour Papert and colleagues at MIT, Logo introduced the concept of turtle graphics that made programming visual and intuitive. Draw complex shapes and fractals with procedures and recursion.
 
 ## Why This Matters for Retro Computing
 
-Most retro computing enthusiasts focus on preserving hardware and running original software in emulators. TimeWarp IDE takes a different approach: **it preserves the languages while modernizing the execution environment**.
+Most retro computing enthusiasts focus on preserving hardware and running original software in emulators. Time_Warp IDE takes a different approach: **it preserves the languages while modernizing the execution environment**.
 
 ### **Preservation Through Innovation**
 - **Authentic Syntax:** Write code exactly as it would have been in the 1960s
@@ -28,7 +28,7 @@ Most retro computing enthusiasts focus on preserving hardware and running origin
 - **No Dependencies:** Standalone executables that don't require vintage hardware
 
 ### **Educational Computing Revival**
-These languages weren't just programming tools - they were designed to teach fundamental computing concepts. TimeWarp IDE lets you experience the original educational intent while benefiting from modern computing power.
+These languages weren't just programming tools - they were designed to teach fundamental computing concepts. Time_Warp IDE lets you experience the original educational intent while benefiting from modern computing power.
 
 ## Hands-On Examples
 
@@ -82,7 +82,7 @@ E:
 
 ## Technical Implementation
 
-TimeWarp IDE uses a sophisticated compilation pipeline:
+Time_Warp IDE uses a sophisticated compilation pipeline:
 1. **Parse** the vintage syntax into an abstract syntax tree
 2. **Generate optimized C code** with custom runtime libraries
 3. **Compile to native binaries** using GCC
@@ -111,12 +111,12 @@ The result? Programs that run faster and more reliably than they would have on t
 
 ```bash
 # Install the modern way
-pip install timewarp-ide
+pip install time_warp-ide
 
 # Compile your vintage code
-timewarp-compiler program.bas -o program
-timewarp-compiler drawing.logo -o drawing
-timewarp-compiler quiz.pilot -o quiz
+time_warp-compiler program.bas -o program
+time_warp-compiler drawing.logo -o drawing
+time_warp-compiler quiz.pilot -o quiz
 
 # Run natively on modern hardware
 ./program
@@ -126,14 +126,14 @@ timewarp-compiler quiz.pilot -o quiz
 
 ## Community & Contributions
 
-TimeWarp IDE is open source (MIT license) and welcomes contributions from the retro computing community. Whether you want to add support for additional vintage languages, improve the compilation pipeline, or enhance the runtime libraries - your expertise in computing history is valuable!
+Time_Warp IDE is open source (MIT license) and welcomes contributions from the retro computing community. Whether you want to add support for additional vintage languages, improve the compilation pipeline, or enhance the runtime libraries - your expertise in computing history is valuable!
 
 ## Links
 
-- **GitHub Repository:** <https://github.com/TimeWarpIDE/TimeWarp>
-- **PyPI Package:** <https://pypi.org/project/timewarp-ide/>
-- **Documentation:** <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
-- **Release:** <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
+- **GitHub Repository:** <https://github.com/Time_WarpIDE/Time_Warp>
+- **PyPI Package:** <https://pypi.org/project/time_warp-ide/>
+- **Documentation:** <https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs>
+- **Release:** <https://github.com/Time_WarpIDE/Time_Warp/releases/tag/v1.0.0>
 
 ## Future Visions
 
@@ -141,6 +141,6 @@ The roadmap includes support for additional vintage languages (FORTRAN, COBOL, P
 
 ---
 
-**TimeWarp IDE v1.0.0** - Where retro computing meets modern compilation. Preserving the past while embracing the future of programming! 🌟
+**Time_Warp IDE v1.0.0** - Where retro computing meets modern compilation. Preserving the past while embracing the future of programming! 🌟
 
 #retrocomputing #BASIC #Logo #PILOT #programming #opensource

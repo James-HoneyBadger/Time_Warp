@@ -1,10 +1,10 @@
-# TimeWarp IDE: Educational Programming Environment with Multi-Language Support
+# Time_Warp IDE: Educational Programming Environment with Multi-Language Support
 
 **Show HN:** Built an educational IDE that brings classic programming languages (PILOT, BASIC, Logo) into a modern development environment! 🚀
 
-## What is TimeWarp IDE?
+## What is Time_Warp IDE?
 
-TimeWarp IDE is a comprehensive educational programming environment designed for learning fundamental programming concepts. It supports 6 programming languages including three foundational educational languages from the 1960s alongside modern ones, all in a unified tkinter-based IDE.
+Time_Warp IDE is a comprehensive educational programming environment designed for learning fundamental programming concepts. It supports 6 programming languages including three foundational educational languages from the 1960s alongside modern ones, all in a unified tkinter-based IDE.
 
 ## Supported Languages
 
@@ -30,7 +30,7 @@ TimeWarp IDE is a comprehensive educational programming environment designed for
 
 ## Why This Matters
 
-Most programming education today jumps straight to modern languages without understanding the foundational concepts. TimeWarp IDE lets students and educators explore the evolution of programming languages while working in a modern, feature-rich environment.
+Most programming education today jumps straight to modern languages without understanding the foundational concepts. Time_Warp IDE lets students and educators explore the evolution of programming languages while working in a modern, feature-rich environment.
 
 ## Quick Demo
 
@@ -38,7 +38,7 @@ Most programming education today jumps straight to modern languages without unde
 # Clone and run
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python TimeWarp.py
+python Time_Warp.py
 
 # Or with auto-environment setup
 ./start_timewarp.sh
@@ -96,7 +96,7 @@ E:
 ## Technical Architecture
 
 ### **Multi-Language Interpreter System:**
-- **Central TimeWarpInterpreter** - Unified execution engine
+- **Central Time_WarpInterpreter** - Unified execution engine
 - **Language-Specific Executors** - Dedicated handlers for each language
 - **Shared Canvas System** - Common turtle graphics for Logo/PILOT
 - **Plugin Manager** - Extensible architecture for custom tools
@@ -149,7 +149,7 @@ plugins/
 pip install -r requirements.txt
 
 # Run with auto-environment setup
-python TimeWarp.py
+python Time_Warp.py
 
 # Or use the shell script
 ./start_timewarp.sh
@@ -170,7 +170,7 @@ python TimeWarp.py
 
 ## Community & Contributions
 
-TimeWarp IDE is actively developed and welcomes contributions! Whether you want to:
+Time_Warp IDE is actively developed and welcomes contributions! Whether you want to:
 - Add support for new programming languages
 - Develop plugins for specialized functionality  
 - Improve the educational content and tutorials
@@ -202,6 +202,6 @@ Your contributions help make programming education more accessible!
 
 ---
 
-**TimeWarp IDE** - Bridging the gap between programming history and modern development! Experience the evolution of programming languages in one powerful educational environment. 🌟
+**Time_Warp IDE** - Bridging the gap between programming history and modern development! Experience the evolution of programming languages in one powerful educational environment. 🌟
 
 #programming #education #ide #python #opensource #computerscience #retrocomputing

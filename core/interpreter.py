@@ -444,7 +444,7 @@ except ImportError:
             self.y = y
 
 
-class TimeWarpInterpreter:
+class Time_WarpInterpreter:
     def __init__(self, output_widget=None):
         self.output_widget = output_widget
         self.variables = {}
@@ -504,7 +504,7 @@ class TimeWarpInterpreter:
         # Default pen style
         self.default_pen_style = "solid"
 
-        # TimeWarp animation and media systems
+        # Time_Warp animation and media systems
         self.mixer = Mixer()
         self.tweens = []
         self.timers = []
@@ -824,7 +824,7 @@ class TimeWarpInterpreter:
         self._last_match_set = False
         self.running = False
 
-        # Reset TimeWarp animation and media systems
+        # Reset Time_Warp animation and media systems
         self.tweens = []
         self.timers = []
         self.particles = []
@@ -1288,7 +1288,7 @@ class TimeWarpInterpreter:
         self._last_match_set = False
         self.running = False
 
-        # Reset TimeWarp animation and media systems but preserve variables
+        # Reset Time_Warp animation and media systems but preserve variables
         self.tweens = []
         self.timers = []
         self.particles = []
@@ -1310,8 +1310,18 @@ class TimeWarpInterpreter:
 
         return True
 
-    def run_program(self, program_text):
-        """Run a complete program"""
+    def run_program(self, program_text, language=None):
+        """Run a complete program
+        
+        Args:
+            program_text (str): The program code to execute
+            language (str, optional): The programming language ('pilot', 'basic', 'logo', etc.)
+                                     Defaults to auto-detection
+        """
+        # Store language preference
+        if language:
+            self.current_language = language.lower()
+        
         if not self.load_program(program_text):
             self.log_output("Error loading program")
             return False
@@ -1480,7 +1490,7 @@ class TimeWarpInterpreter:
 
 
 def create_demo_program():
-    """Create a demo TimeWarp program"""
+    """Create a demo Time_Warp program"""
     return """L:START
 T:Welcome to Time Warp Interpreter Demo!
 A:NAME
@@ -1507,7 +1517,7 @@ END"""
 
 if __name__ == "__main__":
     # Simple test when run directly
-    interpreter = TimeWarpInterpreter()
+    interpreter = Time_WarpInterpreter()
     demo_program = create_demo_program()
     print("Running Time Warp interpreter demo...")
     interpreter.run_program(demo_program)

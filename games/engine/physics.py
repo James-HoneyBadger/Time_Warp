@@ -1,5 +1,5 @@
 """
-Physics Engine for TimeWarp Games
+Physics Engine for Time_Warp Games
 2D physics simulation with collision detection and response.
 """
 

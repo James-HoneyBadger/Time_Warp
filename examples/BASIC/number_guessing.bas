@@ -1,4 +1,4 @@
-10 PRINT "🎯 TimeWarp IDE - Number Guessing Game"
+10 PRINT "🎯 Time_Warp IDE - Number Guessing Game"
 20 PRINT "======================================"
 30 PRINT
 40 PRINT "I'm thinking of a number between 1 and 100..."

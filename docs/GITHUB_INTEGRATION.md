@@ -12,7 +12,7 @@
 ```
 
 ### 2. Configure Git in VS Code
-1. Open VS Code in the TimeWarp project folder
+1. Open VS Code in the Time_Warp project folder
 2. Press `Ctrl+Shift+P` and type "Git: Clone"
 3. Or open the integrated terminal (`Ctrl+``) and run:
 ```bash
@@ -26,7 +26,7 @@ The `.vscode/settings.json` is configured for:
 - ✅ Smart commits
 - ✅ Auto-sync without confirmation
 - ✅ Python path configuration
-- ✅ File associations for TimeWarp languages
+- ✅ File associations for Time_Warp languages
 
 ### 4. GitHub Actions Integration
 - ✅ Automatic testing on push/PR
@@ -63,13 +63,13 @@ The `.vscode/settings.json` is configured for:
 
 
 ### Debug Configuration:
-- F5 to launch TimeWarp IDE with debugger
+- F5 to launch Time_Warp IDE with debugger
 - Configured for Python debugging with breakpoints
 - Integrated terminal for testing
 
 ### Task Runner:
 - `Ctrl+Shift+P` → "Tasks: Run Task"
-- Run tests, start TimeWarp, install dependencies
+- Run tests, start Time_Warp, install dependencies
 
 ## GitHub Repository Auto-Maintenance
 

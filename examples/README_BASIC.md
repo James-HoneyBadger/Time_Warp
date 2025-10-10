@@ -1,4 +1,4 @@
-# TimeWarp IDE - Comprehensive BASIC Examples
+# Time_Warp IDE - Comprehensive BASIC Examples
 
 This directory contains comprehensive BASIC programming examples that demonstrate
 various commands, features, and programming concepts in the BASIC language.
@@ -6,7 +6,7 @@ various commands, features, and programming concepts in the BASIC language.
 ## BASIC Language Overview
 
 BASIC (Beginner's All-purpose Symbolic Instruction Code) is a family of general-purpose,
-high-level programming languages designed for ease of use. TimeWarp IDE implements
+high-level programming languages designed for ease of use. Time_Warp IDE implements
 a classic BASIC with line numbers and simple syntax.
 
 Key features:
@@ -359,9 +359,9 @@ Using GOSUB for subroutines.
 
 ## Running the Examples
 
-To run these examples in TimeWarp IDE:
+To run these examples in Time_Warp IDE:
 
-1. Launch TimeWarp IDE
+1. Launch Time_Warp IDE
 2. Select "BASIC" from the language menu
 3. Copy and paste any example code
 4. Click Run → Execute

@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Advanced Code Editor System
+Time_Warp IDE Advanced Code Editor System
 Provides language-specific editing features with compilation support
 """
 

@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Plugin Manager
+Time_Warp IDE Plugin Manager
 Central management for the plugin system
 """
 
@@ -32,7 +32,7 @@ class PluginManager:
         # Add common plugin directories
         possible_paths = [
             os.path.join(os.getcwd(), "plugins"),
-            os.path.join(os.path.expanduser("~"), ".timewarp", "plugins"),
+            os.path.join(os.path.expanduser("~"), ".time_warp", "plugins"),
             os.path.join(os.path.dirname(__file__), "builtin"),
         ]
 

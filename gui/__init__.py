@@ -1,5 +1,5 @@
 """
-TimeWarp GUI Module
+Time_Warp GUI Module
 ===============
 
 Graphical user interface components:
@@ -12,7 +12,7 @@ Graphical user interface components:
 """
 
 __version__ = "2.0.0"
-__author__ = "TimeWarp Development Team"
+__author__ = "Time_Warp Development Team"
 
 from . import components
 

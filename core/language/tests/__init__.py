@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Test Suite
+Time_Warp IDE Test Suite
 Comprehensive testing for the refactored architecture
 """
 

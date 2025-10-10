@@ -1,5 +1,5 @@
 """
-Enhanced Syntax Highlighter Plugin for TimeWarp IDE
+Enhanced Syntax Highlighter Plugin for Time_Warp IDE
 Provides advanced syntax highlighting with customizable colors
 """
 
@@ -45,7 +45,7 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         super().__init__(ide_instance)
         self.name = "Syntax Highlighter"
         self.version = "1.1.0"
-        self.author = "TimeWarp Development Team"
+        self.author = "Time_Warp Development Team"
         self.description = "Enhanced syntax highlighting for PILOT, BASIC, Logo, and other supported languages"
         self.menu_items = []
 

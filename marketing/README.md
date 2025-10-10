@@ -1,6 +1,6 @@
 # Marketing Materials
 
-This directory contains all marketing and promotional materials for TimeWarp IDE.
+This directory contains all marketing and promotional materials for Time_Warp IDE.
 
 ## 📁 Directory Structure
 

@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Plugin Loader
+Time_Warp IDE Plugin Loader
 Dynamic plugin loading from files and directories
 """
 
@@ -235,7 +235,7 @@ class PluginLoader:
     ):
         """Create a plugin template file"""
         template = f'''"""
-Example TimeWarp IDE Plugin
+Example Time_Warp IDE Plugin
 Generated plugin template
 """
 
@@ -252,7 +252,7 @@ class ExamplePlugin(FunctionLibraryPlugin):
         metadata = PluginMetadata(
             name="Example Plugin",
             version="1.0.0",
-            description="An example plugin for TimeWarp IDE",
+            description="An example plugin for Time_Warp IDE",
             author="Your Name",
             plugin_type=PluginType.{plugin_type.name}
         )

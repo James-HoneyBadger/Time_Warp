@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Advanced Debugger Plugin for TimeWarp IDE
+Advanced Debugger Plugin for Time_Warp IDE
 Professional-grade debugging tool with breakpoints, variable inspection,
 call stack analysis, execution control, and memory monitoring
 """
@@ -29,7 +29,7 @@ class AdvancedDebuggerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Advanced Debugger"
         self.version = "1.0.0"
-        self.author = "TimeWarp IDE Team"
+        self.author = "Time_Warp IDE Team"
         self.description = "Professional-grade debugging tool with breakpoints, variable inspection, call stack analysis, execution control, and memory monitoring"
         self.category = "debugging"
 

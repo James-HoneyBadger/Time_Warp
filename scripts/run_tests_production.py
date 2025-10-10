@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE Test Runner
+Time_Warp IDE Test Runner
 Production-ready test runner with comprehensive testing capabilities
 """
 
@@ -14,7 +14,7 @@ sys.path.insert(0, project_root)
 
 def run_comprehensive_tests():
     """Run comprehensive test suite"""
-    print("🧪 TimeWarp IDE - Production Test Suite")
+    print("🧪 Time_Warp IDE - Production Test Suite")
     print("=" * 60)
 
     # Try to use the comprehensive test runner
@@ -36,7 +36,7 @@ def run_comprehensive_tests():
 
 def run_basic_tests():
     """Run basic functionality tests"""
-    print("🧪 Running Basic TimeWarp IDE Tests")
+    print("🧪 Running Basic Time_Warp IDE Tests")
     print("=" * 50)
 
     test_results = {"passed": 0, "failed": 0, "total": 0}
@@ -60,7 +60,7 @@ def run_basic_tests():
     # Test 1: Core imports
     def test_core_imports():
         try:
-            from core.interpreter import TimeWarpInterpreter
+            from core.interpreter import Time_WarpInterpreter
 
             return True
         except ImportError:
@@ -84,12 +84,12 @@ def run_basic_tests():
     # Test 3: Basic initialization
     def test_initialization():
         try:
-            from core.interpreter import TimeWarpInterpreter
+            from core.interpreter import Time_WarpInterpreter
             from features.tutorial_system import TutorialSystem
             from features.ai_assistant import AICodeAssistant
             from features.gamification import GamificationSystem
 
-            interpreter = TimeWarpInterpreter()
+            interpreter = Time_WarpInterpreter()
             tutorial = TutorialSystem()
             ai_assistant = AICodeAssistant()
             gamification = GamificationSystem()
@@ -103,9 +103,9 @@ def run_basic_tests():
     # Test 4: Basic PILOT execution
     def test_pilot_execution():
         try:
-            from core.interpreter import TimeWarpInterpreter
+            from core.interpreter import Time_WarpInterpreter
 
-            interpreter = TimeWarpInterpreter()
+            interpreter = Time_WarpInterpreter()
             result = interpreter.run_program("T:Hello, Test!\nEND")
             return result is not None
         except Exception:
@@ -173,7 +173,7 @@ def run_basic_tests():
 
     if test_results["failed"] == 0:
         print("\n🎉 All basic tests passed!")
-        print("✨ TimeWarp IDE core functionality is working correctly.")
+        print("✨ Time_Warp IDE core functionality is working correctly.")
         return True
     else:
         print(f"\n⚠️ {test_results['failed']} test(s) failed.")
@@ -183,7 +183,7 @@ def run_basic_tests():
 
 def main():
     """Main test runner entry point"""
-    print("🚀 TimeWarp IDE Test Runner")
+    print("🚀 Time_Warp IDE Test Runner")
     print("=" * 40)
 
     # Check Python version
@@ -202,7 +202,7 @@ def main():
     print("\n" + "=" * 60)
     if success:
         print("🎉 TESTING COMPLETE - ALL SYSTEMS OPERATIONAL")
-        print("\n📋 TimeWarp IDE Status:")
+        print("\n📋 Time_Warp IDE Status:")
         print("  ✅ Core interpreter working")
         print("  ✅ Feature systems operational")
         print("  ✅ Gamification system active")
@@ -216,7 +216,7 @@ def main():
         print("  📖 Check system requirements")
         print("  🔍 Verify all dependencies installed")
         print("  🧪 Run individual test modules for details")
-        print("\n💡 TimeWarp IDE may still be functional for basic use.")
+        print("\n💡 Time_Warp IDE may still be functional for basic use.")
 
     print("=" * 60)
 

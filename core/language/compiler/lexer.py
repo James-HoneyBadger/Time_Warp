@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Enhanced Lexer
+Time_Warp IDE Enhanced Lexer
 Improved tokenization with better error handling and performance
 """
 
@@ -20,7 +20,7 @@ from ..errors.error_manager import (
 
 
 class TokenType(Enum):
-    """Enhanced token types for TimeWarp IDE"""
+    """Enhanced token types for Time_Warp IDE"""
 
     # Literals
     NUMBER = auto()

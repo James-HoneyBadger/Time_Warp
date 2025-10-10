@@ -11,7 +11,7 @@ from pathlib import Path
 def get_config_dir():
     """Get the configuration directory for Time Warp"""
     home_dir = Path.home()
-    config_dir = home_dir / ".timewarp"
+    config_dir = home_dir / ".time_warp"
     config_dir.mkdir(exist_ok=True)
     return config_dir
 
@@ -349,8 +349,22 @@ class ThemeManager:
     def __init__(self):
         """Initialize theme manager"""
         self.config = load_config()
+        self.current_theme = self.config.get("current_theme", "dracula")
         # Initialize with default dark theme colors
-        self.current_colors = get_theme_colors("dracula")
+        self.current_colors = get_theme_colors(self.current_theme)
+        
+    def set_theme(self, theme_name):
+        """Set the current theme"""
+        if theme_name in ['dracula', 'monokai', 'solarized', 'ocean', 
+                          'spring', 'sunset', 'candy', 'forest']:
+            self.current_theme = theme_name
+            self.current_colors = get_theme_colors(theme_name)
+            
+            # Save to config
+            self.config["current_theme"] = theme_name
+            save_config(self.config)
+        else:
+            raise ValueError(f"Unknown theme: {theme_name}")
 
     def apply_theme(self, root, theme_name="dracula"):
         """Apply comprehensive theme to the root window and all components"""

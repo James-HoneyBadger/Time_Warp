@@ -1,5 +1,5 @@
 """
-Sample TimeWarp Plugin
+Sample Time_Warp Plugin
 Demonstrates the plugin system capabilities
 """
 
@@ -43,9 +43,9 @@ class TimeWarpPlugin(BasePlugin):
         super().__init__(ide_instance)
         self.name = "Sample Plugin"
         self.version = "1.0.0"
-        self.author = "TimeWarp Developer"
+        self.author = "Time_Warp Developer"
         self.description = (
-            "A sample plugin demonstrating TimeWarp plugin system capabilities"
+            "A sample plugin demonstrating Time_Warp plugin system capabilities"
         )
         self.menu_items = []
 
@@ -141,7 +141,7 @@ class TimeWarpPlugin(BasePlugin):
         messagebox.showinfo(
             "Sample Plugin",
             f"Hello from {self.name}!\n\n"
-            f"This is a demonstration of the TimeWarp plugin system.\n"
+            f"This is a demonstration of the Time_Warp plugin system.\n"
             f"Version: {self.version}\n"
             f"Author: {self.author}",
         )

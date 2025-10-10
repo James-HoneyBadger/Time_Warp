@@ -1,14 +1,14 @@
-# TimeWarp IDE Facebook Group Description
+# Time_Warp IDE Facebook Group Description
 
 ## Main Description
 
-🚀 **Welcome to TimeWarp IDE - Where Learning Programming Becomes an Adventure!** 🚀
+🚀 **Welcome to Time_Warp IDE - Where Learning Programming Becomes an Adventure!** 🚀
 
 Journey through the evolution of programming languages with our revolutionary educational IDE that makes coding accessible, engaging, and fun for learners of all ages!
 
-## 🌟 What is TimeWarp IDE?
+## 🌟 What is Time_Warp IDE?
 
-TimeWarp IDE is a comprehensive educational programming environment designed to teach programming concepts through a unique multi-language approach. Starting with simple educational languages and progressing to modern development tools, students experience the "time warp" of programming evolution.
+Time_Warp IDE is a comprehensive educational programming environment designed to teach programming concepts through a unique multi-language approach. Starting with simple educational languages and progressing to modern development tools, students experience the "time warp" of programming evolution.
 
 ## 💻 Supported Languages:
 ✅ **PILOT** - Educational language perfect for beginners  
@@ -47,7 +47,7 @@ Share your projects, ask questions, get help with coding challenges, discuss edu
 ✨ Be respectful and supportive of all skill levels  
 📚 Share educational resources and programming tips  
 🐛 Report bugs and suggest improvements  
-🎯 Stay on-topic with programming education and TimeWarp IDE  
+🎯 Stay on-topic with programming education and Time_Warp IDE  
 🚫 No spam, self-promotion unrelated to education, or off-topic posts  
 
 ## 🔗 Useful Links:
@@ -56,11 +56,11 @@ Share your projects, ask questions, get help with coding challenges, discuss edu
 💬 **Discord Community:** Real-time chat and support  
 📺 **Tutorials:** Video guides and walkthroughs  
 
-## 🎉 Ready to Start Your TimeWarp Journey?
-Download TimeWarp IDE, try the sample programs, and share your first turtle graphics creation with the group!
+## 🎉 Ready to Start Your Time_Warp Journey?
+Download Time_Warp IDE, try the sample programs, and share your first turtle graphics creation with the group!
 
-**#TimeWarpIDE #Programming #Education #Coding #Learning #TurtleGraphics #OpenSource #ComputerScience #STEM**
+**#Time_WarpIDE #Programming #Education #Coding #Learning #TurtleGraphics #OpenSource #ComputerScience #STEM**
 
 ---
 
-*TimeWarp IDE - Making programming education accessible, engaging, and fun for everyone! 🚀*
+*Time_Warp IDE - Making programming education accessible, engaging, and fun for everyone! 🚀*

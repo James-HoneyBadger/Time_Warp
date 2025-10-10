@@ -1,5 +1,5 @@
 """
-ML Manager Dialog for TimeWarp IDE
+ML Manager Dialog for Time_Warp IDE
 GUI interface for managing machine learning models and datasets.
 """
 

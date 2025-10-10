@@ -1,5 +1,5 @@
 """
-Logo Language Executor for TimeWarp IDE
+Logo Language Executor for Time_Warp IDE
 =======================================
 
 Logo is an educational programming language known for its turtle graphics capabilities.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Performance Optimizer Module for TimeWarp IDE
+Performance Optimizer Module for Time_Warp IDE
 Provides optimizations for memory usage, output handling, and system performance.
 """
 
@@ -101,7 +101,7 @@ class OutputBuffer:
 
 
 class MemoryManager:
-    """Memory management utilities for TimeWarp IDE."""
+    """Memory management utilities for Time_Warp IDE."""
 
     def __init__(self):
         self._weak_refs = weakref.WeakSet()
@@ -291,7 +291,7 @@ def get_system_performance() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     # Performance optimization demo
-    print("🚀 TimeWarp Performance Optimizer")
+    print("🚀 Time_Warp Performance Optimizer")
     print("=" * 50)
 
     # Apply optimizations

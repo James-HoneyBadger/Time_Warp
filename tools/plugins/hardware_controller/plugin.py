@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Hardware Controller Plugin for TimeWarp IDE
+Hardware Controller Plugin for Time_Warp IDE
 Professional hardware interface tool with GPIO control, sensor management,
 device automation, and Raspberry Pi integration
 """
@@ -26,7 +26,7 @@ class HardwareControllerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Hardware Controller"
         self.version = "1.0.0"
-        self.author = "TimeWarp IDE Team"
+        self.author = "Time_Warp IDE Team"
         self.description = "Professional hardware interface tool with GPIO control, sensor management, device automation, and Raspberry Pi integration"
         self.category = "hardware"
 

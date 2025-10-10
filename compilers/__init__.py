@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-TimeWarp Native Compilers
+Time_Warp Native Compilers
 ==========================
 
-A unified compiler framework for converting TimeWarp IDE languages
+A unified compiler framework for converting Time_Warp IDE languages
 (BASIC, Logo, PILOT) into standalone Linux executables.
 """
 

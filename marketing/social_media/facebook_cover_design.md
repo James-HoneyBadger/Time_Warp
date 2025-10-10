@@ -1,4 +1,4 @@
-# TimeWarp IDE Facebook Cover Design Specification
+# Time_Warp IDE Facebook Cover Design Specification
 
 ## 📐 **Technical Specifications**
 
@@ -21,7 +21,7 @@
 ### **Theme: "Bridging Classic & Modern Computing"**
 - **Left Side:** Retro/vintage computing elements (1960s aesthetic)
 - **Right Side:** Modern development elements (current tech)
-- **Center:** TimeWarp IDE logo and tagline
+- **Center:** Time_Warp IDE logo and tagline
 - **Overall:** Gradient background connecting past and present
 
 ## 🌈 **Color Palette**
@@ -78,7 +78,7 @@
 ```
 ┌─────────────────┐
 │                 │
-│  $ timewarp-compiler │ ← Terminal command
+│  $ time_warp-compiler │ ← Terminal command
 │  hello.bas -o hello │
 │  $ ./hello         │
 │  Hello World!      │ ← Output
@@ -199,7 +199,7 @@
 ## 📝 **Content Checklist**
 
 ### **Must-Have Elements**
-- [ ] TimeWarp IDE logo (prominent)
+- [ ] Time_Warp IDE logo (prominent)
 - [ ] Tagline: "Compile 1960s Languages to Native Code"
 - [ ] Retro computing elements
 - [ ] Modern tech indicators
@@ -283,20 +283,20 @@
 
 ## 📋 **Quick Design Brief**
 
-**Create a Facebook cover for TimeWarp IDE that:**
+**Create a Facebook cover for Time_Warp IDE that:**
 - Measures 820x312px
 - Uses retro-inspired colors (teal, purple, orange)
 - Shows left-to-right progression from 1960s to modern computing
-- Features the TimeWarp IDE logo prominently
+- Features the Time_Warp IDE logo prominently
 - Includes code snippets and tech elements
 - Works well on both desktop and mobile
 - Conveys "bridging classic and modern programming"
 
 **Key Elements:**
-- TimeWarp IDE logo (center, large)
+- Time_Warp IDE logo (center, large)
 - "Compile 1960s Languages to Native Code" tagline
 - Retro computer elements (left)
 - Modern terminal/compilation (right)
 - Gradient background from dark to light
 
-This design will make your Facebook group instantly recognizable and convey the unique value proposition of TimeWarp IDE at a glance!
+This design will make your Facebook group instantly recognizable and convey the unique value proposition of Time_Warp IDE at a glance!

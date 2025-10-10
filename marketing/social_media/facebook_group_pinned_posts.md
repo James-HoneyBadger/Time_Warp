@@ -1,13 +1,13 @@
-# 📌 TimeWarp IDE Facebook Group - Pinned Posts
+# 📌 Time_Warp IDE Facebook Group - Pinned Posts
 
 ## 1. Welcome Message & Group Description
 
 ```
-🎉 **Welcome to the TimeWarp IDE Community!** 🎉
+🎉 **Welcome to the Time_Warp IDE Community!** 🎉
 
 **Bridging Classic & Modern Programming**
 
-TimeWarp IDE is a revolutionary educational compiler that transforms 1960s programming languages (BASIC, PILOT, Logo) into modern native executables. No interpreters required - just GCC-powered native performance!
+Time_Warp IDE is a revolutionary educational compiler that transforms 1960s programming languages (BASIC, PILOT, Logo) into modern native executables. No interpreters required - just GCC-powered native performance!
 
 **🚀 What We Do:**
 • Compile classic educational languages to native code
@@ -24,9 +24,9 @@ TimeWarp IDE is a revolutionary educational compiler that transforms 1960s progr
 • Community events and coding challenges
 
 **📚 Resources:**
-• **GitHub:** https://github.com/TimeWarpIDE/TimeWarp
-• **PyPI:** https://pypi.org/project/timewarp-ide/
-• **Documentation:** https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
+• **GitHub:** https://github.com/Time_WarpIDE/Time_Warp
+• **PyPI:** https://pypi.org/project/time_warp-ide/
+• **Documentation:** https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs
 • **Discord:** [Coming Soon]
 
 **📜 Group Rules:**
@@ -34,7 +34,7 @@ Be respectful, stay on topic, share knowledge, help others!
 
 **New members:** Check the pinned posts below for getting started guides and FAQs!
 
-#TimeWarpIDE #RetroComputing #EducationalProgramming
+#Time_WarpIDE #RetroComputing #EducationalProgramming
 ```
 
 ---
@@ -42,15 +42,15 @@ Be respectful, stay on topic, share knowledge, help others!
 ## 2. Getting Started Guide
 
 ```
-🛠️ **Getting Started with TimeWarp IDE**
+🛠️ **Getting Started with Time_Warp IDE**
 
 **Step 1: Installation**
 ```bash
 # Install from PyPI
-pip install timewarp-ide
+pip install time_warp-ide
 
 # Or clone from GitHub
-git clone https://github.com/TimeWarpIDE/TimeWarp
+git clone https://github.com/Time_WarpIDE/Time_Warp
 cd Time_Warp
 pip install -e .
 ```
@@ -58,11 +58,11 @@ pip install -e .
 **Step 2: Your First Compile**
 ```bash
 # Create a simple BASIC program (hello.bas)
-10 PRINT "Hello, TimeWarp!"
+10 PRINT "Hello, Time_Warp!"
 20 END
 
 # Compile to native executable
-timewarp-compiler hello.bas -o hello
+time_warp-compiler hello.bas -o hello
 ./hello
 ```
 
@@ -81,7 +81,7 @@ timewarp-compiler hello.bas -o hello
 
 **Example Programs:** Check the /examples folder on GitHub
 
-#GettingStarted #TimeWarpIDE #Programming
+#GettingStarted #Time_WarpIDE #Programming
 ```
 
 ---
@@ -89,13 +89,13 @@ timewarp-compiler hello.bas -o hello
 ## 3. Resources & Links
 
 ```
-🔗 **TimeWarp IDE Resources & Links**
+🔗 **Time_Warp IDE Resources & Links**
 
 **📖 Official Resources**
-• **GitHub Repository:** https://github.com/TimeWarpIDE/TimeWarp
-• **PyPI Package:** https://pypi.org/project/timewarp-ide/
-• **Documentation:** https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
-• **Issue Tracker:** https://github.com/TimeWarpIDE/TimeWarp/issues
+• **GitHub Repository:** https://github.com/Time_WarpIDE/Time_Warp
+• **PyPI Package:** https://pypi.org/project/time_warp-ide/
+• **Documentation:** https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs
+• **Issue Tracker:** https://github.com/Time_WarpIDE/Time_Warp/issues
 
 **💬 Community**
 • **Facebook Group:** [This Group]
@@ -112,9 +112,9 @@ timewarp-compiler hello.bas -o hello
 • **Tutorials:** Check pinned tutorials in this group
 
 **🛠️ Development**
-• **Contributing Guide:** https://github.com/TimeWarpIDE/TimeWarp/blob/main/CONTRIBUTING.md
-• **Code of Conduct:** https://github.com/TimeWarpIDE/TimeWarp/blob/main/CODE_OF_CONDUCT.md
-• **Release Notes:** https://github.com/TimeWarpIDE/TimeWarp/releases
+• **Contributing Guide:** https://github.com/Time_WarpIDE/Time_Warp/blob/main/CONTRIBUTING.md
+• **Code of Conduct:** https://github.com/Time_WarpIDE/Time_Warp/blob/main/CODE_OF_CONDUCT.md
+• **Release Notes:** https://github.com/Time_WarpIDE/Time_Warp/releases
 
 **📢 Stay Updated**
 • Follow GitHub for releases
@@ -126,7 +126,7 @@ timewarp-compiler hello.bas -o hello
 - Check the FAQ (pinned below)
 - Ask specific questions with code examples
 
-#Resources #TimeWarpIDE #Help
+#Resources #Time_WarpIDE #Help
 ```
 
 ---
@@ -134,12 +134,12 @@ timewarp-compiler hello.bas -o hello
 ## 4. Frequently Asked Questions (FAQ)
 
 ```
-❓ **TimeWarp IDE - Frequently Asked Questions**
+❓ **Time_Warp IDE - Frequently Asked Questions**
 
 **🔧 Installation & Setup**
 
-**Q: How do I install TimeWarp IDE?**
-A: `pip install timewarp-ide` or clone from GitHub and `pip install -e .`
+**Q: How do I install Time_Warp IDE?**
+A: `pip install time_warp-ide` or clone from GitHub and `pip install -e .`
 
 **Q: What are the system requirements?**
 A: Python 3.8+, GCC compiler, tkinter (usually included with Python)
@@ -149,19 +149,19 @@ A: Yes! Cross-platform support with native executables.
 
 **💻 Languages & Features**
 
-**Q: What languages does TimeWarp support?**
+**Q: What languages does Time_Warp support?**
 A: BASIC, PILOT, and Logo - the classic 1960s educational languages.
 
-**Q: Can I create games with TimeWarp?**
+**Q: Can I create games with Time_Warp?**
 A: Yes! Check out the Galaga example and game engine in /games/
 
 **Q: How does compilation work?**
-A: TimeWarp generates C code from your programs, then compiles with GCC to native executables.
+A: Time_Warp generates C code from your programs, then compiles with GCC to native executables.
 
 **🐛 Troubleshooting**
 
 **Q: "Command not found" error?**
-A: Make sure TimeWarp is installed and in your PATH.
+A: Make sure Time_Warp is installed and in your PATH.
 
 **Q: Compilation fails?**
 A: Ensure GCC is installed. On Ubuntu: `sudo apt install gcc`
@@ -171,7 +171,7 @@ A: Install tkinter: `pip install tk` or use your system's package manager.
 
 **📚 Learning & Education**
 
-**Q: Is TimeWarp good for teaching programming?**
+**Q: Is Time_Warp good for teaching programming?**
 A: Absolutely! It combines retro simplicity with modern compilation.
 
 **Q: Can students create their own games?**
@@ -186,20 +186,20 @@ A: Check the /docs folder and community tutorials.
 A: See CONTRIBUTING.md on GitHub. Bug reports, features, docs welcome!
 
 **Q: Can I add new languages?**
-A: Yes! The plugin system supports extending TimeWarp.
+A: Yes! The plugin system supports extending Time_Warp.
 
 **Q: Where do I report bugs?**
-A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
+A: GitHub Issues: https://github.com/Time_WarpIDE/Time_Warp/issues
 
 **💡 Pro Tips**
-- Use `timewarp-compiler --help` for all options
+- Use `time_warp-compiler --help` for all options
 - Check /examples for sample programs
 - Join Discord for real-time help
 - Share your projects in the showcase channel!
 
 **Still have questions?** Ask in the group - the community is helpful! 😊
 
-#FAQ #Help #TimeWarpIDE
+#FAQ #Help #Time_WarpIDE
 ```
 
 ---
@@ -207,7 +207,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 ## 5. Weekly Content Calendar Template
 
 ```
-📅 **TimeWarp IDE Content Calendar**
+📅 **Time_Warp IDE Content Calendar**
 
 **🎯 Our Mission:** Build a vibrant community of programmers, educators, and retro computing enthusiasts!
 
@@ -241,7 +241,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 **🎨 SATURDAY: Showcase Saturday**
 - Member project highlights
 - Code examples and demos
-- Creative uses of TimeWarp
+- Creative uses of Time_Warp
 
 **❓ SUNDAY: Help & AMA Sunday**
 - Q&A sessions
@@ -263,7 +263,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 
 **Let's build something amazing together! 🚀**
 
-#Community #ContentCalendar #TimeWarpIDE
+#Community #ContentCalendar #Time_WarpIDE
 ```
 
 ---
@@ -271,7 +271,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 ## 6. Group Rules (Detailed)
 
 ```
-🏠 **TimeWarp IDE Community Rules**
+🏠 **Time_Warp IDE Community Rules**
 
 **1. 🤝 Be Respectful & Inclusive**
    - Treat all members with kindness and respect
@@ -280,7 +280,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
    - Use inclusive language
 
 **2. 🎯 Stay On Topic**
-   - Keep discussions relevant to TimeWarp IDE, educational programming, or retro computing
+   - Keep discussions relevant to Time_Warp IDE, educational programming, or retro computing
    - Use appropriate post types and tags
    - Off-topic discussions in designated threads only
 
@@ -318,7 +318,7 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 
 **Remember:** This is a positive, educational community. Let's keep it that way! 😊
 
-#Rules #Community #TimeWarpIDE
+#Rules #Community #Time_WarpIDE
 ```
 
 ---
@@ -326,11 +326,11 @@ A: GitHub Issues: https://github.com/TimeWarpIDE/TimeWarp/issues
 ## 7. First Announcement Post
 
 ```
-🎉 **Welcome to the NEW TimeWarp IDE Community!** 🎉
+🎉 **Welcome to the NEW Time_Warp IDE Community!** 🎉
 
-**We're LIVE!** The official Facebook group for TimeWarp IDE is now open!
+**We're LIVE!** The official Facebook group for Time_Warp IDE is now open!
 
-**🌟 What is TimeWarp IDE?**
+**🌟 What is Time_Warp IDE?**
 A revolutionary compiler that bridges 1960s educational programming with modern development. Compile BASIC, PILOT, and Logo programs to native executables - no interpreters required!
 
 **🚀 Key Features:**
@@ -348,22 +348,22 @@ A revolutionary compiler that bridges 1960s educational programming with modern 
 • Anyone who loves classic computing
 
 **💬 Join the Conversation:**
-• Share your TimeWarp projects
+• Share your Time_Warp projects
 • Ask questions and get help
 • Learn about retro programming
 • Connect with like-minded people
 • Contribute to the community
 
 **🔗 Quick Links:**
-• **Install:** `pip install timewarp-ide`
-• **GitHub:** https://github.com/TimeWarpIDE/TimeWarp
+• **Install:** `pip install time_warp-ide`
+• **GitHub:** https://github.com/Time_WarpIDE/Time_Warp
 • **Examples:** Check the /examples folder
 
 **📌 Pinned Posts:** Check the posts above for getting started guides, resources, and FAQs!
 
 **Let's build the future of educational programming together! 🚀**
 
-#TimeWarpIDE #Launch #Community #RetroComputing #EducationalProgramming
+#Time_WarpIDE #Launch #Community #RetroComputing #EducationalProgramming
 ```
 
 ---

@@ -1,5 +1,5 @@
 """
-Game Renderer for TimeWarp Game Engine
+Game Renderer for Time_Warp Game Engine
 Handles rendering of game objects to tkinter canvas.
 """
 

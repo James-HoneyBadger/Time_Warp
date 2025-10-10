@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Plugin Registry
+Time_Warp IDE Plugin Registry
 Central registry for managing loaded plugins
 """
 

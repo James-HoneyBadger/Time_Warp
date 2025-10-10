@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp Tool Manager - Enhanced plugin system specifically for tools
+Time_Warp Tool Manager - Enhanced plugin system specifically for tools
 Extends the base plugin system with tool-specific functionality
 """
 
@@ -252,7 +252,7 @@ class ToolManagerDialog:
         header_frame.pack(fill=tk.X, pady=(0, 10))
 
         ttk.Label(
-            header_frame, text="🛠️ TimeWarp Tool Manager", font=("Arial", 16, "bold")
+            header_frame, text="🛠️ Time_Warp Tool Manager", font=("Arial", 16, "bold")
         ).pack(side=tk.LEFT)
 
         header_buttons = ttk.Frame(header_frame)
@@ -410,10 +410,10 @@ class ToolManagerDialog:
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
 
-        tool_guide = """🛠️ TimeWarp TOOL DEVELOPMENT GUIDE
+        tool_guide = """🛠️ Time_Warp TOOL DEVELOPMENT GUIDE
 
 📋 Tool Plugin Structure:
-A TimeWarp tool plugin extends the ToolPlugin base class and provides professional functionality.
+A Time_Warp tool plugin extends the ToolPlugin base class and provides professional functionality.
 
 Required Files:
 • plugin.py - Main tool implementation (must contain TimeWarpPlugin class)
@@ -502,7 +502,7 @@ TimeWarpPlugin = MyToolPlugin
 • Export/import capabilities for tool data
 • Configuration persistence
 • Professional error handling and user feedback
-• Integration with TimeWarp interpreter system
+• Integration with Time_Warp interpreter system
 • Comprehensive help and documentation"""
 
         guide_text.insert("1.0", tool_guide)

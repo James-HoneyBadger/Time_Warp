@@ -1,4 +1,4 @@
-10 PRINT "🔄 TimeWarp IDE - BASIC Loops Demo"
+10 PRINT "🔄 Time_Warp IDE - BASIC Loops Demo"
 20 PRINT "==================================="
 30 PRINT
 40 PRINT "Demonstrating different types of loops:"

@@ -1,6 +1,6 @@
 # Hardware Controller Plugin
 
-Professional hardware interface tool for TimeWarp IDE with comprehensive hardware management capabilities.
+Professional hardware interface tool for Time_Warp IDE with comprehensive hardware management capabilities.
 
 ## Features
 
@@ -48,7 +48,7 @@ Professional hardware interface tool for TimeWarp IDE with comprehensive hardwar
 
 The Hardware Controller integrates with:
 
-- TimeWarp interpreter system for hardware programming
+- Time_Warp interpreter system for hardware programming
 - Framework event system for real-time updates
 - GPIO libraries for actual hardware control
 - Sensor libraries for data acquisition
@@ -79,7 +79,7 @@ The Hardware Controller integrates with:
 
 ## Development
 
-The plugin follows the TimeWarp ToolPlugin architecture with:
+The plugin follows the Time_Warp ToolPlugin architecture with:
 
 - Proper lifecycle management (initialize, activate, deactivate, destroy)
 - Event-driven hardware monitoring

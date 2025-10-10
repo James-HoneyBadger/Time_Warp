@@ -1,5 +1,5 @@
 """
-Game Objects for TimeWarp Game Engine
+Game Objects for Time_Warp Game Engine
 Base classes for game entities with physics properties.
 """
 

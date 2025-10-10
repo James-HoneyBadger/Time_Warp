@@ -1,6 +1,6 @@
 """
-TimeWarp IDE Language Parser
-Parses tokenized TimeWarp IDE source code into an Abstract Syntax Tree (AST)
+Time_Warp IDE Language Parser
+Parses tokenized Time_Warp IDE source code into an Abstract Syntax Tree (AST)
 """
 
 from typing import List, Optional, Union, Any
@@ -322,7 +322,7 @@ class ParseError(Exception):
 
 
 class TimeWarpParser:
-    """Parser for TimeWarp IDE language"""
+    """Parser for Time_Warp IDE language"""
 
     def __init__(self):
         self.tokens = []

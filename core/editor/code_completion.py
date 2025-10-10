@@ -1,5 +1,5 @@
 """
-Code Completion Engine for TimeWarp IDE
+Code Completion Engine for Time_Warp IDE
 Provides intelligent code completion based on language context
 """
 

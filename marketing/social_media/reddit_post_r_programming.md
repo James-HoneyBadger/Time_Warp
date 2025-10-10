@@ -1,10 +1,10 @@
-# TimeWarp IDE v1.0.0: Compile 1960s Educational Languages to Native Executables
+# Time_Warp IDE v1.0.0: Compile 1960s Educational Languages to Native Executables
 
-**Show HN:** Just released TimeWarp IDE - a compiler that transforms classic educational programming languages into modern native binaries!
+**Show HN:** Just released Time_Warp IDE - a compiler that transforms classic educational programming languages into modern native binaries!
 
-## What is TimeWarp IDE?
+## What is Time_Warp IDE?
 
-TimeWarp IDE is an educational programming compiler that takes three foundational languages from the 1960s and compiles them to standalone Linux executables. No interpreters required - just native performance with GCC compilation.
+Time_Warp IDE is an educational programming compiler that takes three foundational languages from the 1960s and compiles them to standalone Linux executables. No interpreters required - just native performance with GCC compilation.
 
 ## Supported Languages
 
@@ -22,16 +22,16 @@ TimeWarp IDE is an educational programming compiler that takes three foundationa
 
 ## Why This Matters
 
-Most educational programming tools today use interpreted languages or web-based environments. TimeWarp IDE bridges the gap by letting students and educators work with time-tested languages while generating modern, distributable executables.
+Most educational programming tools today use interpreted languages or web-based environments. Time_Warp IDE bridges the gap by letting students and educators work with time-tested languages while generating modern, distributable executables.
 
 ## Quick Demo
 
 ```bash
 # Install
-pip install timewarp-ide
+pip install time_warp-ide
 
 # Compile a BASIC program
-timewarp-compiler hello.bas -o hello
+time_warp-compiler hello.bas -o hello
 
 # Run the native executable
 ./hello
@@ -107,10 +107,10 @@ E:
 
 ## Links
 
-- **GitHub:** <https://github.com/TimeWarpIDE/TimeWarp>
-- **PyPI:** <https://pypi.org/project/timewarp-ide/>
-- **Documentation:** <https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs>
-- **Release:** <https://github.com/TimeWarpIDE/TimeWarp/releases/tag/v1.0.0>
+- **GitHub:** <https://github.com/Time_WarpIDE/Time_Warp>
+- **PyPI:** <https://pypi.org/project/time_warp-ide/>
+- **Documentation:** <https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs>
+- **Release:** <https://github.com/Time_WarpIDE/Time_Warp/releases/tag/v1.0.0>
 
 ## Future Plans
 
@@ -121,5 +121,5 @@ E:
 
 ---
 
-*TimeWarp IDE v1.0.0 - Transforming educational programming for the modern era*</content>
-<parameter name="filePath">/home/timewarp/Time_Warp/reddit_post_r_programming.md
+*Time_Warp IDE v1.0.0 - Transforming educational programming for the modern era*</content>
+<parameter name="filePath">/home/time_warp/Time_Warp/reddit_post_r_programming.md

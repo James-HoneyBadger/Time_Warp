@@ -1,6 +1,6 @@
 """
 IoT Device Management System
-Smart home and IoT device integration for TimeWarp.
+Smart home and IoT device integration for Time_Warp.
 """
 
 import time

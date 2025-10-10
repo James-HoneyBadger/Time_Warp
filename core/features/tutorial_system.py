@@ -1,5 +1,5 @@
 """
-Interactive Tutorial System for TimeWarp IDE
+Interactive Tutorial System for Time_Warp IDE
 Provides guided learning experiences with built-in challenges and progress tracking
 """
 
@@ -71,14 +71,14 @@ class Tutorial:
 
 
 class TutorialSystem:
-    """Main tutorial system for TimeWarp IDE"""
+    """Main tutorial system for Time_Warp IDE"""
 
     def __init__(self):
         self.tutorials: Dict[str, Tutorial] = {}
         self.user_progress: Dict[str, Dict] = {}
         self.current_tutorial: Optional[Tutorial] = None
         self.current_step: Optional[TutorialStep] = None
-        self.progress_file = Path.home() / ".timewarp" / "tutorial_progress.json"
+        self.progress_file = Path.home() / ".time_warp" / "tutorial_progress.json"
         self.load_progress()
         self.initialize_tutorials()
 
@@ -123,9 +123,9 @@ class TutorialSystem:
             
 Let's start with the classic "Hello World" program. In PILOT, we use the T: command to display text.
 
-Your task: Write a program that displays 'Hello, TimeWarp!' to the screen.""",
-            code_template="T:Hello, TimeWarp!\nEND",
-            expected_output="Hello, TimeWarp!",
+Your task: Write a program that displays 'Hello, Time_Warp!' to the screen.""",
+            code_template="T:Hello, Time_Warp!\nEND",
+            expected_output="Hello, Time_Warp!",
             hints=[
                 "Use T: followed by the text you want to display",
                 "Always end your PILOT program with END",

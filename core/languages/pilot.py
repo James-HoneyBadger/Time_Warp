@@ -1,5 +1,5 @@
 """
-PILOT Language Executor for TimeWarp IDE
+PILOT Language Executor for Time_Warp IDE
 ========================================
 
 PILOT (Programmed Inquiry, Learning, Or Teaching) is an educational programming language

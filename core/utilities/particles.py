@@ -1,5 +1,5 @@
 """
-Particle system utilities for TimeWarp
+Particle system utilities for Time_Warp
 Handles particle effects and visual effects.
 """
 

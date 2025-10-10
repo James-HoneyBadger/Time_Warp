@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Error Handling System
+Time_Warp IDE Error Handling System
 Centralized error management for better debugging and user experience
 """
 
@@ -179,7 +179,7 @@ class ErrorManager:
 
 # Exception classes for different error types
 class TimeWarpBaseException(Exception):
-    """Base exception for all TimeWarp errors"""
+    """Base exception for all Time_Warp errors"""
 
     def __init__(self, error: TimeWarpError):
         self.error = error

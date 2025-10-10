@@ -1,5 +1,5 @@
 """
-TimeWarp Advanced Debugging System
+Time_Warp Advanced Debugging System
 Professional debugging capabilities for educational programming environment
 """
 

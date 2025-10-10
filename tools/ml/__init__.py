@@ -1,5 +1,5 @@
 """
-Machine Learning Tools for TimeWarp
+Machine Learning Tools for Time_Warp
 Educational AI/ML integration with scikit-learn and management GUI.
 """
 

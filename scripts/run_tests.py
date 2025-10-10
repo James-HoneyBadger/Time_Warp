@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE Test Runner
-Tests the enhanced TimeWarp IDE system
+Time_Warp IDE Test Runner
+Tests the enhanced Time_Warp IDE system
 """
 
 import sys
@@ -16,25 +16,25 @@ sys.path.insert(0, project_root)
 
 def discover_and_run_tests():
     """Discover and run all tests"""
-    print("🧪 Running TimeWarp IDE Test Suite")
+    print("🧪 Running Time_Warp IDE Test Suite")
     print("=" * 50)
 
     try:
         # Test core imports and basic functionality
         print("Testing core imports...")
-        from core.interpreter import TimeWarpInterpreter
+        from core.interpreter import Time_WarpInterpreter
 
         print("✅ Core interpreter import successful")
 
         print("Testing feature imports...")
-        from features.tutorial_system import TutorialSystem
-        from features.ai_assistant import AICodeAssistant
-        from features.gamification import GamificationSystem
+        from core.features.tutorial_system import TutorialSystem
+        from core.features.ai_assistant import AICodeAssistant
+        from core.features.gamification import GamificationSystem
 
         print("✅ Feature system imports successful")
 
         print("Testing basic functionality...")
-        interpreter = TimeWarpInterpreter()
+        interpreter = Time_WarpInterpreter()
         _ = TutorialSystem()  # Test initialization
         _ = AICodeAssistant()  # Test initialization
         _ = GamificationSystem()  # Test initialization
@@ -66,7 +66,7 @@ def main():
 
     if success:
         print("✅ All tests passed!")
-        print("\\n🎉 TimeWarp IDE Enhancement Complete!")
+        print("\\n🎉 Time_Warp IDE Enhancement Complete!")
         print("\\nRefactoring Summary:")
         print("  ✅ Modular directory structure created")
         print("  ✅ Centralized error handling implemented")
@@ -86,7 +86,7 @@ def main():
     else:
         print(f"❌ Tests failed: {failures} failures, {errors} errors")
         print("\\nSome tests failed, but refactoring structure is complete.")
-        print("The enhanced architecture provides a solid foundation for TimeWarp IDE.")
+        print("The enhanced architecture provides a solid foundation for Time_Warp IDE.")
         return 1
 
 

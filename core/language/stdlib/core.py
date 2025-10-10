@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Standard Library - Core Module
+Time_Warp IDE Standard Library - Core Module
 Provides essential built-in functions and constants
 """
 

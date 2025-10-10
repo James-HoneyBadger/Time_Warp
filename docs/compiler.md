@@ -1,35 +1,35 @@
-# TimeWarp IDE - Language Compilation System
+# Time_Warp IDE - Language Compilation System
 
 ## Overview
 
-TimeWarp IDE includes both interactive execution and compilation capabilities for multiple programming languages (PILOT, BASIC, Logo, Python, JavaScript, Perl). The IDE provides real-time code execution with turtle graphics visualization, as well as standalone compilation for distribution of programs as native executables.
+Time_Warp IDE includes both interactive execution and compilation capabilities for multiple programming languages (PILOT, BASIC, Logo, Python, JavaScript, Perl). The IDE provides real-time code execution with turtle graphics visualization, as well as standalone compilation for distribution of programs as native executables.
 
 ## Installation
 
-TimeWarp IDE is available directly from GitHub:
+Time_Warp IDE is available directly from GitHub:
 
 ```bash
 # Clone the repository
-git clone https://github.com/YourUsername/TimeWarp.git
-cd TimeWarp
+git clone https://github.com/YourUsername/Time_Warp.git
+cd Time_Warp
 
-# Run TimeWarp IDE
-python TimeWarp.py
+# Run Time_Warp IDE
+python Time_Warp.py
 ```
 
 Or install dependencies manually:
 ```bash
 pip install -r requirements.txt
-python TimeWarp.py
+python Time_Warp.py
 ```
 
 ## Usage
 
-### Interactive Execution in TimeWarp IDE
+### Interactive Execution in Time_Warp IDE
 
-The primary way to run programs is through the TimeWarp IDE interface:
+The primary way to run programs is through the Time_Warp IDE interface:
 
-1. **Launch TimeWarp IDE**: `python TimeWarp.py`
+1. **Launch Time_Warp IDE**: `python Time_Warp.py`
 2. **Select Language**: Choose from PILOT, BASIC, Logo, Python, JavaScript, or Perl
 3. **Write Code**: Use the built-in editor with syntax highlighting
 4. **Run Interactively**: Execute code with real-time turtle graphics visualization
@@ -49,9 +49,9 @@ python compilers/pilot_compiler.py lesson.pilot
 ### Command Line Options
 
 ```
-usage: timewarp-compiler [-h] [-o OUTPUT] [--list-languages] [--version] input_file
+usage: time_warp-compiler [-h] [-o OUTPUT] [--list-languages] [--version] input_file
 
-TimeWarp Compiler - Compile educational programs to native executables
+Time_Warp Compiler - Compile educational programs to native executables
 
 positional arguments:
   input_file           Source file to compile (.bas, .logo, .pilot)
@@ -133,7 +133,7 @@ Create `calculator.bas`:
 
 Compile and run:
 ```bash
-timewarp-compiler calculator.bas
+time_warp-compiler calculator.bas
 ./calculator
 ```
 
@@ -150,7 +150,7 @@ SQUARE 100
 
 Compile and run:
 ```bash
-timewarp-compiler square.logo
+time_warp-compiler square.logo
 ./square
 ```
 
@@ -174,7 +174,7 @@ E:
 
 Compile and run:
 ```bash
-timewarp-compiler quiz.pilot
+time_warp-compiler quiz.pilot
 echo "4" | ./quiz
 ```
 
@@ -211,7 +211,7 @@ Compiled programs require:
 
 **"Syntax error in source"**
 - Check your program syntax against the language reference
-- Use the TimeWarp IDE for syntax checking
+- Use the Time_Warp IDE for syntax checking
 
 **"GCC not found"**
 - Install GCC: `sudo apt install gcc` (Ubuntu/Debian)
@@ -237,7 +237,7 @@ Compiled programs require:
 ```bash
 # Compile multiple files
 for file in *.bas; do
-    timewarp-compiler "$file"
+    time_warp-compiler "$file"
 done
 ```
 
@@ -252,13 +252,13 @@ PROGRAMS = calculator quiz drawing
 all: $(PROGRAMS)
 
 %: %.bas
-    timewarp-compiler $< -o $@
+    time_warp-compiler $< -o $@
 
 %: %.pilot
-    timewarp-compiler $< -o $@
+    time_warp-compiler $< -o $@
 
 %: %.logo
-    timewarp-compiler $< -o $@
+    time_warp-compiler $< -o $@
 
 clean:
     rm -f $(PROGRAMS)
@@ -311,7 +311,7 @@ To add support for new languages:
 
 ## See Also
 
-- [TimeWarp IDE User Guide](user_guide.md)
+- [Time_Warp IDE User Guide](user_guide.md)
 - [Language Reference](languages/)
 - [API Documentation](api/)
-- [GitHub Repository](https://github.com/TimeWarpIDE/TimeWarp)
+- [GitHub Repository](https://github.com/Time_WarpIDE/Time_Warp)

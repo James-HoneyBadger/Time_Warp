@@ -1,5 +1,5 @@
 """
-Learning Assistant Plugin for TimeWarp IDE
+Learning Assistant Plugin for Time_Warp IDE
 Provides educational features including tutorials, code analysis, and progress tracking
 """
 
@@ -867,7 +867,7 @@ class LearningAssistantPlugin(ToolPlugin):
         """Send tutorial code to main editor"""
         code = self.tutorial_code_text.get(1.0, tk.END).strip()
         if code:
-            # This would integrate with the main TimeWarp editor
+            # This would integrate with the main Time_Warp editor
             messagebox.showinfo(
                 "Code Sent", "Tutorial code has been sent to the main editor!"
             )

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE Facebook Cover Generator
+Time_Warp IDE Facebook Cover Generator
 Creates a professional Facebook cover image based on design specifications.
 """
 
@@ -9,7 +9,7 @@ import os
 
 
 def create_facebook_cover():
-    """Generate TimeWarp IDE Facebook cover image."""
+    """Generate Time_Warp IDE Facebook cover image."""
 
     # Canvas dimensions
     width, height = 820, 312
@@ -121,7 +121,7 @@ def create_facebook_cover():
     center_start = left_section_width
     center_width = int(width * 0.4)
 
-    # Main logo - TimeWarp IDE
+    # Main logo - Time_Warp IDE
     logo_text = "⏰ TIMEWARP IDE"
     bbox = draw.textbbox((0, 0), logo_text, font=title_font)
     text_width = bbox[2] - bbox[0]
@@ -171,7 +171,7 @@ def create_facebook_cover():
     # Terminal content
     draw.text(
         (term_x + 10, term_y + 10),
-        "$ timewarp-compiler hello.bas -o hello",
+        "$ time_warp-compiler hello.bas -o hello",
         font=code_font,
         fill=neon_green,
     )
@@ -210,7 +210,7 @@ def create_facebook_cover():
 
 def main():
     """Main function to generate and save the Facebook cover."""
-    print("🎨 Generating TimeWarp IDE Facebook Cover...")
+    print("🎨 Generating Time_Warp IDE Facebook Cover...")
 
     # Create the cover image
     cover_img = create_facebook_cover()

@@ -1,4 +1,4 @@
-# Forums for Advertising TimeWarp IDE
+# Forums for Advertising Time_Warp IDE
 
 ## 🏆 **Top Priority Forums**
 
@@ -29,7 +29,7 @@
 ### **4. Stack Overflow**
 - **Type:** Q&A forum for programmers
 - **Audience:** Professional developers
-- **Strategy:** Don't advertise directly - instead answer questions about educational compilers, vintage languages, or compilation techniques, mentioning TimeWarp as a solution
+- **Strategy:** Don't advertise directly - instead answer questions about educational compilers, vintage languages, or compilation techniques, mentioning Time_Warp as a solution
 - **Example:** Answer questions about "How to compile BASIC programs" or "Educational programming languages"
 
 ### **5. Dev.to (dev.to)**
@@ -88,7 +88,7 @@
 
 ### **14. GitHub Discussions**
 - **Post in related repos:** Compiler projects, educational tools, retro computing
-- **Strategy:** Contribute to discussions, mention TimeWarp as alternative/solution
+- **Strategy:** Contribute to discussions, mention Time_Warp as alternative/solution
 - **Example:** Comment on BASIC interpreters, Logo implementations
 
 ### **15. SourceForge Forums**
@@ -235,4 +235,4 @@
 
 ---
 
-**TimeWarp IDE Forum Advertising Guide** - Comprehensive strategy for reaching programming, educational, and retro computing communities worldwide.
+**Time_Warp IDE Forum Advertising Guide** - Comprehensive strategy for reaching programming, educational, and retro computing communities worldwide.

@@ -1,8 +1,8 @@
-# TimeWarp IDE Facebook Group - Short Description
+# Time_Warp IDE Facebook Group - Short Description
 
 ## About Section (Character-Limited Version)
 
-🚀 **TimeWarp IDE Community** - Educational programming environment supporting 6 languages: PILOT, BASIC, Logo, Python, JavaScript & Perl!
+🚀 **Time_Warp IDE Community** - Educational programming environment supporting 6 languages: PILOT, BASIC, Logo, Python, JavaScript & Perl!
 
 Perfect for educators, students & programming enthusiasts. Features visual turtle graphics, AI assistant, gamification, and 50+ example programs.
 
@@ -30,7 +30,7 @@ Open source, beginner-friendly, with progressive learning from simple to advance
 
 ## Welcome Post Template
 
-🎉 **Welcome to TimeWarp IDE Community!** 
+🎉 **Welcome to Time_Warp IDE Community!** 
 
 New here? Start by:
 ✅ Introducing yourself and your programming background
@@ -40,4 +40,4 @@ New here? Start by:
 
 What programming language are you most excited to learn? Share below! 👇
 
-#Welcome #TimeWarpIDE #Programming
+#Welcome #Time_WarpIDE #Programming

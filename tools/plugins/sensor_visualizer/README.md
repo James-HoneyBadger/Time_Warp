@@ -1,6 +1,6 @@
 # Sensor Visualizer Plugin
 
-A comprehensive sensor data visualization plugin for TimeWarp IDE that provides real-time charts, data logging, historical analysis, and alert management.
+A comprehensive sensor data visualization plugin for Time_Warp IDE that provides real-time charts, data logging, historical analysis, and alert management.
 
 ## Features
 
@@ -52,7 +52,7 @@ A comprehensive sensor data visualization plugin for TimeWarp IDE that provides 
 
 ## Installation
 
-This plugin is part of the TimeWarp IDE modular architecture and is automatically discovered by the Tool Manager.
+This plugin is part of the Time_Warp IDE modular architecture and is automatically discovered by the Tool Manager.
 
 ## Usage
 
@@ -147,7 +147,7 @@ This plugin is part of the TimeWarp IDE modular architecture and is automaticall
 
 - Python 3.7+
 - tkinter (included with Python)
-- TimeWarp Core Framework
+- Time_Warp Core Framework
 
 ### Events
 
@@ -230,7 +230,7 @@ The plugin integrates with various sensor hardware:
 
 ### Software Integration
 
-- **TimeWarp Framework**: Full integration with TimeWarp event system
+- **Time_Warp Framework**: Full integration with Time_Warp event system
 - **File System**: Automatic data persistence and backup
 - **Network Services**: Web dashboard and API endpoints
 - **Email Services**: Automated alert notifications
@@ -266,8 +266,8 @@ Enable debug logging in the plugin settings to troubleshoot issues.
 
 ## License
 
-This plugin is part of the TimeWarp IDE project and follows the same licensing terms.
+This plugin is part of the Time_Warp IDE project and follows the same licensing terms.
 
 ## Support
 
-For support and bug reports, please use the TimeWarp IDE issue tracker or contact the development team.
+For support and bug reports, please use the Time_Warp IDE issue tracker or contact the development team.

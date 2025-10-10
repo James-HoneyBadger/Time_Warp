@@ -1,5 +1,5 @@
 """
-Visual Debugger for TimeWarp IDE
+Visual Debugger for Time_Warp IDE
 Comprehensive debugging interface with breakpoints, variable inspection, and call stack visualization
 """
 
@@ -479,7 +479,7 @@ class VisualDebugger:
 
 
 class TimeWarpDebugger(pdb.Pdb):
-    """Custom debugger for TimeWarp IDE"""
+    """Custom debugger for Time_Warp IDE"""
 
     def __init__(self, visual_debugger: VisualDebugger):
         super().__init__()

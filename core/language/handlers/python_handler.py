@@ -1,6 +1,6 @@
 """
-Python Integration Handler for TimeWarp IDE
-Handles execution of Python code blocks within TimeWarp programs
+Python Integration Handler for Time_Warp IDE
+Handles execution of Python code blocks within Time_Warp programs
 """
 
 import sys
@@ -19,7 +19,7 @@ class PythonHandler:
         self.setup_python_environment()
 
     def setup_python_environment(self):
-        """Setup Python execution environment with TimeWarp interface"""
+        """Setup Python execution environment with Time_Warp interface"""
         # Standard Python builtins
         self.python_globals.update(
             __builtins__ if isinstance(__builtins__, dict) else __builtins__.__dict__
@@ -36,8 +36,8 @@ class PythonHandler:
             }
         )
 
-        # TimeWarp interface
-        self.python_globals["TimeWarp"] = TimeWarpPythonInterface(self.interpreter)
+        # Time_Warp interface
+        self.python_globals["Time_Warp"] = TimeWarpPythonInterface(self.interpreter)
 
     def execute_python_block(self, node: PythonBlockNode) -> Dict[str, Any]:
         """Execute Python code block"""
@@ -88,24 +88,24 @@ class PythonHandler:
 
 
 class TimeWarpPythonInterface:
-    """Interface for accessing TimeWarp from Python code"""
+    """Interface for accessing Time_Warp from Python code"""
 
     def __init__(self, interpreter):
         self.interpreter = interpreter
 
     def GET(self, name: str) -> Any:
-        """Get a TimeWarp variable from Python"""
+        """Get a Time_Warp variable from Python"""
         try:
             return self.interpreter.environment.get(name)
         except Exception:
-            raise NameError(f"TimeWarp variable '{name}' not found")
+            raise NameError(f"Time_Warp variable '{name}' not found")
 
     def SET(self, name: str, value: Any):
-        """Set a TimeWarp variable from Python"""
+        """Set a Time_Warp variable from Python"""
         self.interpreter.environment.set(name, value)
 
     def CALL(self, name: str, *args) -> Any:
-        """Call a TimeWarp function from Python"""
+        """Call a Time_Warp function from Python"""
         try:
             func = self.interpreter.environment.get(name)
             if hasattr(func, "call"):  # TimeWarpFunction
@@ -115,26 +115,26 @@ class TimeWarpPythonInterface:
             else:
                 raise TypeError(f"'{name}' is not callable")
         except Exception as e:
-            raise RuntimeError(f"Error calling TimeWarp function '{name}': {e}")
+            raise RuntimeError(f"Error calling Time_Warp function '{name}': {e}")
 
     def PRINT(self, *args, sep=" ", end="\\n"):
-        """Print from Python to TimeWarp output"""
+        """Print from Python to Time_Warp output"""
         output = sep.join(str(arg) for arg in args) + end
         self.interpreter.output_buffer.append(output.rstrip("\\n"))
 
     def INPUT(self, prompt: str = "") -> str:
-        """Get input through TimeWarp input system"""
+        """Get input through Time_Warp input system"""
         if self.interpreter.input_callback:
             return self.interpreter.input_callback(prompt)
         else:
             return input(prompt)
 
     def VARS(self) -> Dict[str, Any]:
-        """Get all TimeWarp variables as a dictionary"""
+        """Get all Time_Warp variables as a dictionary"""
         return dict(self.interpreter.environment.variables)
 
     def EVAL(self, timewarp_expression: str) -> Any:
-        """Evaluate a TimeWarp expression from Python"""
+        """Evaluate a Time_Warp expression from Python"""
         from ..lexer import TimeWarpLexer
         from ..parser import TimeWarpParser
 
@@ -151,11 +151,11 @@ class TimeWarpPythonInterface:
             return self.interpreter.execute(expr_node)
         except Exception as e:
             raise RuntimeError(
-                f"Error evaluating TimeWarp expression '{timewarp_expression}': {e}"
+                f"Error evaluating Time_Warp expression '{timewarp_expression}': {e}"
             )
 
     def RUN(self, timewarp_code: str):
-        """Execute TimeWarp code from Python"""
+        """Execute Time_Warp code from Python"""
         from ..lexer import TimeWarpLexer
         from ..parser import TimeWarpParser
 
@@ -170,7 +170,7 @@ class TimeWarpPythonInterface:
                 if statement:
                     self.interpreter.execute(statement)
         except Exception as e:
-            raise RuntimeError(f"Error executing TimeWarp code: {e}")
+            raise RuntimeError(f"Error executing Time_Warp code: {e}")
 
 
 class BasicHandler:

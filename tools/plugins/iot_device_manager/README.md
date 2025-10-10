@@ -1,6 +1,6 @@
 # IoT Device Manager Plugin
 
-A comprehensive IoT device management plugin for TimeWarp IDE that provides device discovery, control, network monitoring, protocol support, and data analytics.
+A comprehensive IoT device management plugin for Time_Warp IDE that provides device discovery, control, network monitoring, protocol support, and data analytics.
 
 ## Features
 
@@ -43,7 +43,7 @@ A comprehensive IoT device management plugin for TimeWarp IDE that provides devi
 
 ## Installation
 
-This plugin is part of the TimeWarp IDE modular architecture. It should be automatically discovered and loaded by the Tool Manager.
+This plugin is part of the Time_Warp IDE modular architecture. It should be automatically discovered and loaded by the Tool Manager.
 
 ## Usage
 
@@ -93,10 +93,10 @@ This plugin is part of the TimeWarp IDE modular architecture. It should be autom
 ### Dependencies
 - Python 3.7+
 - tkinter (included with Python)
-- TimeWarp Core Framework
+- Time_Warp Core Framework
 
 ### Events
-The plugin emits various events for integration with the TimeWarp framework:
+The plugin emits various events for integration with the Time_Warp framework:
 - `network_scan_completed`
 - `device_discovered`
 - `device_added`
@@ -164,8 +164,8 @@ Enable debug output by setting the plugin logging level to debug.
 
 ## License
 
-This plugin is part of the TimeWarp IDE project and follows the same licensing terms.
+This plugin is part of the Time_Warp IDE project and follows the same licensing terms.
 
 ## Support
 
-For support and bug reports, please use the TimeWarp IDE issue tracker or contact the development team.
+For support and bug reports, please use the Time_Warp IDE issue tracker or contact the development team.

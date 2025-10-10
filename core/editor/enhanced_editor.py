@@ -1,5 +1,5 @@
 """
-Enhanced Code Editor for TimeWarp IDE
+Enhanced Code Editor for Time_Warp IDE
 Integrates language-specific features with the existing editor
 """
 
@@ -56,7 +56,7 @@ class EnhancedCodeEditor:
         self.container = ttk.Frame(self.parent)
         self.container.pack(fill=tk.BOTH, expand=True)
 
-        # Toolbar disabled - controlled by main TimeWarp interface
+        # Toolbar disabled - controlled by main Time_Warp interface
         # self.create_enhanced_toolbar()
 
         # Create main editor area
@@ -535,7 +535,7 @@ class EnhancedCodeEditor:
         if self.output_callback:
             text = self.text_editor.get("1.0", tk.END)
             self.output_callback(f"🚀 Running {self.current_language.upper()} code...")
-            # This would integrate with the main TimeWarp interpreter
+            # This would integrate with the main Time_Warp interpreter
 
     def update_compilation_buttons(self):
         """Update compilation button states"""
@@ -785,7 +785,7 @@ class EnhancedCodeEditor:
         """Get compilation menu items for current language"""
         return self.compiler_manager.get_compilation_menu_items()
 
-    # Compatibility methods for existing TimeWarp.py integration
+    # Compatibility methods for existing Time_Warp.py integration
     def clear_content(self):
         """Clear editor content - compatibility method"""
         self.text_editor.delete("1.0", tk.END)

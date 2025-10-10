@@ -1,6 +1,6 @@
 """
-TimeWarp Plugin System
-Provides extensible plugin architecture for TimeWarp IDE
+Time_Warp Plugin System
+Provides extensible plugin architecture for Time_Warp IDE
 """
 
 import os
@@ -13,7 +13,7 @@ from tkinter import ttk, messagebox
 
 
 class TimeWarpPlugin:
-    """Base class for TimeWarp plugins"""
+    """Base class for Time_Warp plugins"""
 
     def __init__(self, ide_instance):
         self.ide = ide_instance
@@ -41,7 +41,7 @@ class TimeWarpPlugin:
 
 
 class PluginManager:
-    """Manages TimeWarp plugins - loading, activation, and management"""
+    """Manages Time_Warp plugins - loading, activation, and management"""
 
     def __init__(self, ide_instance):
         self.ide = ide_instance
@@ -249,7 +249,7 @@ class PluginManagerDialog:
         header_frame.pack(fill=tk.X, pady=(0, 10))
 
         ttk.Label(
-            header_frame, text="🔌 TimeWarp Plugin Manager", font=("Arial", 16, "bold")
+            header_frame, text="🔌 Time_Warp Plugin Manager", font=("Arial", 16, "bold")
         ).pack(side=tk.LEFT)
         ttk.Button(header_frame, text="🔄 Refresh", command=self.refresh_plugins).pack(
             side=tk.RIGHT
@@ -389,10 +389,10 @@ class PluginManagerDialog:
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
 
-        plugin_guide = """🛠️ TimeWarp PLUGIN DEVELOPMENT GUIDE
+        plugin_guide = """🛠️ Time_Warp PLUGIN DEVELOPMENT GUIDE
 
 📋 Plugin Structure:
-A TimeWarp plugin is a Python module that extends the IDE functionality.
+A Time_Warp plugin is a Python module that extends the IDE functionality.
 
 Required Files:
 • plugin.py - Main plugin code
@@ -451,7 +451,7 @@ class TimeWarpPlugin(TimeWarpPlugin):
 1. Create a new folder in the plugins directory
 2. Write the manifest.json file
 3. Implement the plugin class in plugin.py
-4. Test with the TimeWarp Plugin API
+4. Test with the Time_Warp Plugin API
 5. Enable through Plugin Manager
 
 💡 Best Practices:

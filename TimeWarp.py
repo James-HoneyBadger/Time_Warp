@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE - Enhanced Multi-Tab Editor
+Time_Warp IDE - Enhanced Multi-Tab Editor
 Updated main application with new features:
 - Multi-tab code editor
 - File explorer panel  
@@ -25,7 +25,7 @@ from tools.theme import load_config, save_config, ThemeManager
 
 # Import core components
 try:
-    from core.interpreter import TimeWarpInterpreter
+    from core.interpreter import Time_WarpInterpreter
     from plugins import PluginManager
     CORE_AVAILABLE = True
 except ImportError as e:
@@ -48,15 +48,15 @@ from core.features.ai_assistant import AICodeAssistant
 from core.features.gamification import GamificationSystem
 
 
-class TimeWarpIDE:
+class Time_WarpIDE:
     """
-    TimeWarp IDE - Enhanced Educational Programming Environment
+    Time_Warp IDE - Enhanced Educational Programming Environment
     New features: Multi-tab editor, File explorer, Enhanced graphics, Better errors
     """
 
     def __init__(self):
-        """Initialize TimeWarp IDE"""
-        print("🚀 Starting TimeWarp IDE 1,1...")
+        """Initialize Time_Warp IDE"""
+        print("🚀 Starting Time_Warp IDE 1.1...")
         print("⏰ Enhanced Educational Programming Environment")
         print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
         
@@ -71,7 +71,7 @@ class TimeWarpIDE:
         self.plugin_manager = PluginManager(self)
         
         # Initialize interpreter
-        self.interpreter = TimeWarpInterpreter()
+        self.interpreter = Time_WarpInterpreter()
         
         # Initialize execution tracking
         self.execution_thread = None
@@ -95,7 +95,7 @@ class TimeWarpIDE:
         # Load plugins
         self.load_plugins()
         
-        print("🚀 TimeWarp IDE 1,1 - Clean two-panel layout ready!")
+        print("🚀 Time_Warp IDE 1.1 - Clean two-panel layout ready!")
         
         # Handle any initialization errors gracefully
 
@@ -131,7 +131,7 @@ class TimeWarpIDE:
             # Initialize error handler
             self.error_handler = EnhancedErrorHandler()
             
-            # Simplified feature initialization for 1,1
+            # Simplified feature initialization for 1.1
             # Advanced features will be added in future versions
             
         except Exception as e:
@@ -249,7 +249,7 @@ class TimeWarpIDE:
         help_menu.add_command(label="📖 Documentation", command=self.show_documentation)
         help_menu.add_command(label="🆘 Quick Help", command=self.show_quick_help, accelerator="F1")
         help_menu.add_separator()
-        help_menu.add_command(label="ℹ️ About TimeWarp IDE", command=self.show_about)
+        help_menu.add_command(label="ℹ️ About Time_Warp IDE", command=self.show_about)
 
     def setup_multi_tab_editor(self):
         """Setup multi-tab code editor"""
@@ -379,7 +379,7 @@ class TimeWarpIDE:
         file_path = filedialog.askopenfilename(
             title="Open File",
             filetypes=[
-                ("All TimeWarp files", "*.py *.js *.pilot *.bas *.logo *.pl"),
+                ("All Time_Warp files", "*.py *.js *.pilot *.bas *.logo *.pl"),
                 ("Python files", "*.py"),
                 ("BASIC files", "*.bas"),
                 ("Logo files", "*.logo"),
@@ -735,8 +735,8 @@ class TimeWarpIDE:
             return "JavaScript"
         elif filename.endswith('.pl'):
             return "Perl"
-        elif filename.endswith('.jtc') or filename.endswith('.timewarp'):
-            return "TimeWarp"
+        elif filename.endswith('.jtc') or filename.endswith('.time_warp'):
+            return "Time_Warp"
         else:
             return "Text"
 
@@ -800,7 +800,7 @@ class TimeWarpIDE:
         try:
             # Create tutorial window
             tutorial_window = tk.Toplevel(self.root)
-            tutorial_window.title("📚 TimeWarp IDE Tutorial System")
+            tutorial_window.title("📚 Time_Warp IDE Tutorial System")
             tutorial_window.geometry("800x600")
             tutorial_window.transient(self.root)
             tutorial_window.grab_set()
@@ -822,7 +822,7 @@ class TimeWarpIDE:
             
             basic_content = """🎯 BASIC PROGRAMMING TUTORIAL
 
-Welcome to TimeWarp IDE! Let's learn the fundamentals:
+Welcome to Time_Warp IDE! Let's learn the fundamentals:
 
 1. CHOOSING A LANGUAGE:
    • PILOT (1962) - Great for beginners, simple commands
@@ -835,7 +835,7 @@ Welcome to TimeWarp IDE! Let's learn the fundamentals:
    
    T:Hello, World!
    A:Enter your name
-   T:Welcome to TimeWarp IDE!
+   T:Welcome to Time_Warp IDE!
    
    Press F5 to run!
 
@@ -1208,7 +1208,7 @@ TIPS:
                     elif language == "Python":
                         response += "• print() - Display text\n• input() - Get input\n• for/while - Loops\n• if/elif/else - Conditions"
                 
-                response += f"\n\n💡 Try running this code in TimeWarp IDE!"
+                response += f"\n\n💡 Try running this code in Time_Warp IDE!"
                 
                 response_text.delete("1.0", tk.END)
                 response_text.insert(tk.END, response)
@@ -1292,7 +1292,7 @@ if guess == number:
 else:
     print(f"Wrong! It was {number}")
 
-💡 TIP: Copy any example and paste it into TimeWarp IDE!"""
+💡 TIP: Copy any example and paste it into Time_Warp IDE!"""
             
             examples_text.insert(tk.END, examples_content)
             examples_text.config(state=tk.DISABLED)
@@ -1332,7 +1332,7 @@ else:
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
             
             # Title
-            title_label = ttk.Label(main_frame, text="🎮 TimeWarp IDE Gamification", 
+            title_label = ttk.Label(main_frame, text="🎮 Time_Warp IDE Gamification", 
                                    font=("Arial", 16, "bold"))
             title_label.pack(pady=(0, 20))
             
@@ -1351,7 +1351,7 @@ else:
             
             achievements_content = """🏆 ACHIEVEMENT SYSTEM
 
-Welcome to TimeWarp IDE's Learning Journey! Complete challenges to unlock achievements and level up your programming skills!
+Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achievements and level up your programming skills!
 
 🥇 BEGINNER ACHIEVEMENTS:
 ▣ First Steps - Run your first program in any language
@@ -1379,7 +1379,7 @@ Welcome to TimeWarp IDE's Learning Journey! Complete challenges to unlock achiev
 ▣ BASIC Pioneer - Create advanced BASIC programs with graphics
 ▣ Logo Legend - Draw intricate patterns and designs
 ▣ Python Expert - Use advanced Python features
-▣ TimeWarp Master - Unlock all other achievements
+▣ Time_Warp Master - Unlock all other achievements
 
 📊 CURRENT PROGRESS:
 • Programs Run: 0/100 ⭐
@@ -1553,7 +1553,7 @@ Ready to test your skills? Complete these challenges to earn XP and achievements
 ━━━━━━━━━━━━━━━━━━━━
 This Week: "Retro Game Recreation"
 • Recreate a classic game like Pong or Snake
-• Use any TimeWarp language
+• Use any Time_Warp language
 • Deadline: End of week
 • Reward: 100 XP + Special Badge
 
@@ -1568,7 +1568,7 @@ This Week: "Retro Game Recreation"
 • 5 challenges: "Challenge Accepted" badge
 • 10 challenges: "Problem Solver" badge  
 • 15 challenges: "Challenge Master" badge
-• All challenges: "TimeWarp Champion" title"""
+• All challenges: "Time_Warp Champion" title"""
             
             challenges_text.insert(tk.END, challenges_content)
             challenges_text.config(state=tk.DISABLED)
@@ -2366,7 +2366,7 @@ Keep coding and improving! 🚀"""
             
             progress_content = """📊 LEARNING PROGRESS TRACKER
 
-Welcome to your personal learning journey with TimeWarp IDE!
+Welcome to your personal learning journey with Time_Warp IDE!
 
 🎯 CURRENT LEVEL: Beginner
 📈 Overall Progress: 15%
@@ -2432,7 +2432,7 @@ Welcome to your personal learning journey with TimeWarp IDE!
 📈 CODING ACHIEVEMENTS:
 
 🏆 Recently Earned:
-   ✅ First Steps - Ran your first TimeWarp program
+   ✅ First Steps - Ran your first Time_Warp program
    ✅ Multi-Lingual - Tried 3 different languages
    ✅ Graphics Explorer - Created your first turtle drawing
 
@@ -2522,7 +2522,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
     def show_quick_help(self):
         """Show quick help"""
-        help_text = """⏰ TimeWarp IDE 1,1 - Quick Help
+        help_text = """⏰ Time_Warp IDE 1.1 - Quick Help
 
 🔥 NEW FEATURES:
 • Multi-tab editor with syntax highlighting
@@ -2548,7 +2548,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
 🚀 Happy coding through time!"""
         
-        messagebox.showinfo("TimeWarp IDE 1,1 - Quick Help", help_text)
+        messagebox.showinfo("Time_Warp IDE 1.1 - Quick Help", help_text)
 
     # Theme and settings
 
@@ -2556,7 +2556,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
     def show_settings(self):
         """Show settings dialog"""
         settings_window = tk.Toplevel(self.root)
-        settings_window.title("⚙️ TimeWarp IDE Settings")
+        settings_window.title("⚙️ Time_Warp IDE Settings")
         settings_window.geometry("500x400")
         settings_window.resizable(True, True)
         
@@ -2660,10 +2660,10 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
     def show_about(self):
         """Show about dialog"""
-        about_text = """⏰ TimeWarp IDE 1,1
+        about_text = """⏰ Time_Warp IDE 1.1
 Enhanced Educational Programming Environment
 
-🔥 NEW IN 1,1:
+🔥 NEW IN 1.1:
 ✅ Multi-tab code editor with syntax highlighting
 ✅ File explorer with project navigation
 ✅ Enhanced graphics canvas (zoom, export, grid)
@@ -2687,7 +2687,7 @@ GitHub: https://github.com/James-HoneyBadger/Time_Warp
 License: MIT"""
 
         
-        messagebox.showinfo("About TimeWarp IDE 1,1", about_text)
+        messagebox.showinfo("About Time_Warp IDE 1.1", about_text)
     
     def change_theme(self, theme_name):
         """Change to a different theme"""
@@ -2791,7 +2791,7 @@ License: MIT"""
         """Load essential plugins"""
         try:
             print("🔌 Loading plugins...")
-            # TODO: Load plugins for 1,1
+            # TODO: Load plugins for 1.1
         except Exception as e:
             print(f"⚠️ Plugin loading error: {e}")
 
@@ -2833,19 +2833,19 @@ License: MIT"""
 
 
 def main():
-    """Main application entry point - TimeWarp IDE"""
-    print("🚀 Starting TimeWarp IDE 1,1...")
+    """Main application entry point - Time_Warp IDE"""
+    print("🚀 Starting Time_Warp IDE 1.1...")
     print("⏰ Enhanced Educational Programming Environment")
     print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
     
     try:
-        app = TimeWarpIDE()
+        app = Time_WarpIDE()
         app.root.mainloop()
-        print("👋 TimeWarp IDE session ended. Happy coding!")
+        print("👋 Time_Warp IDE session ended. Happy coding!")
     except KeyboardInterrupt:
-        print("\n⚡ TimeWarp interrupted. See you next time!")
+        print("\n⚡ Time_Warp interrupted. See you next time!")
     except Exception as e:
-        print(f"💥 TimeWarp error: {e}")
+        print(f"💥 Time_Warp error: {e}")
         print("🔧 Please report this issue on GitHub")
 
 

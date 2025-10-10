@@ -1,6 +1,6 @@
 """
-TimeWarp IDE Language Lexer
-Tokenizes TimeWarp IDE source code for parsing
+Time_Warp IDE Language Lexer
+Tokenizes Time_Warp IDE source code for parsing
 """
 
 import re
@@ -126,7 +126,7 @@ class Token:
 
 
 class TimeWarpLexer:
-    """Lexical analyzer for TimeWarp IDE language"""
+    """Lexical analyzer for Time_Warp IDE language"""
 
     def __init__(self):
         self.keywords = {
@@ -202,7 +202,7 @@ class TimeWarpLexer:
         }
 
     def tokenize(self, source_code: str) -> List[Token]:
-        """Tokenize TimeWarp IDE source code"""
+        """Tokenize Time_Warp IDE source code"""
         tokens = []
         lines = source_code.split("\n")
 

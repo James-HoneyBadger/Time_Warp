@@ -1,5 +1,5 @@
 """
-Animation utilities for TimeWarp
+Animation utilities for Time_Warp
 Handles tweening and smooth transitions.
 """
 

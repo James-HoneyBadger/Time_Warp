@@ -1,5 +1,5 @@
 """
-Gamification System for TimeWarp IDE
+Gamification System for Time_Warp IDE
 Adds achievements, badges, challenges, and progress tracking to make learning fun
 """
 
@@ -125,14 +125,14 @@ class UserStats:
 
 
 class GamificationSystem:
-    """Main gamification system for TimeWarp IDE"""
+    """Main gamification system for Time_Warp IDE"""
 
     def __init__(self):
         self.achievements: Dict[str, Achievement] = {}
         self.challenges: Dict[str, Challenge] = {}
         self.daily_challenges: Dict[str, DailyChallenge] = {}
         self.user_stats = UserStats()
-        self.data_file = Path.home() / ".timewarp" / "gamification.json"
+        self.data_file = Path.home() / ".time_warp" / "gamification.json"
 
         self.initialize_achievements()
         self.initialize_challenges()
@@ -355,7 +355,7 @@ class GamificationSystem:
         self.achievements["time_traveler"] = Achievement(
             achievement_id="time_traveler",
             name="Time Traveler",
-            description="Use TimeWarp IDE for 10 hours total",
+            description="Use Time_Warp IDE for 10 hours total",
             icon="⏰",
             rarity=BadgeRarity.LEGENDARY,
             points=500,
@@ -698,7 +698,7 @@ class GamificationSystem:
             import os
 
             # Create directory if it doesn't exist
-            stats_dir = os.path.expanduser("~/.timewarp")
+            stats_dir = os.path.expanduser("~/.time_warp")
             os.makedirs(stats_dir, exist_ok=True)
 
             # Save stats to JSON file

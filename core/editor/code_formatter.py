@@ -1,5 +1,5 @@
 """
-Code Formatter for TimeWarp IDE
+Code Formatter for Time_Warp IDE
 Provides language-specific code formatting capabilities
 """
 

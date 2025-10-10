@@ -1,4 +1,4 @@
-# TimeWarp IDE v1.0.0 - Marketing Content Package
+# Time_Warp IDE v1.0.0 - Marketing Content Package
 
 ## 📢 Ready-to-Post Content
 
@@ -141,6 +141,6 @@ For maximum impact, consider creating:
 
 ---
 
-**TimeWarp IDE v1.0.0 Marketing Package - Ready for Launch!** 🚀
+**Time_Warp IDE v1.0.0 Marketing Package - Ready for Launch!** 🚀
 
 *Transforming educational programming for the modern era*

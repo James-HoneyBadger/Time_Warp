@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp Performance Benchmark - Safe Version
+Time_Warp Performance Benchmark - Safe Version
 Comprehensive performance testing without threading issues
 """
 
@@ -42,7 +42,7 @@ class PerformanceResult:
 
 
 class TimeWarpPerformanceBench:
-    """Safe performance testing for TimeWarp IDE"""
+    """Safe performance testing for Time_Warp IDE"""
 
     def __init__(self):
         self.results: Dict[str, PerformanceResult] = {}
@@ -95,7 +95,7 @@ class TimeWarpPerformanceBench:
         """Test interpreter creation and basic operations"""
 
         def interpreter_test():
-            from core.interpreter import TimeWarpInterpreter
+            from core.interpreter import Time_WarpInterpreter
             import tkinter as tk
 
             # Single threaded test
@@ -103,7 +103,7 @@ class TimeWarpPerformanceBench:
             root.withdraw()
 
             for i in range(10):
-                interpreter = TimeWarpInterpreter(root)
+                interpreter = Time_WarpInterpreter(root)
                 # Simulate some operations
                 if hasattr(interpreter, "variables"):
                     interpreter.variables[f"test_{i}"] = f"value_{i}"
@@ -355,7 +355,7 @@ class TimeWarpPerformanceBench:
 
     def run_all_tests(self):
         """Run all performance tests"""
-        print("🚀 TimeWarp Performance Benchmark Suite")
+        print("🚀 Time_Warp Performance Benchmark Suite")
         print("=" * 70)
         print(f"System: {os.name} | Python: {sys.version.split()[0]}")
         print(
@@ -481,7 +481,7 @@ class TimeWarpPerformanceBench:
             )
 
         if successful_tests == len(self.results) and total_memory_usage < 50:
-            print("  • ✅ TimeWarp shows excellent overall performance")
+            print("  • ✅ Time_Warp shows excellent overall performance")
             print("  • 🚀 System is optimized and ready for production use")
 
         print(f"\n🏁 Performance benchmark completed successfully!")

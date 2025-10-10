@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp Core Framework - Base architecture for modular tool system
+Time_Warp Core Framework - Base architecture for modular tool system
 Provides event management, plugin interfaces, and standardized component registration
 """
 
@@ -96,7 +96,7 @@ class ComponentRegistry:
 
 
 class ToolPlugin(ABC):
-    """Base class for TimeWarp tool plugins with standardized lifecycle and UI integration"""
+    """Base class for Time_Warp tool plugins with standardized lifecycle and UI integration"""
 
     def __init__(self, ide_instance, framework):
         self.ide = ide_instance
@@ -107,7 +107,7 @@ class ToolPlugin(ABC):
         # Tool metadata
         self.name = "Base Tool"
         self.version = "1.0.0"
-        self.author = "TimeWarp IDE"
+        self.author = "Time_Warp IDE"
         self.description = "Base tool plugin"
         self.category = "general"
 
@@ -284,7 +284,7 @@ class ToolPlugin(ABC):
 
 
 class TimeWarpFramework:
-    """Core framework for TimeWarp IDE - manages tools, events, and components"""
+    """Core framework for Time_Warp IDE - manages tools, events, and components"""
 
     def __init__(self, ide_instance):
         self.ide = ide_instance
@@ -297,13 +297,13 @@ class TimeWarpFramework:
 
         # Configuration
         self._config = {}
-        self._config_file = os.path.expanduser("~/.timewarp/framework_config.json")
+        self._config_file = os.path.expanduser("~/.time_warp/framework_config.json")
 
         # Initialize
         self._ensure_config_dir()
         self._load_config()
 
-        print("🚀 TimeWarp Framework initialized")
+        print("🚀 Time_Warp Framework initialized")
 
     def register_tool(self, tool: ToolPlugin) -> bool:
         """Register a tool plugin"""
@@ -523,7 +523,7 @@ class TimeWarpFramework:
 
     def shutdown(self) -> None:
         """Shutdown the framework"""
-        print("🛑 Shutting down TimeWarp Framework...")
+        print("🛑 Shutting down Time_Warp Framework...")
 
         # Deactivate all active tools
         for tool_name in self.list_active_tools():
@@ -539,4 +539,4 @@ class TimeWarpFramework:
         # Clear registry
         self.registry._components.clear()
 
-        print("✅ TimeWarp Framework shutdown complete")
+        print("✅ Time_Warp Framework shutdown complete")

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Logo is an educational programming language famous for its turtle graphics. Programs control a virtual turtle that draws on the screen using simple movement commands. TimeWarp IDE implements a comprehensive Logo dialect with modern enhancements.
+Logo is an educational programming language famous for its turtle graphics. Programs control a virtual turtle that draws on the screen using simple movement commands. Time_Warp IDE implements a comprehensive Logo dialect with modern enhancements.
 
 ## Basic Concepts
 
@@ -473,7 +473,7 @@ MYPROC 21  ; Prints 42
 
 ## Compatibility
 
-TimeWarp Logo extends classic Logo with:
+Time_Warp Logo extends classic Logo with:
 - Enhanced graphics capabilities
 - Better error handling
 - Modern programming constructs
@@ -483,5 +483,5 @@ TimeWarp Logo extends classic Logo with:
 ## See Also
 
 - [Logo Sample Programs](../../samples/logo/)
-- [TimeWarp IDE User Guide](../user_guide.md)
+- [Time_Warp IDE User Guide](../user_guide.md)
 - [Compiler Documentation](../compiler.md)

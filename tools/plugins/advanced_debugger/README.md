@@ -1,6 +1,6 @@
 # Advanced Debugger Plugin
 
-Professional-grade debugging tool for TimeWarp IDE with comprehensive debugging capabilities.
+Professional-grade debugging tool for Time_Warp IDE with comprehensive debugging capabilities.
 
 ## Features
 
@@ -47,7 +47,7 @@ Professional-grade debugging tool for TimeWarp IDE with comprehensive debugging 
 ## Integration
 
 The Advanced Debugger integrates with:
-- TimeWarp interpreter system
+- Time_Warp interpreter system
 - All language executors (PILOT, BASIC, Logo, Python, JavaScript, Perl)
 - Framework event system for real-time updates
 - IDE menu and toolbar systems
@@ -62,7 +62,7 @@ The Advanced Debugger integrates with:
 
 ## Development
 
-The plugin follows the TimeWarp ToolPlugin architecture with:
+The plugin follows the Time_Warp ToolPlugin architecture with:
 - Proper lifecycle management (initialize, activate, deactivate, destroy)
 - Event-driven updates
 - Comprehensive error handling

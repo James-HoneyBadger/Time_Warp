@@ -1,4 +1,4 @@
-10 PRINT "🎨 TimeWarp IDE - BASIC Graphics Demo"
+10 PRINT "🎨 Time_Warp IDE - BASIC Graphics Demo"
 20 PRINT "====================================="
 30 PRINT
 40 SCREEN 12  ' Set graphics mode (640x480)

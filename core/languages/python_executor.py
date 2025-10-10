@@ -1,10 +1,10 @@
 """
-Python Language Executor for TimeWarp IDE
+Python Language Executor for Time_Warp IDE
 ==========================================
 
 Python is a high-level, general-purpose programming language.
 
-This module handles Python script execution for the TimeWarp IDE.
+This module handles Python script execution for the Time_Warp IDE.
 """
 
 import subprocess
@@ -19,7 +19,7 @@ class PythonExecutor:
     def __init__(self, interpreter):
         """Initialize with reference to main interpreter"""
         self.interpreter = interpreter
-        self.python_executable = sys.executable  # Use the same Python as TimeWarp
+        self.python_executable = sys.executable  # Use the same Python as Time_Warp
 
     def execute_command(self, command):
         """Execute a Python command or script"""

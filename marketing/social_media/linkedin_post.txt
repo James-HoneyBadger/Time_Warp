@@ -1,7 +1,7 @@
-Excited to announce the release of TimeWarp IDE v1.0.0 - an educational programming compiler that bridges classic and modern computing!
+Excited to announce the release of Time_Warp IDE v1.0.0 - an educational programming compiler that bridges classic and modern computing!
 
 🎓 Educational Impact:
-TimeWarp IDE compiles three foundational programming languages from the 1960s (PILOT, BASIC, Logo) into native Linux executables. This unique approach allows students to learn programming fundamentals with time-tested languages while generating modern, distributable software.
+Time_Warp IDE compiles three foundational programming languages from the 1960s (PILOT, BASIC, Logo) into native Linux executables. This unique approach allows students to learn programming fundamentals with time-tested languages while generating modern, distributable software.
 
 🔧 Technical Innovation:
 • Unified compiler framework with GCC-powered native compilation
@@ -24,8 +24,8 @@ TimeWarp IDE compiles three foundational programming languages from the 1960s (P
 
 The project represents a unique intersection of computer history and modern software engineering, making foundational programming concepts accessible through contemporary development practices.
 
-Available now on PyPI: pip install timewarp-ide
-GitHub: https://github.com/TimeWarpIDE/TimeWarp
+Available now on PyPI: pip install time_warp-ide
+GitHub: https://github.com/Time_WarpIDE/Time_Warp
 
 #ComputerScience #Education #OpenSource #Programming #EdTech #SoftwareEngineering
 

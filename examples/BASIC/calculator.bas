@@ -1,4 +1,4 @@
-10 PRINT "TimeWarp IDE - BASIC Calculator Demo"
+10 PRINT "Time_Warp IDE - BASIC Calculator Demo"
 20 PRINT "=================================="
 30 PRINT
 40 PRINT "Operations available:"

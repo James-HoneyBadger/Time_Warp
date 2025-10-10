@@ -1,5 +1,5 @@
 """
-TimeWarp Utilities Package
+Time_Warp Utilities Package
 Contains utility classes for audio, animation, timing, effects, and hardware.
 """
 

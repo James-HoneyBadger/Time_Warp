@@ -1,10 +1,10 @@
-# TimeWarp IDE: Experience Classic Computing in a Modern Educational Environment
+# Time_Warp IDE: Experience Classic Computing in a Modern Educational Environment
 
 **Retro Computing Meets Modern Development!** 🕹️ Built an IDE that lets you program in authentic 1960s languages (PILOT, BASIC, Logo) while running on contemporary hardware.
 
 ## A Love Letter to Computing History
 
-Remember when programming was about **learning fundamental concepts** rather than memorizing framework APIs? TimeWarp IDE brings back that educational focus by preserving three foundational programming languages in a modern, feature-rich development environment.
+Remember when programming was about **learning fundamental concepts** rather than memorizing framework APIs? Time_Warp IDE brings back that educational focus by preserving three foundational programming languages in a modern, feature-rich development environment.
 
 ## The Historical Trio
 
@@ -29,7 +29,7 @@ Remember when programming was about **learning fundamental concepts** rather tha
 ## Why This Matters for Retro Computing
 
 ### **Software Archaeology in Action**
-Most retro computing focuses on preserving hardware and running original binaries. TimeWarp IDE takes a different approach: **preserve the languages themselves** and make them accessible on modern systems.
+Most retro computing focuses on preserving hardware and running original binaries. Time_Warp IDE takes a different approach: **preserve the languages themselves** and make them accessible on modern systems.
 
 - **Authentic Syntax:** Write code exactly as it appeared in 1960s documentation
 - **Modern Performance:** Native Python execution with full debugging
@@ -43,7 +43,7 @@ These weren't just programming tools - they were **educational philosophies made
 - **BASIC** democratized computing for the masses  
 - **Logo** implemented constructionist learning principles
 
-TimeWarp IDE lets you experience these educational philosophies firsthand while benefiting from modern development tools.
+Time_Warp IDE lets you experience these educational philosophies firsthand while benefiting from modern development tools.
 
 ## Hands-On Historical Programming
 
@@ -139,7 +139,7 @@ E:
 - **Performance Comparison** - See how fast these programs run today
 
 ### **Turtle Graphics Evolution:**
-TimeWarp IDE's turtle graphics system shows the evolution from Logo's original concept to modern interactive graphics:
+Time_Warp IDE's turtle graphics system shows the evolution from Logo's original concept to modern interactive graphics:
 
 - **Real-time Drawing** - Watch your turtle programs execute step by step
 - **Export Capabilities** - Save your turtle art as modern image formats
@@ -173,11 +173,11 @@ TimeWarp IDE's turtle graphics system shows the evolution from Logo's original c
 # Great for retro computing labs
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python3 TimeWarp.py
+python3 Time_Warp.py
 ```
 
 ### **Vintage Hardware Simulation:**
-While TimeWarp IDE runs on modern systems, you can create an authentic retro experience:
+While Time_Warp IDE runs on modern systems, you can create an authentic retro experience:
 - **Terminal Themes** - Green-on-black, amber, or other classic color schemes
 - **Monospace Fonts** - Period-appropriate typefaces
 - **Limited Screen** - Resize the window to simulate vintage display limitations
@@ -205,7 +205,7 @@ While TimeWarp IDE runs on modern systems, you can create an authentic retro exp
 
 ## Preserve Computing History
 
-TimeWarp IDE isn't just about nostalgia - it's about **preserving and sharing the foundational concepts** that built our computing world. These languages taught generations of programmers how to think computationally.
+Time_Warp IDE isn't just about nostalgia - it's about **preserving and sharing the foundational concepts** that built our computing world. These languages taught generations of programmers how to think computationally.
 
 ### **For Educators:**
 - Teach the evolution of programming concepts
@@ -242,7 +242,7 @@ The roadmap includes support for additional vintage languages:
 
 ---
 
-**TimeWarp IDE** - Where computing history lives and breathes! Experience the foundational languages that shaped our digital world, running with modern performance on contemporary hardware. 🌟
+**Time_Warp IDE** - Where computing history lives and breathes! Experience the foundational languages that shaped our digital world, running with modern performance on contemporary hardware. 🌟
 
 *Preserving the past, inspiring the future of programming education!*
 

@@ -1,15 +1,15 @@
-# TimeWarp IDE: A Multi-Language Educational Programming Environment for CS Education
+# Time_Warp IDE: A Multi-Language Educational Programming Environment for CS Education
 
 **Academic Tool:** Developed an IDE that implements classic educational programming languages (PILOT, BASIC, Logo) alongside modern ones for comprehensive programming language education and research.
 
 ## Abstract
 
-TimeWarp IDE is a unified development environment designed for computer science education that bridges historical and contemporary programming paradigms. The system implements three foundational educational languages from the 1960s within a modern Python-based architecture, providing a platform for studying language evolution, compiler design, and educational programming methodologies.
+Time_Warp IDE is a unified development environment designed for computer science education that bridges historical and contemporary programming paradigms. The system implements three foundational educational languages from the 1960s within a modern Python-based architecture, providing a platform for studying language evolution, compiler design, and educational programming methodologies.
 
 ## Motivation and Educational Value
 
 ### **Programming Language Evolution Studies**
-Computer science curricula often focus on current languages without exploring the foundational concepts that shaped modern programming. TimeWarp IDE provides a hands-on laboratory for studying:
+Computer science curricula often focus on current languages without exploring the foundational concepts that shaped modern programming. Time_Warp IDE provides a hands-on laboratory for studying:
 
 - **Language Design Principles** - Compare syntax and semantics across language generations
 - **Educational Programming Theory** - Experience the pedagogical intent behind classic languages  
@@ -28,7 +28,7 @@ The IDE implements a **progressive complexity model** for CS education:
 
 ### **Language Implementation Framework**
 ```
-TimeWarpInterpreter (Core)
+Time_WarpInterpreter (Core)
 ├── LanguageExecutors/
 │   ├── PilotExecutor     # PILOT language implementation
 │   ├── BasicExecutor     # BASIC language implementation  
@@ -49,7 +49,7 @@ TimeWarpInterpreter (Core)
 The system uses a **unified interpreter architecture** with modular language executors:
 
 ```python
-class TimeWarpInterpreter:
+class Time_WarpInterpreter:
     def __init__(self):
         self.language_executors = {
             'PILOT': PilotExecutor(self),
@@ -131,7 +131,7 @@ SIERPINSKI 200 4
 ## Research Applications
 
 ### **Compiler Design Education**
-TimeWarp IDE serves as a **complete compiler construction laboratory**:
+Time_Warp IDE serves as a **complete compiler construction laboratory**:
 
 - **Lexical Analysis** - Study tokenization across different language syntaxes
 - **Parsing Techniques** - Compare recursive descent vs. table-driven parsing
@@ -183,7 +183,7 @@ The IDE includes built-in analytics for educational research:
 ## Classroom Integration
 
 ### **Curriculum Support**
-TimeWarp IDE aligns with standard CS curriculum topics:
+Time_Warp IDE aligns with standard CS curriculum topics:
 
 - **CS1: Introduction to Programming** - PILOT → BASIC → Python progression
 - **CS2: Data Structures** - Array manipulation in BASIC, list processing in Python
@@ -227,7 +227,7 @@ Extensible design supports research and custom educational tools:
 
 ```python
 class EducationalPlugin:
-    def __init__(self, interpreter: TimeWarpInterpreter):
+    def __init__(self, interpreter: Time_WarpInterpreter):
         self.interpreter = interpreter
         
     def analyze_student_code(self, code: str) -> Analysis:
@@ -248,7 +248,7 @@ class EducationalPlugin:
 - **Educational Validation** - User studies with CS educators and students
 
 ### **Research Methodology**
-TimeWarp IDE enables controlled studies in programming education:
+Time_Warp IDE enables controlled studies in programming education:
 
 - **A/B Testing** - Compare traditional vs. progressive language learning
 - **Longitudinal Studies** - Track student progress over multiple semesters
@@ -291,12 +291,12 @@ TimeWarp IDE enables controlled studies in programming education:
 
 ## Conclusion
 
-TimeWarp IDE provides a unique research and educational platform that combines historical programming languages with modern development tools. The system enables empirical studies of programming education while providing students with a comprehensive understanding of language evolution and design principles.
+Time_Warp IDE provides a unique research and educational platform that combines historical programming languages with modern development tools. The system enables empirical studies of programming education while providing students with a comprehensive understanding of language evolution and design principles.
 
-The progressive complexity model, from simple PILOT commands to modern Python programming, offers a structured approach to programming education that respects both historical foundations and contemporary needs. This makes TimeWarp IDE valuable for both CS education and programming language research.
+The progressive complexity model, from simple PILOT commands to modern Python programming, offers a structured approach to programming education that respects both historical foundations and contemporary needs. This makes Time_Warp IDE valuable for both CS education and programming language research.
 
 ---
 
-**TimeWarp IDE** - Advancing computer science education through multi-paradigm programming language studies and empirical educational research.
+**Time_Warp IDE** - Advancing computer science education through multi-paradigm programming language studies and empirical educational research.
 
 #computerscience #programming #education #research #compilers #programming-languages #pedagogy

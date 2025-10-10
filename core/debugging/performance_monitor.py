@@ -1,5 +1,5 @@
 """
-Performance Monitoring and Memory Analysis for TimeWarp IDE
+Performance Monitoring and Memory Analysis for Time_Warp IDE
 Real-time performance tracking, memory usage analysis, and profiling tools
 """
 
@@ -405,7 +405,7 @@ class PerformanceMonitor:
 
     def _generate_report(self) -> str:
         """Generate performance report"""
-        report = "TimeWarp IDE Performance Report\n"
+        report = "Time_Warp IDE Performance Report\n"
         report += "=" * 50 + "\n\n"
         report += f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
         report += f"Monitoring Duration: {len(self.performance_data['timestamps'])} seconds\n\n"

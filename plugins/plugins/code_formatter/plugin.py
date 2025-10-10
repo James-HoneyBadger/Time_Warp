@@ -1,5 +1,5 @@
 """
-Code Formatter Plugin for TimeWarp IDE
+Code Formatter Plugin for Time_Warp IDE
 Provides automatic code formatting and beautification
 """
 
@@ -45,7 +45,7 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
         super().__init__(ide_instance)
         self.name = "Code Formatter"
         self.version = "1.2.0"
-        self.author = "TimeWarp Development Team"
+        self.author = "Time_Warp Development Team"
         self.description = "Automatic code formatting and beautification for PILOT, BASIC, and Logo programs"
         self.menu_items = []
 

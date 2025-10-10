@@ -1,4 +1,4 @@
-# TimeWarp IDE: Revolutionary Programming Education Tool - From Simple to Complex
+# Time_Warp IDE: Revolutionary Programming Education Tool - From Simple to Complex
 
 **Educators:** Built a progressive programming learning environment that starts with 1960s educational languages and advances to modern Python - perfect for teaching computational thinking! 🎓
 
@@ -6,12 +6,12 @@
 
 Most programming education today throws students into the deep end with complex modern languages. Students struggle with overwhelming syntax, advanced concepts, and abstract thinking all at once. **What if there was a better way?**
 
-TimeWarp IDE implements a **research-backed progressive approach** that builds programming skills step-by-step, starting with languages specifically designed for education.
+Time_Warp IDE implements a **research-backed progressive approach** that builds programming skills step-by-step, starting with languages specifically designed for education.
 
 ## Evidence-Based Progressive Learning Model
 
 ### **Cognitive Load Theory in Action**
-Based on educational research, TimeWarp IDE reduces cognitive load by:
+Based on educational research, Time_Warp IDE reduces cognitive load by:
 
 - **Starting Simple** - Just 3-5 commands to learn initially
 - **Building Concepts** - Each language adds complexity gradually  
@@ -138,7 +138,7 @@ SPIRAL_SQUARES 20 36
 ## Research-Backed Educational Benefits
 
 ### **Constructivist Learning Theory**
-TimeWarp IDE implements **learning by doing** principles:
+Time_Warp IDE implements **learning by doing** principles:
 
 - **Active Construction** - Students build programs step by step
 - **Experimentation** - Safe environment for trial and error
@@ -168,21 +168,21 @@ TimeWarp IDE implements **learning by doing** principles:
 ## Classroom Implementation Success Stories
 
 ### **"My Students Finally 'Get' Programming!"**
-*"I've been teaching computer science for 15 years. TimeWarp IDE transformed my classroom. Students who struggled with Python now start with PILOT, build confidence, and advance naturally. My success rate went from 60% to 95%!"*
+*"I've been teaching computer science for 15 years. Time_Warp IDE transformed my classroom. Students who struggled with Python now start with PILOT, build confidence, and advance naturally. My success rate went from 60% to 95%!"*
 **- Dr. Sarah Martinez, High School CS Teacher**
 
 ### **"Perfect for Elementary Introduction"**
-*"We use TimeWarp IDE with 4th and 5th graders. They start with simple PILOT adventures and by year-end they're creating complex Logo art. The visual feedback keeps them engaged while they learn real programming concepts."*
+*"We use Time_Warp IDE with 4th and 5th graders. They start with simple PILOT adventures and by year-end they're creating complex Logo art. The visual feedback keeps them engaged while they learn real programming concepts."*
 **- Ms. Jennifer Chen, Elementary STEM Coordinator**
 
 ### **"University Students Excel with Progressive Approach"**
-*"My CS1 students used to struggle with Python complexity. Now they start with BASIC fundamentals and transition to Python with solid understanding. Dropout rates decreased 40% since adopting TimeWarp IDE."*
+*"My CS1 students used to struggle with Python complexity. Now they start with BASIC fundamentals and transition to Python with solid understanding. Dropout rates decreased 40% since adopting Time_Warp IDE."*
 **- Prof. Michael Rodriguez, State University**
 
 ## Curriculum Integration Made Easy
 
 ### **Lesson Plan Templates**
-TimeWarp IDE includes complete curriculum support:
+Time_Warp IDE includes complete curriculum support:
 
 ```
 curricula/
@@ -201,7 +201,7 @@ Built-in features support comprehensive assessment:
 - **Peer Review System** - Students learn by reviewing each other's code
 
 ### **Standards Alignment**
-TimeWarp IDE aligns with educational standards:
+Time_Warp IDE aligns with educational standards:
 
 - **CSTA K-12 Computer Science Standards**
 - **ISTE Standards for Students** 
@@ -284,14 +284,14 @@ TimeWarp IDE aligns with educational standards:
 # Download and run - no installation required
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python TimeWarp.py
+python Time_Warp.py
 ```
 
 ### **30-Minute Teacher Orientation**
 1. **Explore Student View** - Try each language level yourself
 2. **Review Curriculum** - Browse included lesson plans and activities
 3. **Test Classroom Features** - Try student accounts and progress tracking
-4. **Plan Integration** - Identify where TimeWarp fits in your curriculum
+4. **Plan Integration** - Identify where Time_Warp fits in your curriculum
 
 ### **First Week Implementation**
 - **Day 1:** Students create first PILOT program
@@ -309,7 +309,7 @@ python TimeWarp.py
 - **Research Papers** - Educational theory behind the progressive approach
 
 ### **Community Support**
-- **Teacher Forums** - Connect with other educators using TimeWarp
+- **Teacher Forums** - Connect with other educators using Time_Warp
 - **Lesson Sharing** - Exchange activities and assessment ideas  
 - **Student Showcases** - Celebrate student achievements
 - **Development Input** - Influence future educational features
@@ -337,7 +337,7 @@ python TimeWarp.py
 
 ---
 
-**TimeWarp IDE** - Transforming programming education through research-backed progressive learning. Give your students the foundation they need to succeed in computational thinking and computer science! 🌟
+**Time_Warp IDE** - Transforming programming education through research-backed progressive learning. Give your students the foundation they need to succeed in computational thinking and computer science! 🌟
 
 *Start simple. Build confidence. Achieve mastery.*
 

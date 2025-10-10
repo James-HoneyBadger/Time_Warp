@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sensor Visualizer Plugin for TimeWarp IDE
+Sensor Visualizer Plugin for Time_Warp IDE
 Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities
 """
 
@@ -26,7 +26,7 @@ class SensorVisualizerPlugin(ToolPlugin):
         # Plugin metadata
         self.name = "Sensor Visualizer"
         self.version = "1.0.0"
-        self.author = "TimeWarp IDE Team"
+        self.author = "Time_Warp IDE Team"
         self.description = "Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities"
         self.category = "sensors"
 

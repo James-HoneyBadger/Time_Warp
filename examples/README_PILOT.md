@@ -1,4 +1,4 @@
-# TimeWarp IDE - Comprehensive PILOT Examples
+# Time_Warp IDE - Comprehensive PILOT Examples
 
 This directory contains comprehensive PILOT (Programmed Inquiry, Learning Or Teaching)
 programming examples that demonstrate various commands, features, and programming
@@ -511,9 +511,9 @@ E:
 
 ## Running the Examples
 
-To run these examples in TimeWarp IDE:
+To run these examples in Time_Warp IDE:
 
-1. Launch TimeWarp IDE
+1. Launch Time_Warp IDE
 2. Select "PILOT" from the language menu
 3. Copy and paste any example code
 4. Click Run → Execute

@@ -1,4 +1,4 @@
-# TimeWarp IDE Facebook Group Setup Guide
+# Time_Warp IDE Facebook Group Setup Guide
 
 ## 🚀 **Creating Your Facebook Group**
 
@@ -8,17 +8,17 @@
 3. **Choose "Create New Group"**
 
 ### **Step 2: Basic Group Setup**
-- **Group Name:** "TimeWarp IDE Community"
+- **Group Name:** "Time_Warp IDE Community"
 - **Group Type:** "Public" (for maximum visibility and discoverability)
 - **Privacy Setting:** "Public" (anyone can see posts, join without approval)
-- **Group Icon:** Upload a simple TimeWarp logo
+- **Group Icon:** Upload a simple Time_Warp logo
 - **Cover Photo:** Attractive banner with "Compile 1960s Languages to Modern Executables"
 
 ### **Step 3: Group Description**
 ```
-Welcome to the TimeWarp IDE Community! 🎓
+Welcome to the Time_Warp IDE Community! 🎓
 
-TimeWarp IDE is an educational programming compiler that transforms classic 1960s languages (PILOT, BASIC, Logo) into modern native executables. No interpreters required - just GCC-powered native performance!
+Time_Warp IDE is an educational programming compiler that transforms classic 1960s languages (PILOT, BASIC, Logo) into modern native executables. No interpreters required - just GCC-powered native performance!
 
 **What we discuss:**
 • Installation help and technical support
@@ -29,10 +29,10 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
 • Community events and coding challenges
 
 **Resources:**
-• GitHub: https://github.com/TimeWarpIDE/TimeWarp
-• PyPI: https://pypi.org/project/timewarp-ide/
+• GitHub: https://github.com/Time_WarpIDE/Time_Warp
+• PyPI: https://pypi.org/project/time_warp-ide/
 • Discord: [Add Discord invite link when created]
-• Documentation: https://github.com/TimeWarpIDE/TimeWarp/tree/main/docs
+• Documentation: https://github.com/Time_WarpIDE/Time_Warp/tree/main/docs
 
 **Rules:** Be respectful, stay on topic, share knowledge, help others!
 ```
@@ -114,7 +114,7 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
 
 ### **Primary Rules (Pin as Featured Post)**
 ```
-🏠 **TimeWarp IDE Community Rules**
+🏠 **Time_Warp IDE Community Rules**
 
 **1. Be Respectful & Inclusive**
    - Treat all members with kindness and respect
@@ -122,7 +122,7 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
    - Welcome beginners and experts alike
 
 **2. Stay On Topic**
-   - Keep discussions relevant to TimeWarp IDE, educational programming, or retro computing
+   - Keep discussions relevant to Time_Warp IDE, educational programming, or retro computing
    - Use appropriate post types and tags
    - Off-topic discussions in designated threads
 
@@ -168,7 +168,7 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
 ## 🎨 **Group Customization**
 
 ### **Visual Branding**
-- **Cover Photo:** TimeWarp IDE logo with gradient background
+- **Cover Photo:** Time_Warp IDE logo with gradient background
 - **Profile Picture:** Clean, recognizable logo
 - **Theme Colors:** Retro-inspired (teal, purple, orange)
 - **Custom Emoji Reactions:** Programming-themed reactions
@@ -300,6 +300,6 @@ TimeWarp IDE is an educational programming compiler that transforms classic 1960
 
 ---
 
-**Your TimeWarp IDE Facebook group will become a vibrant community hub!** 🚀
+**Your Time_Warp IDE Facebook group will become a vibrant community hub!** 🚀
 
 Focus on providing value through educational content, technical support, and community engagement. The combination of educational programming, retro computing, and modern development will attract passionate members who contribute to discussions and help grow the community organically.

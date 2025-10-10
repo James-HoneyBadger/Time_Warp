@@ -1,10 +1,10 @@
-# Learn Programming Fundamentals with TimeWarp IDE - From 1960s Languages to Modern Python!
+# Learn Programming Fundamentals with Time_Warp IDE - From 1960s Languages to Modern Python!
 
 **Perfect for beginners:** Built an educational IDE that teaches programming concepts through language evolution - start with simple 1960s languages and progress to modern Python! 📚
 
-## Why TimeWarp IDE is Perfect for Learning Programming
+## Why Time_Warp IDE is Perfect for Learning Programming
 
-Learning programming can be overwhelming when you start with complex modern languages. TimeWarp IDE takes a different approach: **learn programming concepts by exploring how languages evolved**, starting with simple educational languages and progressing to modern ones.
+Learning programming can be overwhelming when you start with complex modern languages. Time_Warp IDE takes a different approach: **learn programming concepts by exploring how languages evolved**, starting with simple educational languages and progressing to modern ones.
 
 ## Learning Path: Simple → Advanced
 
@@ -142,10 +142,10 @@ tutorials/
 ## Real Student Success Stories
 
 ### **"I Finally 'Get' Programming!"**
-*"I tried Python tutorials for months and got frustrated. TimeWarp IDE let me start with PILOT - just 3 commands! - and suddenly programming made sense. Now I'm writing Python web apps!"* - Sarah, College Freshman
+*"I tried Python tutorials for months and got frustrated. Time_Warp IDE let me start with PILOT - just 3 commands! - and suddenly programming made sense. Now I'm writing Python web apps!"* - Sarah, College Freshman
 
 ### **"Perfect for My CS Class"**
-*"I teach Intro to Computer Science and TimeWarp IDE is perfect. Students start with simple PILOT programs and by the end of semester they're writing complex Python projects. The progression is natural and confidence-building."* - Dr. Martinez, Professor
+*"I teach Intro to Computer Science and Time_Warp IDE is perfect. Students start with simple PILOT programs and by the end of semester they're writing complex Python projects. The progression is natural and confidence-building."* - Dr. Martinez, Professor
 
 ### **"My Kids Love It"**
 *"My 10-year-old started with Logo turtle graphics and now she's teaching her friends. The visual feedback keeps them engaged while they learn real programming concepts."* - Parent Review
@@ -156,7 +156,7 @@ tutorials/
 ```bash
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python TimeWarp.py
+python Time_Warp.py
 ```
 
 ### **Step 2: Your First PILOT Program (3 minutes)**
@@ -196,7 +196,7 @@ E:
 - Build interactive quizzes and tutorials
 - Develop utility programs for daily tasks
 
-## Why Teachers Love TimeWarp IDE
+## Why Teachers Love Time_Warp IDE
 
 ### **🎓 Pedagogically Sound**
 - Based on proven educational programming languages
@@ -229,7 +229,7 @@ E:
 # Simple clone and run
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
 cd Time_Warp
-python TimeWarp.py
+python Time_Warp.py
 
 # Or use the auto-setup script
 ./start_timewarp.sh
@@ -244,7 +244,7 @@ python TimeWarp.py
 
 ## Start Your Programming Journey Today!
 
-Don't let complex modern languages intimidate you. Start with TimeWarp IDE's progressive approach:
+Don't let complex modern languages intimidate you. Start with Time_Warp IDE's progressive approach:
 
 1. **Week 1:** Master PILOT basics (30 minutes/day)
 2. **Week 2:** Explore BASIC programming (45 minutes/day)  
@@ -255,6 +255,6 @@ By the end of your first month, you'll have solid programming fundamentals and t
 
 ---
 
-**TimeWarp IDE** - Learn programming the right way: simple to complex, concept-first, with immediate visual feedback. Start your coding journey today! 🚀
+**Time_Warp IDE** - Learn programming the right way: simple to complex, concept-first, with immediate visual feedback. Start your coding journey today! 🚀
 
 #learnprogramming #education #programming #python #computerscience #coding #opensource

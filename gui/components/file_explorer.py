@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-File Explorer Panel for TimeWarp IDE
+File Explorer Panel for Time_Warp IDE
 Tree-view file navigation with project support
 """
 

@@ -1,4 +1,4 @@
-# TimeWarp IDE v1.1 - Feature Roadmap
+# Time_Warp IDE v1.1 - Feature Roadmap
 
 ## 🎯 Version 1.1 Goals
 Build upon the solid v1.0 foundation with practical enhancements that improve usability, educational value, and developer experience while maintaining the core educational mission.
@@ -229,6 +229,6 @@ Build upon the solid v1.0 foundation with practical enhancements that improve us
 
 ---
 
-**TimeWarp IDE v1.1** - Taking educational programming to the next level while staying true to our mission of making programming history accessible to modern learners! 🚀
+**Time_Warp IDE v1.1** - Taking educational programming to the next level while staying true to our mission of making programming history accessible to modern learners! 🚀
 
 *"Where the past meets the future of programming education"*

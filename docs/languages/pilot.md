@@ -2,7 +2,7 @@
 
 ## Overview
 
-PILOT (Programmed Inquiry, Learning Or Teaching) is an educational programming language designed for interactive learning and computer-assisted instruction. TimeWarp IDE implements a comprehensive PILOT dialect with modern enhancements.
+PILOT (Programmed Inquiry, Learning Or Teaching) is an educational programming language designed for interactive learning and computer-assisted instruction. Time_Warp IDE implements a comprehensive PILOT dialect with modern enhancements.
 
 ## Program Structure
 
@@ -386,7 +386,7 @@ C:CARD=#RANDOM(52)
 
 ## Compatibility
 
-TimeWarp PILOT extends classic PILOT with:
+Time_Warp PILOT extends classic PILOT with:
 - Enhanced variable interpolation
 - More mathematical functions
 - Better string handling
@@ -396,5 +396,5 @@ TimeWarp PILOT extends classic PILOT with:
 ## See Also
 
 - [PILOT Sample Programs](../../samples/pilot/)
-- [TimeWarp IDE User Guide](../user_guide.md)
+- [Time_Warp IDE User Guide](../user_guide.md)
 - [Compiler Documentation](../compiler.md)

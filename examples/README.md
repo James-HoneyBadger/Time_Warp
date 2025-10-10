@@ -1,6 +1,6 @@
-# TimeWarp IDE Sample Programs
+# Time_Warp IDE Sample Programs
 
-This directory contains sample programs demonstrating the capabilities of TimeWarp IDE across all supported languages.
+This directory contains sample programs demonstrating the capabilities of Time_Warp IDE across all supported languages.
 
 ## Sample Programs
 
@@ -26,7 +26,7 @@ This directory contains sample programs demonstrating the capabilities of TimeWa
 
 ## How to Use
 
-1. Open TimeWarp IDE
+1. Open Time_Warp IDE
 2. Load any sample program using File → Open
 3. Run the program to see it in action
 4. Modify the code to experiment and learn
@@ -40,4 +40,4 @@ This directory contains sample programs demonstrating the capabilities of TimeWa
 - **Educational Tools**: Code analysis and learning assistance
 - **Interactive Execution**: Real-time program execution and debugging
 
-Enjoy exploring programming with TimeWarp IDE! 🎓
+Enjoy exploring programming with Time_Warp IDE! 🎓

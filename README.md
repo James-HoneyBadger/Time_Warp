@@ -1,17 +1,30 @@
-# ⏰ TimeWarp IDE
+# ⏰ Time_Warp IDE
 
 **A Multi-Language Educational Programming Environment**
 
-TimeWarp IDE is a comprehensive educational programming environment that supports multiple classic and modern programming languages. Featuring an intuitive GUI interface, turtle graphics, interactive code execution, theme system, plugin architecture, and educational tools designed to make programming accessible and engaging.
+Time_Warp IDE is a comprehensive educational programming environment that supports multiple classic and modern programming languages. Featuring an intuitive GUI interface, turtle graphics, interactive code execution, theme system, plugin architecture, and educational tools designed to make programming accessible and engaging.
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](https://github.com/TimeWarpIDE/TimeWarp)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](https://github.com/Time_WarpIDE/Time_Warp)
+[![Version](https://img.shields.io/badge/version-1.1-brightgreen.svg)](https://github.com/Time_WarpIDE/Time_Warp/releases)
+[![Tests](https://img.shields.io/badge/tests-23%20passing-brightgreen.svg)](https://github.com/Time_WarpIDE/Time_Warp/actions)
+
+## 🔥 What's New in Version 1.1
+
+- **🖱️ Multi-Tab Editor** - Professional code editing with syntax highlighting and language detection
+- **🎨 Advanced Theme System** - 8 beautiful themes with consistent styling across all components
+- **📚 Features Menu** - Complete tutorial system, AI assistant, gamification, and learning tools  
+- **🔍 Smart Language Detection** - Automatic language recognition from file extensions and content
+- **🚀 Enhanced Graphics** - Improved turtle graphics with zoom, export, and grid features
+- **💻 VS Code Integration** - Pre-configured launch settings and keyboard shortcuts
+- **🧪 Comprehensive Testing** - 23 unit tests covering all functionality with 100% pass rate
+- **📁 Clean Project Structure** - Organized file hierarchy for professional development
 
 ## ✨ Features
 
 ### 🎯 Multi-Language Support
-TimeWarp IDE supports six programming languages in one integrated environment:
+Time_Warp IDE supports six programming languages in one integrated environment:
 
 - **PILOT** (1962) - Educational language with branching logic and turtle graphics
 - **BASIC** (1964) - Classic line-numbered programming with variables and loops  
@@ -66,54 +79,54 @@ TimeWarp IDE supports six programming languages in one integrated environment:
 
 #### Option 1: Quick Install (Recommended)
 ```bash
-git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd TimeWarp
-python TimeWarp.py
+git clone https://github.com/Time_WarpIDE/Time_Warp.git
+cd Time_Warp
+python Time_Warp.py
 ```
 
 #### Option 2: Development Setup
 ```bash
-git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd TimeWarp
+git clone https://github.com/Time_WarpIDE/Time_Warp.git
+cd Time_Warp
 pip install -r requirements.txt
-python TimeWarp.py
+python Time_Warp.py
 ```
 
 #### Option 3: Virtual Environment
 ```bash
-git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd TimeWarp
-python -m venv timewarp_env
-source timewarp_env/bin/activate  # On Windows: timewarp_env\\Scripts\\activate
+git clone https://github.com/Time_WarpIDE/Time_Warp.git
+cd Time_Warp
+python -m venv time_warp_env
+source time_warp_env/bin/activate  # On Windows: time_warp_env\\Scripts\\activate
 pip install -r requirements.txt
-python TimeWarp.py
+python Time_Warp.py
 ```
 
 ### VS Code Integration (Recommended)
-If you're using Visual Studio Code, TimeWarp includes pre-configured launch and task configurations:
+If you're using Visual Studio Code, Time_Warp includes pre-configured launch and task configurations:
 
 #### Quick Launch Options:
-- **Ctrl+Shift+R** - Run TimeWarp IDE without debugging
-- **F5** - Run TimeWarp IDE with debugging (when TimeWarp.py is open)
-- **Ctrl+F5** - Run TimeWarp IDE without debugging (when TimeWarp.py is open)
+- **Ctrl+Shift+R** - Run Time_Warp IDE without debugging
+- **F5** - Run Time_Warp IDE with debugging (when Time_Warp.py is open)
+- **Ctrl+F5** - Run Time_Warp IDE without debugging (when Time_Warp.py is open)
 
 #### Using Command Palette:
 1. Press **Ctrl+Shift+P** (Cmd+Shift+P on macOS)
 2. Type "Tasks: Run Task"
-3. Select "🚀 Run TimeWarp IDE"
+3. Select "🚀 Run Time_Warp IDE"
 
 #### Using Run and Debug Panel:
 1. Open the Run and Debug panel (Ctrl+Shift+D)
-2. Select "▶️ Run TimeWarp IDE" from the dropdown
+2. Select "▶️ Run Time_Warp IDE" from the dropdown
 3. Click the play button or press F5
 
 #### Available Configurations:
-- **▶️ Run TimeWarp IDE** - Standard execution without debugging
-- **🐛 Debug TimeWarp IDE** - Full debugging with breakpoints
-- **🧪 Run TimeWarp Tests** - Execute the test suite
+- **▶️ Run Time_Warp IDE** - Standard execution without debugging
+- **🐛 Debug Time_Warp IDE** - Full debugging with breakpoints
+- **🧪 Run Time_Warp Tests** - Execute the test suite
 
 ### First Launch
-1. Run `python TimeWarp.py` (or use VS Code integration above)
+1. Run `python Time_Warp.py` (or use VS Code integration above)
 2. Choose your preferred theme from the Theme menu
 3. Select a programming language from the Language menu
 4. Start coding in the editor pane
@@ -178,14 +191,14 @@ FLOWER
 ```
 
 ### Python Integration
-Full Python language support with TimeWarp IDE integration:
+Full Python language support with Time_Warp IDE integration:
 
 ```python
 import math
 import random
 
-# TimeWarp IDE provides turtle graphics
-print("Python in TimeWarp IDE!")
+# Time_Warp IDE provides turtle graphics
+print("Python in Time_Warp IDE!")
 
 # Generate random numbers
 for i in range(5):
@@ -198,7 +211,7 @@ for i in range(5):
 Modern JavaScript execution with console output:
 
 ```javascript
-console.log("JavaScript in TimeWarp IDE!");
+console.log("JavaScript in Time_Warp IDE!");
 
 // Array manipulation
 const numbers = [1, 2, 3, 4, 5];
@@ -230,11 +243,11 @@ Text processing and system scripting:
 use strict;
 use warnings;
 
-print "Perl in TimeWarp IDE!\n";
+print "Perl in Time_Warp IDE!\n";
 
 # Text processing example
 my $text = "Hello, World!";
-$text =~ s/World/TimeWarp/;
+$text =~ s/World/Time_Warp/;
 print "$text\n";
 
 # Array operations
@@ -247,7 +260,7 @@ print "Doubled: " . join(", ", @doubled) . "\n";
 
 ### Core Components
 
-#### TimeWarp Interpreter (`core/interpreter.py`)
+#### Time_Warp Interpreter (`core/interpreter.py`)
 - Central execution engine that dispatches commands to language-specific executors
 - Manages program state, variables, and execution context
 - Provides unified interface for all supported languages
@@ -275,7 +288,7 @@ print "Doubled: " . join(", ", @doubled) . "\n";
 ### Directory Structure
 
 ```
-TimeWarp/
+Time_Warp/
 ├── core/                   # Core interpreter and language engines
 ├── gui/                    # User interface components  
 ├── plugins/                # Plugin system and extensions
@@ -285,13 +298,13 @@ TimeWarp/
 ├── docs/                   # Comprehensive documentation
 ├── testing/                # Test suite and quality assurance
 ├── marketing/              # Promotional materials and outreach
-└── TimeWarp.py            # Main application entry point
+└── Time_Warp.py            # Main application entry point
 ```
 
 ## 📚 Documentation
 
 ### User Guides
-- [Getting Started Guide](docs/getting-started.md) - First steps with TimeWarp IDE
+- [Getting Started Guide](docs/getting-started.md) - First steps with Time_Warp IDE
 - [PILOT Language Reference](docs/languages/pilot.md) - Complete PILOT documentation
 - [BASIC Language Reference](docs/languages/basic.md) - BASIC programming guide
 - [Logo Language Reference](docs/languages/logo.md) - Logo turtle graphics manual
@@ -303,13 +316,13 @@ TimeWarp/
 - [API Reference](docs/api-reference.md) - Complete API documentation
 
 ### Educational Resources
-- [Teaching with TimeWarp](docs/education/teaching-guide.md) - Classroom integration
+- [Teaching with Time_Warp](docs/education/teaching-guide.md) - Classroom integration
 - [Curriculum Integration](docs/education/curriculum.md) - Lesson plans and activities
 - [Student Projects](docs/education/projects.md) - Example assignments and exercises
 
 ## 🎓 Educational Use
 
-TimeWarp IDE is designed specifically for educational environments:
+Time_Warp IDE is designed specifically for educational environments:
 
 ### Classroom Features
 - **Multi-Language Learning** - Introduce programming concepts across different languages
@@ -335,14 +348,14 @@ TimeWarp IDE is designed specifically for educational environments:
 ### Building from Source
 ```bash
 # Clone the repository
-git clone https://github.com/TimeWarpIDE/TimeWarp.git
-cd TimeWarp
+git clone https://github.com/Time_WarpIDE/Time_Warp.git
+cd Time_Warp
 
 # Install development dependencies
 pip install -r requirements.txt
 
 # Run the application
-python TimeWarp.py
+python Time_Warp.py
 
 # Run tests
 python -m pytest testing/
@@ -391,24 +404,24 @@ See our [Contributing Guide](CONTRIBUTING.md) for detailed information.
 
 ### Showcase
 - **Student Projects** - Share creative programs and artwork
-- **Classroom Success Stories** - How teachers use TimeWarp IDE
+- **Classroom Success Stories** - How teachers use Time_Warp IDE
 - **Plugin Gallery** - Community-developed extensions
 - **Language Examples** - Advanced programming demonstrations
 
 ## 📄 License
 
-TimeWarp IDE is open source software licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Time_Warp IDE is open source software licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
 - **Educational Programming Pioneer Languages** - PILOT, BASIC, Logo, and their creators
 - **Python Community** - For the robust ecosystem and libraries
-- **Tkinter** - GUI framework that makes TimeWarp IDE possible
+- **Tkinter** - GUI framework that makes Time_Warp IDE possible
 - **Open Source Contributors** - Everyone who has contributed to this project
 - **Educators Worldwide** - Teachers who inspire the next generation of programmers
 
 ---
 
-**⏰ TimeWarp IDE** - Where classic programming languages meet modern educational technology.
+**⏰ Time_Warp IDE** - Where classic programming languages meet modern educational technology.
 
 *Journey through the history of programming while building skills for the future.*

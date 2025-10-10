@@ -1,6 +1,6 @@
 """
 Language Engine System
-Provides language-specific editing features for TimeWarp IDE
+Provides language-specific editing features for Time_Warp IDE
 """
 
 import re

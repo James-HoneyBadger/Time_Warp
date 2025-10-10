@@ -1,5 +1,5 @@
 """
-TimeWarp IDE Plugin System
+Time_Warp IDE Plugin System
 Extensible architecture for adding new features and integrations
 """
 

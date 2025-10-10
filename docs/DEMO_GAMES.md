@@ -1,6 +1,6 @@
-# 🎮 TimeWarp Demo Games Collection
+# 🎮 Time_Warp Demo Games Collection
 
-TimeWarp IDE now includes 8 exciting demo games that showcase different game development concepts and mechanics!
+Time_Warp IDE now includes 8 exciting demo games that showcase different game development concepts and mechanics!
 
 ## How to Run Demo Games
 
@@ -117,7 +117,7 @@ Each demo provides a foundation you can build upon:
 
 ## Technical Details
 
-All games use TimeWarp's built-in game engine featuring:
+All games use Time_Warp's built-in game engine featuring:
 - **Physics Simulation** - Gravity, velocity, collision detection
 - **Object Management** - Create, move, delete game objects
 - **Rendering System** - Real-time graphics updates

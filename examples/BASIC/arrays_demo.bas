@@ -1,4 +1,4 @@
-10 PRINT "📊 TimeWarp IDE - BASIC Arrays Demo"
+10 PRINT "📊 Time_Warp IDE - BASIC Arrays Demo"
 20 PRINT "===================================="
 30 PRINT
 40 PRINT "Working with arrays and data structures..."

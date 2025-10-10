@@ -1,5 +1,5 @@
 """
-Compiler Manager for TimeWarp IDE
+Compiler Manager for Time_Warp IDE
 Handles compilation of different languages and execution of compiled programs
 """
 

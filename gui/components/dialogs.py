@@ -1,5 +1,5 @@
 """
-Advanced GUI Components for TimeWarp IDE
+Advanced GUI Components for Time_Warp IDE
 Contains dialogs, managers, and specialized interface components.
 """
 
@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Callable
 
 
 class ProjectExplorer:
-    """File tree view for managing TimeWarp projects and files"""
+    """File tree view for managing Time_Warp projects and files"""
 
     def __init__(self, ide):
         self.ide = ide
@@ -86,7 +86,7 @@ class ProjectExplorer:
 
         # Tree widget with scrollbars
         self.tree_widget = ttk.Treeview(tree_frame, show="tree headings")
-        self.tree_widget.heading("#0", text="TimeWarp Files", anchor=tk.W)
+        self.tree_widget.heading("#0", text="Time_Warp Files", anchor=tk.W)
 
         # Scrollbars
         v_scrollbar = ttk.Scrollbar(
@@ -178,7 +178,7 @@ class ProjectExplorer:
         """Get icon for file based on extension"""
         ext = filename.lower().split(".")[-1] if "." in filename else ""
         icons = {
-            "jtc": "🎯",  # TimeWarp files
+            "jtc": "🎯",  # Time_Warp files
             "pil": "✈️",  # PILOT files
             "pilot": "✈️",  # PILOT files
             "logo": "🐢",  # Logo files
@@ -240,7 +240,7 @@ class ProjectExplorer:
 
             # Update IDE title and status
             filename = os.path.basename(file_path)
-            self.ide.root.title(f"TimeWarp - {filename}")
+            self.ide.root.title(f"Time_Warp - {filename}")
 
             if hasattr(self.ide, "status_label"):
                 self.ide.status_label.config(text=f"📂 Opened: {filename}")
@@ -252,7 +252,7 @@ class ProjectExplorer:
             messagebox.showerror("Error", f"Could not open file:\n{str(e)}")
 
     def new_file(self):
-        """Create a new TimeWarp file"""
+        """Create a new Time_Warp file"""
         if not self.current_project_path:
             messagebox.showwarning("Warning", "Please open a project folder first")
             return
@@ -268,8 +268,8 @@ class ProjectExplorer:
 
             try:
                 # Create empty file with basic template
-                template_content = """T:Welcome to TimeWarp!
-T:This is a new TimeWarp program.
+                template_content = """T:Welcome to Time_Warp!
+T:This is a new Time_Warp program.
 T:Start coding here...
 E:
 """
@@ -1290,7 +1290,7 @@ Available Commands:
 
 
 class VirtualEnvironmentManager:
-    """Manages virtual environment for TimeWarp IDE and package installation"""
+    """Manages virtual environment for Time_Warp IDE and package installation"""
 
     def __init__(self, base_dir=None):
         self.base_dir = base_dir or os.path.dirname(os.path.abspath(__file__))
@@ -1359,7 +1359,7 @@ class VirtualEnvironmentManager:
             return False
 
     def initialize(self) -> bool:
-        """Initialize virtual environment for TimeWarp"""
+        """Initialize virtual environment for Time_Warp"""
         if self.check_venv_exists():
             self.log_status("Virtual environment found")
             self.is_initialized = True
@@ -1410,14 +1410,14 @@ class VirtualEnvironmentManager:
             return False
 
     def install_timewarp_dependencies(self) -> bool:
-        """Install all dependencies needed for TimeWarp functionality"""
+        """Install all dependencies needed for Time_Warp functionality"""
         dependencies = [
             ("matplotlib", "3.7.0"),  # For plotting features
             ("pillow", "10.0.0"),  # For image processing
             ("requests", "2.31.0"),  # For web operations
         ]
 
-        self.log_status("Installing TimeWarp dependencies...")
+        self.log_status("Installing Time_Warp dependencies...")
         success_count = 0
 
         for package, version in dependencies:
