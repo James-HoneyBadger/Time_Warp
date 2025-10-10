@@ -5,6 +5,13 @@ Simplified test runner for CI environments
 """
 
 import sys
+import os
+import warnings
+
+# Suppress pygame startup messages and warnings in CI
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+warnings.filterwarnings('ignore', message='pkg_resources is deprecated')
+warnings.filterwarnings('ignore', category=UserWarning)
 
 def test_basic_imports():
     """Test that core modules can be imported"""
@@ -15,21 +22,22 @@ def test_basic_imports():
         from core.interpreter import TimeWarpInterpreter
         print("✅ Core interpreter import successful")
         
-        # Test that basic initialization works
-        interpreter = TimeWarpInterpreter()
+        # Test that basic initialization works (with minimal setup)
+        interpreter = TimeWarpInterpreter(output_widget=None)
         print("✅ Core interpreter initialization successful")
         
         # Test basic functionality without GUI
         result = interpreter.interpolate_text("Hello, World!")
         if result == "Hello, World!":
             print("✅ Basic text interpolation working")
+        else:
+            print(f"⚠️ Text interpolation returned: {result}")
         
         return True
         
     except (ImportError, AttributeError, TypeError) as e:
         print(f"❌ Import test failed: {e}")
-        import traceback
-        traceback.print_exc()
+        # Don't print full traceback in CI to keep output clean
         return False
 
 def test_language_imports():
@@ -52,8 +60,7 @@ def test_language_imports():
         
     except (ImportError, AttributeError, TypeError) as e:
         print(f"❌ Language import test failed: {e}")
-        import traceback
-        traceback.print_exc()
+        # Don't print full traceback in CI to keep output clean
         return False
 
 def main():

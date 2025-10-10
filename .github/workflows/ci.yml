@@ -37,6 +37,7 @@ jobs:
       run: |
         export SDL_VIDEODRIVER=dummy
         export SDL_AUDIODRIVER=dummy
+        export PYGAME_HIDE_SUPPORT_PROMPT=1
         xvfb-run -a python run_tests_ci.py
         
     - name: Test TimeWarp IDE startup
@@ -44,6 +45,7 @@ jobs:
         # Test that TimeWarp can import without GUI
         export SDL_VIDEODRIVER=dummy
         export SDL_AUDIODRIVER=dummy
+        export PYGAME_HIDE_SUPPORT_PROMPT=1
         python -c "import sys; sys.path.append('.'); from core.interpreter import TimeWarpInterpreter; print('✅ TimeWarp core imports successfully')"
 
   lint:
