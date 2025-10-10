@@ -735,8 +735,7 @@ class Time_WarpIDE:
             return "JavaScript"
         elif filename.endswith('.pl'):
             return "Perl"
-        elif filename.endswith('.jtc') or filename.endswith('.Time_Warp'):
-            return "Time_Warp"
+        # Removed .jtc and .Time_Warp extensions - these were TempleCode remnants
         else:
             return "Text"
 

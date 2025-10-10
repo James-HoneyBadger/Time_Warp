@@ -148,7 +148,7 @@ class TabEditor:
                 '.basic': 'basic',
                 '.logo': 'logo',
                 '.pl': 'perl',
-                '.jtc': 'time_warp',
+                # Removed .jtc mapping - was TempleCode remnant
                 '.time_warp': 'time_warp'
             }
             detected = language_map.get(ext, None)

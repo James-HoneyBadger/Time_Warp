@@ -19,7 +19,7 @@
             "*.bas": "plaintext", 
             "*.basic": "plaintext",
             "*.logo": "plaintext",
-            "*.jtc": "plaintext",
+            // Removed .jtc association - was TempleCode remnant
             "*.Time_Warp": "plaintext"
         },
         "git.autofetch": true,
@@ -36,8 +36,7 @@
             "**/test_*.py": true,
             "**/*_backup.py": true,
             "**/*_corrupted*.py": true,
-            "**/*.jtc": true,
-            "**/*.JTC": true
+            // Removed .jtc file associations - were TempleCode remnants
         },
         "python.testing.pytestEnabled": true,
         "explorer.fileNesting.enabled": true,

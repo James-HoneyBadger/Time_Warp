@@ -99,7 +99,7 @@ class ToolManager(PluginManager):
             # Create tool plugin instance
             if hasattr(plugin_module, "TimeWarpPlugin"):
                 # Create instance with framework
-                tool_instance = plugin_module.TimeWarpPlugin(self.ide, self.framework)
+                tool_instance = plugin_module.Time_WarpPlugin(self.ide, self.framework)
 
                 # Verify it's a ToolPlugin
                 if not isinstance(tool_instance, ToolPlugin):

@@ -148,7 +148,7 @@ class ProjectExplorer:
                 item_path = os.path.join(path, item)
                 if os.path.isdir(item_path):
                     items.append((item, item_path, "folder"))
-                elif item.endswith((".jtc", ".pil", ".pilot", ".logo", ".bas")):
+                elif item.endswith((".pilot", ".logo", ".bas", ".py", ".js", ".pl")):
                     items.append((item, item_path, "file"))
 
             # Sort: folders first, then files
@@ -248,11 +248,12 @@ class ProjectExplorer:
             return
 
         filename = simpledialog.askstring(
-            "New File", "Enter filename (with .jtc extension):"
+            "New File", "Enter filename (e.g., program.pilot, script.py):"
         )
         if filename:
-            if not filename.endswith(".jtc"):
-                filename += ".jtc"
+            # Let users specify their own extensions for different languages
+            if not any(filename.endswith(ext) for ext in ['.pilot', '.bas', '.logo', '.py', '.js', '.pl']):
+                filename += ".pilot"  # Default to PILOT for educational use
 
             file_path = os.path.join(self.current_project_path, filename)
 
