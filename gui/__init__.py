@@ -1,9 +1,9 @@
 """
-JAMES GUI Module
+TimeWarp GUI Module
 ===============
 
 Graphical user interface components:
-- Main application window (JAMESII)
+- Main application window (TimeWarpII)
 - Educational tutorials and exercises
 - Project explorer and file management
 - Debugging interface
@@ -12,7 +12,7 @@ Graphical user interface components:
 """
 
 __version__ = "2.0.0"
-__author__ = "JAMES Development Team"
+__author__ = "TimeWarp Development Team"
 
 from . import components
 

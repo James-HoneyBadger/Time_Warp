@@ -6,7 +6,7 @@ Generates executable code from AST
 from typing import List, Dict, Any, Optional, Callable
 from .parser import ASTNode, ASTNodeType, LiteralNode, IdentifierNode, BinaryOpNode, UnaryOpNode, FunctionCallNode, AssignmentNode, ProgramNode
 from ..runtime.engine import RuntimeEngine, ExecutionContext
-from ..errors.error_manager import JAMESError, JAMESRuntimeError, ErrorCode, ErrorSeverity
+from ..errors.error_manager import TimeWarpError, TimeWarpRuntimeError, ErrorCode, ErrorSeverity
 
 class CodeGenerator:
     """Generates executable code from AST"""
@@ -49,7 +49,7 @@ class CodeGenerator:
         elif node.node_type == ASTNodeType.ASSIGNMENT:
             return self._execute_assignment(node, context)
         else:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.PYTHON_EXECUTION_ERROR,
                 severity=ErrorSeverity.ERROR,
                 message=f"Unknown AST node type: {node.node_type}",
@@ -90,9 +90,9 @@ class CodeGenerator:
             # Then check variables
             try:
                 return context.variables.get_variable(node.name)
-            except JAMESRuntimeError:
+            except TimeWarpRuntimeError:
                 # Variable not found
-                raise JAMESRuntimeError(JAMESError(
+                raise TimeWarpRuntimeError(TimeWarpError(
                     code=ErrorCode.UNDEFINED_VARIABLE,
                     severity=ErrorSeverity.ERROR,
                     message=f"Undefined variable or constant: '{node.name}'",
@@ -122,7 +122,7 @@ class CodeGenerator:
                 return left_val * right_val
             elif node.operator == '/':
                 if right_val == 0:
-                    raise JAMESRuntimeError(JAMESError(
+                    raise TimeWarpRuntimeError(TimeWarpError(
                         code=ErrorCode.DIVISION_BY_ZERO,
                         severity=ErrorSeverity.ERROR,
                         message="Division by zero",
@@ -131,7 +131,7 @@ class CodeGenerator:
                 return left_val / right_val
             elif node.operator == '%':
                 if right_val == 0:
-                    raise JAMESRuntimeError(JAMESError(
+                    raise TimeWarpRuntimeError(TimeWarpError(
                         code=ErrorCode.DIVISION_BY_ZERO,
                         severity=ErrorSeverity.ERROR,
                         message="Modulo by zero",
@@ -157,14 +157,14 @@ class CodeGenerator:
             elif node.operator.upper() == 'OR':
                 return bool(left_val) or bool(right_val)
             else:
-                raise JAMESRuntimeError(JAMESError(
+                raise TimeWarpRuntimeError(TimeWarpError(
                     code=ErrorCode.PYTHON_EXECUTION_ERROR,
                     severity=ErrorSeverity.ERROR,
                     message=f"Unknown binary operator: {node.operator}",
                     location=node.location
                 ))
         except (TypeError, ValueError) as e:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.TYPE_MISMATCH,
                 severity=ErrorSeverity.ERROR,
                 message=f"Type error in binary operation: {e}",
@@ -191,14 +191,14 @@ class CodeGenerator:
             elif node.operator.upper() == 'NOT':
                 return not bool(operand_val)
             else:
-                raise JAMESRuntimeError(JAMESError(
+                raise TimeWarpRuntimeError(TimeWarpError(
                     code=ErrorCode.PYTHON_EXECUTION_ERROR,
                     severity=ErrorSeverity.ERROR,
                     message=f"Unknown unary operator: {node.operator}",
                     location=node.location
                 ))
         except (TypeError, ValueError) as e:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.TYPE_MISMATCH,
                 severity=ErrorSeverity.ERROR,
                 message=f"Type error in unary operation: {e}",
@@ -219,7 +219,7 @@ class CodeGenerator:
         # Get function
         func = context.stdlib.get_function(node.name)
         if func is None:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.FUNCTION_NOT_FOUND,
                 severity=ErrorSeverity.ERROR,
                 message=f"Unknown function: '{node.name}'",
@@ -235,10 +235,10 @@ class CodeGenerator:
         try:
             return func(*args)
         except Exception as e:
-            if isinstance(e, JAMESRuntimeError):
+            if isinstance(e, TimeWarpRuntimeError):
                 raise
             
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.FUNCTION_NOT_FOUND,
                 severity=ErrorSeverity.ERROR,
                 message=f"Error calling function '{node.name}': {e}",

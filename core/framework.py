@@ -293,7 +293,7 @@ class TimeWarpFramework:
         
         # Configuration
         self._config = {}
-        self._config_file = os.path.expanduser("~/.james/framework_config.json")
+        self._config_file = os.path.expanduser("~/.timewarp/framework_config.json")
         
         # Initialize
         self._ensure_config_dir()

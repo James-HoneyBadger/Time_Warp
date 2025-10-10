@@ -775,7 +775,7 @@ class LearningAssistantPlugin(ToolPlugin):
         """Send tutorial code to main editor"""
         code = self.tutorial_code_text.get(1.0, tk.END).strip()
         if code:
-            # This would integrate with the main JAMES editor
+            # This would integrate with the main TimeWarp editor
             messagebox.showinfo("Code Sent", "Tutorial code has been sent to the main editor!")
     
     def complete_tutorial_step(self):

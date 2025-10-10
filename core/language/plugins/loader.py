@@ -13,7 +13,7 @@ import traceback
 
 from .base import PluginInterface, PluginMetadata, PluginType
 from .registry import PluginRegistry
-from ..errors.error_manager import JAMESError, ErrorCode, ErrorSeverity
+from ..errors.error_manager import TimeWarpError, ErrorCode, ErrorSeverity
 
 class PluginLoader:
     """Loads plugins from files and directories"""

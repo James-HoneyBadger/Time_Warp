@@ -122,4 +122,4 @@ E:
 ---
 
 *TimeWarp IDE v1.0.0 - Transforming educational programming for the modern era*</content>
-<parameter name="filePath">/home/james/Time_Warp/reddit_post_r_programming.md
+<parameter name="filePath">/home/timewarp/Time_Warp/reddit_post_r_programming.md

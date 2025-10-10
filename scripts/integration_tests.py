@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JAMES IDE Integration Test Suite
+TimeWarp IDE Integration Test Suite
 Tests the complete system including enhanced editor, plugins, and sample programs
 """
 
@@ -39,7 +39,7 @@ except ImportError as e:
 
 
 class IntegrationTestRunner:
-    """Comprehensive integration test runner for JAMES IDE"""
+    """Comprehensive integration test runner for TimeWarp IDE"""
     
     def __init__(self):
         self.results = {
@@ -58,7 +58,7 @@ class IntegrationTestRunner:
         
         # Create root window for UI tests
         self.root = tk.Tk()
-        self.root.title("JAMES Integration Tests")
+        self.root.title("TimeWarp Integration Tests")
         self.root.geometry("800x600")
         self.root.withdraw()  # Hide initially
         
@@ -644,7 +644,7 @@ if __name__ == "__main__":
     
     def run_comprehensive_tests(self):
         """Run all integration tests"""
-        print("🎮 JAMES IDE - Comprehensive Integration Tests")
+        print("🎮 TimeWarp IDE - Comprehensive Integration Tests")
         print("=" * 60)
         
         self.setup_test_environment()
@@ -696,9 +696,9 @@ if __name__ == "__main__":
                 print(f"❌ Failed to create {filename}: {e}")
         
         # Create a README for the samples
-        readme_content = """# JAMES IDE Sample Programs
+        readme_content = """# TimeWarp IDE Sample Programs
 
-This directory contains sample programs demonstrating the capabilities of JAMES IDE across all supported languages.
+This directory contains sample programs demonstrating the capabilities of TimeWarp IDE across all supported languages.
 
 ## Sample Programs
 
@@ -724,7 +724,7 @@ This directory contains sample programs demonstrating the capabilities of JAMES 
 
 ## How to Use
 
-1. Open JAMES IDE
+1. Open TimeWarp IDE
 2. Load any sample program using File → Open
 3. Run the program to see it in action
 4. Modify the code to experiment and learn
@@ -738,7 +738,7 @@ This directory contains sample programs demonstrating the capabilities of JAMES 
 - **Educational Tools**: Code analysis and learning assistance
 - **Interactive Execution**: Real-time program execution and debugging
 
-Enjoy exploring programming with JAMES IDE! 🎓
+Enjoy exploring programming with TimeWarp IDE! 🎓
 """
         
         readme_path = os.path.join(samples_dir, "README.md")
@@ -793,7 +793,7 @@ Enjoy exploring programming with JAMES IDE! 🎓
         print("\n" + "=" * 60)
         if failed == 0:
             print("🎉 ALL INTEGRATION TESTS PASSED!")
-            print("JAMES IDE is ready for production use.")
+            print("TimeWarp IDE is ready for production use.")
         else:
             print("⚠️ SOME TESTS FAILED")
             print("Please review the failed tests and address any issues.")

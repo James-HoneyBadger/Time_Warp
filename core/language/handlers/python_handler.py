@@ -1,6 +1,6 @@
 """
 Python Integration Handler for TimeWarp IDE
-Handles execution of Python code blocks within JAMES programs
+Handles execution of Python code blocks within TimeWarp programs
 """
 
 import sys
@@ -18,7 +18,7 @@ class PythonHandler:
         self.setup_python_environment()
     
     def setup_python_environment(self):
-        """Setup Python execution environment with JAMES interface"""
+        """Setup Python execution environment with TimeWarp interface"""
         # Standard Python builtins
         self.python_globals.update(__builtins__ if isinstance(__builtins__, dict) else __builtins__.__dict__)
         
@@ -31,8 +31,8 @@ class PythonHandler:
             'sys': sys,
         })
         
-        # JAMES interface
-        self.python_globals['JAMES'] = JAMESPythonInterface(self.interpreter)
+        # TimeWarp interface
+        self.python_globals['TimeWarp'] = TimeWarpPythonInterface(self.interpreter)
     
     def execute_python_block(self, node: PythonBlockNode) -> Dict[str, Any]:
         """Execute Python code block"""
@@ -78,62 +78,62 @@ class PythonHandler:
         self.python_locals.clear()
         self.setup_python_environment()
 
-class JAMESPythonInterface:
-    """Interface for accessing JAMES from Python code"""
+class TimeWarpPythonInterface:
+    """Interface for accessing TimeWarp from Python code"""
     
     def __init__(self, interpreter):
         self.interpreter = interpreter
     
     def GET(self, name: str) -> Any:
-        """Get a JAMES variable from Python"""
+        """Get a TimeWarp variable from Python"""
         try:
             return self.interpreter.environment.get(name)
         except Exception:
-            raise NameError(f"JAMES variable '{name}' not found")
+            raise NameError(f"TimeWarp variable '{name}' not found")
     
     def SET(self, name: str, value: Any):
-        """Set a JAMES variable from Python"""
+        """Set a TimeWarp variable from Python"""
         self.interpreter.environment.set(name, value)
     
     def CALL(self, name: str, *args) -> Any:
-        """Call a JAMES function from Python"""
+        """Call a TimeWarp function from Python"""
         try:
             func = self.interpreter.environment.get(name)
-            if hasattr(func, 'call'):  # JAMESFunction
+            if hasattr(func, 'call'):  # TimeWarpFunction
                 return func.call(self.interpreter, list(args))
             elif callable(func):
                 return func(*args)
             else:
                 raise TypeError(f"'{name}' is not callable")
         except Exception as e:
-            raise RuntimeError(f"Error calling JAMES function '{name}': {e}")
+            raise RuntimeError(f"Error calling TimeWarp function '{name}': {e}")
     
     def PRINT(self, *args, sep=' ', end='\\n'):
-        """Print from Python to JAMES output"""
+        """Print from Python to TimeWarp output"""
         output = sep.join(str(arg) for arg in args) + end
         self.interpreter.output_buffer.append(output.rstrip('\\n'))
     
     def INPUT(self, prompt: str = "") -> str:
-        """Get input through JAMES input system"""
+        """Get input through TimeWarp input system"""
         if self.interpreter.input_callback:
             return self.interpreter.input_callback(prompt)
         else:
             return input(prompt)
     
     def VARS(self) -> Dict[str, Any]:
-        """Get all JAMES variables as a dictionary"""
+        """Get all TimeWarp variables as a dictionary"""
         return dict(self.interpreter.environment.variables)
     
-    def EVAL(self, james_expression: str) -> Any:
-        """Evaluate a JAMES expression from Python"""
-        from ..lexer import JAMESLexer
-        from ..parser import JAMESParser
+    def EVAL(self, timewarp_expression: str) -> Any:
+        """Evaluate a TimeWarp expression from Python"""
+        from ..lexer import TimeWarpLexer
+        from ..parser import TimeWarpParser
         
         try:
-            lexer = JAMESLexer()
-            parser = JAMESParser()
+            lexer = TimeWarpLexer()
+            parser = TimeWarpParser()
             
-            tokens = lexer.tokenize(james_expression)
+            tokens = lexer.tokenize(timewarp_expression)
             # Parse as a single expression
             parser.tokens = tokens
             parser.current = 0
@@ -141,25 +141,25 @@ class JAMESPythonInterface:
             
             return self.interpreter.execute(expr_node)
         except Exception as e:
-            raise RuntimeError(f"Error evaluating JAMES expression '{james_expression}': {e}")
+            raise RuntimeError(f"Error evaluating TimeWarp expression '{timewarp_expression}': {e}")
     
-    def RUN(self, james_code: str):
-        """Execute JAMES code from Python"""
-        from ..lexer import JAMESLexer
-        from ..parser import JAMESParser
+    def RUN(self, timewarp_code: str):
+        """Execute TimeWarp code from Python"""
+        from ..lexer import TimeWarpLexer
+        from ..parser import TimeWarpParser
         
         try:
-            lexer = JAMESLexer()
-            parser = JAMESParser()
+            lexer = TimeWarpLexer()
+            parser = TimeWarpParser()
             
-            tokens = lexer.tokenize(james_code)
+            tokens = lexer.tokenize(timewarp_code)
             program = parser.parse(tokens)
             
             for statement in program.statements:
                 if statement:
                     self.interpreter.execute(statement)
         except Exception as e:
-            raise RuntimeError(f"Error executing JAMES code: {e}")
+            raise RuntimeError(f"Error executing TimeWarp code: {e}")
 
 class BasicHandler:
     """Handler for BASIC-style programming constructs"""

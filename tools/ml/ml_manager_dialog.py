@@ -1,5 +1,5 @@
 """
-ML Manager Dialog for JAMES IDE
+ML Manager Dialog for TimeWarp IDE
 GUI interface for managing machine learning models and datasets.
 """
 

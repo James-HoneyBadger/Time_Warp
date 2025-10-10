@@ -1,5 +1,5 @@
 """
-Game Manager for JAMES Game Engine
+Game Manager for TimeWarp Game Engine
 Main game management system with game loop and object management.
 """
 

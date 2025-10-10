@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JAMES Performance Benchmark - Safe Version
+TimeWarp Performance Benchmark - Safe Version
 Comprehensive performance testing without threading issues
 """
 
@@ -29,8 +29,8 @@ class PerformanceResult:
         self.error = error
         self.ops_per_second = operations_count / execution_time if execution_time > 0 else 0
 
-class JAMESPerformanceBench:
-    """Safe performance testing for JAMES IDE"""
+class TimeWarpPerformanceBench:
+    """Safe performance testing for TimeWarp IDE"""
     
     def __init__(self):
         self.results: Dict[str, PerformanceResult] = {}
@@ -81,7 +81,7 @@ class JAMESPerformanceBench:
     def test_interpreter_performance(self):
         """Test interpreter creation and basic operations"""
         def interpreter_test():
-            from core.interpreter import JAMESInterpreter
+            from core.interpreter import TimeWarpInterpreter
             import tkinter as tk
             
             # Single threaded test
@@ -89,7 +89,7 @@ class JAMESPerformanceBench:
             root.withdraw()
             
             for i in range(10):
-                interpreter = JAMESInterpreter(root)
+                interpreter = TimeWarpInterpreter(root)
                 # Simulate some operations
                 if hasattr(interpreter, 'variables'):
                     interpreter.variables[f"test_{i}"] = f"value_{i}"
@@ -326,7 +326,7 @@ class JAMESPerformanceBench:
     
     def run_all_tests(self):
         """Run all performance tests"""
-        print("🚀 JAMES Performance Benchmark Suite")
+        print("🚀 TimeWarp Performance Benchmark Suite")
         print("=" * 70)
         print(f"System: {os.name} | Python: {sys.version.split()[0]}")
         print(f"CPU Count: {os.cpu_count()} | Memory: {psutil.virtual_memory().total // (1024**3)} GB")
@@ -432,7 +432,7 @@ class JAMESPerformanceBench:
             print(f"  • Reduce memory usage for {len(high_memory_tests)} memory-intensive test(s)")
         
         if successful_tests == len(self.results) and total_memory_usage < 50:
-            print("  • ✅ JAMES shows excellent overall performance")
+            print("  • ✅ TimeWarp shows excellent overall performance")
             print("  • 🚀 System is optimized and ready for production use")
         
         print(f"\n🏁 Performance benchmark completed successfully!")
@@ -440,7 +440,7 @@ class JAMESPerformanceBench:
 def main():
     """Run the performance benchmark"""
     try:
-        benchmark = JAMESPerformanceBench()
+        benchmark = TimeWarpPerformanceBench()
         benchmark.run_all_tests()
         return 0
     except Exception as e:

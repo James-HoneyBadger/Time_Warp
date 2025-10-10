@@ -5,7 +5,7 @@ BASIC Native Compiler
 
 A compiler for the BASIC programming language that produces 
 standalone Linux executables. This version supports the core
-BASIC features used in the JAMES IDE.
+BASIC features used in the TimeWarp IDE.
 
 BASIC Language Features Supported:
 - Variable assignments (LET X = 10)

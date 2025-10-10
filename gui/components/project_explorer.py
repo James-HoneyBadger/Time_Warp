@@ -1,6 +1,6 @@
 """
-Project Explorer for JAMES IDE
-File tree view for managing JAMES projects and files.
+Project Explorer for TimeWarp IDE
+File tree view for managing TimeWarp projects and files.
 """
 
 import os
@@ -9,7 +9,7 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 
 
 class ProjectExplorer:
-    """File tree view for managing JAMES projects and files"""
+    """File tree view for managing TimeWarp projects and files"""
     
     def __init__(self, ide):
         self.ide = ide
@@ -59,7 +59,7 @@ class ProjectExplorer:
         
         # Tree widget with scrollbars
         self.tree_widget = ttk.Treeview(tree_frame, show='tree headings')
-        self.tree_widget.heading('#0', text='JAMES Files', anchor=tk.W)
+        self.tree_widget.heading('#0', text='TimeWarp Files', anchor=tk.W)
         
         # Scrollbars
         v_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree_widget.yview)    
@@ -77,10 +77,10 @@ class ProjectExplorer:
         
         # Set default project path to current directory
         current_dir = os.getcwd()
-        JAMES_projects = os.path.join(current_dir, "JAMES_Projects")
+        TimeWarp_projects = os.path.join(current_dir, "TimeWarp_Projects")
         
-        if os.path.exists(JAMES_projects):
-            self.load_project(JAMES_projects)
+        if os.path.exists(TimeWarp_projects):
+            self.load_project(TimeWarp_projects)
         else:
             self.load_project(current_dir)
     
@@ -145,7 +145,7 @@ class ProjectExplorer:
         """Get icon for file based on extension"""
         ext = filename.lower().split('.')[-1] if '.' in filename else ''
         icons = {
-            'spt': '🎯',    # JAMES files
+            'spt': '🎯',    # TimeWarp files
             'pil': '✈️',    # PILOT files
             'pilot': '✈️',  # PILOT files  
             'logo': '🐢',   # Logo files
@@ -196,7 +196,7 @@ class ProjectExplorer:
             
             # Update IDE title and status
             filename = os.path.basename(file_path)
-            self.ide.root.title(f"JAMES - {filename}")
+            self.ide.root.title(f"TimeWarp - {filename}")
             
             if hasattr(self.ide, 'status_label'):
                 self.ide.status_label.config(text=f"📂 Opened: {filename}")
@@ -208,7 +208,7 @@ class ProjectExplorer:
             messagebox.showerror("Error", f"Could not open file:\n{str(e)}")
     
     def new_file(self):
-        """Create a new JAMES file"""
+        """Create a new TimeWarp file"""
         if not self.current_project_path:
             messagebox.showwarning("Warning", "Please open a project folder first")
             return
@@ -223,8 +223,8 @@ class ProjectExplorer:
             
             try:
                 # Create empty file with basic template
-                template_content = """T:Welcome to JAMES!
-T:This is a new JAMES program.
+                template_content = """T:Welcome to TimeWarp!
+T:This is a new TimeWarp program.
 T:Start coding here...
 E:
 """

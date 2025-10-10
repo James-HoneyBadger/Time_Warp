@@ -1,5 +1,5 @@
 """
-Machine Learning Tools for JAMES
+Machine Learning Tools for TimeWarp
 Educational AI/ML integration with scikit-learn and management GUI.
 """
 

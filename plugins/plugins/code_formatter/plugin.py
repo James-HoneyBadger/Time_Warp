@@ -1,5 +1,5 @@
 """
-Code Formatter Plugin for JAMES IDE
+Code Formatter Plugin for TimeWarp IDE
 Provides automatic code formatting and beautification
 """
 
@@ -12,10 +12,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 try:
-    from plugins import JAMESPlugin as BaseJAMESPlugin
+    from plugins import TimeWarpPlugin as BaseTimeWarpPlugin
 except ImportError:
     # Fallback base class
-    class BaseJAMESPlugin:
+    class BaseTimeWarpPlugin:
         def __init__(self, ide_instance):
             self.ide = ide_instance
             self.name = "Base Plugin"
@@ -38,14 +38,14 @@ except ImportError:
             }
 
 
-class JAMESPlugin(BaseJAMESPlugin):
+class TimeWarpPlugin(BaseTimeWarpPlugin):
     """Code formatter plugin implementation"""
     
     def __init__(self, ide_instance):
         super().__init__(ide_instance)
         self.name = "Code Formatter"
         self.version = "1.2.0"
-        self.author = "JAMES Development Team"
+        self.author = "TimeWarp Development Team"
         self.description = "Automatic code formatting and beautification for PILOT, BASIC, and Logo programs"
         self.menu_items = []
         

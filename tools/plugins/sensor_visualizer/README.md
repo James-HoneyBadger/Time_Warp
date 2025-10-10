@@ -230,7 +230,7 @@ The plugin integrates with various sensor hardware:
 
 ### Software Integration
 
-- **JAMES Framework**: Full integration with JAMES event system
+- **TimeWarp Framework**: Full integration with TimeWarp event system
 - **File System**: Automatic data persistence and backup
 - **Network Services**: Web dashboard and API endpoints
 - **Email Services**: Automated alert notifications

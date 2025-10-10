@@ -55,9 +55,9 @@ class TimeWarpCompiler:
         self.interpreter.execute_PythonBlockNode = enhanced_python_execute
     
     def compile_file(self, filename: str) -> ProgramNode:
-        """Compile a JAMES file to AST"""
-        if not filename.endswith('.james'):
-            raise ValueError("JAMES files must have .james extension")
+        """Compile a TimeWarp file to AST"""
+        if not filename.endswith('.timewarp'):
+            raise ValueError("TimeWarp files must have .timewarp extension")
         
         if not os.path.exists(filename):
             raise FileNotFoundError(f"File not found: {filename}")
@@ -68,7 +68,7 @@ class TimeWarpCompiler:
         return self.compile_string(source_code)
     
     def compile_string(self, source_code: str) -> ProgramNode:
-        """Compile JAMES source code to AST"""
+        """Compile TimeWarp source code to AST"""
         try:
             # Lexical analysis
             tokens = self.lexer.tokenize(source_code)
@@ -92,12 +92,12 @@ class TimeWarpCompiler:
             raise RuntimeError(f"Compilation error: {e}")
     
     def execute_file(self, filename: str, input_callback: Optional[Callable[[str], str]] = None) -> List[str]:
-        """Execute a JAMES file"""
+        """Execute a TimeWarp file"""
         ast = self.compile_file(filename)
         return self.execute_ast(ast, input_callback)
     
     def execute_string(self, source_code: str, input_callback: Optional[Callable[[str], str]] = None) -> List[str]:
-        """Execute JAMES source code"""
+        """Execute TimeWarp source code"""
         ast = self.compile_string(source_code)
         return self.execute_ast(ast, input_callback)
     
@@ -121,14 +121,14 @@ class TimeWarpCompiler:
             return [f"Runtime error: {e}"]
     
     def interactive_mode(self):
-        """Start interactive JAMES interpreter"""
+        """Start interactive TimeWarp interpreter"""
         print("TimeWarp IDE Interactive Interpreter")
         print("Type 'EXIT' to quit, 'HELP' for help")
         print()
         
         while True:
             try:
-                line = input("JAMES> ").strip()
+                line = input("TimeWarp> ").strip()
                 
                 if line.upper() == 'EXIT':
                     break
@@ -164,7 +164,7 @@ class TimeWarpCompiler:
     
     def reset(self):
         """Reset all handlers and interpreter state"""
-        self.interpreter = JAMESInterpreter()
+        self.interpreter = TimeWarpInterpreter()
         self.pilot_handler.reset()
         self.logo_handler.reset()
         self.python_handler.reset()
@@ -257,7 +257,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="TimeWarp IDE Programming Language")
-    parser.add_argument('file', nargs='?', help='JAMES file to execute')
+    parser.add_argument('file', nargs='?', help='TimeWarp file to execute')
     parser.add_argument('-i', '--interactive', action='store_true', help='Start interactive mode')
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode')
     parser.add_argument('-O', '--optimize', action='store_true', help='Enable optimization')

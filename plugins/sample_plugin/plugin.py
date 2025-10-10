@@ -1,5 +1,5 @@
 """
-Sample JAMES Plugin
+Sample TimeWarp Plugin
 Demonstrates the plugin system capabilities
 """
 
@@ -35,15 +35,15 @@ class BasePlugin:
         }
 
 
-class JAMESPlugin(BasePlugin):
+class TimeWarpPlugin(BasePlugin):
     """Sample plugin implementation"""
     
     def __init__(self, ide_instance):
         super().__init__(ide_instance)
         self.name = "Sample Plugin"
         self.version = "1.0.0"
-        self.author = "JAMES Developer"
-        self.description = "A sample plugin demonstrating JAMES plugin system capabilities"
+        self.author = "TimeWarp Developer"
+        self.description = "A sample plugin demonstrating TimeWarp plugin system capabilities"
         self.menu_items = []
         
     def activate(self):
@@ -123,7 +123,7 @@ class JAMESPlugin(BasePlugin):
         """Sample plugin action"""
         messagebox.showinfo("Sample Plugin", 
                            f"Hello from {self.name}!\n\n"
-                           f"This is a demonstration of the JAMES plugin system.\n"
+                           f"This is a demonstration of the TimeWarp plugin system.\n"
                            f"Version: {self.version}\n"
                            f"Author: {self.author}")
     

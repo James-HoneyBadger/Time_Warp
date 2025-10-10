@@ -122,7 +122,7 @@ class TimeWarpInterpreter:
         
         # Python integration globals
         self.python_globals = {
-            'TimeWarp': self._create_james_interface()
+            'TimeWarp': self._create_timewarp_interface()
         }
     
     def _init_builtins(self):
@@ -155,7 +155,7 @@ class TimeWarpInterpreter:
         self.globals.define("PI", math.pi)
         self.globals.define("E", math.e)
     
-    def _create_james_interface(self):
+    def _create_timewarp_interface(self):
         """Create TimeWarp interface for Python integration"""
         class TimeWarpInterface:
             def __init__(self, interpreter):

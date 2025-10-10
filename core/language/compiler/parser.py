@@ -10,7 +10,7 @@ from enum import Enum
 
 from .lexer import Token, TokenType, EnhancedLexer
 from ..errors.error_manager import (
-    ErrorManager, JAMESError, JAMESSyntaxError,
+    ErrorManager, TimeWarpError, TimeWarpSyntaxError,
     ErrorCode, ErrorSeverity, SourceLocation
 )
 
@@ -547,7 +547,7 @@ class EnhancedParser:
         while (not self.state.match(TokenType.NEWLINE, TokenType.EOF)):
             self.state.advance()
     
-    def get_errors(self) -> List[JAMESError]:
+    def get_errors(self) -> List[TimeWarpError]:
         """Get parser errors"""
         errors = []
         

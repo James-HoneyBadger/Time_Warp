@@ -1,5 +1,5 @@
 """
-Physics Engine for JAMES Games
+Physics Engine for TimeWarp Games
 2D physics simulation with collision detection and response.
 """
 

@@ -1,6 +1,6 @@
-# JAMES IDE Sample Programs
+# TimeWarp IDE Sample Programs
 
-This directory contains sample programs demonstrating the capabilities of JAMES IDE across all supported languages.
+This directory contains sample programs demonstrating the capabilities of TimeWarp IDE across all supported languages.
 
 ## Sample Programs
 
@@ -26,7 +26,7 @@ This directory contains sample programs demonstrating the capabilities of JAMES 
 
 ## How to Use
 
-1. Open JAMES IDE
+1. Open TimeWarp IDE
 2. Load any sample program using File → Open
 3. Run the program to see it in action
 4. Modify the code to experiment and learn
@@ -40,4 +40,4 @@ This directory contains sample programs demonstrating the capabilities of JAMES 
 - **Educational Tools**: Code analysis and learning assistance
 - **Interactive Execution**: Real-time program execution and debugging
 
-Enjoy exploring programming with JAMES IDE! 🎓
+Enjoy exploring programming with TimeWarp IDE! 🎓

@@ -47,7 +47,7 @@ Professional-grade debugging tool for TimeWarp IDE with comprehensive debugging 
 ## Integration
 
 The Advanced Debugger integrates with:
-- JAMES interpreter system
+- TimeWarp interpreter system
 - All language executors (PILOT, BASIC, Logo, Python, JavaScript, Perl)
 - Framework event system for real-time updates
 - IDE menu and toolbar systems

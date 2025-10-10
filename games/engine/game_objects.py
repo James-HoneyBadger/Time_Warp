@@ -1,5 +1,5 @@
 """
-Game Objects for JAMES Game Engine
+Game Objects for TimeWarp Game Engine
 Base classes for game entities with physics properties.
 """
 

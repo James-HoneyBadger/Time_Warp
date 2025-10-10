@@ -10,7 +10,7 @@ import threading
 import time
 
 from ..errors.error_manager import (
-    ErrorManager, JAMESError, JAMESRuntimeError, 
+    ErrorManager, TimeWarpError, TimeWarpRuntimeError, 
     ErrorCode, ErrorSeverity, SourceLocation
 )
 from ..stdlib.core import StandardLibrary
@@ -64,7 +64,7 @@ class VariableManager:
         # Check if trying to modify a constant
         existing = self.get_variable_info(name)
         if existing and existing.is_constant:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.UNDEFINED_VARIABLE,
                 severity=ErrorSeverity.ERROR,
                 message=f"Cannot modify constant '{name}'",
@@ -85,7 +85,7 @@ class VariableManager:
         """Get variable value with scope resolution"""
         var_info = self.get_variable_info(name)
         if var_info is None:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.UNDEFINED_VARIABLE,
                 severity=ErrorSeverity.ERROR,
                 message=f"Undefined variable '{name}'",
@@ -259,7 +259,7 @@ class ModeHandler:
         try:
             return bool(re.search(str(pattern), str(text)))
         except re.error as e:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.PILOT_PATTERN_ERROR,
                 severity=ErrorSeverity.ERROR,
                 message=f"Invalid pattern: {e}"
@@ -295,14 +295,14 @@ class RuntimeEngine:
                 return result
                 
             except Exception as e:
-                if not isinstance(e, (JAMESRuntimeError,)):
+                if not isinstance(e, (TimeWarpRuntimeError,)):
                     # Wrap unexpected errors
-                    error = JAMESError(
+                    error = TimeWarpError(
                         code=ErrorCode.PYTHON_EXECUTION_ERROR,
                         severity=ErrorSeverity.ERROR,
                         message=f"Unexpected error: {e}"
                     )
-                    raise JAMESRuntimeError(error) from e
+                    raise TimeWarpRuntimeError(error) from e
                 raise
             finally:
                 self.context.is_running = False
@@ -358,7 +358,7 @@ class RuntimeEngine:
         """Call a built-in function"""
         func = self.context.stdlib.get_function(name)
         if func is None:
-            raise JAMESRuntimeError(JAMESError(
+            raise TimeWarpRuntimeError(TimeWarpError(
                 code=ErrorCode.FUNCTION_NOT_FOUND,
                 severity=ErrorSeverity.ERROR,
                 message=f"Unknown function '{name}'",
@@ -372,12 +372,12 @@ class RuntimeEngine:
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            if isinstance(e, JAMESRuntimeError):
+            if isinstance(e, TimeWarpRuntimeError):
                 raise
             
-            error = JAMESError(
+            error = TimeWarpError(
                 code=ErrorCode.FUNCTION_NOT_FOUND,
                 severity=ErrorSeverity.ERROR,
                 message=f"Error calling function '{name}': {e}"
             )
-            raise JAMESRuntimeError(error) from e
+            raise TimeWarpRuntimeError(error) from e

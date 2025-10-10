@@ -1,6 +1,6 @@
-# JAMES IDE Sample Programs Index
+# TimeWarp IDE Sample Programs Index
 
-This directory contains educational sample programs demonstrating the capabilities of JAMES IDE.
+This directory contains educational sample programs demonstrating the capabilities of TimeWarp IDE.
 
 ## 📚 Program Catalog
 
@@ -111,7 +111,7 @@ Each sample program is designed to demonstrate specific programming concepts:
 ## 🚀 How to Use
 
 1. **Browse Programs**: Review this index to find programs matching your learning goals
-2. **Load in JAMES**: Open any program in JAMES IDE for syntax highlighting and editing
+2. **Load in TimeWarp**: Open any program in TimeWarp IDE for syntax highlighting and editing
 3. **Run and Experiment**: Execute programs to see them in action
 4. **Learn and Modify**: Study the code and make your own modifications
 5. **Get Help**: Use the Learning Assistant plugin for additional guidance
@@ -139,4 +139,4 @@ Each sample program is designed to demonstrate specific programming concepts:
 - Nested loops: 1 programs
 
 ---
-*Generated automatically by JAMES IDE Integration Tests*
+*Generated automatically by TimeWarp IDE Integration Tests*

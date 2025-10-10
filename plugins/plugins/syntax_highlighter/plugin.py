@@ -1,5 +1,5 @@
 """
-Enhanced Syntax Highlighter Plugin for JAMES IDE
+Enhanced Syntax Highlighter Plugin for TimeWarp IDE
 Provides advanced syntax highlighting with customizable colors
 """
 
@@ -12,10 +12,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 try:
-    from plugins import JAMESPlugin as BaseJAMESPlugin
+    from plugins import TimeWarpPlugin as BaseTimeWarpPlugin
 except ImportError:
     # Fallback base class
-    class BaseJAMESPlugin:
+    class BaseTimeWarpPlugin:
         def __init__(self, ide_instance):
             self.ide = ide_instance
             self.name = "Base Plugin"
@@ -38,14 +38,14 @@ except ImportError:
             }
 
 
-class JAMESPlugin(BaseJAMESPlugin):
+class TimeWarpPlugin(BaseTimeWarpPlugin):
     """Enhanced syntax highlighter plugin implementation"""
     
     def __init__(self, ide_instance):
         super().__init__(ide_instance)
         self.name = "Syntax Highlighter"
         self.version = "1.1.0"
-        self.author = "JAMES Development Team"
+        self.author = "TimeWarp Development Team"
         self.description = "Enhanced syntax highlighting for PILOT, BASIC, Logo, and other supported languages"
         self.menu_items = []
         

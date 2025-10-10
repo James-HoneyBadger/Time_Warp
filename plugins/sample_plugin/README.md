@@ -1,6 +1,6 @@
-# Sample JAMES Plugin
+# Sample TimeWarp Plugin
 
-A demonstration plugin for the JAMES IDE plugin system.
+A demonstration plugin for the TimeWarp IDE plugin system.
 
 ## Features
 
@@ -11,7 +11,7 @@ A demonstration plugin for the JAMES IDE plugin system.
 
 ## Installation
 
-This plugin comes pre-installed with JAMES as a demonstration of the plugin system.
+This plugin comes pre-installed with TimeWarp as a demonstration of the plugin system.
 
 ## Usage
 
@@ -34,14 +34,14 @@ This plugin demonstrates:
 - User feedback
 - Plugin information display
 
-Use this as a reference when creating your own JAMES plugins.
+Use this as a reference when creating your own TimeWarp plugins.
 
 ## Requirements
 
-- JAMES IDE v2.0+
+- TimeWarp IDE v2.0+
 - Python 3.7+
 - tkinter (included with Python)
 
 ## License
 
-This plugin is distributed under the same license as JAMES IDE.
+This plugin is distributed under the same license as TimeWarp IDE.

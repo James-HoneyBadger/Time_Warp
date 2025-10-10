@@ -240,7 +240,7 @@ class MathLibraryPlugin(FunctionLibraryPlugin):
             name="Advanced Math Library",
             version="1.0.0", 
             description="Additional mathematical functions",
-            author="JAMES Team",
+            author="TimeWarp Team",
             plugin_type=PluginType.FUNCTION_LIBRARY
         )
         super().__init__(metadata)
@@ -317,7 +317,7 @@ class LoggingPlugin(RuntimeHookPlugin):
             name="Runtime Logger",
             version="1.0.0",
             description="Logs runtime events for debugging",
-            author="JAMES Team", 
+            author="TimeWarp Team", 
             plugin_type=PluginType.RUNTIME_HOOK
         )
         super().__init__(metadata)

@@ -1,6 +1,6 @@
 """
-JAMES Plugin System
-Provides extensible plugin architecture for JAMES IDE
+TimeWarp Plugin System
+Provides extensible plugin architecture for TimeWarp IDE
 """
 
 import os
@@ -12,8 +12,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 
-class JAMESPlugin:
-    """Base class for JAMES plugins"""
+class TimeWarpPlugin:
+    """Base class for TimeWarp plugins"""
     
     def __init__(self, ide_instance):
         self.ide = ide_instance
@@ -41,13 +41,13 @@ class JAMESPlugin:
 
 
 class PluginManager:
-    """Manages JAMES plugins - loading, activation, and management"""
+    """Manages TimeWarp plugins - loading, activation, and management"""
     
     def __init__(self, ide_instance):
         self.ide = ide_instance
         self.plugins_dir = os.path.join(os.path.dirname(__file__), "plugins")
-        self.loaded_plugins: Dict[str, JAMESPlugin] = {}
-        self.active_plugins: Dict[str, JAMESPlugin] = {}
+        self.loaded_plugins: Dict[str, TimeWarpPlugin] = {}
+        self.active_plugins: Dict[str, TimeWarpPlugin] = {}
         self.plugin_manifests: Dict[str, Dict] = {}
         
         # Ensure plugins directory exists
@@ -114,8 +114,8 @@ class PluginManager:
             spec.loader.exec_module(plugin_module)
             
             # Create plugin instance
-            if hasattr(plugin_module, 'JAMESPlugin'):
-                plugin_instance = plugin_module.JAMESPlugin(self.ide)
+            if hasattr(plugin_module, 'TimeWarpPlugin'):
+                plugin_instance = plugin_module.TimeWarpPlugin(self.ide)
                 
                 # Set plugin info from manifest
                 if hasattr(plugin_instance, 'name'):
@@ -131,7 +131,7 @@ class PluginManager:
                 print(f"Plugin loaded: {plugin_name}")
                 return True
             else:
-                print(f"Plugin {plugin_name} does not contain a JAMESPlugin class")
+                print(f"Plugin {plugin_name} does not contain a TimeWarpPlugin class")
                 return False
                 
         except Exception as e:
@@ -246,7 +246,7 @@ class PluginManagerDialog:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Label(header_frame, text="🔌 JAMES Plugin Manager", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
+        ttk.Label(header_frame, text="🔌 TimeWarp Plugin Manager", font=("Arial", 16, "bold")).pack(side=tk.LEFT)
         ttk.Button(header_frame, text="🔄 Refresh", command=self.refresh_plugins).pack(side=tk.RIGHT)
         
         # Create notebook for different plugin sections
@@ -352,10 +352,10 @@ class PluginManagerDialog:
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
         
-        plugin_guide = """🛠️ JAMES PLUGIN DEVELOPMENT GUIDE
+        plugin_guide = """🛠️ TimeWarp PLUGIN DEVELOPMENT GUIDE
 
 📋 Plugin Structure:
-A JAMES plugin is a Python module that extends the IDE functionality.
+A TimeWarp plugin is a Python module that extends the IDE functionality.
 
 Required Files:
 • plugin.py - Main plugin code
@@ -374,9 +374,9 @@ Required Files:
 }
 
 🐍 Sample plugin.py:
-from plugins import JAMESPlugin
+from plugins import TimeWarpPlugin
 
-class JAMESPlugin(JAMESPlugin):
+class TimeWarpPlugin(TimeWarpPlugin):
     def __init__(self, ide_instance):
         super().__init__(ide_instance)
         self.name = "My Plugin"
@@ -414,7 +414,7 @@ class JAMESPlugin(JAMESPlugin):
 1. Create a new folder in the plugins directory
 2. Write the manifest.json file
 3. Implement the plugin class in plugin.py
-4. Test with the JAMES Plugin API
+4. Test with the TimeWarp Plugin API
 5. Enable through Plugin Manager
 
 💡 Best Practices:

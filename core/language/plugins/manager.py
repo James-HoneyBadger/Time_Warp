@@ -31,7 +31,7 @@ class PluginManager:
         # Add common plugin directories
         possible_paths = [
             os.path.join(os.getcwd(), 'plugins'),
-            os.path.join(os.path.expanduser('~'), '.james', 'plugins'),
+            os.path.join(os.path.expanduser('~'), '.timewarp', 'plugins'),
             os.path.join(os.path.dirname(__file__), 'builtin'),
         ]
         

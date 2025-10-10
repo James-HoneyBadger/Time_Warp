@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-JAMES Tool Manager - Enhanced plugin system specifically for tools
+TimeWarp Tool Manager - Enhanced plugin system specifically for tools
 Extends the base plugin system with tool-specific functionality
 """
 
@@ -13,14 +13,14 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 # Import base plugin system
-from plugins import PluginManager, JAMESPlugin
-from core.framework import JAMESFramework, ToolPlugin
+from plugins import PluginManager, TimeWarpPlugin
+from core.framework import TimeWarpFramework, ToolPlugin
 
 
 class ToolManager(PluginManager):
     """Enhanced plugin manager specifically for tool plugins"""
     
-    def __init__(self, ide_instance, framework: JAMESFramework):
+    def __init__(self, ide_instance, framework: TimeWarpFramework):
         # Initialize base plugin manager but override plugins directory
         self.ide = ide_instance
         self.framework = framework
@@ -95,9 +95,9 @@ class ToolManager(PluginManager):
             spec.loader.exec_module(plugin_module)
             
             # Create tool plugin instance
-            if hasattr(plugin_module, 'JAMESPlugin'):
+            if hasattr(plugin_module, 'TimeWarpPlugin'):
                 # Create instance with framework
-                tool_instance = plugin_module.JAMESPlugin(self.ide, self.framework)
+                tool_instance = plugin_module.TimeWarpPlugin(self.ide, self.framework)
                 
                 # Verify it's a ToolPlugin
                 if not isinstance(tool_instance, ToolPlugin):
@@ -120,7 +120,7 @@ class ToolManager(PluginManager):
                     print(f"Failed to register tool with framework: {tool_name}")
                     return False
             else:
-                print(f"Tool {tool_name} does not contain a JAMESPlugin class")
+                print(f"Tool {tool_name} does not contain a TimeWarpPlugin class")
                 return False
                 
         except Exception as e:
@@ -245,7 +245,7 @@ class ToolManagerDialog:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill=tk.X, pady=(0, 10))
         
-        ttk.Label(header_frame, text="🛠️ JAMES Tool Manager", 
+        ttk.Label(header_frame, text="🛠️ TimeWarp Tool Manager", 
                  font=("Arial", 16, "bold")).pack(side=tk.LEFT)
         
         header_buttons = ttk.Frame(header_frame)
@@ -370,13 +370,13 @@ class ToolManagerDialog:
         guide_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         guide_scroll.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
         
-        tool_guide = """🛠️ JAMES TOOL DEVELOPMENT GUIDE
+        tool_guide = """🛠️ TimeWarp TOOL DEVELOPMENT GUIDE
 
 📋 Tool Plugin Structure:
-A JAMES tool plugin extends the ToolPlugin base class and provides professional functionality.
+A TimeWarp tool plugin extends the ToolPlugin base class and provides professional functionality.
 
 Required Files:
-• plugin.py - Main tool implementation (must contain JAMESPlugin class)
+• plugin.py - Main tool implementation (must contain TimeWarpPlugin class)
 • manifest.json - Tool metadata and configuration
 • README.md - Documentation and usage guide
 
@@ -429,7 +429,7 @@ class MyToolPlugin(ToolPlugin):
         return main_frame
 
 # Required: Plugin entry point
-JAMESPlugin = MyToolPlugin
+TimeWarpPlugin = MyToolPlugin
 
 🔧 Tool Categories:
 • debugging - Debugging and analysis tools
@@ -462,7 +462,7 @@ JAMESPlugin = MyToolPlugin
 • Export/import capabilities for tool data
 • Configuration persistence
 • Professional error handling and user feedback
-• Integration with JAMES interpreter system
+• Integration with TimeWarp interpreter system
 • Comprehensive help and documentation"""
         
         guide_text.insert("1.0", tool_guide)

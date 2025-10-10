@@ -1,5 +1,5 @@
 """
-JAMES Tools Module
+TimeWarp Tools Module
 ==================
 
 Additional tools and integrations:
@@ -9,6 +9,6 @@ Additional tools and integrations:
 """
 
 __version__ = "2.0.0"
-__author__ = "JAMES Development Team"
+__author__ = "TimeWarp Development Team"
 
 __all__ = []

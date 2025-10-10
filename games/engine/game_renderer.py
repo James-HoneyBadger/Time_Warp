@@ -1,5 +1,5 @@
 """
-Game Renderer for JAMES Game Engine
+Game Renderer for TimeWarp Game Engine
 Handles rendering of game objects to tkinter canvas.
 """
 

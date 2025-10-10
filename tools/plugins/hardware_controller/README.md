@@ -48,7 +48,7 @@ Professional hardware interface tool for TimeWarp IDE with comprehensive hardwar
 
 The Hardware Controller integrates with:
 
-- JAMES interpreter system for hardware programming
+- TimeWarp interpreter system for hardware programming
 - Framework event system for real-time updates
 - GPIO libraries for actual hardware control
 - Sensor libraries for data acquisition

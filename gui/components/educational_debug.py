@@ -1,5 +1,5 @@
 """
-Educational and Debugging Components for JAMES IDE
+Educational and Debugging Components for TimeWarp IDE
 Contains tutorial, exercise, version control, and debugging functionality.
 """
 
@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 class EducationalTutorials:
-    """Provides guided tutorials for learning JAMES programming"""
+    """Provides guided tutorials for learning TimeWarp programming"""
     
     def __init__(self, ide):
         self.ide = ide
@@ -34,7 +34,7 @@ class ExerciseMode:
 
 
 class VersionControlSystem:
-    """Simple version control for JAMES projects"""
+    """Simple version control for TimeWarp projects"""
     
     def __init__(self, ide):
         self.ide = ide

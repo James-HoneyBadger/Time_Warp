@@ -10,7 +10,7 @@ import re
 import string
 
 from ..errors.error_manager import (
-    ErrorManager, JAMESError, JAMESLexicalError,
+    ErrorManager, TimeWarpError, TimeWarpLexicalError,
     ErrorCode, ErrorSeverity, SourceLocation
 )
 
@@ -482,7 +482,7 @@ class EnhancedLexer:
         else:
             self.state.add_token(TokenType.IDENTIFIER, text, start_location)
     
-    def get_errors(self) -> List[JAMESError]:
+    def get_errors(self) -> List[TimeWarpError]:
         """Get lexical errors"""
         return self.state.error_manager.get_all_issues() if self.state else []
     

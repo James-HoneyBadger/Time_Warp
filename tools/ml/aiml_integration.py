@@ -1,5 +1,5 @@
 """
-AI/ML Integration for JAMES
+AI/ML Integration for TimeWarp
 Educational machine learning integration with scikit-learn, numpy, and pandas.
 """
 
@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 class AIMLIntegration:
-    """Educational AI/ML integration for JAMES"""
+    """Educational AI/ML integration for TimeWarp"""
     
     def __init__(self):
         self.models = {}  # name -> model_info

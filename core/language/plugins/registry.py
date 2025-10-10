@@ -5,7 +5,7 @@ Central registry for managing loaded plugins
 
 from typing import Dict, List, Optional, Set, Any
 from .base import PluginInterface, PluginType, PluginMetadata
-from ..errors.error_manager import JAMESError, ErrorCode, ErrorSeverity
+from ..errors.error_manager import TimeWarpError, ErrorCode, ErrorSeverity
 
 class PluginRegistry:
     """Central registry for plugins"""

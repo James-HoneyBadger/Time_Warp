@@ -23,14 +23,14 @@ __version__ = "1.0.0"
 setup(
     name="timewarp-ide",
     version=__version__,
-    author="James-HoneyBadger",
+    author="TimeWarp IDE Team",
     author_email="timewarp-ide@example.com",
     description="A multi-language educational programming IDE with time-traveling themes",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/James-HoneyBadger/Time_Warp",
+    url="https://github.com/TimeWarpIDE/TimeWarp",
     project_urls={
-        "Bug Reports": "https://github.com/James-HoneyBadger/Time_Warp/issues",
+        "Bug Reports": "https://github.com/TimeWarpIDE/TimeWarp/issues",
         "Source": "https://github.com/James-HoneyBadger/Time_Warp",
         "Documentation": "https://github.com/James-HoneyBadger/Time_Warp#readme",
     },
