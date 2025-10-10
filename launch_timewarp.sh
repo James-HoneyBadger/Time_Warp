@@ -1,8 +1,8 @@
 #!/bin/bash
-# TimeWarp IDE v1.1 Launch Script
+# TimeWarp IDE Launch Script
 # This script launches the TimeWarp IDE with proper Python environment
 
-echo "🚀 Launching TimeWarp IDE v1.1..."
+echo "🚀 Launching TimeWarp IDE 1,1..."
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,10 +13,10 @@ cd "$SCRIPT_DIR"
 # Check if Python 3 is available
 if command -v python3 >/dev/null 2>&1; then
     echo "✅ Found Python 3"
-    python3 TimeWarp_v11.py
+    python3 TimeWarp.py
 elif command -v python >/dev/null 2>&1; then
     echo "✅ Found Python"
-    python TimeWarp_v11.py
+    python TimeWarp.py
 else
     echo "❌ Python not found!"
     echo "Please install Python 3 to run TimeWarp IDE"

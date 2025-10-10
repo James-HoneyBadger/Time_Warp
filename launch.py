@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE v1.1 Python Launcher
+TimeWarp IDE Python Launcher
 Alternative launcher that can be run directly with Python
 """
 
@@ -9,18 +9,18 @@ import sys
 import subprocess
 
 def main():
-    """Launch TimeWarp IDE v1.1"""
-    print("🚀 TimeWarp IDE v1.1 Python Launcher")
+    """Launch TimeWarp IDE"""
+    print("🚀 TimeWarp IDE 1,1 Python Launcher")
     print("=" * 50)
     
     # Get the directory where this launcher is located
     launcher_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Path to the main TimeWarp application
-    timewarp_path = os.path.join(launcher_dir, "TimeWarp_v11.py")
+    timewarp_path = os.path.join(launcher_dir, "TimeWarp.py")
     
     if not os.path.exists(timewarp_path):
-        print(f"❌ TimeWarp_v11.py not found at: {timewarp_path}")
+        print(f"❌ TimeWarp.py not found at: {timewarp_path}")
         print("Please make sure you're running this from the TimeWarp directory")
         return 1
     

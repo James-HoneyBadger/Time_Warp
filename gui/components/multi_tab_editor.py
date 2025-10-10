@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-Tab Code Editor for TimeWarp IDE v1.1
+Multi-Tab Code Editor for TimeWarp IDE
 Enhanced editor with tabbed interface and file management
 """
 
@@ -15,11 +15,12 @@ import re
 class TabEditor:
     """Individual tab editor instance"""
     
-    def __init__(self, parent_notebook: ttk.Notebook, file_path: Optional[str] = None):
+    def __init__(self, parent_notebook: ttk.Notebook, file_path: Optional[str] = None, language_callback=None):
         self.notebook = parent_notebook
         self.file_path = file_path
         self.is_modified = False
         self.language = "text"
+        self.language_callback = language_callback
         
         # Create tab frame
         self.frame = ttk.Frame(parent_notebook)
@@ -133,6 +134,69 @@ class TabEditor:
             '.txt': 'text'
         }
         self.language = language_map.get(ext, 'text')
+        
+    def detect_and_set_language(self):
+        """Detect language from filename and content, then update language"""
+        # First try extension
+        if self.file_path:
+            ext = Path(self.file_path).suffix.lower()
+            language_map = {
+                '.py': 'python',
+                '.js': 'javascript',
+                '.pilot': 'pilot',
+                '.bas': 'basic',
+                '.basic': 'basic',
+                '.logo': 'logo',
+                '.pl': 'perl',
+                '.jtc': 'timewarp',
+                '.timewarp': 'timewarp'
+            }
+            detected = language_map.get(ext, None)
+            if detected:
+                self.language = detected
+                return
+        
+        # Then try content analysis
+        content = self.text_editor.get('1.0', tk.END).strip()
+        if not content:
+            self.language = 'text'
+            return
+            
+        content_lower = content.lower()
+        lines = content.split('\n')
+        
+        # Check for line numbers (BASIC)
+        has_line_numbers = any(line.strip() and line.strip()[0].isdigit() for line in lines[:5])
+        if has_line_numbers and any(word in content_lower for word in ['print', 'let', 'goto', 'if']):
+            self.language = 'basic'
+            return
+        
+        # Check for PILOT commands
+        pilot_commands = ['t:', 'a:', 'j:', 'y:', 'n:', 'c:', 'e:', 'm:']
+        if any(cmd in content_lower for cmd in pilot_commands):
+            self.language = 'pilot'
+            return
+        
+        # Check for Logo commands
+        logo_commands = ['forward', 'back', 'left', 'right', 'penup', 'pendown', 'repeat']
+        if any(cmd in content_lower for cmd in logo_commands):
+            self.language = 'logo'
+            return
+        
+        # Check for Python
+        python_keywords = ['def ', 'import ', 'from ', 'class ', 'if __name__']
+        if any(keyword in content_lower for keyword in python_keywords):
+            self.language = 'python'
+            return
+        
+        # Check for JavaScript
+        js_keywords = ['function', 'var ', 'let ', 'const ', 'document.', 'window.']
+        if any(keyword in content_lower for keyword in js_keywords):
+            self.language = 'javascript'
+            return
+        
+        # Default to text
+        self.language = 'text'
         
     def apply_syntax_highlighting(self):
         """Apply basic syntax highlighting based on language"""
@@ -311,9 +375,17 @@ class TabEditor:
         if not self.is_modified:
             self.is_modified = True
             self.update_tab_title()
+        # Detect language from content
+        self.text_editor.after_idle(self.detect_and_set_language)
         # Schedule syntax highlighting update
         self.text_editor.after_idle(self.apply_syntax_highlighting)
         self.text_editor.after_idle(self.update_line_numbers)
+        # Update language indicator
+        if self.language_callback:
+            try:
+                self.text_editor.after_idle(lambda: self.language_callback() if self.language_callback else None)
+            except Exception:
+                pass
         
     def update_tab_title(self):
         """Update tab title to reflect modification status"""
@@ -369,10 +441,11 @@ class TabEditor:
 class MultiTabEditor:
     """Multi-tab code editor manager"""
     
-    def __init__(self, parent_widget):
+    def __init__(self, parent_widget, language_callback=None):
         self.parent = parent_widget
         self.tabs: Dict[str, TabEditor] = {}
         self.active_tab: Optional[TabEditor] = None
+        self.language_callback = language_callback
         
         # Create notebook widget
         self.notebook = ttk.Notebook(parent_widget)
@@ -386,7 +459,7 @@ class MultiTabEditor:
         
     def new_tab(self, file_path: Optional[str] = None) -> TabEditor:
         """Create new tab"""
-        tab_editor = TabEditor(self.notebook, file_path)
+        tab_editor = TabEditor(self.notebook, file_path, self.language_callback)
         
         # Generate unique key
         key = file_path if file_path else f"untitled_{len(self.tabs) + 1}"
@@ -395,7 +468,14 @@ class MultiTabEditor:
         # Set as active tab
         self.notebook.select(tab_editor.frame)
         self.active_tab = tab_editor
-        
+
+        # Update language indicator
+        if self.language_callback:
+            try:
+                self.language_callback()
+            except Exception:
+                pass
+
         return tab_editor
         
     def open_file(self, file_path: str) -> TabEditor:
@@ -405,6 +485,12 @@ class MultiTabEditor:
             if tab.file_path == file_path:
                 self.notebook.select(tab.frame)
                 self.active_tab = tab
+                # Update language indicator
+                if self.language_callback:
+                    try:
+                        self.language_callback()
+                    except Exception:
+                        pass
                 return tab
                 
         # Create new tab
@@ -487,17 +573,24 @@ class MultiTabEditor:
             if str(tab.frame) == selected_tab_id:
                 self.active_tab = tab
                 break
+        
+        # Update language indicator if callback is available
+        if self.language_callback:
+            try:
+                self.language_callback()
+            except Exception:
+                pass  # Ignore callback errors
     
     def apply_theme(self, colors):
-        """Apply theme colors to all tabs"""
+        """Apply theme colors comprehensively to all editor components"""
         try:
-            # Apply theme to notebook
+            # Apply theme to notebook with enhanced styling
             self.notebook.configure(style="Modern.TNotebook")
             
-            # Apply theme to all tab editors
+            # Apply theme to all tab editors with comprehensive styling
             for tab in self.tabs.values():
                 if hasattr(tab, 'text_editor'):
-                    # Apply theme to text widget
+                    # Apply theme to main text widget
                     tab.text_editor.configure(
                         bg=colors["bg_primary"],
                         fg=colors["text_primary"],
@@ -508,7 +601,40 @@ class MultiTabEditor:
                         borderwidth=0,
                         highlightthickness=1,
                         highlightcolor=colors["accent"],
-                        highlightbackground=colors["border"]
+                        highlightbackground=colors["border"],
+                        font=("Consolas", 11),
+                        wrap="none",
+                        undo=True,
+                        maxundo=50
                     )
+                    
+                    # Apply theme to line numbers if they exist
+                    if hasattr(tab, 'line_numbers'):
+                        tab.line_numbers.configure(
+                            bg=colors["bg_secondary"],
+                            fg=colors["text_secondary"],
+                            relief="flat",
+                            borderwidth=0,
+                            highlightthickness=0,
+                            font=("Consolas", 11),
+                            width=4,
+                            state="disabled"
+                        )
+                    
+                    # Configure syntax highlighting tags with theme colors
+                    tab.text_editor.tag_configure("keyword", foreground=colors.get("keyword", colors["accent"]))
+                    tab.text_editor.tag_configure("string", foreground=colors.get("string", "#6A994E"))
+                    tab.text_editor.tag_configure("comment", foreground=colors.get("comment", colors["text_secondary"]))
+                    tab.text_editor.tag_configure("number", foreground=colors.get("number", "#F77F00"))
+                    tab.text_editor.tag_configure("operator", foreground=colors.get("operator", colors["text_primary"]))
+                    tab.text_editor.tag_configure("variable", foreground=colors.get("variable", "#BC6C25"))
+                    
+                    # Re-apply syntax highlighting after theme change
+                    tab.apply_syntax_highlighting()
+                
+                # Apply theme to tab frame
+                if hasattr(tab, 'frame'):
+                    tab.frame.configure(style="Themed.TFrame")
+        
         except Exception as e:
             print(f"⚠️ MultiTabEditor theme error: {e}")
