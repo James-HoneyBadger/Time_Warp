@@ -20,20 +20,25 @@ import pathlib
 import subprocess
 import platform
 
-# Core modular components
-from core.interpreter import TimeWarpInterpreter
-from tools.theme import ThemeManager
-from plugins import PluginManager
+# Import theme configuration functions
+from tools.theme import load_config, save_config, ThemeManager
 
-# v1.0.1 Enhanced components
-from gui.components.multi_tab_editor import MultiTabEditor
-from gui.components.file_explorer import FileExplorer
-# PIL is optional for enhanced graphics
+# Import core components
 try:
+    from core.interpreter import TimeWarpInterpreter
+    from plugins import PluginManager
+    CORE_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Core components not available: {e}")
+    CORE_AVAILABLE = False
+
+# Import GUI components
+try:
+    from gui.components.multi_tab_editor import MultiTabEditor
     from gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
     ENHANCED_GRAPHICS_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️ Enhanced graphics not available: {e}")
+    print(f"⚠️ Enhanced components not available: {e}")
     ENHANCED_GRAPHICS_AVAILABLE = False
 from core.enhanced_error_handler import EnhancedErrorHandler, ErrorHighlighter
 
@@ -50,51 +55,47 @@ class TimeWarpIDE_v101:
     """
 
     def __init__(self):
-        """Initialize TimeWarp IDE v1.0.1 with enhanced components"""
-        # Main window setup
+        """Initialize TimeWarp IDE v1.0.1"""
+        print("🚀 Starting TimeWarp IDE v1.0.1...")
+        print("⏰ Enhanced Educational Programming Environment")
+        print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
+        
+        # Initialize main window
         self.root = tk.Tk()
-        self.root.title("⏰ TimeWarp IDE v1.0.1 - Enhanced Educational Programming")
-        self.root.geometry("1600x1000")
-        try:
-            self.root.minsize(1200, 800)
-        except:
-            # Fallback for older Tkinter versions
-            self.root.wm_minsize(1200, 800)
+        self._setup_window()
 
-        # Initialize theme system
+        # Initialize core systems
         self.theme_manager = ThemeManager()
-        self.load_theme_config()
-
-        # Initialize plugin system
+        self.current_theme = "sunset"  # Default theme
+        
         self.plugin_manager = PluginManager(self)
-
-        # Core components
+        
+        # Initialize interpreter
         self.interpreter = TimeWarpInterpreter()
         
-        # v1.0.1 Enhanced components
-        self.error_handler = EnhancedErrorHandler(self.write_to_console)
+        # Initialize execution tracking
+        self.execution_thread = None
+        self.stop_execution_flag = False
         
-        # Feature systems
-        self.tutorial_system = TutorialSystem()
-        self.ai_assistant = AICodeAssistant()
-        self.gamification = GamificationSystem()
-
-        # Set up gamification callbacks
-        self.gamification.set_callbacks(
-            achievement_cb=self.show_achievement_notification,
-            level_up_cb=self.show_level_up_notification,
-            stats_cb=self.update_stats_display,
-        )
-
-        # Setup UI with new layout
+        # Setup UI
         self.setup_ui()
-        self.load_plugins()
+        
+        # Initialize other components
+        self.load_theme_config()
+        
+        # Setup keyboard shortcuts
+        self.setup_keyboard_shortcuts()
+        
+        # Initialize features
+        self.init_features()
+        
+        # Apply initial theme
         self.apply_theme()
-
-        # Initialize keybindings
-        self.setup_keybindings()
-
-        print("🚀 TimeWarp IDE v1.0.1 - Enhanced features loaded!")
+        
+        # Load plugins
+        self.load_plugins()
+        
+        print("🚀 TimeWarp IDE v1.0.1 - Clean two-panel layout ready!")
 
     def load_theme_config(self):
         """Load theme configuration"""
@@ -105,36 +106,49 @@ class TimeWarpIDE_v101:
             print(f"⚠️ Theme loading error: {e}")
             self.current_theme = "dracula"
 
+    def _setup_window(self):
+        """Setup main window properties"""
+        # Basic window setup is now done in setup_ui
+        pass
+
+    def setup_keyboard_shortcuts(self):
+        """Setup keyboard shortcuts - delegates to setup_keybindings"""
+        self.setup_keybindings()
+
+    def init_features(self):
+        """Initialize additional features"""
+        try:
+            # Initialize error handler
+            self.error_handler = EnhancedErrorHandler()
+            
+            # Simplified feature initialization for v1.0.1
+            # Advanced features will be added in future versions
+            
+        except Exception as e:
+            print(f"⚠️ Feature initialization error: {e}")
+
     def setup_ui(self):
-        """Setup the enhanced UI with new v1.0.1 layout"""
-        # Create main container with three-panel layout
+        """Setup the enhanced UI with clean two-panel layout"""
+        # Create main container with two-panel layout (editor + graphics/output)
         self.main_container = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
         self.main_container.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # Left panel: File Explorer (250px width)
-        self.left_panel = ttk.Frame(self.main_container, width=250)
+        # Left panel: Code Editor (takes most space)
+        self.editor_panel = ttk.Frame(self.main_container)
         try:
-            self.main_container.add(self.left_panel, weight=0, minsize=200)
+            self.main_container.add(self.editor_panel, weight=3, minsize=600)
         except:
-            self.main_container.add(self.left_panel, weight=0)
-
-        # Center panel: Code Editor
-        self.center_panel = ttk.Frame(self.main_container)
-        try:
-            self.main_container.add(self.center_panel, weight=3, minsize=600)
-        except:
-            self.main_container.add(self.center_panel, weight=3)
+            self.main_container.add(self.editor_panel, weight=3)
 
         # Right panel: Graphics and Output
-        self.right_panel = ttk.Frame(self.main_container, width=400)
+        self.graphics_output_panel = ttk.Frame(self.main_container, width=400)
         try:
-            self.main_container.add(self.right_panel, weight=1, minsize=350)
+            self.main_container.add(self.graphics_output_panel, weight=1, minsize=350)
         except:
-            self.main_container.add(self.right_panel, weight=1)
+            self.main_container.add(self.graphics_output_panel, weight=1)
 
         # Setup components
         self.setup_menu()
-        self.setup_file_explorer()
         self.setup_multi_tab_editor()
         self.setup_output_graphics_panel()
 
@@ -173,8 +187,25 @@ class TimeWarpIDE_v101:
         view_menu.add_command(label="🔍 Zoom Out", command=self.zoom_out, accelerator="Ctrl+-")
         view_menu.add_command(label="🔍 Reset Zoom", command=self.reset_zoom, accelerator="Ctrl+0")
         view_menu.add_separator()
-        view_menu.add_command(label="📁 Toggle File Explorer", command=self.toggle_file_explorer, accelerator="Ctrl+B")
         view_menu.add_command(label="🎨 Toggle Graphics Panel", command=self.toggle_graphics_panel)
+        view_menu.add_separator()
+        
+        # Theme selector submenu
+        theme_menu = tk.Menu(view_menu, tearoff=0)
+        view_menu.add_cascade(label="🎨 Themes", menu=theme_menu)
+        
+        # Dark themes
+        theme_menu.add_command(label="🌙 Dracula", command=lambda: self.change_theme("dracula"))
+        theme_menu.add_command(label="🌙 Monokai", command=lambda: self.change_theme("monokai"))
+        theme_menu.add_command(label="🌙 Solarized Dark", command=lambda: self.change_theme("solarized"))
+        theme_menu.add_command(label="🌙 Ocean", command=lambda: self.change_theme("ocean"))
+        theme_menu.add_separator()
+        
+        # Light themes
+        theme_menu.add_command(label="☀️ Spring", command=lambda: self.change_theme("spring"))
+        theme_menu.add_command(label="☀️ Sunset", command=lambda: self.change_theme("sunset"))
+        theme_menu.add_command(label="☀️ Candy", command=lambda: self.change_theme("candy"))
+        theme_menu.add_command(label="☀️ Forest", command=lambda: self.change_theme("forest"))
 
         # Run menu  
         run_menu = tk.Menu(self.menubar, tearoff=0)
@@ -188,7 +219,6 @@ class TimeWarpIDE_v101:
         # Tools menu
         tools_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Tools", menu=tools_menu)
-        tools_menu.add_command(label="🎨 Theme Selector", command=self.show_theme_selector)
         tools_menu.add_command(label="⚙️ Settings", command=self.show_settings)
         tools_menu.add_command(label="🔌 Plugin Manager", command=self.show_plugin_manager)
 
@@ -207,14 +237,10 @@ class TimeWarpIDE_v101:
         help_menu.add_separator()
         help_menu.add_command(label="ℹ️ About TimeWarp IDE", command=self.show_about)
 
-    def setup_file_explorer(self):
-        """Setup file explorer panel"""
-        self.file_explorer = FileExplorer(self.left_panel, self.open_file_from_explorer)
-
     def setup_multi_tab_editor(self):
         """Setup multi-tab code editor"""
         # Editor with status bar
-        editor_frame = ttk.Frame(self.center_panel)
+        editor_frame = ttk.Frame(self.editor_panel)
         editor_frame.pack(fill=tk.BOTH, expand=True)
 
         # Multi-tab editor
@@ -244,12 +270,12 @@ class TimeWarpIDE_v101:
     def setup_output_graphics_panel(self):
         """Setup right panel with output and graphics"""
         # Create notebook for output and graphics
-        self.right_notebook = ttk.Notebook(self.right_panel)
-        self.right_notebook.pack(fill=tk.BOTH, expand=True)
+        self.graphics_notebook = ttk.Notebook(self.graphics_output_panel)
+        self.graphics_notebook.pack(fill=tk.BOTH, expand=True)
 
         # Output tab
-        output_frame = ttk.Frame(self.right_notebook)
-        self.right_notebook.add(output_frame, text="📺 Output")
+        output_frame = ttk.Frame(self.graphics_notebook)
+        self.graphics_notebook.add(output_frame, text="📺 Output")
 
         self.output_text = scrolledtext.ScrolledText(
             output_frame,
@@ -260,8 +286,8 @@ class TimeWarpIDE_v101:
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Graphics tab
-        graphics_frame = ttk.Frame(self.right_notebook)
-        self.right_notebook.add(graphics_frame, text="🎨 Graphics")
+        graphics_frame = ttk.Frame(self.graphics_notebook)
+        self.graphics_notebook.add(graphics_frame, text="🎨 Graphics")
 
         # Enhanced graphics canvas
         if ENHANCED_GRAPHICS_AVAILABLE:
@@ -315,7 +341,7 @@ class TimeWarpIDE_v101:
             '<Shift-F5>': self.stop_execution,
             '<Control-f>': self.find_text,
             '<Control-h>': self.replace_text,
-            '<Control-b>': self.toggle_file_explorer,
+
             '<F1>': self.show_quick_help,
             '<Control-plus>': self.zoom_in,
             '<Control-minus>': self.zoom_out,
@@ -350,17 +376,12 @@ class TimeWarpIDE_v101:
             self.multi_tab_editor.open_file(file_path)
             self.update_status(f"Opened: {os.path.basename(file_path)}")
 
-    def open_file_from_explorer(self, file_path: str):
-        """Open file from file explorer"""
-        self.multi_tab_editor.open_file(file_path)
-        self.update_status(f"Opened: {os.path.basename(file_path)}")
-
     def open_folder(self):
-        """Open folder in file explorer"""
-        folder_path = filedialog.askdirectory(title="Open Project Folder")
+        """Open folder for reference"""
+        folder_path = filedialog.askdirectory(title="Select Working Directory")
         if folder_path:
-            self.file_explorer.set_project_path(folder_path)
-            self.update_status(f"Opened project: {os.path.basename(folder_path)}")
+            os.chdir(folder_path)
+            self.update_status(f"Working directory: {os.path.basename(folder_path)}")
 
     def save_file(self):
         """Save current file"""
@@ -392,13 +413,115 @@ class TimeWarpIDE_v101:
     # Editor operations
     def find_text(self):
         """Show find dialog"""
-        # TODO: Implement find in active tab
-        self.update_status("Find function - Coming soon!")
+        if not self.multi_tab_editor.active_tab:
+            self.update_status("No active tab to search")
+            return
+            
+        search_term = simpledialog.askstring("Find", "Enter text to find:")
+        if search_term:
+            text_widget = self.multi_tab_editor.active_tab.text_editor
+            
+            # Clear previous search highlights
+            text_widget.tag_remove("search_highlight", "1.0", tk.END)
+            
+            # Search for the term
+            start_pos = "1.0"
+            found_positions = []
+            
+            while True:
+                pos = text_widget.search(search_term, start_pos, tk.END)
+                if not pos:
+                    break
+                found_positions.append(pos)
+                # Highlight the found text
+                end_pos = f"{pos}+{len(search_term)}c"
+                text_widget.tag_add("search_highlight", pos, end_pos)
+                start_pos = end_pos
+            
+            # Configure highlight style
+            text_widget.tag_configure("search_highlight", background="yellow", foreground="black")
+            
+            if found_positions:
+                # Move to first occurrence
+                text_widget.see(found_positions[0])
+                text_widget.mark_set("insert", found_positions[0])
+                self.update_status(f"Found {len(found_positions)} occurrence(s) of '{search_term}'")
+            else:
+                self.update_status(f"'{search_term}' not found")
+        else:
+            self.update_status("Search cancelled")
 
     def replace_text(self):
-        """Show replace dialog"""  
-        # TODO: Implement replace in active tab
-        self.update_status("Replace function - Coming soon!")
+        """Show replace dialog"""
+        if not self.multi_tab_editor.active_tab:
+            self.update_status("No active tab for replacement")
+            return
+            
+        # Create replace dialog window
+        replace_window = tk.Toplevel(self.root)
+        replace_window.title("Find and Replace")
+        replace_window.geometry("400x150")
+        replace_window.resizable(False, False)
+        
+        # Center the window
+        replace_window.transient(self.root)
+        replace_window.grab_set()
+        
+        # Find field
+        tk.Label(replace_window, text="Find:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        find_entry = tk.Entry(replace_window, width=30)
+        find_entry.grid(row=0, column=1, padx=10, pady=5)
+        find_entry.focus()
+        
+        # Replace field
+        tk.Label(replace_window, text="Replace with:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        replace_entry = tk.Entry(replace_window, width=30)
+        replace_entry.grid(row=1, column=1, padx=10, pady=5)
+        
+        # Button frame
+        button_frame = tk.Frame(replace_window)
+        button_frame.grid(row=2, column=0, columnspan=2, pady=10)
+        
+        def do_find():
+            search_term = find_entry.get()
+            if search_term and self.multi_tab_editor.active_tab:
+                text_widget = self.multi_tab_editor.active_tab.text_editor
+                text_widget.tag_remove("search_highlight", "1.0", tk.END)
+                
+                pos = text_widget.search(search_term, "insert", tk.END)
+                if pos:
+                    end_pos = f"{pos}+{len(search_term)}c"
+                    text_widget.tag_add("search_highlight", pos, end_pos)
+                    text_widget.tag_configure("search_highlight", background="yellow", foreground="black")
+                    text_widget.see(pos)
+                    text_widget.mark_set("insert", pos)
+                    self.update_status(f"Found '{search_term}'")
+                else:
+                    self.update_status(f"'{search_term}' not found")
+        
+        def do_replace():
+            search_term = find_entry.get()
+            replace_term = replace_entry.get()
+            if search_term and self.multi_tab_editor.active_tab:
+                text_widget = self.multi_tab_editor.active_tab.text_editor
+                content = text_widget.get("1.0", tk.END)
+                new_content = content.replace(search_term, replace_term)
+                
+                if content != new_content:
+                    text_widget.delete("1.0", tk.END)
+                    text_widget.insert("1.0", new_content)
+                    count = content.count(search_term)
+                    self.update_status(f"Replaced {count} occurrence(s)")
+                    self.multi_tab_editor.active_tab.is_modified = True
+                    self.multi_tab_editor.active_tab.update_tab_title()
+                else:
+                    self.update_status("No replacements made")
+                replace_window.destroy()
+        
+        # Buttons
+        tk.Button(button_frame, text="Find Next", command=do_find).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Replace All", command=do_replace).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Cancel", command=replace_window.destroy).pack(side=tk.LEFT, padx=5)
 
     # View operations
     def zoom_in(self):
@@ -416,15 +539,28 @@ class TimeWarpIDE_v101:
         if hasattr(self.enhanced_graphics, 'zoom_fit'):
             self.enhanced_graphics.zoom_fit()
 
-    def toggle_file_explorer(self):
-        """Toggle file explorer visibility"""
-        # TODO: Implement panel toggling
-        self.update_status("File explorer toggle - Coming soon!")
+
 
     def toggle_graphics_panel(self):
         """Toggle graphics panel visibility"""
-        # TODO: Implement panel toggling
-        self.update_status("Graphics panel toggle - Coming soon!")
+        try:
+            if hasattr(self, 'graphics_output_panel'):
+                # Check current state
+                if self.graphics_output_panel.winfo_viewable():
+                    # Hide the panel by removing it from the container
+                    self.main_container.forget(self.graphics_output_panel)
+                    self.update_status("Graphics panel hidden")
+                else:
+                    # Show the panel by adding it back
+                    try:
+                        self.main_container.add(self.graphics_output_panel, weight=1, minsize=350)
+                    except:
+                        self.main_container.add(self.graphics_output_panel, weight=1)
+                    self.update_status("Graphics panel shown")
+            else:
+                self.update_status("Graphics panel not available")
+        except Exception as e:
+            self.update_status(f"Panel toggle error: {e}")
 
     # Execution operations
     def run_code(self):
@@ -443,30 +579,99 @@ class TimeWarpIDE_v101:
 
         self.update_status(f"Running {language.upper()} code...")
         
-        try:
-            # Clear previous output
-            self.clear_output()
-            
-            # Execute code using appropriate method
-            if language.lower() == 'pilot':
-                result = self.interpreter.run_program(code)
-            else:
-                # For other languages, we'll need language-specific executors
-                self.write_to_console(f"🔧 {language.upper()} execution - Coming in next update!\n")
-                result = True
-            
-            if result:
-                self.write_to_console(f"✅ {language.upper()} execution completed\n")
-            else:
-                self.write_to_console(f"❌ {language.upper()} execution failed\n")
+        # Clear previous output
+        self.clear_output()
+        
+        # Reset stop flag
+        self.stop_execution_flag = False
+        
+        # Run code in a separate thread for better responsiveness
+        def run_in_thread():
+            try:
+                self.write_to_console(f"▶️ Starting {language.upper()} execution...\n")
                 
-        except Exception as e:
-            self.error_handler.display_error(str(e), language, code)
+                # Execute code using appropriate method
+                if language.lower() == 'pilot':
+                    result = self.interpreter.run_program(code)
+                elif language.lower() in ['python', 'py']:
+                    # Basic Python execution
+                    import io
+                    import sys
+                    from contextlib import redirect_stdout, redirect_stderr
+                    
+                    # Capture output
+                    stdout_capture = io.StringIO()
+                    stderr_capture = io.StringIO()
+                    
+                    try:
+                        with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
+                            # Check for stop flag periodically
+                            if self.stop_execution_flag:
+                                self.write_to_console("🛑 Execution stopped by user\n")
+                                return
+                            
+                            exec(code)
+                        
+                        # Display captured output
+                        stdout_content = stdout_capture.getvalue()
+                        stderr_content = stderr_capture.getvalue()
+                        
+                        if stdout_content:
+                            self.write_to_console(stdout_content)
+                        if stderr_content:
+                            self.write_to_console(f"Error: {stderr_content}")
+                        
+                        result = True
+                    except Exception as e:
+                        self.write_to_console(f"❌ Python Error: {str(e)}\n")
+                        result = False
+                else:
+                    # For other languages, show placeholder
+                    self.write_to_console(f"🔧 {language.upper()} execution - Coming in next update!\n")
+                    result = True
+                
+                if not self.stop_execution_flag:
+                    if result:
+                        self.write_to_console(f"✅ {language.upper()} execution completed\n")
+                        self.root.after(0, lambda: self.update_status(f"{language.upper()} code executed successfully"))
+                    else:
+                        self.write_to_console(f"❌ {language.upper()} execution failed\n")
+                        self.root.after(0, lambda: self.update_status(f"{language.upper()} execution failed"))
+                        
+            except Exception as e:
+                self.write_to_console(f"💥 Execution error: {str(e)}\n")
+                self.root.after(0, lambda: self.update_status(f"Execution error: {str(e)}"))
+        
+        # Start execution thread
+        self.execution_thread = threading.Thread(target=run_in_thread, daemon=True)
+        self.execution_thread.start()
 
     def stop_execution(self):
         """Stop code execution"""
-        # TODO: Implement execution stopping
-        self.update_status("Stop execution - Coming soon!")
+        try:
+            # If there's an active execution thread, try to stop it
+            if hasattr(self, 'execution_thread') and self.execution_thread and self.execution_thread.is_alive():
+                # Set a stop flag for graceful termination
+                if hasattr(self, 'stop_execution_flag'):
+                    self.stop_execution_flag = True
+                
+                self.write_to_console("🛑 Execution stop requested...\n")
+                self.update_status("Stopping execution...")
+                
+                # Give thread a moment to stop gracefully
+                import time
+                time.sleep(0.1)
+                
+                if self.execution_thread.is_alive():
+                    self.write_to_console("⚠️ Force stopping execution (may not work for all code)\n")
+                
+                self.update_status("Execution stopped")
+            else:
+                self.write_to_console("ℹ️ No active execution to stop\n")
+                self.update_status("No running code to stop")
+                
+        except Exception as e:
+            self.update_status(f"Stop execution error: {e}")
 
     def clear_output(self):
         """Clear output console"""
@@ -547,15 +752,112 @@ class TimeWarpIDE_v101:
         messagebox.showinfo("TimeWarp IDE v1.0.1 - Quick Help", help_text)
 
     # Theme and settings
-    def show_theme_selector(self):
-        """Show theme selection dialog"""
-        # TODO: Implement theme selector
-        messagebox.showinfo("Theme Selector", "Theme selection - Coming soon!")
+
 
     def show_settings(self):
         """Show settings dialog"""
-        # TODO: Implement settings
-        messagebox.showinfo("Settings", "IDE settings - Coming soon!")
+        settings_window = tk.Toplevel(self.root)
+        settings_window.title("⚙️ TimeWarp IDE Settings")
+        settings_window.geometry("500x400")
+        settings_window.resizable(True, True)
+        
+        # Center the window
+        settings_window.transient(self.root)
+        settings_window.grab_set()
+        
+        # Create notebook for different settings categories
+        notebook = ttk.Notebook(settings_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Editor Settings Tab
+        editor_frame = ttk.Frame(notebook)
+        notebook.add(editor_frame, text="📝 Editor")
+        
+        # Font settings
+        font_frame = ttk.LabelFrame(editor_frame, text="Font Settings")
+        font_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        tk.Label(font_frame, text="Font Family:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+        font_var = tk.StringVar(value="Consolas")
+        font_combo = ttk.Combobox(font_frame, textvariable=font_var, 
+                                 values=["Consolas", "Monaco", "DejaVu Sans Mono", "Courier New"])
+        font_combo.grid(row=0, column=1, padx=5, pady=2)
+        
+        tk.Label(font_frame, text="Font Size:").grid(row=1, column=0, sticky="w", padx=5, pady=2)
+        size_var = tk.IntVar(value=10)
+        size_spin = tk.Spinbox(font_frame, from_=8, to=24, textvariable=size_var, width=10)
+        size_spin.grid(row=1, column=1, padx=5, pady=2)
+        
+        # Editor behavior
+        behavior_frame = ttk.LabelFrame(editor_frame, text="Editor Behavior")
+        behavior_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        line_numbers_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(behavior_frame, text="Show line numbers", 
+                      variable=line_numbers_var).pack(anchor="w", padx=5, pady=2)
+        
+        auto_indent_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(behavior_frame, text="Auto-indent", 
+                      variable=auto_indent_var).pack(anchor="w", padx=5, pady=2)
+        
+        word_wrap_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(behavior_frame, text="Word wrap", 
+                      variable=word_wrap_var).pack(anchor="w", padx=5, pady=2)
+        
+        # Theme Settings Tab
+        theme_frame = ttk.Frame(notebook)
+        notebook.add(theme_frame, text="🎨 Themes")
+        
+        current_theme_frame = ttk.LabelFrame(theme_frame, text="Current Theme")
+        current_theme_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        tk.Label(current_theme_frame, text=f"Active Theme: {self.current_theme.title()}").pack(pady=10)
+        
+        theme_list_frame = ttk.LabelFrame(theme_frame, text="Available Themes")
+        theme_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        themes = ["dracula", "monokai", "solarized", "ocean", "spring", "sunset", "candy", "forest"]
+        theme_var = tk.StringVar(value=self.current_theme)
+        
+        for theme in themes:
+            rb = tk.Radiobutton(theme_list_frame, text=theme.title(), 
+                               variable=theme_var, value=theme)
+            rb.pack(anchor="w", padx=5, pady=2)
+        
+        # General Settings Tab
+        general_frame = ttk.Frame(notebook)
+        notebook.add(general_frame, text="⚙️ General")
+        
+        startup_frame = ttk.LabelFrame(general_frame, text="Startup Options")
+        startup_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        remember_tabs_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(startup_frame, text="Remember open tabs", 
+                      variable=remember_tabs_var).pack(anchor="w", padx=5, pady=2)
+        
+        auto_save_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(startup_frame, text="Auto-save files", 
+                      variable=auto_save_var).pack(anchor="w", padx=5, pady=2)
+        
+        # Button frame
+        button_frame = tk.Frame(settings_window)
+        button_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        def apply_settings():
+            # Apply theme change
+            if theme_var.get() != self.current_theme:
+                self.change_theme(theme_var.get())
+            
+            self.update_status("Settings applied")
+            settings_window.destroy()
+        
+        def cancel_settings():
+            settings_window.destroy()
+        
+        # Buttons
+        tk.Button(button_frame, text="Apply", command=apply_settings).pack(side=tk.RIGHT, padx=5)
+        tk.Button(button_frame, text="Cancel", command=cancel_settings).pack(side=tk.RIGHT, padx=5)
+        tk.Button(button_frame, text="OK", command=apply_settings).pack(side=tk.RIGHT, padx=5)
 
     def show_about(self):
         """Show about dialog"""
@@ -587,11 +889,57 @@ License: MIT"""
 
         messagebox.showinfo("About TimeWarp IDE v1.0.1", about_text)
 
+    def change_theme(self, theme_name):
+        """Change to a different theme"""
+        try:
+            print(f"🎨 Changing theme to: {theme_name}")
+            self.current_theme = theme_name
+            
+            # Save theme preference
+            config = load_config()
+            config['current_theme'] = theme_name
+            save_config(config)
+            
+            # Apply the new theme
+            self.apply_theme()
+            
+            print(f"✅ Theme changed to: {theme_name}")
+        except Exception as e:
+            print(f"⚠️ Theme change error: {e}")
+
     def apply_theme(self):
         """Apply current theme to all components"""
         try:
             print(f"🎨 Applying theme: {self.current_theme}")
-            # TODO: Apply theme to all new components
+            
+            # Initialize theme manager if not already done
+            if not hasattr(self, 'theme_manager'):
+                from tools.theme import ThemeManager
+                self.theme_manager = ThemeManager()
+            
+            # Apply theme to root window and ttk styles
+            self.theme_manager.apply_theme(self.root, self.current_theme)
+            colors = self.theme_manager.get_colors()
+            
+            # Apply theme to main panels
+            self.root.configure(bg=colors["bg_primary"])
+            
+            # Apply theme to multi-tab editor if it exists
+            if hasattr(self, 'multi_tab_editor'):
+                self.multi_tab_editor.apply_theme(colors)
+            
+
+            
+            # Apply theme to enhanced graphics canvas if it exists
+            if hasattr(self, 'enhanced_graphics') and ENHANCED_GRAPHICS_AVAILABLE:
+                self.enhanced_graphics.apply_theme(colors)
+            elif hasattr(self, 'basic_canvas'):
+                self.theme_manager.apply_canvas_theme(self.basic_canvas)
+            
+            # Apply theme to output text areas
+            if hasattr(self, 'output_text'):
+                self.theme_manager.apply_text_widget_theme(self.output_text)
+            
         except Exception as e:
             print(f"⚠️ Theme application error: {e}")
 

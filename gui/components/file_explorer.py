@@ -481,3 +481,33 @@ Modified: {modified}"""
         """Set project path and refresh"""
         self.current_project_path = path
         self.populate_tree()
+    
+    def apply_theme(self, colors):
+        """Apply theme colors to file explorer"""
+        try:
+            # Configure treeview style first
+            
+            # Configure treeview style
+            style = ttk.Style()
+            style.configure(
+                "Themed.Treeview",
+                background=colors["bg_primary"],
+                foreground=colors["text_primary"],
+                fieldbackground=colors["bg_secondary"],
+                borderwidth=0,
+                relief="flat"
+            )
+            
+            style.configure(
+                "Themed.Treeview.Heading",
+                background=colors["bg_tertiary"],
+                foreground=colors["text_primary"],
+                borderwidth=1,
+                relief="flat"
+            )
+            
+            # Apply the themed style
+            self.tree.configure(style="Themed.Treeview")
+            
+        except Exception as e:
+            print(f"⚠️ FileExplorer theme error: {e}")

@@ -425,3 +425,32 @@ class EnhancedGraphicsCanvas:
     def get_canvas(self) -> tk.Canvas:
         """Get the canvas object"""
         return self.canvas
+    
+    def apply_theme(self, colors):
+        """Apply theme colors to graphics canvas"""
+        try:
+            # Apply theme to canvas
+            self.canvas.configure(
+                bg=colors["bg_primary"],
+                highlightcolor=colors["accent"],
+                highlightbackground=colors["border"]
+            )
+            
+            # Apply theme to turtle screen
+            self.screen.bgcolor(colors["bg_primary"])
+            
+            # Update main frame background
+            self.frame.configure(style="Modern.TFrame")
+            
+            # Update status bar
+            self.status_label.configure(
+                background=colors["bg_secondary"],
+                foreground=colors["text_primary"]
+            )
+            self.position_label.configure(
+                background=colors["bg_secondary"],
+                foreground=colors["text_primary"]
+            )
+            
+        except Exception as e:
+            print(f"⚠️ EnhancedGraphicsCanvas theme error: {e}")

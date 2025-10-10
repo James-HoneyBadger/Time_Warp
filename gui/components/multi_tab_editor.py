@@ -487,3 +487,28 @@ class MultiTabEditor:
             if str(tab.frame) == selected_tab_id:
                 self.active_tab = tab
                 break
+    
+    def apply_theme(self, colors):
+        """Apply theme colors to all tabs"""
+        try:
+            # Apply theme to notebook
+            self.notebook.configure(style="Modern.TNotebook")
+            
+            # Apply theme to all tab editors
+            for tab in self.tabs.values():
+                if hasattr(tab, 'text_editor'):
+                    # Apply theme to text widget
+                    tab.text_editor.configure(
+                        bg=colors["bg_primary"],
+                        fg=colors["text_primary"],
+                        insertbackground=colors["accent"],
+                        selectbackground=colors["selection"],
+                        selectforeground=colors["text_primary"],
+                        relief="flat",
+                        borderwidth=0,
+                        highlightthickness=1,
+                        highlightcolor=colors["accent"],
+                        highlightbackground=colors["border"]
+                    )
+        except Exception as e:
+            print(f"⚠️ MultiTabEditor theme error: {e}")
