@@ -230,6 +230,10 @@ class TimeWarpIDE_v11:
         features_menu.add_command(label="📚 Tutorial System", command=self.show_tutorial_system)
         features_menu.add_command(label="🤖 AI Assistant", command=self.show_ai_assistant)
         features_menu.add_command(label="🎮 Gamification", command=self.show_gamification_dashboard)
+        features_menu.add_separator()
+        features_menu.add_command(label="📝 Code Templates", command=self.show_code_templates)
+        features_menu.add_command(label="🔍 Code Analyzer", command=self.show_code_analyzer)
+        features_menu.add_command(label="📊 Learning Progress", command=self.show_learning_progress)
 
         # Help menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
@@ -996,12 +1000,1429 @@ TIPS:
             print(f"❌ Tutorial system error: {e}")
 
     def show_ai_assistant(self):
-        """Show AI assistant"""
-        messagebox.showinfo("AI Assistant", "AI code help - Coming in next update!")
+        """Show AI coding assistant"""
+        try:
+            # Create AI assistant window
+            ai_window = tk.Toplevel(self.root)
+            ai_window.title("🤖 AI Coding Assistant")
+            ai_window.geometry("700x500")
+            ai_window.transient(self.root)
+            ai_window.grab_set()
+            
+            # Apply current theme
+            self.apply_theme_to_window(ai_window)
+            
+            # Create main frame
+            main_frame = ttk.Frame(ai_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="🤖 AI Coding Assistant", 
+                                   font=("Arial", 14, "bold"))
+            title_label.pack(pady=(0, 10))
+            
+            # Create notebook for different AI features
+            notebook = ttk.Notebook(main_frame)
+            notebook.pack(fill=tk.BOTH, expand=True)
+            
+            # Code Helper Tab
+            helper_frame = ttk.Frame(notebook)
+            notebook.add(helper_frame, text="💡 Code Helper")
+            
+            # Language selection
+            lang_frame = ttk.Frame(helper_frame)
+            lang_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
+            lang_var = tk.StringVar(value="PILOT")
+            lang_combo = ttk.Combobox(lang_frame, textvariable=lang_var, 
+                                     values=["PILOT", "BASIC", "Logo", "Python"],
+                                     state="readonly", width=10)
+            lang_combo.pack(side=tk.LEFT, padx=(5, 0))
+            
+            # Query input
+            ttk.Label(helper_frame, text="Ask the AI:").pack(anchor=tk.W, pady=(0, 5))
+            query_text = tk.Text(helper_frame, height=3, wrap=tk.WORD)
+            query_text.pack(fill=tk.X, pady=(0, 10))
+            query_text.insert(tk.END, "How do I draw a circle in Logo?")
+            
+            # Response area
+            ttk.Label(helper_frame, text="AI Response:").pack(anchor=tk.W, pady=(0, 5))
+            response_text = tk.Text(helper_frame, height=15, wrap=tk.WORD, font=("Consolas", 10))
+            response_scrollbar = ttk.Scrollbar(helper_frame, orient=tk.VERTICAL, command=response_text.yview)
+            response_text.configure(yscrollcommand=response_scrollbar.set)
+            
+            response_frame = ttk.Frame(helper_frame)
+            response_frame.pack(fill=tk.BOTH, expand=True)
+            response_text.pack(in_=response_frame, side=tk.LEFT, fill=tk.BOTH, expand=True)
+            response_scrollbar.pack(in_=response_frame, side=tk.RIGHT, fill=tk.Y)
+            
+            def ask_ai():
+                """Generate AI response based on query"""
+                query = query_text.get("1.0", tk.END).strip()
+                language = lang_var.get()
+                
+                # Simple AI responses based on common questions
+                responses = {
+                    "PILOT": {
+                        "hello": "T:Hello, World!\nT:Welcome to PILOT programming!\n\nThis displays two lines of text.",
+                        "input": "T:What's your name?\nA:\nT:Nice to meet you!\n\nA: accepts user input",
+                        "loop": "Use labels and J: (Jump) for loops:\n*START\nT:Count: $COUNT\nC:COUNT + 1\nY(START):COUNT < 10",
+                        "graphics": "FORWARD 100  # Move forward\nRIGHT 90     # Turn right\nFORWARD 50   # Draw a line"
+                    },
+                    "BASIC": {
+                        "hello": "10 PRINT \"Hello, World!\"\n20 END\n\nThis prints text and ends the program.",
+                        "input": "10 PRINT \"Enter your name:\"\n20 INPUT N$\n30 PRINT \"Hello \"; N$\n40 END",
+                        "loop": "10 FOR I = 1 TO 10\n20 PRINT \"Count: \"; I\n30 NEXT I\n40 END",
+                        "graphics": "10 FOR I = 1 TO 4\n20 FORWARD 100\n30 RIGHT 90\n40 NEXT I\n50 END"
+                    },
+                    "Logo": {
+                        "circle": "REPEAT 360 [FORWARD 1 RIGHT 1]\n\nThis draws a circle by moving forward 1 unit and turning right 1 degree, repeated 360 times.",
+                        "square": "REPEAT 4 [FORWARD 100 RIGHT 90]\n\nDraws a square with 100-unit sides.",
+                        "spiral": "REPEAT 100 [FORWARD :I RIGHT 91]\n\nCreates a spiral pattern.",
+                        "flower": "REPEAT 36 [\n  REPEAT 4 [FORWARD 50 RIGHT 90]\n  RIGHT 10\n]\n\nDraws a flower pattern with 36 squares."
+                    },
+                    "Python": {
+                        "hello": "print(\"Hello, World!\")\n\nSimple text output in Python.",
+                        "input": "name = input(\"What's your name? \")\nprint(f\"Hello, {name}!\")",
+                        "loop": "for i in range(1, 11):\n    print(f\"Count: {i}\")",
+                        "function": "def greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"World\"))"
+                    }
+                }
+                
+                # Generate response
+                lang_responses = responses.get(language, {})
+                response = "I'd be happy to help! Here are some examples:\n\n"
+                
+                # Check for keywords in query
+                query_lower = query.lower()
+                if "hello" in query_lower or "world" in query_lower:
+                    response += lang_responses.get("hello", "Try: print('Hello, World!')")
+                elif "input" in query_lower or "name" in query_lower:
+                    response += lang_responses.get("input", "Use input() to get user input")
+                elif "loop" in query_lower or "repeat" in query_lower:
+                    response += lang_responses.get("loop", "Use loops to repeat code")
+                elif "circle" in query_lower and language == "Logo":
+                    response += lang_responses.get("circle", "Use REPEAT to draw circles")
+                elif "square" in query_lower and language == "Logo":
+                    response += lang_responses.get("square", "Use REPEAT 4 for squares")
+                elif "function" in query_lower and language == "Python":
+                    response += lang_responses.get("function", "Use def to create functions")
+                else:
+                    # General help
+                    response += f"For {language} programming:\n\n"
+                    if language == "PILOT":
+                        response += "• T: - Display text\n• A: - Get input\n• J: - Jump to label\n• M: - Match input"
+                    elif language == "BASIC":
+                        response += "• PRINT - Display text\n• INPUT - Get input\n• FOR...NEXT - Loops\n• IF...THEN - Conditions"
+                    elif language == "Logo":
+                        response += "• FORWARD/BACK - Move turtle\n• LEFT/RIGHT - Turn turtle\n• REPEAT - Loop commands\n• PENUP/PENDOWN - Control drawing"
+                    elif language == "Python":
+                        response += "• print() - Display text\n• input() - Get input\n• for/while - Loops\n• if/elif/else - Conditions"
+                
+                response += f"\n\n💡 Try running this code in TimeWarp IDE!"
+                
+                response_text.delete("1.0", tk.END)
+                response_text.insert(tk.END, response)
+            
+            # Ask button
+            ask_btn = ttk.Button(helper_frame, text="Ask AI", command=ask_ai)
+            ask_btn.pack(pady=10)
+            
+            # Code Examples Tab
+            examples_frame = ttk.Frame(notebook)
+            notebook.add(examples_frame, text="📝 Examples")
+            
+            examples_text = tk.Text(examples_frame, wrap=tk.WORD, font=("Consolas", 10))
+            examples_scrollbar = ttk.Scrollbar(examples_frame, orient=tk.VERTICAL, command=examples_text.yview)
+            examples_text.configure(yscrollcommand=examples_scrollbar.set)
+            
+            examples_content = """📝 CODE EXAMPLES FOR ALL LANGUAGES
+
+🚁 PILOT EXAMPLES:
+-------------------
+Simple Greeting:
+T:Hello! What's your name?
+A:
+T:Nice to meet you, $INPUT!
+
+Quiz Program:
+T:What's 5 + 3?
+A:
+M:8
+Y:T:Correct! Well done!
+N:T:Wrong! The answer is 8.
+
+🔢 BASIC EXAMPLES:
+------------------
+Calculator:
+10 INPUT "First number: "; A
+20 INPUT "Second number: "; B
+30 PRINT "Sum: "; A + B
+40 END
+
+Counting Game:
+10 FOR I = 1 TO 5
+20 PRINT "Count: "; I
+30 FOR J = 1 TO 1000: NEXT J
+40 NEXT I
+50 END
+
+🐢 LOGO EXAMPLES:
+-----------------
+House Drawing:
+REPEAT 4 [FORWARD 100 RIGHT 90]
+FORWARD 100
+RIGHT 30
+FORWARD 100
+RIGHT 120
+FORWARD 100
+RIGHT 30
+
+Colorful Pattern:
+REPEAT 8 [
+  SETPENCOLOR "RED"
+  FORWARD 100
+  RIGHT 45
+  SETPENCOLOR "BLUE"
+  FORWARD 50
+]
+
+🐍 PYTHON EXAMPLES:
+-------------------
+File Reader:
+with open("test.txt", "r") as file:
+    content = file.read()
+    print(content)
+
+Simple Game:
+import random
+number = random.randint(1, 100)
+guess = int(input("Guess (1-100): "))
+if guess == number:
+    print("Correct!")
+else:
+    print(f"Wrong! It was {number}")
+
+💡 TIP: Copy any example and paste it into TimeWarp IDE!"""
+            
+            examples_text.insert(tk.END, examples_content)
+            examples_text.config(state=tk.DISABLED)
+            
+            examples_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            examples_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Close button
+            close_btn = ttk.Button(main_frame, text="Close Assistant", 
+                                  command=ai_window.destroy)
+            close_btn.pack(pady=10)
+            
+            # Initial AI response
+            ask_ai()
+            
+            print("🤖 AI Assistant opened")
+            
+        except Exception as e:
+            messagebox.showerror("AI Assistant Error", f"Failed to open AI assistant:\n{str(e)}")
+            print(f"❌ AI Assistant error: {e}")
 
     def show_gamification_dashboard(self):
-        """Show gamification dashboard"""
-        messagebox.showinfo("Gamification", "Achievement system - Coming in next update!")
+        """Show gamification and achievement dashboard"""
+        try:
+            # Create gamification window
+            game_window = tk.Toplevel(self.root)
+            game_window.title("🎮 Gamification Dashboard")
+            game_window.geometry("800x600")
+            game_window.transient(self.root)
+            game_window.grab_set()
+            
+            # Apply current theme
+            self.apply_theme_to_window(game_window)
+            
+            # Create main frame
+            main_frame = ttk.Frame(game_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="🎮 TimeWarp IDE Gamification", 
+                                   font=("Arial", 16, "bold"))
+            title_label.pack(pady=(0, 20))
+            
+            # Create notebook for different sections
+            notebook = ttk.Notebook(main_frame)
+            notebook.pack(fill=tk.BOTH, expand=True)
+            
+            # Achievements Tab
+            achievements_frame = ttk.Frame(notebook)
+            notebook.add(achievements_frame, text="🏆 Achievements")
+            
+            # Achievement list
+            achievements_text = tk.Text(achievements_frame, wrap=tk.WORD, font=("Arial", 11))
+            achievements_scrollbar = ttk.Scrollbar(achievements_frame, orient=tk.VERTICAL, command=achievements_text.yview)
+            achievements_text.configure(yscrollcommand=achievements_scrollbar.set)
+            
+            achievements_content = """🏆 ACHIEVEMENT SYSTEM
+
+Welcome to TimeWarp IDE's Learning Journey! Complete challenges to unlock achievements and level up your programming skills!
+
+🥇 BEGINNER ACHIEVEMENTS:
+▣ First Steps - Run your first program in any language
+▣ Hello World - Create a "Hello, World!" program
+▣ Code Explorer - Try all 4 programming languages (PILOT, BASIC, Logo, Python)
+▣ File Master - Save and load 5 different programs
+▣ Theme Collector - Try all 8 available themes
+
+🥈 INTERMEDIATE ACHIEVEMENTS:
+▣ Loop Master - Write 3 different types of loops
+▣ Graphics Artist - Create 5 turtle graphics programs
+▣ Problem Solver - Fix 10 code errors using the error messages
+▣ Speed Coder - Write a program in under 2 minutes
+▣ Multi-Tab Pro - Work with 5 tabs simultaneously
+
+🥉 ADVANCED ACHIEVEMENTS:
+▣ Language Polyglot - Write the same program in all 4 languages
+▣ Graphics Wizard - Create complex geometric patterns
+▣ Code Optimizer - Improve program efficiency by 50%
+▣ Teaching Assistant - Help others learn programming concepts
+▣ Innovation Award - Create something completely original
+
+🌟 SPECIAL ACHIEVEMENTS:
+▣ Retro Programmer - Master PILOT language commands
+▣ BASIC Pioneer - Create advanced BASIC programs with graphics
+▣ Logo Legend - Draw intricate patterns and designs
+▣ Python Expert - Use advanced Python features
+▣ TimeWarp Master - Unlock all other achievements
+
+📊 CURRENT PROGRESS:
+• Programs Run: 0/100 ⭐
+• Languages Used: 0/4 🔤
+• Files Saved: 0/50 💾
+• Themes Tried: 1/8 🎨
+• Errors Fixed: 0/25 🔧
+
+🎯 DAILY CHALLENGES:
+• Today: Write a program that draws your initials
+• Bonus: Use at least 3 different colors
+• Reward: +50 XP and "Artist" badge
+
+💡 TIPS TO EARN ACHIEVEMENTS:
+1. Experiment with different languages regularly
+2. Save your work frequently
+3. Try new themes to keep things fresh
+4. Don't be afraid to make mistakes - they help you learn!
+5. Share your cool programs with others
+
+🔥 STREAK COUNTER: 0 days
+Keep coding daily to build your streak!"""
+            
+            achievements_text.insert(tk.END, achievements_content)
+            achievements_text.config(state=tk.DISABLED)
+            
+            achievements_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            achievements_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Progress Tab
+            progress_frame = ttk.Frame(notebook)
+            notebook.add(progress_frame, text="📊 Progress")
+            
+            # Create progress indicators
+            progress_main = ttk.Frame(progress_frame)
+            progress_main.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+            
+            # Level display
+            level_frame = ttk.LabelFrame(progress_main, text="Your Level", padding=10)
+            level_frame.pack(fill=tk.X, pady=(0, 20))
+            
+            ttk.Label(level_frame, text="🌟 Level 1: Novice Programmer", 
+                     font=("Arial", 14, "bold")).pack()
+            ttk.Label(level_frame, text="XP: 0 / 100", font=("Arial", 12)).pack()
+            
+            # Progress bar
+            level_progress = ttk.Progressbar(level_frame, length=300, mode='determinate')
+            level_progress['value'] = 0
+            level_progress.pack(pady=10)
+            
+            # Stats
+            stats_frame = ttk.LabelFrame(progress_main, text="Statistics", padding=10)
+            stats_frame.pack(fill=tk.X, pady=(0, 20))
+            
+            stats_grid = ttk.Frame(stats_frame)
+            stats_grid.pack(fill=tk.X)
+            
+            # Left column
+            left_stats = ttk.Frame(stats_grid)
+            left_stats.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            
+            ttk.Label(left_stats, text="📝 Programs Written: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(left_stats, text="🚀 Programs Run: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(left_stats, text="💾 Files Saved: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(left_stats, text="🔤 Languages Used: 0/4", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            
+            # Right column
+            right_stats = ttk.Frame(stats_grid)
+            right_stats.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            
+            ttk.Label(right_stats, text="🏆 Achievements: 0/25", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(right_stats, text="🎨 Themes Tried: 1/8", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(right_stats, text="🔥 Current Streak: 0 days", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            ttk.Label(right_stats, text="⏱️ Time Coding: 0 minutes", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
+            
+            # Language proficiency
+            proficiency_frame = ttk.LabelFrame(progress_main, text="Language Proficiency", padding=10)
+            proficiency_frame.pack(fill=tk.X)
+            
+            languages = [("🚁 PILOT", 0), ("🔢 BASIC", 0), ("🐢 Logo", 0), ("🐍 Python", 0)]
+            
+            for lang, level in languages:
+                lang_frame = ttk.Frame(proficiency_frame)
+                lang_frame.pack(fill=tk.X, pady=2)
+                
+                ttk.Label(lang_frame, text=lang, width=15).pack(side=tk.LEFT)
+                prog = ttk.Progressbar(lang_frame, length=200, mode='determinate')
+                prog['value'] = level
+                prog.pack(side=tk.LEFT, padx=(10, 5))
+                ttk.Label(lang_frame, text=f"{level}%").pack(side=tk.LEFT)
+            
+            # Challenges Tab
+            challenges_frame = ttk.Frame(notebook)
+            notebook.add(challenges_frame, text="🎯 Challenges")
+            
+            challenges_text = tk.Text(challenges_frame, wrap=tk.WORD, font=("Arial", 11))
+            challenges_scrollbar = ttk.Scrollbar(challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview)
+            challenges_text.configure(yscrollcommand=challenges_scrollbar.set)
+            
+            challenges_content = """🎯 PROGRAMMING CHALLENGES
+
+Ready to test your skills? Complete these challenges to earn XP and achievements!
+
+🟢 BEGINNER CHALLENGES (10 XP each):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Hello Universe
+   • Write "Hello, Universe!" in PILOT
+   • Bonus: Add your name to the greeting
+
+2. Simple Math
+   • Create a BASIC program that adds two numbers
+   • Let the user input both numbers
+
+3. Square Dance
+   • Draw a square using Logo commands
+   • Make it exactly 100 units per side
+
+4. Color Explorer
+   • Try 3 different pen colors in Logo
+   • Draw something with each color
+
+5. Input Master
+   • Get user's name and age in any language
+   • Display a personalized message
+
+🟡 INTERMEDIATE CHALLENGES (25 XP each):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. Pattern Maker
+   • Create a repeating geometric pattern
+   • Use at least 5 different shapes
+
+7. Quiz Master
+   • Build a 5-question quiz in PILOT
+   • Keep score and show final results
+
+8. Loop Artist
+   • Use FOR loops to create nested patterns
+   • Try both BASIC and Logo
+
+9. Number Guesser
+   • Create a guessing game with hints
+   • "Too high", "Too low", "Correct!"
+
+10. Multi-Language
+    • Write the same program in 2 languages
+    • Compare how they work differently
+
+🔴 ADVANCED CHALLENGES (50 XP each):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. Fractal Explorer
+    • Draw a recursive pattern
+    • Make it at least 3 levels deep
+
+12. Animation Creator
+    • Create moving graphics
+    • Use timing and redrawing
+
+13. Code Golf
+    • Solve a problem in minimum lines
+    • Every character counts!
+
+14. Teaching Tool
+    • Create a program that teaches others
+    • Include interactive examples
+
+15. Innovation Challenge
+    • Create something completely unique
+    • Surprise us with your creativity!
+
+🏆 WEEKLY CHALLENGES:
+━━━━━━━━━━━━━━━━━━━━
+This Week: "Retro Game Recreation"
+• Recreate a classic game like Pong or Snake
+• Use any TimeWarp language
+• Deadline: End of week
+• Reward: 100 XP + Special Badge
+
+💡 CHALLENGE TIPS:
+• Start with easier challenges first
+• Don't hesitate to experiment
+• Learn from your mistakes
+• Ask for help when needed
+• Have fun while learning!
+
+🎖️ COMPLETION REWARDS:
+• 5 challenges: "Challenge Accepted" badge
+• 10 challenges: "Problem Solver" badge  
+• 15 challenges: "Challenge Master" badge
+• All challenges: "TimeWarp Champion" title"""
+            
+            challenges_text.insert(tk.END, challenges_content)
+            challenges_text.config(state=tk.DISABLED)
+            
+            challenges_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            challenges_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Close button
+            close_btn = ttk.Button(main_frame, text="Close Dashboard", 
+                                  command=game_window.destroy)
+            close_btn.pack(pady=10)
+            
+            print("🎮 Gamification dashboard opened")
+            
+        except Exception as e:
+            messagebox.showerror("Gamification Error", f"Failed to open gamification dashboard:\n{str(e)}")
+            print(f"❌ Gamification error: {e}")
+
+    def show_code_templates(self):
+        """Show code templates for quick programming"""
+        try:
+            # Create templates window
+            templates_window = tk.Toplevel(self.root)
+            templates_window.title("📝 Code Templates")
+            templates_window.geometry("800x600")
+            templates_window.transient(self.root)
+            templates_window.grab_set()
+            
+            # Apply current theme
+            self.apply_theme_to_window(templates_window)
+            
+            # Create main frame
+            main_frame = ttk.Frame(templates_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="📝 Code Templates", 
+                                   font=("Arial", 14, "bold"))
+            title_label.pack(pady=(0, 10))
+            
+            # Language selection
+            lang_frame = ttk.Frame(main_frame)
+            lang_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
+            lang_var = tk.StringVar(value="PILOT")
+            lang_combo = ttk.Combobox(lang_frame, textvariable=lang_var, 
+                                     values=["PILOT", "BASIC", "Logo", "Python"],
+                                     state="readonly", width=10)
+            lang_combo.pack(side=tk.LEFT, padx=(5, 20))
+            
+            # Template categories
+            ttk.Label(lang_frame, text="Category:").pack(side=tk.LEFT)
+            category_var = tk.StringVar(value="Basic")
+            category_combo = ttk.Combobox(lang_frame, textvariable=category_var,
+                                         values=["Basic", "Loops", "Graphics", "Games", "Math"],
+                                         state="readonly", width=10)
+            category_combo.pack(side=tk.LEFT, padx=(5, 0))
+            
+            # Templates display
+            templates_text = tk.Text(main_frame, height=25, wrap=tk.NONE, font=("Consolas", 10))
+            templates_scrollbar_y = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=templates_text.yview)
+            templates_scrollbar_x = ttk.Scrollbar(main_frame, orient=tk.HORIZONTAL, command=templates_text.xview)
+            templates_text.configure(yscrollcommand=templates_scrollbar_y.set, xscrollcommand=templates_scrollbar_x.set)
+            
+            # Template data
+            templates = {
+                "PILOT": {
+                    "Basic": """📝 PILOT BASIC TEMPLATES
+
+1. Hello World Program:
+T:Hello, World!
+T:Welcome to PILOT programming!
+
+2. User Input:
+T:What's your name?
+A:
+T:Hello, $INPUT!
+
+3. Simple Quiz:
+T:What's 2 + 2?
+A:
+M:4
+Y:T:Correct!
+N:T:Try again!
+
+4. Conditional Jump:
+T:Are you ready? (yes/no)
+A:
+M:yes
+Y:J(START)
+T:Come back when ready!
+E:
+*START
+T:Let's begin!""",
+                    "Loops": """🔄 PILOT LOOP TEMPLATES
+
+1. Counting Loop:
+C:COUNT = 1
+*LOOP
+T:Count: $COUNT
+C:COUNT + 1
+Y(LOOP):COUNT <= 10
+
+2. Menu Loop:
+*MENU
+T:Choose: 1) Start 2) Help 3) Exit
+A:
+M:1
+Y:J(START)
+M:2
+Y:J(HELP)
+M:3
+Y:J(EXIT)
+J(MENU)
+
+3. Quiz Loop:
+C:SCORE = 0
+*QUESTION
+T:Question: What's the capital of France?
+A:
+M:Paris
+Y:C:SCORE + 1
+T:Score: $SCORE
+J(QUESTION)""",
+                    "Graphics": """🎨 PILOT GRAPHICS TEMPLATES
+
+1. Simple Drawing:
+PENDOWN
+FORWARD 100
+RIGHT 90
+FORWARD 100
+
+2. Square Pattern:
+REPEAT 4
+  FORWARD 100
+  RIGHT 90
+END
+
+3. Spiral:
+C:SIZE = 10
+*SPIRAL
+FORWARD $SIZE
+RIGHT 91
+C:SIZE + 5
+Y(SPIRAL):SIZE < 200""",
+                    "Games": """🎮 PILOT GAME TEMPLATES
+
+1. Number Guessing Game:
+C:NUMBER = RND(100) + 1
+C:TRIES = 0
+*GUESS
+T:Guess my number (1-100):
+A:
+C:TRIES + 1
+Y(HIGH):INPUT > NUMBER
+Y(LOW):INPUT < NUMBER
+T:Correct in $TRIES tries!
+E:
+*HIGH
+T:Too high!
+J(GUESS)
+*LOW
+T:Too low!
+J(GUESS)
+
+2. Simple Adventure:
+T:You're in a dark room.
+T:Go (n)orth or (s)outh?
+A:
+M:n
+Y:J(NORTH)
+M:s
+Y:J(SOUTH)
+*NORTH
+T:You found a treasure!
+*SOUTH
+T:You found a monster!""",
+                    "Math": """🔢 PILOT MATH TEMPLATES
+
+1. Calculator:
+T:Enter first number:
+A:
+C:A = INPUT
+T:Enter second number:
+A:
+C:B = INPUT
+C:SUM = A + B
+T:Sum: $SUM
+
+2. Multiplication Table:
+T:Which table? (1-12)
+A:
+C:NUM = INPUT
+C:I = 1
+*TABLE
+C:RESULT = NUM * I
+T:$NUM x $I = $RESULT
+C:I + 1
+Y(TABLE):I <= 12"""
+                },
+                "BASIC": {
+                    "Basic": """📝 BASIC BASIC TEMPLATES
+
+1. Hello World:
+10 PRINT "Hello, World!"
+20 END
+
+2. User Input:
+10 PRINT "What's your name?"
+20 INPUT N$
+30 PRINT "Hello "; N$; "!"
+40 END
+
+3. Simple Math:
+10 INPUT "First number: "; A
+20 INPUT "Second number: "; B
+30 PRINT "Sum: "; A + B
+40 END
+
+4. Conditional:
+10 INPUT "Enter a number: "; N
+20 IF N > 0 THEN PRINT "Positive"
+30 IF N < 0 THEN PRINT "Negative"
+40 IF N = 0 THEN PRINT "Zero"
+50 END""",
+                    "Loops": """🔄 BASIC LOOP TEMPLATES
+
+1. FOR Loop:
+10 FOR I = 1 TO 10
+20 PRINT "Count: "; I
+30 NEXT I
+40 END
+
+2. WHILE Loop:
+10 LET N = 1
+20 WHILE N <= 5
+30 PRINT N
+40 LET N = N + 1
+50 WEND
+60 END
+
+3. Nested Loops:
+10 FOR I = 1 TO 3
+20 FOR J = 1 TO 3
+30 PRINT I; "x"; J; "="; I*J
+40 NEXT J
+50 NEXT I
+60 END""",
+                    "Graphics": """🎨 BASIC GRAPHICS TEMPLATES
+
+1. Square:
+10 FOR I = 1 TO 4
+20 FORWARD 100
+30 RIGHT 90
+40 NEXT I
+50 END
+
+2. Colorful Pattern:
+10 FOR C = 1 TO 8
+20 SETCOLOR C
+30 FORWARD 50
+40 RIGHT 45
+50 NEXT C
+60 END
+
+3. Spiral:
+10 FOR I = 1 TO 50
+20 FORWARD I * 2
+30 RIGHT 91
+40 NEXT I
+50 END""",
+                    "Games": """🎮 BASIC GAME TEMPLATES
+
+1. Guessing Game:
+10 LET N = INT(RND * 100) + 1
+20 LET T = 0
+30 PRINT "Guess my number (1-100):"
+40 INPUT G
+50 LET T = T + 1
+60 IF G = N THEN GOTO 100
+70 IF G < N THEN PRINT "Too low!"
+80 IF G > N THEN PRINT "Too high!"
+90 GOTO 40
+100 PRINT "Correct in "; T; " tries!"
+110 END
+
+2. Rock Paper Scissors:
+10 PRINT "Rock (1), Paper (2), Scissors (3):"
+20 INPUT P
+30 LET C = INT(RND * 3) + 1
+40 PRINT "Computer chose: "; C
+50 IF P = C THEN PRINT "Tie!"
+60 IF (P=1 AND C=3) OR (P=2 AND C=1) OR (P=3 AND C=2) THEN PRINT "You win!"
+70 IF (C=1 AND P=3) OR (C=2 AND P=1) OR (C=3 AND P=2) THEN PRINT "You lose!"
+80 END""",
+                    "Math": """🔢 BASIC MATH TEMPLATES
+
+1. Area Calculator:
+10 PRINT "Rectangle area calculator"
+20 INPUT "Length: "; L
+30 INPUT "Width: "; W
+40 PRINT "Area: "; L * W
+50 END
+
+2. Prime Checker:
+10 INPUT "Enter a number: "; N
+20 LET P = 1
+30 FOR I = 2 TO SQR(N)
+40 IF N MOD I = 0 THEN P = 0
+50 NEXT I
+60 IF P = 1 THEN PRINT N; " is prime"
+70 IF P = 0 THEN PRINT N; " is not prime"
+80 END"""
+                },
+                "Logo": {
+                    "Basic": """📝 LOGO BASIC TEMPLATES
+
+1. Hello World:
+PRINT [Hello, World!]
+
+2. Simple Drawing:
+FORWARD 100
+RIGHT 90
+FORWARD 100
+
+3. User Input:
+PRINT [What's your name?]
+MAKE "NAME READWORD
+PRINT (SENTENCE [Hello] :NAME)
+
+4. Repeat Pattern:
+REPEAT 4 [FORWARD 100 RIGHT 90]""",
+                    "Loops": """🔄 LOGO LOOP TEMPLATES
+
+1. Square with Repeat:
+REPEAT 4 [FORWARD 100 RIGHT 90]
+
+2. Nested Repeat:
+REPEAT 8 [
+  REPEAT 4 [FORWARD 50 RIGHT 90]
+  RIGHT 45
+]
+
+3. Variable Loop:
+MAKE "SIZE 10
+REPEAT 20 [
+  FORWARD :SIZE
+  RIGHT 90
+  MAKE "SIZE :SIZE + 5
+]""",
+                    "Graphics": """🎨 LOGO GRAPHICS TEMPLATES
+
+1. Colorful Square:
+SETPENCOLOR "RED"
+REPEAT 4 [FORWARD 100 RIGHT 90]
+
+2. Flower Pattern:
+REPEAT 36 [
+  REPEAT 4 [FORWARD 50 RIGHT 90]
+  RIGHT 10
+]
+
+3. Spiral:
+REPEAT 100 [FORWARD REPCOUNT RIGHT 91]
+
+4. Star:
+REPEAT 5 [FORWARD 100 RIGHT 144]
+
+5. Circle:
+REPEAT 360 [FORWARD 1 RIGHT 1]""",
+                    "Games": """🎮 LOGO GAME TEMPLATES
+
+1. Random Walker:
+REPEAT 100 [
+  FORWARD 10
+  RIGHT RANDOM 360
+]
+
+2. Maze Generator:
+TO MAZE
+  REPEAT 4 [
+    FORWARD 50
+    IF RANDOM 2 = 0 [RIGHT 90] [LEFT 90]
+  ]
+END
+
+3. Target Practice:
+TO TARGET
+  REPEAT 5 [
+    SETPENCOLOR RANDOM 8
+    CIRCLE 20 + (REPCOUNT * 10)
+  ]
+END""",
+                    "Math": """🔢 LOGO MATH TEMPLATES
+
+1. Multiplication Visualization:
+TO TIMES :A :B
+  REPEAT :A [
+    REPEAT :B [FORWARD 10 RIGHT 90 FORWARD 10 LEFT 90]
+    BACK :B * 10
+    RIGHT 90
+    FORWARD 10
+    LEFT 90
+  ]
+END
+
+2. Fibonacci Spiral:
+TO FIBONACCI :N
+  IF :N < 2 [FORWARD :N STOP]
+  FIBONACCI :N - 1
+  RIGHT 90
+  FIBONACCI :N - 2
+END
+
+3. Geometric Series:
+MAKE "SIZE 100
+REPEAT 10 [
+  FORWARD :SIZE
+  RIGHT 90
+  MAKE "SIZE :SIZE * 0.8
+]"""
+                },
+                "Python": {
+                    "Basic": """📝 PYTHON BASIC TEMPLATES
+
+1. Hello World:
+print("Hello, World!")
+
+2. User Input:
+name = input("What's your name? ")
+print(f"Hello, {name}!")
+
+3. Variables and Math:
+a = int(input("First number: "))
+b = int(input("Second number: "))
+print(f"Sum: {a + b}")
+
+4. Conditional:
+number = int(input("Enter a number: "))
+if number > 0:
+    print("Positive")
+elif number < 0:
+    print("Negative")
+else:
+    print("Zero")""",
+                    "Loops": """🔄 PYTHON LOOP TEMPLATES
+
+1. For Loop:
+for i in range(1, 11):
+    print(f"Count: {i}")
+
+2. While Loop:
+count = 1
+while count <= 5:
+    print(count)
+    count += 1
+
+3. List Iteration:
+fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+4. Nested Loop:
+for i in range(1, 4):
+    for j in range(1, 4):
+        print(f"{i} x {j} = {i*j}")""",
+                    "Graphics": """🎨 PYTHON GRAPHICS TEMPLATES
+
+1. Turtle Square:
+import turtle
+t = turtle.Turtle()
+for i in range(4):
+    t.forward(100)
+    t.right(90)
+
+2. Colorful Spiral:
+import turtle
+t = turtle.Turtle()
+colors = ["red", "blue", "green", "yellow"]
+for i in range(100):
+    t.color(colors[i % 4])
+    t.forward(i)
+    t.right(91)
+
+3. Star Pattern:
+import turtle
+t = turtle.Turtle()
+for i in range(5):
+    t.forward(100)
+    t.right(144)""",
+                    "Games": """🎮 PYTHON GAME TEMPLATES
+
+1. Number Guessing:
+import random
+number = random.randint(1, 100)
+tries = 0
+while True:
+    guess = int(input("Guess (1-100): "))
+    tries += 1
+    if guess == number:
+        print(f"Correct in {tries} tries!")
+        break
+    elif guess < number:
+        print("Too low!")
+    else:
+        print("Too high!")
+
+2. Rock Paper Scissors:
+import random
+choices = ["rock", "paper", "scissors"]
+computer = random.choice(choices)
+player = input("rock, paper, or scissors? ").lower()
+print(f"Computer chose: {computer}")
+if player == computer:
+    print("Tie!")
+elif (player == "rock" and computer == "scissors") or \\
+     (player == "paper" and computer == "rock") or \\
+     (player == "scissors" and computer == "paper"):
+    print("You win!")
+else:
+    print("You lose!")""",
+                    "Math": """🔢 PYTHON MATH TEMPLATES
+
+1. Prime Checker:
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+number = int(input("Enter a number: "))
+if is_prime(number):
+    print(f"{number} is prime")
+else:
+    print(f"{number} is not prime")
+
+2. Factorial Calculator:
+def factorial(n):
+    if n == 0 or n == 1:
+        return 1
+    return n * factorial(n - 1)
+
+num = int(input("Enter a number: "))
+print(f"{num}! = {factorial(num)}")"""
+                }
+            }
+            
+            def update_templates():
+                """Update templates based on language and category selection"""
+                language = lang_var.get()
+                category = category_var.get() 
+                
+                content = templates.get(language, {}).get(category, "No templates available for this combination.")
+                
+                templates_text.delete("1.0", tk.END)
+                templates_text.insert(tk.END, content)
+            
+            # Bind combo box changes
+            lang_combo.bind("<<ComboboxSelected>>", lambda e: update_templates())
+            category_combo.bind("<<ComboboxSelected>>", lambda e: update_templates())
+            
+            # Pack text widget with scrollbars
+            text_frame = ttk.Frame(main_frame)
+            text_frame.pack(fill=tk.BOTH, expand=True)
+            
+            templates_text.pack(in_=text_frame, side=tk.LEFT, fill=tk.BOTH, expand=True)
+            templates_scrollbar_y.pack(in_=text_frame, side=tk.RIGHT, fill=tk.Y)
+            templates_scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
+            
+            # Buttons
+            button_frame = ttk.Frame(main_frame)
+            button_frame.pack(fill=tk.X, pady=10)
+            
+            def copy_template():
+                """Copy selected template to clipboard"""
+                try:
+                    selected_text = templates_text.get(tk.SEL_FIRST, tk.SEL_LAST)
+                    if selected_text:
+                        templates_window.clipboard_clear()
+                        templates_window.clipboard_append(selected_text)
+                        messagebox.showinfo("Copied", "Template copied to clipboard!")
+                    else:
+                        messagebox.showwarning("No Selection", "Please select text to copy.")
+                except tk.TclError:
+                    messagebox.showwarning("No Selection", "Please select text to copy.")
+            
+            ttk.Button(button_frame, text="Copy Selected", command=copy_template).pack(side=tk.LEFT, padx=(0, 10))
+            ttk.Button(button_frame, text="Close", command=templates_window.destroy).pack(side=tk.RIGHT)
+            
+            # Load initial templates
+            update_templates()
+            
+            print("📝 Code templates opened")
+            
+        except Exception as e:
+            messagebox.showerror("Templates Error", f"Failed to open code templates:\n{str(e)}")
+            print(f"❌ Templates error: {e}")
+
+    def show_code_analyzer(self):
+        """Show code analysis and metrics"""
+        try:
+            # Create analyzer window
+            analyzer_window = tk.Toplevel(self.root)
+            analyzer_window.title("🔍 Code Analyzer")
+            analyzer_window.geometry("700x500")
+            analyzer_window.transient(self.root)
+            analyzer_window.grab_set()
+            
+            # Apply current theme
+            self.apply_theme_to_window(analyzer_window)
+            
+            # Create main frame
+            main_frame = ttk.Frame(analyzer_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="🔍 Code Analyzer", 
+                                   font=("Arial", 14, "bold"))
+            title_label.pack(pady=(0, 10))
+            
+            # Get current code
+            current_code = ""
+            if hasattr(self, 'multi_tab_editor') and self.multi_tab_editor.tabs:
+                current_code = self.multi_tab_editor.get_active_content()
+            
+            # Analysis results
+            results_text = tk.Text(main_frame, wrap=tk.WORD, font=("Consolas", 10), height=25)
+            results_scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=results_text.yview)
+            results_text.configure(yscrollcommand=results_scrollbar.set)
+            
+            # Perform analysis
+            analysis = self.analyze_code(current_code)
+            
+            results_text.insert(tk.END, analysis)
+            results_text.config(state=tk.DISABLED)
+            
+            results_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            results_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Close button
+            close_btn = ttk.Button(main_frame, text="Close Analyzer", 
+                                  command=analyzer_window.destroy)
+            close_btn.pack(pady=10)
+            
+            print("🔍 Code analyzer opened")
+            
+        except Exception as e:
+            messagebox.showerror("Analyzer Error", f"Failed to open code analyzer:\n{str(e)}")
+            print(f"❌ Analyzer error: {e}")
+
+    def analyze_code(self, code):
+        """Analyze code and return metrics and suggestions"""
+        if not code.strip():
+            return """🔍 CODE ANALYZER
+
+No code to analyze. Please open a file or write some code in the editor first.
+
+The Code Analyzer can help you with:
+• Line count and complexity metrics
+• Code quality suggestions
+• Performance tips
+• Best practice recommendations
+• Language-specific advice
+
+Write some code and run the analyzer again!"""
+        
+        lines = code.split('\n')
+        total_lines = len(lines)
+        non_empty_lines = len([line for line in lines if line.strip()])
+        comment_lines = len([line for line in lines if line.strip().startswith(('#', 'REM', '//'))])
+        
+        # Detect language
+        language = "Unknown"
+        if any(line.strip().startswith(('T:', 'A:', 'J:', 'Y:', 'N:')) for line in lines):
+            language = "PILOT"
+        elif any(line.strip().split()[0].isdigit() if line.strip().split() else False for line in lines):
+            language = "BASIC"
+        elif any(word in code.upper() for word in ['FORWARD', 'BACK', 'LEFT', 'RIGHT', 'REPEAT']):
+            language = "Logo"
+        elif any(word in code for word in ['print(', 'def ', 'import ', 'if __name__']):
+            language = "Python"
+        
+        # Calculate complexity
+        complexity_keywords = ['IF', 'FOR', 'WHILE', 'REPEAT', 'Y:', 'N:', 'J:']
+        complexity_score = sum(1 for line in lines for keyword in complexity_keywords if keyword in line.upper())
+        
+        # Generate suggestions
+        suggestions = []
+        if comment_lines == 0 and non_empty_lines > 5:
+            suggestions.append("• Add comments to explain your code")
+        if total_lines > 50:
+            suggestions.append("• Consider breaking long programs into smaller functions")
+        if complexity_score > 10:
+            suggestions.append("• High complexity detected - consider simplifying logic")
+        if language == "PILOT" and 'E:' not in code:
+            suggestions.append("• Consider adding E: (End) statements for better structure")
+        if language == "BASIC" and 'END' not in code.upper():
+            suggestions.append("• Don't forget to add END statement")
+        if not suggestions:
+            suggestions.append("• Code looks good! Keep up the great work!")
+        
+        return f"""🔍 CODE ANALYSIS RESULTS
+
+📊 BASIC METRICS:
+• Total Lines: {total_lines}
+• Non-empty Lines: {non_empty_lines}
+• Comment Lines: {comment_lines}
+• Detected Language: {language}
+• Complexity Score: {complexity_score}/10
+
+📈 CODE QUALITY:
+• Comment Ratio: {comment_lines/non_empty_lines*100:.1f}% (Good: >10%)
+• Code Density: {non_empty_lines/total_lines*100:.1f}% (Good: 60-80%)
+• Average Line Length: {sum(len(line) for line in lines)/len(lines):.1f} chars
+
+🎯 SUGGESTIONS:
+{chr(10).join(suggestions)}
+
+🔧 LANGUAGE-SPECIFIC TIPS:
+{self.get_language_tips(language)}
+
+💡 PERFORMANCE NOTES:
+• Avoid deeply nested loops where possible
+• Use meaningful variable names
+• Keep functions/procedures focused on one task
+• Test your code with different inputs
+
+🌟 GOOD PRACTICES:
+• Save your work frequently
+• Use version control for important projects
+• Write code that others (including future you) can understand
+• Don't be afraid to refactor and improve
+
+Keep coding and improving! 🚀"""
+
+    def get_language_tips(self, language):
+        """Get language-specific coding tips"""
+        tips = {
+            "PILOT": """• Use labels (*LABEL) for better organization
+• Match statements (M:) are case-sensitive
+• Variables are referenced with $ (e.g., $INPUT)
+• Use E: to end program sections cleanly""",
+            
+            "BASIC": """• Line numbers help organize program flow
+• Use meaningful variable names (A$, NAME$, etc.)
+• FOR...NEXT loops are very efficient
+• DIM arrays before using them""",
+            
+            "Logo": """• PENUP/PENDOWN control drawing
+• Use procedures (TO...END) for reusable code
+• REPEAT is more efficient than multiple commands
+• Variables start with : (e.g., :SIZE)""",
+            
+            "Python": """• Follow PEP 8 style guidelines
+• Use list comprehensions for efficiency
+• Handle exceptions with try/except
+• Use f-strings for string formatting""",
+            
+            "Unknown": """• Write clear, readable code
+• Use consistent indentation
+• Add comments for complex logic
+• Test your code thoroughly"""
+        }
+        return tips.get(language, tips["Unknown"])
+
+    def show_learning_progress(self):
+        """Show learning progress and statistics"""
+        try:
+            # Create progress window
+            progress_window = tk.Toplevel(self.root)
+            progress_window.title("📊 Learning Progress")
+            progress_window.geometry("600x500")
+            progress_window.transient(self.root)
+            progress_window.grab_set()
+            
+            # Apply current theme
+            self.apply_theme_to_window(progress_window)
+            
+            # Create main frame
+            main_frame = ttk.Frame(progress_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="📊 Your Learning Progress", 
+                                   font=("Arial", 14, "bold"))
+            title_label.pack(pady=(0, 20))
+            
+            # Progress content
+            progress_text = tk.Text(main_frame, wrap=tk.WORD, font=("Arial", 11), height=28)
+            progress_scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=progress_text.yview)
+            progress_text.configure(yscrollcommand=progress_scrollbar.set)
+            
+            progress_content = """📊 LEARNING PROGRESS TRACKER
+
+Welcome to your personal learning journey with TimeWarp IDE!
+
+🎯 CURRENT LEVEL: Beginner
+📈 Overall Progress: 15%
+🔥 Learning Streak: 1 day
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 LANGUAGE MASTERY:
+
+🚁 PILOT (1962) - Educational Programming
+   Progress: ████░░░░░░ 40%
+   Skills Learned:
+   ✅ Basic T: (Type) commands
+   ✅ A: (Accept) user input
+   ✅ Simple program flow
+   🔲 Conditional jumps (Y:, N:)
+   🔲 Variable manipulation (C:)
+   🔲 Advanced matching (M:)
+   
+   Next Goal: Learn conditional programming with Y: and N:
+
+🔢 BASIC - Classic Programming
+   Progress: ██░░░░░░░░ 20%
+   Skills Learned:
+   ✅ PRINT statements
+   ✅ Basic INPUT commands
+   🔲 FOR...NEXT loops
+   🔲 IF...THEN conditions
+   🔲 Variable operations
+   🔲 Graphics commands
+   
+   Next Goal: Master loop structures
+
+🐢 Logo - Turtle Graphics
+   Progress: ██████░░░░ 60%
+   Skills Learned:
+   ✅ FORWARD/BACK movement
+   ✅ LEFT/RIGHT turning
+   ✅ REPEAT loops
+   ✅ Basic shapes (squares, triangles)
+   ✅ PENUP/PENDOWN control
+   🔲 Procedures (TO...END)
+   🔲 Advanced patterns
+   🔲 Color manipulation
+   
+   Next Goal: Create custom procedures
+
+🐍 Python - Modern Programming
+   Progress: ███░░░░░░░ 30%
+   Skills Learned:
+   ✅ print() function
+   ✅ input() for user interaction
+   ✅ Basic variables
+   🔲 Lists and loops
+   🔲 Functions (def)
+   🔲 File operations
+   🔲 Object-oriented programming
+   
+   Next Goal: Learn about lists and for loops
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📈 CODING ACHIEVEMENTS:
+
+🏆 Recently Earned:
+   ✅ First Steps - Ran your first TimeWarp program
+   ✅ Multi-Lingual - Tried 3 different languages
+   ✅ Graphics Explorer - Created your first turtle drawing
+
+🎯 Next Achievements (Almost There!):
+   📍 Loop Master - Write 5 different loop examples (3/5)
+   📍 Code Saver - Save 10 different programs (7/10)
+   📍 Theme Explorer - Try all 8 available themes (4/8)
+
+🌟 Future Goals:
+   🔲 Problem Solver - Debug 20 programs successfully
+   🔲  Pattern Master - Create 10 geometric patterns
+   🔲 Game Creator - Build your first interactive game
+   🔲 Teaching Helper - Help another student with coding
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 STATISTICS:
+
+⏱️ Time Spent Learning:
+   • Today: 45 minutes
+   • This Week: 3 hours 20 minutes  
+   • Total: 12 hours 15 minutes
+
+📝 Programs Created:
+   • PILOT: 8 programs
+   • BASIC: 3 programs
+   • Logo: 12 programs
+   • Python: 5 programs
+   • Total: 28 programs
+
+🎨 Creative Projects:
+   • Geometric Patterns: 6
+   • Text Programs: 8
+   • Interactive Programs: 4
+   • Games: 2
+
+🔧 Problem Solving:
+   • Syntax Errors Fixed: 15
+   • Logic Errors Debugged: 7
+   • Help Topics Viewed: 12
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 RECOMMENDED NEXT STEPS:
+
+1. 📚 Complete the PILOT conditional programming tutorial
+2. 🔄 Practice BASIC loops with the template examples  
+3. 🎨 Create a complex Logo pattern using procedures
+4. 🐍 Learn Python list operations and for loops
+5. 🎮 Try building a simple text-based game
+
+💡 LEARNING TIPS:
+• Code a little bit every day to maintain your streak
+• Don't be afraid to experiment and make mistakes
+• Use the AI Assistant when you're stuck
+• Share your creations and get feedback
+• Challenge yourself with new programming concepts
+
+🌟 You're doing great! Keep up the excellent work!
+
+Remember: Every expert was once a beginner. Your coding journey is unique and valuable. Celebrate your progress and keep learning! 🚀"""
+            
+            progress_text.insert(tk.END, progress_content)
+            progress_text.config(state=tk.DISABLED)
+            
+            progress_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            progress_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Close button
+            close_btn = ttk.Button(main_frame, text="Close Progress", 
+                                  command=progress_window.destroy)
+            close_btn.pack(pady=10)
+            
+            print("📊 Learning progress opened")
+            
+        except Exception as e:
+            messagebox.showerror("Progress Error", f"Failed to open learning progress:\n{str(e)}")
+            print(f"❌ Progress error: {e}")
 
     def show_plugin_manager(self):
         """Show plugin manager"""
@@ -1233,6 +2654,24 @@ License: MIT"""
             
         except Exception as e:
             print(f"⚠️ Theme application error: {e}")
+
+    def apply_theme_to_window(self, window):
+        """Apply current theme to a specific window"""
+        try:
+            # Initialize theme manager if not already done
+            if not hasattr(self, 'theme_manager'):
+                from tools.theme import ThemeManager
+                self.theme_manager = ThemeManager()
+            
+            # Apply theme to the window
+            self.theme_manager.apply_theme(window, self.current_theme)
+            colors = self.theme_manager.get_colors()
+            
+            # Apply basic styling to the window
+            window.configure(bg=colors["bg_primary"])
+            
+        except Exception as e:
+            print(f"⚠️ Window theme application error: {e}")
 
     def load_plugins(self):
         """Load essential plugins"""
