@@ -704,8 +704,296 @@ class TimeWarpIDE_v11:
 
     # Feature system methods (placeholder implementations)
     def show_tutorial_system(self):
-        """Show tutorial system"""
-        messagebox.showinfo("Tutorial System", "Interactive tutorials - Coming in next update!")
+        """Show interactive tutorial system"""
+        try:
+            # Create tutorial window
+            tutorial_window = tk.Toplevel(self.root)
+            tutorial_window.title("📚 TimeWarp IDE Tutorial System")
+            tutorial_window.geometry("800x600")
+            tutorial_window.transient(self.root)
+            tutorial_window.grab_set()
+            
+            # Apply current theme to tutorial window
+            self.apply_theme_to_window(tutorial_window)
+            
+            # Create notebook for tutorial categories
+            notebook = ttk.Notebook(tutorial_window)
+            notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+            
+            # Basic Programming Tutorial
+            basic_frame = ttk.Frame(notebook)
+            notebook.add(basic_frame, text="🎯 Basic Programming")
+            
+            basic_text = tk.Text(basic_frame, wrap=tk.WORD, font=("Consolas", 11))
+            basic_scrollbar = ttk.Scrollbar(basic_frame, orient=tk.VERTICAL, command=basic_text.yview)
+            basic_text.configure(yscrollcommand=basic_scrollbar.set)
+            
+            basic_content = """🎯 BASIC PROGRAMMING TUTORIAL
+
+Welcome to TimeWarp IDE! Let's learn the fundamentals:
+
+1. CHOOSING A LANGUAGE:
+   • PILOT (1962) - Great for beginners, simple commands
+   • BASIC - Classic line-numbered programming
+   • Logo - Perfect for graphics and turtle programming
+   • Python - Modern, powerful scripting
+
+2. YOUR FIRST PILOT PROGRAM:
+   Type this in the editor:
+   
+   T:Hello, World!
+   A:Enter your name
+   T:Welcome to TimeWarp IDE!
+   
+   Press F5 to run!
+
+3. YOUR FIRST BASIC PROGRAM:
+   10 PRINT "What's your name?"
+   20 INPUT N$
+   30 PRINT "Hello "; N$; "!"
+   40 END
+
+4. YOUR FIRST LOGO PROGRAM:
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+
+5. TIPS FOR SUCCESS:
+   • Save your work frequently (Ctrl+S)
+   • Use the graphics panel to see turtle drawings
+   • Check the output panel for results
+   • Try different themes in View → Themes"""
+            
+            basic_text.insert(tk.END, basic_content)
+            basic_text.config(state=tk.DISABLED)
+            
+            basic_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            basic_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # PILOT Language Tutorial
+            pilot_frame = ttk.Frame(notebook)
+            notebook.add(pilot_frame, text="🚁 PILOT Language")
+            
+            pilot_text = tk.Text(pilot_frame, wrap=tk.WORD, font=("Consolas", 11))
+            pilot_scrollbar = ttk.Scrollbar(pilot_frame, orient=tk.VERTICAL, command=pilot_text.yview)
+            pilot_text.configure(yscrollcommand=pilot_scrollbar.set)
+            
+            pilot_content = """🚁 PILOT LANGUAGE TUTORIAL
+
+PILOT is perfect for interactive learning!
+
+BASIC COMMANDS:
+• T: - Type (display text)
+• A: - Accept (get user input)
+• J: - Jump (go to label)
+• Y: - Yes (conditional jump)
+• N: - No (conditional jump)
+
+EXAMPLES:
+
+1. HELLO WORLD:
+   T:Hello, World!
+   T:Welcome to PILOT programming!
+
+2. INTERACTIVE PROGRAM:
+   T:What's 2 + 2?
+   A:
+   M:4
+   Y:T:Correct! Well done!
+   N:T:Try again. The answer is 4.
+
+3. SIMPLE QUIZ:
+   *START
+   T:What language was created in 1962?
+   A:
+   M:PILOT
+   Y:J(CORRECT)
+   T:Wrong! It was PILOT.
+   J(END)
+   *CORRECT
+   T:Excellent! You know your programming history!
+   *END
+   T:Thanks for playing!
+
+4. TURTLE GRAPHICS:
+   Use these commands to draw:
+   FORWARD 100    - Move forward
+   BACK 50        - Move backward
+   LEFT 90        - Turn left
+   RIGHT 45       - Turn right
+   PENUP          - Stop drawing
+   PENDOWN        - Start drawing
+
+TRY IT NOW:
+Copy any example above into the editor and press F5!"""
+            
+            pilot_text.insert(tk.END, pilot_content)
+            pilot_text.config(state=tk.DISABLED)
+            
+            pilot_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            pilot_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # BASIC Language Tutorial
+            basic_lang_frame = ttk.Frame(notebook)
+            notebook.add(basic_lang_frame, text="📊 BASIC Language")
+            
+            basic_lang_text = tk.Text(basic_lang_frame, wrap=tk.WORD, font=("Consolas", 11))
+            basic_lang_scrollbar = ttk.Scrollbar(basic_lang_frame, orient=tk.VERTICAL, command=basic_lang_text.yview)
+            basic_lang_text.configure(yscrollcommand=basic_lang_scrollbar.set)
+            
+            basic_lang_content = """📊 BASIC LANGUAGE TUTORIAL
+
+BASIC uses line numbers and is great for structured programs!
+
+ESSENTIAL COMMANDS:
+• PRINT - Display text or values
+• INPUT - Get user input
+• LET - Assign values to variables
+• IF...THEN - Conditional statements
+• FOR...NEXT - Loops
+• GOTO - Jump to line number
+• END - End program
+
+EXAMPLES:
+
+1. SIMPLE CALCULATOR:
+   10 PRINT "Simple Calculator"
+   20 PRINT "Enter first number:"
+   30 INPUT A
+   40 PRINT "Enter second number:"
+   50 INPUT B
+   60 LET C = A + B
+   70 PRINT "Sum is: "; C
+   80 END
+
+2. COUNTING LOOP:
+   10 FOR I = 1 TO 10
+   20 PRINT "Count: "; I
+   30 NEXT I
+   40 PRINT "Done counting!"
+   50 END
+
+3. GUESSING GAME:
+   10 LET N = INT(RND * 100) + 1
+   20 PRINT "Guess my number (1-100):"
+   30 INPUT G
+   40 IF G = N THEN GOTO 80
+   50 IF G < N THEN PRINT "Too low!"
+   60 IF G > N THEN PRINT "Too high!"
+   70 GOTO 30
+   80 PRINT "Correct! The number was "; N
+   90 END
+
+4. GRAPHICS DEMO:
+   10 FOR I = 1 TO 360 STEP 10
+   20 FORWARD 50
+   30 RIGHT I
+   40 NEXT I
+   50 END
+
+VARIABLES:
+• Use A, B, C for numbers
+• Use A$, B$, C$ for text (strings)
+• Arrays: DIM A(100) for 100 numbers"""
+            
+            basic_lang_text.insert(tk.END, basic_lang_content)
+            basic_lang_text.config(state=tk.DISABLED)
+            
+            basic_lang_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            basic_lang_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Logo Language Tutorial
+            logo_frame = ttk.Frame(notebook)
+            notebook.add(logo_frame, text="🐢 Logo Language")
+            
+            logo_text = tk.Text(logo_frame, wrap=tk.WORD, font=("Consolas", 11))
+            logo_scrollbar = ttk.Scrollbar(logo_frame, orient=tk.VERTICAL, command=logo_text.yview)
+            logo_text.configure(yscrollcommand=logo_scrollbar.set)
+            
+            logo_content = """🐢 LOGO LANGUAGE TUTORIAL
+
+Logo is perfect for graphics and turtle programming!
+
+TURTLE COMMANDS:
+• FORWARD (FD) - Move forward
+• BACK (BK) - Move backward  
+• LEFT (LT) - Turn left
+• RIGHT (RT) - Turn right
+• PENUP (PU) - Stop drawing
+• PENDOWN (PD) - Start drawing
+• HOME - Return to center
+• CLEARSCREEN (CS) - Clear screen
+
+EXAMPLES:
+
+1. DRAW A SQUARE:
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+   RIGHT 90
+   FORWARD 100
+   RIGHT 90
+
+2. DRAW A TRIANGLE:
+   FORWARD 100
+   LEFT 120
+   FORWARD 100
+   LEFT 120
+   FORWARD 100
+   LEFT 120
+
+3. SPIRAL PATTERN:
+   REPEAT 36 [FORWARD 100 RIGHT 170]
+
+4. FLOWER PATTERN:
+   REPEAT 36 [
+     REPEAT 4 [FORWARD 50 RIGHT 90]
+     RIGHT 10
+   ]
+
+5. COLORFUL DESIGN:
+   SETPENCOLOR "RED"
+   REPEAT 8 [FORWARD 100 RIGHT 45]
+   SETPENCOLOR "BLUE"
+   REPEAT 8 [FORWARD 80 LEFT 45]
+
+PROCEDURES (Functions):
+   TO SQUARE :SIZE
+     REPEAT 4 [FORWARD :SIZE RIGHT 90]
+   END
+   
+   # Then use it:
+   SQUARE 50
+   SQUARE 100
+
+TIPS:
+• Watch the turtle move in the graphics panel
+• Try different colors and patterns
+• Use REPEAT for loops
+• Create your own procedures with TO...END"""
+            
+            logo_text.insert(tk.END, logo_content)
+            logo_text.config(state=tk.DISABLED)
+            
+            logo_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            logo_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            
+            # Close button
+            close_btn = ttk.Button(tutorial_window, text="Close Tutorial", 
+                                  command=tutorial_window.destroy)
+            close_btn.pack(pady=10)
+            
+            print("📚 Tutorial system opened")
+            
+        except Exception as e:
+            messagebox.showerror("Tutorial Error", f"Failed to open tutorial system:\n{str(e)}")
+            print(f"❌ Tutorial system error: {e}")
 
     def show_ai_assistant(self):
         """Show AI assistant"""
