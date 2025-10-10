@@ -14,13 +14,13 @@ from tkinter import ttk, messagebox
 
 # Import base plugin system
 from plugins import PluginManager, TimeWarpPlugin
-from core.framework import TimeWarpFramework, ToolPlugin
+from core.framework import Time_WarpFramework, ToolPlugin
 
 
 class ToolManager(PluginManager):
     """Enhanced plugin manager specifically for tool plugins"""
 
-    def __init__(self, ide_instance, framework: TimeWarpFramework):
+    def __init__(self, ide_instance, framework: Time_WarpFramework):
         # Initialize base plugin manager but override plugins directory
         self.ide = ide_instance
         self.framework = framework

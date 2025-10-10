@@ -19,11 +19,11 @@ def run_comprehensive_tests():
 
     # Try to use the comprehensive test runner
     try:
-        from tests.test_runner import TimeWarpTestRunner
+        from tests.test_runner import Time_WarpTestRunner
 
         print("🚀 Running comprehensive test suite...")
 
-        test_runner = TimeWarpTestRunner()
+        test_runner = Time_WarpTestRunner()
         success = test_runner.run_all_tests()
 
         return success

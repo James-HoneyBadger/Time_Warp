@@ -283,7 +283,7 @@ class ToolPlugin(ABC):
         self._toolbar_items.clear()
 
 
-class TimeWarpFramework:
+class Time_WarpFramework:
     """Core framework for Time_Warp IDE - manages tools, events, and components"""
 
     def __init__(self, ide_instance):

@@ -419,7 +419,7 @@ class VisualDebugger:
         """Debug worker thread"""
         try:
             # Create custom debugger
-            debugger = TimeWarpDebugger(self)
+            debugger = Time_WarpDebugger(self)
 
             # Set up debugging environment
             global_vars = {"__name__": "__main__", "__file__": filename}
@@ -478,7 +478,7 @@ class VisualDebugger:
         self.variable_inspector.update_variables(local_vars, global_vars)
 
 
-class TimeWarpDebugger(pdb.Pdb):
+class Time_WarpDebugger(pdb.Pdb):
     """Custom debugger for Time_Warp IDE"""
 
     def __init__(self, visual_debugger: VisualDebugger):

@@ -10,10 +10,10 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
 authors = [
-    {name = "TimeWarp Development Team", email = "info@timewarp-ide.org"},
+    {name = "Time_Warp Development Team", email = "info@time-warp-ide.org"},
 ]
 maintainers = [
-    {name = "TimeWarp IDE Team", email = "timewarp-ide@example.com"},
+    {name = "Time_Warp IDE Team", email = "time-warp-ide@example.com"},
 ]
 keywords = [
     "education",
@@ -68,11 +68,11 @@ hardware = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TimeWarpIDE/TimeWarp"
-Documentation = "https://timewarp-ide.readthedocs.io/"
-Repository = "https://github.com/TimeWarpIDE/TimeWarp"
-Issues = "https://github.com/TimeWarpIDE/TimeWarp/issues"
-Changelog = "https://github.com/TimeWarpIDE/TimeWarp/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/James-HoneyBadger/Time_Warp"
+Documentation = "https://time-warp-ide.readthedocs.io/"
+Repository = "https://github.com/James-HoneyBadger/Time_Warp"
+Issues = "https://github.com/James-HoneyBadger/Time_Warp/issues"
+Changelog = "https://github.com/James-HoneyBadger/Time_Warp/blob/main/CHANGELOG.md"
 
 [project.scripts]
 timewarp = "timewarp_ide.main:main"
