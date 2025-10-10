@@ -23,9 +23,9 @@ from tools.theme import ThemeManager
 from plugins import PluginManager
 
 # Feature modules
-from features.tutorial_system import TutorialSystem
-from features.ai_assistant import AICodeAssistant
-from features.gamification import GamificationSystem
+from core.features.tutorial_system import TutorialSystem
+from core.features.ai_assistant import AICodeAssistant
+from core.features.gamification import GamificationSystem
 
 
 class IDETimeWarp:
