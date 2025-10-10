@@ -1321,6 +1321,7 @@ class Time_WarpInterpreter:
         # Store language preference
         if language:
             self.current_language = language.lower()
+            self.current_language_mode = language.lower()
         
         if not self.load_program(program_text):
             self.log_output("Error loading program")
