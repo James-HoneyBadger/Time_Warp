@@ -1,8 +1,8 @@
-# ⏰ TimeWarp IDE v1.0.1 - Enhanced Educational Programming Environment
+# ⏰ TimeWarp IDE v1.1 - Enhanced Educational Programming Environment
 
-## 🔥 What's New in v1.0.1
+## 🔥 What's New in v1.1
 
-TimeWarp IDE v1.0.1 brings significant usability improvements while maintaining our core educational focus. This release transforms the single-window experience into a modern, multi-panel IDE that's perfect for both students and educators.
+TimeWarp IDE v1.1 brings significant usability improvements while maintaining our core educational focus. This release transforms the single-window experience into a modern, multi-panel IDE that's perfect for both students and educators.
 
 ### ✨ **Major New Features**
 
@@ -48,7 +48,7 @@ TimeWarp IDE v1.0.1 brings significant usability improvements while maintaining 
 - **JavaScript** - Web scripting with educational feedback
 - **Perl** - Text processing with syntax awareness
 
-## 🚀 **Getting Started with v1.0.1**
+## 🚀 **Getting Started with v1.1**
 
 ### **Installation**
 ```bash
@@ -59,8 +59,8 @@ cd Time_Warp
 # Install dependencies (enhanced graphics require PIL)
 pip install Pillow
 
-# Run TimeWarp IDE v1.0.1
-python TimeWarp_v101.py
+# Run TimeWarp IDE v1.1
+python TimeWarp_v11.py
 ```
 
 ### **First Steps**
@@ -132,7 +132,7 @@ python TimeWarp_v101.py
 
 ## 🔄 **Migration from v1.0.0**
 
-TimeWarp IDE v1.0.1 is fully backward compatible with v1.0.0:
+TimeWarp IDE v1.1 is fully backward compatible with v1.0.0:
 
 - **Existing Projects**: All your existing code files work without changes
 - **Settings**: Theme and configuration settings are preserved
@@ -143,14 +143,14 @@ TimeWarp IDE v1.0.1 is fully backward compatible with v1.0.0:
 
 ```
 Time_Warp/
-├── TimeWarp_v101.py          # Enhanced main application
+├── TimeWarp_v11.py           # Enhanced main application
 ├── gui/components/           # New UI components
 │   ├── multi_tab_editor.py   # Multi-tab code editor
 │   ├── file_explorer.py      # Project file explorer
 │   └── enhanced_graphics_canvas.py  # Enhanced graphics
 ├── core/
 │   └── enhanced_error_handler.py    # Better error handling
-└── test_v101_components.py   # Component testing
+└── test_v11_components.py    # Component testing
 ```
 
 ## 🎯 **Use Cases Enhanced**
@@ -189,7 +189,7 @@ Time_Warp/
 
 ## 🤝 **Contributing**
 
-TimeWarp IDE v1.0.1 introduces new components that welcome contributions:
+TimeWarp IDE v1.1 introduces new components that welcome contributions:
 
 - **UI Components**: Enhance the multi-tab editor, file explorer, or graphics canvas
 - **Error Handling**: Improve educational error messages and suggestions
@@ -201,11 +201,11 @@ TimeWarp IDE v1.0.1 introduces new components that welcome contributions:
 - **GitHub Issues**: Report bugs or request features
 - **Discussions**: Join community discussions about educational programming
 - **Documentation**: Comprehensive guides for all new features
-- **Examples**: Sample projects demonstrating v1.0.1 features
+- **Examples**: Sample projects demonstrating v1.1 features
 
 ---
 
-**TimeWarp IDE v1.0.1** - Enhanced Educational Programming Made Simple! 
+**TimeWarp IDE v1.1** - Enhanced Educational Programming Made Simple! 
 
 *Experience the evolution of programming languages through a modern, user-friendly interface that brings the best of both worlds: historical programming languages with contemporary development tools.*
 

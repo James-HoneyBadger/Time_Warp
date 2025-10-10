@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Graphics Canvas for TimeWarp IDE v1.0.1
+Enhanced Graphics Canvas for TimeWarp IDE v1.1
 Improved turtle graphics with zoom, export, and grid features
 """
 

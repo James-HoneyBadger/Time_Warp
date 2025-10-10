@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TimeWarp IDE v1.0.1 - Enhanced Multi-Tab Editor
+TimeWarp IDE v1.1 - Enhanced Multi-Tab Editor
 Updated main application with new features:
 - Multi-tab code editor
 - File explorer panel  
@@ -48,15 +48,15 @@ from core.features.ai_assistant import AICodeAssistant
 from core.features.gamification import GamificationSystem
 
 
-class TimeWarpIDE_v101:
+class TimeWarpIDE_v11:
     """
-    TimeWarp IDE v1.0.1 - Enhanced Educational Programming Environment
+    TimeWarp IDE v1.1 - Enhanced Educational Programming Environment
     New features: Multi-tab editor, File explorer, Enhanced graphics, Better errors
     """
 
     def __init__(self):
-        """Initialize TimeWarp IDE v1.0.1"""
-        print("🚀 Starting TimeWarp IDE v1.0.1...")
+        """Initialize TimeWarp IDE v1.1"""
+        print("🚀 Starting TimeWarp IDE v1.1...")
         print("⏰ Enhanced Educational Programming Environment")
         print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
         
@@ -95,7 +95,9 @@ class TimeWarpIDE_v101:
         # Load plugins
         self.load_plugins()
         
-        print("🚀 TimeWarp IDE v1.0.1 - Clean two-panel layout ready!")
+        print("🚀 TimeWarp IDE v1.1 - Clean two-panel layout ready!")
+        
+        # Handle any initialization errors gracefully
 
     def load_theme_config(self):
         """Load theme configuration"""
@@ -121,7 +123,7 @@ class TimeWarpIDE_v101:
             # Initialize error handler
             self.error_handler = EnhancedErrorHandler()
             
-            # Simplified feature initialization for v1.0.1
+            # Simplified feature initialization for v1.1
             # Advanced features will be added in future versions
             
         except Exception as e:
@@ -723,7 +725,7 @@ class TimeWarpIDE_v101:
 
     def show_quick_help(self):
         """Show quick help"""
-        help_text = """⏰ TimeWarp IDE v1.0.1 - Quick Help
+        help_text = """⏰ TimeWarp IDE v1.1 - Quick Help
 
 🔥 NEW FEATURES:
 • Multi-tab editor with syntax highlighting
@@ -749,7 +751,7 @@ class TimeWarpIDE_v101:
 
 🚀 Happy coding through time!"""
         
-        messagebox.showinfo("TimeWarp IDE v1.0.1 - Quick Help", help_text)
+        messagebox.showinfo("TimeWarp IDE v1.1 - Quick Help", help_text)
 
     # Theme and settings
 
@@ -861,10 +863,10 @@ class TimeWarpIDE_v101:
 
     def show_about(self):
         """Show about dialog"""
-        about_text = """⏰ TimeWarp IDE v1.0.1
+        about_text = """⏰ TimeWarp IDE v1.1
 Enhanced Educational Programming Environment
 
-🔥 NEW IN v1.0.1:
+🔥 NEW IN v1.1:
 ✅ Multi-tab code editor with syntax highlighting
 ✅ File explorer with project navigation
 ✅ Enhanced graphics canvas (zoom, export, grid)
@@ -887,8 +889,9 @@ through an accessible educational environment.
 GitHub: https://github.com/James-HoneyBadger/Time_Warp
 License: MIT"""
 
-        messagebox.showinfo("About TimeWarp IDE v1.0.1", about_text)
-
+        
+        messagebox.showinfo("About TimeWarp IDE v1.1", about_text)
+    
     def change_theme(self, theme_name):
         """Change to a different theme"""
         try:
@@ -947,7 +950,7 @@ License: MIT"""
         """Load essential plugins"""
         try:
             print("🔌 Loading plugins...")
-            # TODO: Load plugins for v1.0.1
+            # TODO: Load plugins for v1.1
         except Exception as e:
             print(f"⚠️ Plugin loading error: {e}")
 
@@ -989,13 +992,13 @@ License: MIT"""
 
 
 def main():
-    """Main application entry point - TimeWarp IDE v1.0.1"""
-    print("🚀 Starting TimeWarp IDE v1.0.1...")
+    """Main application entry point - TimeWarp IDE v1.1"""
+    print("🚀 Starting TimeWarp IDE v1.1...")
     print("⏰ Enhanced Educational Programming Environment")
-    print("🔥 New: Multi-tab editor, File explorer, Enhanced graphics!")
+    print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
     
     try:
-        app = TimeWarpIDE_v101()
+        app = TimeWarpIDE_v11()
         app.root.mainloop()
         print("👋 TimeWarp IDE session ended. Happy coding!")
     except KeyboardInterrupt:

@@ -1,7 +1,7 @@
 # Theme Selector "Coming Soon" Message - FIXED ✅
 
 ## Issue:
-TimeWarp IDE v1.0.1 displayed a "Theme selection - Coming soon!" message even though the theme selector was fully implemented and working.
+TimeWarp IDE v1.1 displayed a "Theme selection - Coming soon!" message even though the theme selector was fully implemented and working.
 
 ## Root Cause:
 - Old unused method `show_theme_selector()` contained outdated "coming soon" message
@@ -26,7 +26,7 @@ TimeWarp IDE v1.0.1 displayed a "Theme selection - Coming soon!" message even th
 - All UI components properly themed
 
 ## How to Use Theme Selector:
-1. Launch TimeWarp IDE v1.0.1
+1. Launch TimeWarp IDE v1.1
 2. Go to `View → Themes` in menu bar
 3. Select any theme - applies immediately
 4. Theme choice saves automatically

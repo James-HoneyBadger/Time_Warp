@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-Tab Code Editor for TimeWarp IDE v1.0.1
+Multi-Tab Code Editor for TimeWarp IDE v1.1
 Enhanced editor with tabbed interface and file management
 """
 
