@@ -2749,9 +2749,23 @@ License: MIT"""
                 )
             
             if hasattr(self, 'language_label'):
+                # Use high contrast colors for language label readability
+                if self.current_theme in ['forest', 'spring']:
+                    # Light themes: use dark background with light text
+                    label_bg = colors["text_primary"]  # Dark green
+                    label_fg = colors["bg_primary"]    # Light background
+                elif self.current_theme in ['sunset', 'candy']:
+                    # Light themes with colorful backgrounds: use dark text on light background
+                    label_bg = colors["bg_secondary"]  # Light background
+                    label_fg = colors["text_primary"]  # Dark text
+                else:
+                    # Dark themes: use accent with light text
+                    label_bg = colors["accent"]
+                    label_fg = colors["bg_primary"]    # Light background color for text
+                
                 self.language_label.configure(
-                    background=colors["accent"],
-                    foreground=colors["text_primary"],
+                    background=label_bg,
+                    foreground=label_fg,
                     relief="flat"
                 )
             
