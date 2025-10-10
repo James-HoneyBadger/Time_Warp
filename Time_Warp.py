@@ -301,6 +301,22 @@ class Time_WarpIDE:
             font=('Consolas', 10)
         )
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Connect interpreter to output widget with custom handler
+        # Create a custom output handler that respects our GUI's disabled state
+        class OutputHandler:
+            def __init__(self, gui_instance):
+                self.gui = gui_instance
+            
+            def insert(self, position, text):
+                # Use the GUI's write_to_console method which handles state properly
+                self.gui.write_to_console(text)
+            
+            def see(self, position):
+                # Already handled by write_to_console
+                pass
+        
+        self.interpreter.output_widget = OutputHandler(self)
 
         # Graphics tab
         graphics_frame = ttk.Frame(self.graphics_notebook)
@@ -607,45 +623,25 @@ class Time_WarpIDE:
             try:
                 self.write_to_console(f"▶️ Starting {language.upper()} execution...\n")
                 
-                # Execute code using appropriate method
-                if language.lower() == 'pilot':
-                    result = self.interpreter.run_program(code)
-                elif language.lower() in ['python', 'py']:
-                    # Basic Python execution
-                    import io
-                    import sys
-                    from contextlib import redirect_stdout, redirect_stderr
+                # Execute code using the interpreter for all supported languages
+                try:
+                    # Check for stop flag
+                    if self.stop_execution_flag:
+                        self.write_to_console("🛑 Execution stopped by user\n")
+                        return
                     
-                    # Capture output
-                    stdout_capture = io.StringIO()
-                    stderr_capture = io.StringIO()
+                    # Use the interpreter's run_program method which handles all languages
+                    result = self.interpreter.run_program(code, language=language.lower())
                     
-                    try:
-                        with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
-                            # Check for stop flag periodically
-                            if self.stop_execution_flag:
-                                self.write_to_console("🛑 Execution stopped by user\n")
-                                return
-                            
-                            exec(code)
-                        
-                        # Display captured output
-                        stdout_content = stdout_capture.getvalue()
-                        stderr_content = stderr_capture.getvalue()
-                        
-                        if stdout_content:
-                            self.write_to_console(stdout_content)
-                        if stderr_content:
-                            self.write_to_console(f"Error: {stderr_content}")
-                        
-                        result = True
-                    except Exception as e:
-                        self.write_to_console(f"❌ Python Error: {str(e)}\n")
+                    if result is None:
+                        # If run_program returns None, it means the language isn't supported yet
+                        self.write_to_console(f"🔧 {language.upper()} language support coming soon!\n")
+                        self.write_to_console(f"Currently supported: PILOT, BASIC, Logo, Python, JavaScript, Perl\n")
                         result = False
-                else:
-                    # For other languages, show placeholder
-                    self.write_to_console(f"🔧 {language.upper()} execution - Coming in next update!\n")
-                    result = True
+                    
+                except Exception as e:
+                    self.write_to_console(f"❌ {language.upper()} Execution Error: {str(e)}\n")
+                    result = False
                 
                 if not self.stop_execution_flag:
                     if result:
