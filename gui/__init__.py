@@ -3,7 +3,7 @@ Time_Warp GUI Module
 ===============
 
 Graphical user interface components:
-- Main application window (TimeWarpII)
+- Main application window (Time_Warp IDE)
 - Educational tutorials and exercises
 - Project explorer and file management
 - Debugging interface
