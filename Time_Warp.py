@@ -66,7 +66,7 @@ class Time_WarpIDE:
 
         # Initialize core systems
         self.theme_manager = ThemeManager()
-        self.current_theme = "sunset"  # Default theme
+        self.current_theme = "forest"  # Default theme
         
         self.plugin_manager = PluginManager(self)
         
@@ -102,11 +102,11 @@ class Time_WarpIDE:
     def load_theme_config(self):
         """Load theme configuration"""
         try:
-            self.current_theme = self.theme_manager.config.get("current_theme", "dracula")
+            self.current_theme = self.theme_manager.config.get("current_theme", "forest")
             print(f"🎨 Loaded theme: {self.current_theme}")
         except Exception as e:
             print(f"⚠️ Theme loading error: {e}")
-            self.current_theme = "dracula"
+            self.current_theme = "forest"
 
     def _setup_window(self):
         """Setup main window properties"""

@@ -28,7 +28,7 @@ def load_config():
     # Default configuration
     default_config = {
         "dark_mode": False,
-        "current_theme": "dracula",  # Default theme, will be overridden by user selection
+        "current_theme": "forest",  # Default theme - easy on the eyes
         "font_size": 11,
         "font_family": "Consolas",
         "theme_colors": {
@@ -158,9 +158,9 @@ def get_theme_colors(theme_name="dracula"):
             "bg_primary": "#002B36",  # Dark blue-green
             "bg_secondary": "#073642",  # Slightly lighter
             "bg_tertiary": "#586E75",  # Medium gray
-            "text_primary": "#839496",  # Light gray
-            "text_secondary": "#93A1A1",  # Lighter gray
-            "text_muted": "#657B83",  # Muted gray
+            "text_primary": "#FDF6E3",  # Light cream (much more readable)
+            "text_secondary": "#EEE8D5",  # Light beige (better contrast)
+            "text_muted": "#93A1A1",  # Muted gray
             "accent": "#268BD2",  # Blue
             "accent_secondary": "#2AA198",  # Cyan
             "success": "#859900",  # Green
@@ -207,9 +207,9 @@ def get_theme_colors(theme_name="dracula"):
             "bg_primary": "#F0FFF0",  # Honeydew
             "bg_secondary": "#E6FFE6",  # Light mint
             "bg_tertiary": "#D4F4DD",  # Pale green
-            "text_primary": "#2E7D32",  # Forest green
-            "text_secondary": "#1B5E20",  # Dark green
-            "text_muted": "#66BB6A",  # Medium green
+            "text_primary": "#1B5E20",  # Darker green (better contrast)
+            "text_secondary": "#2E7D32",  # Forest green
+            "text_muted": "#388E3C",  # Darker medium green (more readable)
             "accent": "#00BCD4",  # Cyan
             "accent_secondary": "#8BC34A",  # Light green
             "success": "#4CAF50",  # Green
@@ -231,9 +231,9 @@ def get_theme_colors(theme_name="dracula"):
             "bg_primary": "#FFF8E1",  # Light yellow
             "bg_secondary": "#FFECB3",  # Pale yellow
             "bg_tertiary": "#FFE082",  # Light gold
-            "text_primary": "#E65100",  # Dark orange
-            "text_secondary": "#BF360C",  # Red-orange
-            "text_muted": "#FF8F00",  # Orange
+            "text_primary": "#BF360C",  # Darker red-orange (better contrast)
+            "text_secondary": "#D84315",  # Deep orange (more readable)
+            "text_muted": "#E65100",  # Darker orange (better visibility)
             "accent": "#E91E63",  # Pink
             "accent_secondary": "#9C27B0",  # Purple
             "success": "#4CAF50",  # Green
@@ -255,9 +255,9 @@ def get_theme_colors(theme_name="dracula"):
             "bg_primary": "#FFF0F5",  # Lavender blush
             "bg_secondary": "#FFE4E1",  # Misty rose
             "bg_tertiary": "#FFCCCB",  # Light coral
-            "text_primary": "#8B008B",  # Dark magenta
-            "text_secondary": "#9932CC",  # Dark orchid
-            "text_muted": "#DA70D6",  # Orchid
+            "text_primary": "#4A0E4E",  # Much darker magenta (better contrast)
+            "text_secondary": "#6B1076",  # Darker orchid (better readability)
+            "text_muted": "#B85C9E",  # More muted orchid (easier to read)
             "accent": "#FF1493",  # Deep pink
             "accent_secondary": "#00CED1",  # Dark turquoise
             "success": "#32CD32",  # Lime green
@@ -303,7 +303,7 @@ def get_theme_colors(theme_name="dracula"):
 
     # Get the requested theme
     if theme_name not in themes:
-        theme_name = "dracula"  # Fallback to default
+        theme_name = "forest"  # Fallback to default
 
     return themes[theme_name]
 
