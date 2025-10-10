@@ -45,6 +45,9 @@ logs/
 *.temp
 temp/
 
+# Archive directory
+archive/
+
 # Output files
 *.ppm
 *.out
