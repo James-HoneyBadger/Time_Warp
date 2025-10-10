@@ -1,4 +1,4 @@
-# TimeWarp IDE - Clean Directory Structure
+# TimeWarp IDE - Streamlined Directory Structure
 
 ## 📁 Project Organization
 
@@ -8,12 +8,19 @@ Time_Warp/
 │   ├── interpreter.py          # Main TimeWarp interpreter
 │   ├── languages/             # Language-specific executors
 │   ├── hardware/              # Hardware integration
-│   └── iot/                   # IoT device management
+│   ├── iot/                   # IoT device management
+│   └── features/              # Advanced features (AI, gamification)
 │
 ├── 📁 gui/                     # User interface components
 │   ├── main_window.py         # Primary GUI window
 │   ├── canvas.py              # Turtle graphics canvas
 │   └── components/            # UI components
+│
+├── 📁 compilers/               # Standalone compiler implementations
+│   ├── basic_compiler.py      # BASIC standalone compiler
+│   ├── pilot_compiler.py      # PILOT standalone compiler
+│   ├── logo_compiler.py       # Logo standalone compiler
+│   └── base.py                # Base compiler functionality
 │
 ├── 📁 tools/                   # Development and utility tools
 │   ├── theme.py               # Theme management system
@@ -31,20 +38,29 @@ Time_Warp/
 │   └── __init__.py            # Plugin manager
 │
 ├── 📁 examples/                # Sample programs and demos
-│   ├── *.bas                  # BASIC examples
-│   ├── *.pilot                # PILOT examples
-│   ├── *.logo                 # Logo examples
-│   ├── *.timewarp             # Multi-language examples
-│   ├── demo_*.py              # Demo scripts
-│   └── graphics_test.*        # Graphics examples
+│   ├── BASIC/                 # BASIC language examples
+│   ├── PILOT/                 # PILOT language examples
+│   ├── Logo/                  # Logo language examples
+│   ├── TimeWarp/              # Multi-language examples
+│   ├── Python/                # Python integration examples
+│   ├── JavaScript/            # JavaScript examples
+│   ├── Perl/                  # Perl examples
+│   └── README.md              # Examples documentation
 │
-├── 📁 tests/                   # Test suite
-│   ├── test_*.py              # Unit tests
-│   ├── test_results/          # Test output
-│   └── test_samples/          # Test data
+├── 📁 testing/                 # Complete testing infrastructure
+│   ├── tests/                 # Unit tests
+│   ├── test_results/          # Test output and reports
+│   ├── test_samples/          # Test data files
+│   └── test_requirements.txt  # Testing dependencies
+│
+├── 📁 scripts/                 # Development scripts and utilities
+│   ├── install_dependencies.py # Dependency installer
+│   ├── integration_tests.py   # Integration test suite
+│   ├── run_tests.py           # Standard test runner
+│   ├── run_tests_production.py # Production test runner
+│   └── setup_dev.sh           # Development environment setup
 │
 ├── 📁 docs/                    # Documentation
-│   ├── README.md              # API and usage docs (coming soon)
 │   ├── development/           # Development documentation
 │   ├── DEMO_GAMES.md          # Game development guide
 │   ├── GALAGA_GAME_GUIDE.md   # Galaga implementation guide
@@ -66,30 +82,21 @@ Time_Warp/
 │   ├── devto_article.md       # Dev.to article
 │   └── educational_outreach_email.txt # Email templates
 │
+├── 📁 build/                   # Build artifacts and packaging
+│   ├── dist/                  # Distribution files (PyPI packages)
+│   └── timewarp_ide.egg-info/ # Package metadata
+│
 ├── 📁 archive/                 # Archived/deprecated files
 │   ├── old_compilers/         # Previous compiler implementations
-│   │   ├── basic_compiler.py  # Legacy BASIC compiler
-│   │   ├── logo_compiler.py   # Legacy Logo compiler
-│   │   ├── pilot_compiler.py  # Legacy PILOT compiler
-│   │   └── simple_pilot_compiler.py # Simple PILOT compiler
 │   └── debug_scripts/         # Debug and diagnostic scripts
-│       ├── debug_*.py         # Debug utilities
-│       ├── diagnose_display.py # Display diagnostics
-│       └── theme_*.py         # Theme debugging
 │
 ├── 📁 temp/                    # Temporary and compiled files
 │   ├── *_compiled             # Compiled test programs
 │   ├── *_test                 # Test executables
 │   ├── *_demo                 # Demo executables
-│   ├── *_output               # Program outputs
-│   └── logo_output.ppm        # Graphics output
+│   └── *_output               # Program outputs
 │
-├── 📁 dist/                    # Distribution files (PyPI packages)
 ├── 📁 timewarp_ide/            # Python package structure
-├── 📁 timewarp_ide.egg-info/   # Package metadata
-├── 📁 samples/                 # Additional sample programs
-├── 📁 compilers/               # Modern compiler implementations
-├── 📁 features/                # Feature-specific code
 │
 ├── 📁 .github/                 # GitHub configuration
 │   ├── workflows/             # CI/CD workflows

@@ -91,3 +91,9 @@ run_*_direct.py
 "test_file.txt"
 test file with spaces.txt
 unicode_test.txt
+# Build directory
+build/
+
+# Scripts (development only - don't ignore)
+# scripts/
+
