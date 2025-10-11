@@ -22,41 +22,15 @@ __platform__ = "macOS"
 
 import sys
 import os
+import tkinter as tk
+from tkinter import ttk, scrolledtext, messagebox, filedialog, simpledialog
+import turtle
 import json
 from datetime import datetime
 import threading
 import pathlib
 import subprocess
 import platform
-
-# GUI availability check and graceful handling
-GUI_AVAILABLE = True
-try:
-    # Check for display availability on macOS
-    if platform.system() == "Darwin":
-        # Check if we're running in a proper GUI environment
-        import subprocess
-        result = subprocess.run(['ps', 'aux'], capture_output=True, text=True)
-        if 'WindowServer' not in result.stdout:
-            print("⚠️ Warning: WindowServer not detected. GUI may not be available.")
-    
-    # Try importing tkinter with proper error handling
-    import tkinter as tk
-    from tkinter import ttk, scrolledtext, messagebox, filedialog, simpledialog
-    import turtle
-    
-    # Test tkinter initialization
-    test_root = tk.Tk()
-    test_root.withdraw()  # Hide the test window
-    test_root.destroy()   # Clean up
-    
-except ImportError as e:
-    print(f"❌ GUI libraries not available: {e}")
-    GUI_AVAILABLE = False
-except Exception as e:
-    print(f"❌ GUI initialization failed: {e}")
-    print("This may occur when running without a display or in headless mode.")
-    GUI_AVAILABLE = False
 
 # Import theme configuration functions
 from tools.theme import load_config, save_config, ThemeManager
@@ -94,50 +68,35 @@ class Time_WarpIDE:
 
     def __init__(self):
         """Initialize Time_Warp IDE"""
-        print("🚀 Starting Time_Warp IDE 1.2...")
+        print("🚀 Starting Time_Warp IDE 1.1...")
         print("⏰ Enhanced Educational Programming Environment")
         print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
         
-        # Check GUI availability
-        if not GUI_AVAILABLE:
-            raise RuntimeError("GUI not available - cannot initialize Time_Warp IDE")
-        
-        # Initialize main window with error handling
-        try:
-            self.root = tk.Tk()
-            self._setup_window()
-        except Exception as e:
-            print(f"❌ Failed to create main window: {e}")
-            raise RuntimeError(f"GUI initialization failed: {e}")
+        # Initialize main window
+        self.root = tk.Tk()
+        self._setup_window()
 
         # Initialize core systems
-        try:
-            self.theme_manager = ThemeManager()
-            self.current_theme = "forest"  # Default theme
-            
-            self.plugin_manager = PluginManager(self)
-            
-            # Initialize interpreter
-            self.interpreter = Time_WarpInterpreter()
-            
-            # Initialize execution tracking
-            self.execution_thread = None
-            self.stop_execution_flag = False
-            
-            # Setup UI
-            self.setup_ui()
-            
-            # Initialize other components
-            self.load_theme_config()
-            
-            # Setup keyboard shortcuts
-            self.setup_keyboard_shortcuts()
-            
-        except Exception as e:
-            print(f"❌ Failed to initialize IDE components: {e}")
-            if hasattr(self, 'root'):
-                self.root.destroy()
-            raise
+        self.theme_manager = ThemeManager()
+        self.current_theme = "forest"  # Default theme
+        
+        self.plugin_manager = PluginManager(self)
+        
+        # Initialize interpreter
+        self.interpreter = Time_WarpInterpreter()
+        
+        # Initialize execution tracking
+        self.execution_thread = None
+        self.stop_execution_flag = False
+        
+        # Setup UI
+        self.setup_ui()
+        
+        # Initialize other components
+        self.load_theme_config()
+        
+        # Setup keyboard shortcuts
+        self.setup_keyboard_shortcuts()
         
         # Initialize features
         self.init_features()
@@ -2967,47 +2926,18 @@ License: MIT"""
         self.root.quit()
 
 
-def check_gui_environment():
-    """Check if GUI environment is available"""
-    if not GUI_AVAILABLE:
-        return False
-    
-    try:
-        # Additional macOS-specific checks
-        if platform.system() == "Darwin":
-            # Check if we can access the window server
-            import subprocess
-            result = subprocess.run(['launchctl', 'list'], 
-                                  capture_output=True, text=True)
-            if 'com.apple.WindowServer' not in result.stdout:
-                print("⚠️ WindowServer not running - GUI unavailable")
-                return False
-        
-        return True
-    except Exception as e:
-        print(f"⚠️ GUI environment check failed: {e}")
-        return False
-
-
 def main():
     """Main application entry point - Time_Warp IDE"""
-    print("🚀 Starting Time_Warp IDE 1.2...")
+    print("🚀 Starting Time_Warp IDE 1.1...")
     print("⏰ Enhanced Educational Programming Environment")
     print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
-    
-    # Check GUI environment first
-    if not check_gui_environment():
-        print("❌ GUI environment not available.")
-        print("Time_Warp IDE requires a graphical display to run.")
-        print("Please ensure you're running on a system with GUI support.")
-        sys.exit(1)
     
     try:
         print("🔧 Initializing Time_Warp IDE...")
         app = Time_WarpIDE()
         
         print("🔧 Starting main event loop...")
-        # Add a check to ensure the window is still valid before starting
+        # Add a check to ensure the window is still valid before starting mainloop
         if app.root.winfo_exists():
             app.root.mainloop()
             print("👋 Time_Warp IDE session ended. Happy coding!")
@@ -3015,38 +2945,28 @@ def main():
             print("❌ Window was destroyed during initialization")
             
     except KeyboardInterrupt:
-        print("\n⚠️ User interrupted - Time_Warp IDE shutting down...")
-    except RuntimeError as e:
-        print(f"❌ Runtime error: {e}")
-        print("Please check system requirements and try again.")
-        sys.exit(1)
+        print("\n⚠️ User interrupted - Time_Warp IDE shutting down gracefully...")
     except Exception as e:
         print(f"❌ Critical error during startup: {e}")
         import traceback
         traceback.print_exc()
         
-        # Try to show error in GUI if possible
-        if GUI_AVAILABLE:
-            try:
-                root = tk.Tk()
-                root.title("Time_Warp IDE - Error")
-                root.geometry("500x300")
-                
-                error_text = (f"Time_Warp IDE encountered an error:\n"
-                             f"{str(e)}\n\n"
-                             f"Check console for details.")
-                error_label = tk.Label(root, text=error_text,
-                                     wraplength=450, justify=tk.CENTER, 
-                                     fg="red")
-                error_label.pack(pady=50)
-                
-                tk.Button(root, text="Close", 
-                         command=root.quit).pack(pady=20)
-                root.mainloop()
-            except Exception:
-                pass  # Fallback to console-only error reporting
-        
-        sys.exit(1)
+        # Try to keep a minimal window open for debugging
+        try:
+            import tkinter as tk
+            root = tk.Tk()
+            root.title("Time_Warp IDE - Error")
+            root.geometry("500x300")
+            
+            error_label = tk.Label(root, 
+                                 text=f"Time_Warp IDE encountered an error:\n{str(e)}\n\nCheck console for details.",
+                                 wraplength=450, justify=tk.CENTER, fg="red")
+            error_label.pack(pady=50)
+            
+            tk.Button(root, text="Close", command=root.quit).pack(pady=20)
+            root.mainloop()
+        except:
+            pass
 
 
 if __name__ == "__main__":
