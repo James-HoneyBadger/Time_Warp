@@ -360,6 +360,9 @@ class Time_WarpIDE:
                 'screen': screen,
                 'turtle': turtle_obj
             }
+            
+            # Add reference to the graphics canvas for updates
+            self.interpreter.graphics_canvas = self.basic_canvas
 
     def setup_keybindings(self):
         """Setup keyboard shortcuts"""
@@ -647,6 +650,10 @@ class Time_WarpIDE:
                     if result:
                         self.write_to_console(f"✅ {language.upper()} execution completed\n")
                         self.root.after(0, lambda: self.update_status(f"{language.upper()} code executed successfully"))
+                        
+                        # Force graphics update for Logo programs
+                        if language.lower() == 'logo':
+                            self.root.after(0, self.update_graphics_display)
                     else:
                         self.write_to_console(f"❌ {language.upper()} execution failed\n")
                         self.root.after(0, lambda: self.update_status(f"{language.upper()} execution failed"))
@@ -695,8 +702,37 @@ class Time_WarpIDE:
 
     def clear_graphics(self):
         """Clear graphics canvas"""
-        if hasattr(self.enhanced_graphics, 'clear_canvas'):
-            self.enhanced_graphics.clear_canvas()
+        if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, 'enhanced_graphics'):
+            if hasattr(self.enhanced_graphics, 'clear_canvas'):
+                self.enhanced_graphics.clear_canvas()
+        elif hasattr(self, 'basic_canvas'):
+            self.basic_canvas.delete("all")
+            # Reset turtle to center
+            if hasattr(self.interpreter, 'turtle_graphics') and self.interpreter.turtle_graphics:
+                screen = self.interpreter.turtle_graphics.get('screen')
+                turtle_obj = self.interpreter.turtle_graphics.get('turtle')
+                if screen and turtle_obj:
+                    turtle_obj.home()
+                    screen.update()
+
+    def update_graphics_display(self):
+        """Force update of graphics display after Logo execution"""
+        try:
+            if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, 'enhanced_graphics'):
+                # Update enhanced graphics canvas
+                if hasattr(self.enhanced_graphics, 'update_display'):
+                    self.enhanced_graphics.update_display()
+            elif hasattr(self, 'basic_canvas'):
+                # Update basic turtle graphics
+                if hasattr(self.interpreter, 'turtle_graphics') and self.interpreter.turtle_graphics:
+                    screen = self.interpreter.turtle_graphics.get('screen')
+                    if screen:
+                        screen.update()
+                        print("🎨 Graphics display updated")
+                # Also update the canvas widget
+                self.basic_canvas.update_idletasks()
+        except Exception as e:
+            print(f"⚠️ Graphics update error: {e}")
 
     # Utility methods
     def write_to_console(self, text: str):
@@ -772,22 +808,30 @@ class Time_WarpIDE:
 
     def update_language_indicator(self):
         """Update the language indicator based on current tab"""
-        if hasattr(self, 'language_label') and hasattr(self, 'multi_tab_editor'):
-            active_tab = self.multi_tab_editor.active_tab
-            if active_tab:
-                filename = getattr(active_tab, 'filename', '') or ''
-                content = self.multi_tab_editor.get_active_content() or ''
-                
-                # Try extension first, then content
-                detected_lang = self.detect_language_from_extension(filename)
-                if detected_lang == "Text" and content:
-                    detected_lang = self.detect_language_from_content(content)
-                
-                self.language_label.config(text=f"Lang: {detected_lang}")
-                
-                # Update editor syntax highlighting if needed
-                if hasattr(active_tab, 'apply_syntax_highlighting'):
-                    active_tab.apply_syntax_highlighting()
+        try:
+            if hasattr(self, 'language_label') and hasattr(self, 'multi_tab_editor'):
+                active_tab = self.multi_tab_editor.active_tab
+                if active_tab:
+                    # Get filename from tab's file_path or filename attribute
+                    filename = getattr(active_tab, 'file_path', '') or getattr(active_tab, 'filename', '') or ''
+                    content = self.multi_tab_editor.get_active_content() or ''
+                    
+                    # Try extension first, then content
+                    detected_lang = self.detect_language_from_extension(filename)
+                    if detected_lang == "Text" and content:
+                        detected_lang = self.detect_language_from_content(content)
+                    
+                    # Update the label
+                    self.language_label.config(text=f"Lang: {detected_lang}")
+                    print(f"🔄 Language updated to: {detected_lang}")
+                    
+                    # Update editor syntax highlighting if needed
+                    if hasattr(active_tab, 'apply_syntax_highlighting'):
+                        active_tab.apply_syntax_highlighting()
+                else:
+                    self.language_label.config(text="Lang: None")
+        except Exception as e:
+            print(f"⚠️ Language indicator update error: {e}")
 
     # Feature system methods (placeholder implementations)
     def show_tutorial_system(self):
@@ -2707,17 +2751,17 @@ License: MIT"""
         try:
             print(f"🎨 Applying theme: {self.current_theme}")
             
-            # Initialize theme manager if not already done
-            if not hasattr(self, 'theme_manager'):
-                from tools.theme import ThemeManager
-                self.theme_manager = ThemeManager()
-            
-            # Apply theme to root window and ttk styles
-            self.theme_manager.apply_theme(self.root, self.current_theme)
+            # Get theme colors
             colors = self.theme_manager.get_colors()
             
-            # Apply theme to main panels and containers
+            # Apply theme to root window first
             self.root.configure(bg=colors["bg_primary"])
+            
+            # Apply TTK styles
+            self.theme_manager.apply_theme(self.root, self.current_theme)
+            
+            # Apply theme consistently to all frames and panels
+            frame_bg = colors.get("bg_secondary", colors["bg_primary"])
             
             # Apply theme to main container and panels
             if hasattr(self, 'main_container'):
@@ -2726,15 +2770,44 @@ License: MIT"""
                 except:
                     pass
             
+            # Ensure editor panel uses consistent colors
             if hasattr(self, 'editor_panel'):
-                self.editor_panel.configure(style="Themed.TFrame")
+                try:
+                    self.editor_panel.configure(style="Themed.TFrame")
+                    # Force background color for consistency
+                    if hasattr(self.editor_panel, 'configure'):
+                        self.editor_panel.configure(bg=frame_bg)
+                except Exception as e:
+                    print(f"Warning: Could not theme editor panel: {e}")
             
+            # Ensure graphics panel uses consistent colors
             if hasattr(self, 'graphics_output_panel'):
-                self.graphics_output_panel.configure(style="Themed.TFrame")
+                try:
+                    self.graphics_output_panel.configure(style="Themed.TFrame")
+                    # Force background color for consistency
+                    if hasattr(self.graphics_output_panel, 'configure'):
+                        self.graphics_output_panel.configure(bg=frame_bg)
+                except Exception as e:
+                    print(f"Warning: Could not theme graphics panel: {e}")
             
-            # Apply theme to multi-tab editor with enhanced theming
+            # Apply theme to multi-tab editor with proper error handling
             if hasattr(self, 'multi_tab_editor'):
-                self.multi_tab_editor.apply_theme(colors)
+                try:
+                    self.multi_tab_editor.apply_theme(colors)
+                    print("✅ Multi-tab editor theme applied successfully")
+                except Exception as e:
+                    print(f"Warning: Could not apply theme to multi-tab editor: {e}")
+            
+            # Apply theme to output text
+            if hasattr(self, 'output_text'):
+                try:
+                    self.output_text.configure(
+                        bg=colors.get("bg_secondary", colors["bg_primary"]),
+                        fg=colors.get("text_primary", "#000000"),
+                        insertbackground=colors.get("text_primary", "#000000")
+                    )
+                except:
+                    pass
             
             # Apply theme to status bar
             if hasattr(self, 'status_label'):
@@ -2848,14 +2921,40 @@ def main():
     print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
     
     try:
+        print("🔧 Initializing Time_Warp IDE...")
         app = Time_WarpIDE()
-        app.root.mainloop()
-        print("👋 Time_Warp IDE session ended. Happy coding!")
+        
+        print("🔧 Starting main event loop...")
+        # Add a check to ensure the window is still valid before starting mainloop
+        if app.root.winfo_exists():
+            app.root.mainloop()
+            print("👋 Time_Warp IDE session ended. Happy coding!")
+        else:
+            print("❌ Window was destroyed during initialization")
+            
     except KeyboardInterrupt:
-        print("\n⚡ Time_Warp interrupted. See you next time!")
+        print("\n⚠️ User interrupted - Time_Warp IDE shutting down gracefully...")
     except Exception as e:
-        print(f"💥 Time_Warp error: {e}")
-        print("🔧 Please report this issue on GitHub")
+        print(f"❌ Critical error during startup: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Try to keep a minimal window open for debugging
+        try:
+            import tkinter as tk
+            root = tk.Tk()
+            root.title("Time_Warp IDE - Error")
+            root.geometry("500x300")
+            
+            error_label = tk.Label(root, 
+                                 text=f"Time_Warp IDE encountered an error:\n{str(e)}\n\nCheck console for details.",
+                                 wraplength=450, justify=tk.CENTER, fg="red")
+            error_label.pack(pady=50)
+            
+            tk.Button(root, text="Close", command=root.quit).pack(pady=20)
+            root.mainloop()
+        except:
+            pass
 
 
 if __name__ == "__main__":
