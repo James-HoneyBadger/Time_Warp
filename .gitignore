@@ -94,6 +94,12 @@ unicode_test.txt
 # Build directory
 build/
 
+# Release archives (too large for GitHub)
+release/**/*.tar.gz
+release/**/*.zip
+*.tar.gz
+*.zip
+
 # Scripts (development only - don't ignore)
 # scripts/
 

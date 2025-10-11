@@ -70,16 +70,24 @@ done
 
 echo "✅ All required files present!"
 
-# Create release archive
+# Create release archive (excluding large files for GitHub compatibility)
 echo "📦 Creating release archive..."
 tar -czf "release/v$VERSION/Time_Warp-IDE-v$VERSION.tar.gz" \
     --exclude='.git' \
     --exclude='*.pyc' \
     --exclude='__pycache__' \
     --exclude='.vscode' \
+    --exclude='.pytest_cache' \
+    --exclude='.mypy_cache' \
     --exclude='release' \
     --exclude='archive' \
+    --exclude='dist' \
+    --exclude='build' \
+    --exclude='.venv' \
     --exclude='*.log' \
+    --exclude='*.tar.gz' \
+    --exclude='*.zip' \
+    --max-size=90M \
     .
 
 # Create distribution files
