@@ -1,6 +1,35 @@
 # Time_Warp IDE - Changelog
 
-## Version 1.1 (October 2025)
+## Version 1.2.0 (October 11, 2025) 🚀
+
+### 🛠️ Critical Bug Fixes
+- **Fixed Code Editor Theme Inheritance**: Multi-tab editor now properly inherits and applies the main UI theme
+- **Resolved Turtle Graphics Display**: Fixed connection between turtle graphics interpreter and canvas display  
+- **Enhanced Package Structure**: Improved import system with proper relative imports
+- **VS Code Debugging Support**: Fixed launch.json and tasks.json configurations for seamless debugging
+
+### 🔧 Technical Improvements
+- Converted from absolute to relative imports for better package structure
+- Added proper `ide_turtle_canvas` attribute connection for turtle graphics
+- Fixed theme application timing for multi-tab editor
+- Enhanced error handling and graceful degradation for missing dependencies
+- Improved canvas coordinate system and centering for turtle graphics
+
+### 🎨 User Experience
+- Code editor now consistently applies selected themes
+- Turtle graphics (Logo) commands now properly display visual results
+- Better startup messages and error reporting
+- Improved theme application across all UI components
+
+### 🧪 Testing & Quality
+- Added comprehensive turtle graphics testing
+- Verified theme application across all components
+- Enhanced debug output for troubleshooting
+- Improved error messages and user feedback
+
+---
+
+## Version 1.1.0 (October 2025) - DEPRECATED
 
 ### 🔄 Name Standardization
 - **Consistent Naming**: Standardized all references from 'TimeWarp'/'timewarp' to 'Time_Warp'

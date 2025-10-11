@@ -74,7 +74,7 @@ class Time_WarpIDE:
 
     def __init__(self):
         """Initialize Time_Warp IDE"""
-        print("🚀 Starting Time_Warp IDE 1.1...")
+        print("🚀 Starting Time_Warp IDE 1.2...")
         print("⏰ Enhanced Educational Programming Environment")
         print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
         
@@ -111,13 +111,22 @@ class Time_WarpIDE:
         # Initialize features
         self.init_features()
         
-        # Apply initial theme
+        # Apply initial theme (after all UI components are created)
         self.apply_theme()
+        
+        # Ensure theme is applied to multi-tab editor specifically
+        if hasattr(self, 'multi_tab_editor'):
+            try:
+                colors = self.theme_manager.get_colors()
+                self.multi_tab_editor.apply_theme(colors)
+                print("✅ Initial theme applied to multi-tab editor")
+            except Exception as e:
+                print(f"⚠️ Failed to apply initial theme to editor: {e}")
         
         # Load plugins
         self.load_plugins()
         
-        print("🚀 Time_Warp IDE 1.1 - Clean two-panel layout ready!")
+        print("🚀 Time_Warp IDE 1.2 - Clean two-panel layout ready!")
         
         # Handle any initialization errors gracefully
 
@@ -348,8 +357,12 @@ class Time_WarpIDE:
         if ENHANCED_GRAPHICS_AVAILABLE:
             self.enhanced_graphics = EnhancedGraphicsCanvas(graphics_frame, 380, 300)
             
-            # Connect to interpreter (using available attributes)
+            # Connect to interpreter (using correct interface)
             try:
+                # Set the ide_turtle_canvas that the interpreter expects
+                self.interpreter.ide_turtle_canvas = self.enhanced_graphics.get_canvas()
+                
+                # Also maintain the turtle_graphics dict for compatibility
                 self.interpreter.turtle_graphics = {
                     'canvas': self.enhanced_graphics.get_canvas(),
                     'screen': self.enhanced_graphics.get_screen(),
@@ -742,8 +755,10 @@ class Time_WarpIDE:
         try:
             if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, 'enhanced_graphics'):
                 # Update enhanced graphics canvas
-                if hasattr(self.enhanced_graphics, 'update_display'):
-                    self.enhanced_graphics.update_display()
+                canvas = self.enhanced_graphics.get_canvas()
+                if canvas:
+                    canvas.update_idletasks()
+                    canvas.update()
             elif hasattr(self, 'basic_canvas'):
                 # Update basic turtle graphics
                 if hasattr(self.interpreter, 'turtle_graphics') and self.interpreter.turtle_graphics:
@@ -2583,7 +2598,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
     def show_quick_help(self):
         """Show quick help"""
-        help_text = """⏰ Time_Warp IDE 1.1 - Quick Help
+        help_text = """⏰ Time_Warp IDE 1.2 - Quick Help
 
 🔥 NEW FEATURES:
 • Multi-tab editor with syntax highlighting
@@ -2609,7 +2624,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
 🚀 Happy coding through time!"""
         
-        messagebox.showinfo("Time_Warp IDE 1.1 - Quick Help", help_text)
+        messagebox.showinfo("Time_Warp IDE 1.2 - Quick Help", help_text)
 
     # Theme and settings
 
@@ -2721,15 +2736,15 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
     def show_about(self):
         """Show about dialog"""
-        about_text = """⏰ Time_Warp IDE 1.1
+        about_text = """⏰ Time_Warp IDE 1.2
 Enhanced Educational Programming Environment
 
-🔥 NEW IN 1.1:
-✅ Multi-tab code editor with syntax highlighting
-✅ File explorer with project navigation
-✅ Enhanced graphics canvas (zoom, export, grid)
-✅ Better error messages with suggestions
-✅ Improved UI layout and usability
+🔥 NEW IN 1.2:
+✅ Fixed code editor theme inheritance
+✅ Resolved turtle graphics display issues
+✅ Enhanced package structure and imports
+✅ Improved VS Code debugging support
+✅ Comprehensive testing and bug fixes
 
 🎯 MISSION:
 Bridge programming history with modern development
@@ -2748,7 +2763,7 @@ GitHub: https://github.com/James-HoneyBadger/Time_Warp
 License: MIT"""
 
         
-        messagebox.showinfo("About Time_Warp IDE 1.1", about_text)
+        messagebox.showinfo("About Time_Warp IDE 1.2", about_text)
     
     def change_theme(self, theme_name):
         """Change to a different theme"""
@@ -2938,7 +2953,7 @@ License: MIT"""
 
 def main():
     """Main application entry point - Time_Warp IDE"""
-    print("🚀 Starting Time_Warp IDE 1.1...")
+    print("🚀 Starting Time_Warp IDE 1.2...")
     print("⏰ Enhanced Educational Programming Environment")
     print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
     
