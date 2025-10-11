@@ -1,15 +1,17 @@
-# Time_Warp IDE 1.1 - Project Structure
+# Time_Warp IDE 1.1 - Project Structure (Organized)
 
 ## 📁 Directory Organization
 
-### Root Directory
+### Root Directory (Essential Files Only)
 ```
 Time_Warp/
 ├── Time_Warp.py              # Main application entry point
 ├── Time_Warp -> Time_Warp.py # Symbolic link for convenience
-├── README.md                # Project documentation
+├── README.md                 # Project documentation
+├── CHANGELOG.md             # Version history
 ├── requirements.txt         # Python dependencies
 ├── pyproject.toml          # Modern Python project configuration
+├── pytest.ini             # Testing configuration
 ├── Time_Warp.code-workspace # VS Code workspace configuration
 └── .gitignore              # Git ignore patterns
 ```
@@ -80,6 +82,7 @@ plugins/
 ### Development & Testing
 ```
 scripts/                    # Development scripts
+├── prepare_release.sh      # Release preparation
 ├── run_all_tests.py        # Master test runner
 ├── run_tests.py            # Basic test runner
 ├── run_tests_ci.py         # CI/CD test runner
@@ -87,21 +90,58 @@ scripts/                    # Development scripts
 ├── launch.py               # Python launcher
 ├── launch_Time_Warp.sh     # Shell launcher
 ├── launch_Time_Warp.bat    # Windows launcher
-└── start.sh                # Quick start script
+├── start.sh                # Quick start script
+├── build/                  # Build-related scripts
+│   ├── build_linux_executable.sh
+│   ├── create_icon.py
+│   ├── Time_Warp.spec
+│   └── MANIFEST.in
+└── development/            # Development utilities
+    ├── apply_fixes.py
+    ├── fix_issues.py
+    └── fix_remaining_issues.py
 
-tests/                      # Test suite
+tests/                      # Test suite organization
 ├── test_comprehensive.py   # Complete test coverage
 ├── sample_outputs/         # Test output samples
-└── tests/                  # Additional test files
+├── verification/           # Verification test suite
+│   ├── comprehensive_verification.py
+│   ├── comprehensive_test_suite.py
+│   ├── comprehensive_interpreter_test.py
+│   └── exhaustive_test_suite.py
+├── debug/                  # Debug test files
+│   ├── debug_theme.py
+│   ├── focused_debug_test.py
+│   ├── focused_interpreter_test.py
+│   ├── corrected_interpreter_test.py
+│   └── quick_interpreter_test.py
+├── test_*.py               # Individual test modules
+├── theme_test.py           # Theme testing
+└── verify_working.py       # Working verification
 ```
 
-### Documentation
+### Documentation (Organized)
 ```
 docs/                       # Documentation files
+├── PROJECT_STRUCTURE.md    # This file - project organization
 ├── README_v11.md           # Version 1.1 features
-├── DIRECTORY_STRUCTURE.md  # Project organization
 ├── CONTRIBUTING.md         # Contribution guidelines
-└── LICENSE                 # MIT license
+├── LICENSE                 # MIT license
+├── reports/                # Project reports
+│   ├── CI_FIX_SUMMARY.md
+│   ├── CRISIS_RESOLUTION_SUCCESS.md
+│   ├── INTERPRETER_VERIFICATION_REPORT.md
+│   ├── ISSUES_RESOLVED.md
+│   ├── LINUX_EXECUTABLE_COMPLETE.md
+│   └── VERIFICATION_COMPLETE.md
+├── releases/               # Release documentation
+│   ├── GITHUB_RELEASE_INSTRUCTIONS.md
+│   ├── RELEASE_1_1_SUMMARY.md
+│   ├── RELEASE_UPDATE_STEPS.md
+│   ├── RELEASE_V1.1_VERIFIED_SUMMARY.md
+│   ├── UPDATED_RELEASE_NOTES_v1.1.md
+│   └── UPDATE_RELEASE_GUIDE.md
+└── guides/                 # User guides (future)
 ```
 
 ### Example Programs
@@ -142,7 +182,9 @@ archive/                    # Archived/deprecated files
 - `requirements.txt` - Runtime dependencies
 
 ### Testing
-- `tests/test_comprehensive.py` - Complete test suite
+
+- `tests/verification/comprehensive_verification.py` - Master verification suite
+- `tests/test_comprehensive.py` - Complete test coverage
 - `scripts/run_all_tests.py` - Master test runner
 
 ## 🚀 Usage

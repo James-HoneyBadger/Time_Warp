@@ -19,7 +19,7 @@ mkdir -p release/v$VERSION
 # Run comprehensive verification
 echo "🧪 Running comprehensive verification suite..."
 cd /home/james/Time_Warp
-python3 comprehensive_verification.py
+python3 tests/verification/comprehensive_verification.py
 
 if [ $? -eq 0 ]; then
     echo "✅ Comprehensive verification completed successfully!"
@@ -149,7 +149,7 @@ Release Date: $RELEASE_DATE
 
 Status: GENUINELY FUNCTIONAL - Every claim verified through automated testing.
 
-For full verification report, run: python3 comprehensive_verification.py
+For full verification report, run: python3 tests/verification/comprehensive_verification.py
 EOF
 
 # Generate checksums
