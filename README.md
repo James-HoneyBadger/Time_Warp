@@ -68,6 +68,7 @@ python timewarp.py
 40 NEXT I
 50 END
 ```
+
 </details>
 
 <details>
@@ -80,6 +81,7 @@ REPEAT 8 [
   RIGHT 45
 ]
 ```
+
 </details>
 
 <details>
@@ -94,6 +96,7 @@ T:FORWARD 100
 T:RIGHT 90
 ; Continue for all 4 sides...
 ```
+
 </details>
 
 ## 🎨 Themes
@@ -172,6 +175,7 @@ python -m pytest tests/integration/   # Integration tests
 ## 🤝 Contributing
 
 We welcome contributions! Please read our [Contributing Guide](docs/developer-guide/CONTRIBUTING.md) for:
+
 - Code style guidelines
 - Development setup
 - Pull request process
