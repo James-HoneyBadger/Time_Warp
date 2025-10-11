@@ -5,38 +5,45 @@ Runs all tests for the Time_Warp IDE project
 """
 
 import sys
-import os
 import subprocess
 from pathlib import Path
+
 
 # Get project root
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+
 def run_comprehensive_tests():
     """Run the comprehensive test suite"""
     print("🧪 Running Comprehensive Test Suite...")
     test_file = project_root / "tests" / "test_comprehensive.py"
-    result = subprocess.run([sys.executable, str(test_file)], capture_output=False)
+    result = subprocess.run([sys.executable, str(test_file)],
+                           capture_output=False, check=True)
     return result.returncode == 0
+
 
 def run_minimal_tests():
     """Run minimal smoke tests"""
     print("🔥 Running Minimal Smoke Tests...")
     test_file = project_root / "scripts" / "run_tests_minimal.py"
     if test_file.exists():
-        result = subprocess.run([sys.executable, str(test_file)], capture_output=False)
+        result = subprocess.run([sys.executable, str(test_file)],
+                               capture_output=False, check=True)
         return result.returncode == 0
     return True
+
 
 def run_ci_tests():
     """Run CI/CD pipeline tests"""
     print("🚀 Running CI/CD Tests...")
     test_file = project_root / "scripts" / "run_tests_ci.py"
     if test_file.exists():
-        result = subprocess.run([sys.executable, str(test_file)], capture_output=False)
+        result = subprocess.run([sys.executable, str(test_file)],
+                               capture_output=False, check=True)
         return result.returncode == 0
     return True
+
 
 def main():
     """Main test runner"""
@@ -79,6 +86,7 @@ def main():
     else:
         print("💥 Some tests failed. Please review and fix issues.")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

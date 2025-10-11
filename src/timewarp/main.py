@@ -2811,9 +2811,7 @@ License: MIT"""
             if hasattr(self, 'editor_panel'):
                 try:
                     self.editor_panel.configure(style="Themed.TFrame")
-                    # Force background color for consistency
-                    if hasattr(self.editor_panel, 'configure'):
-                        self.editor_panel.configure(bg=frame_bg)
+                    # Note: ttk widgets use styles, not direct bg configuration
                 except Exception as e:
                     print(f"Warning: Could not theme editor panel: {e}")
             
@@ -2821,9 +2819,7 @@ License: MIT"""
             if hasattr(self, 'graphics_output_panel'):
                 try:
                     self.graphics_output_panel.configure(style="Themed.TFrame")
-                    # Force background color for consistency
-                    if hasattr(self.graphics_output_panel, 'configure'):
-                        self.graphics_output_panel.configure(bg=frame_bg)
+                    # Note: ttk widgets use styles, not direct bg configuration
                 except Exception as e:
                     print(f"Warning: Could not theme graphics panel: {e}")
             

@@ -2,21 +2,23 @@
 
 > **Educational Programming Environment** - A comprehensive multi-language IDE designed for learning and teaching programming with integrated turtle graphics, professional themes, and intuitive tools.
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/James-HoneyBadger/Time_Warp/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/James-HoneyBadger/Time_Warp/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 
 ## ✨ Features
 
 ### 🔤 **Multi-Language Support**
+
 - **BASIC** - Classic line-numbered programming with variables and loops
-- **PILOT** - Educational programming with turtle graphics and text commands  
+- **PILOT** - Educational programming with turtle graphics and text commands
 - **Logo** - Turtle graphics programming for visual learning
 - **Python** - Modern scripting with full library support
 - **JavaScript** - Web development and scripting (Node.js)
 - **Perl** - Text processing and system scripting
 
 ### 🎨 **Professional Environment**
+
 - **Multi-Tab Editor** - Syntax highlighting and code completion
 - **8 Beautiful Themes** - 4 dark themes, 4 light themes
 - **Turtle Graphics** - Visual programming canvas
@@ -24,6 +26,7 @@
 - **Real-time Execution** - Immediate code execution and results
 
 ### 📚 **Educational Focus**
+
 - **Learning-Centered Design** - Built specifically for programming education
 - **Visual Programming** - Turtle graphics for Logo and PILOT
 - **Clear Error Messages** - Educational feedback for learning
@@ -32,6 +35,7 @@
 ## 🚀 Quick Start
 
 ### Installation
+
 ```bash
 # Clone repository
 git clone https://github.com/James-HoneyBadger/Time_Warp.git
@@ -45,6 +49,7 @@ python timewarp.py
 ```
 
 ### First Program
+
 1. **Launch** Time_Warp IDE
 2. **Select Language** from the dropdown menu
 3. **Write Code** in the editor with syntax highlighting

@@ -22,9 +22,6 @@ def test_minimal_import():
     """Test minimal core functionality"""
     try:
         # Test basic Python imports first
-        import os
-        import sys
-        import json
         print("✅ Basic Python imports successful")
         
         # Test pygame import
@@ -35,7 +32,7 @@ def test_minimal_import():
         from core.interpreter import Time_WarpInterpreter
         print("✅ Time_WarpInterpreter import successful")
         return True
-    except Exception as e:
+    except ImportError as e:
         print(f"❌ Import failed: {e}")
         import traceback
         traceback.print_exc()
@@ -52,7 +49,7 @@ def test_basic_instantiation():
         print("✅ Time_WarpInterpreter instantiation successful")
         
         # Test a simple execution
-        result = interpreter.run_program("# Simple comment test", language="python")
+        interpreter.run_program("# Simple comment test", language="python")
         print("✅ Basic execution test successful")
         return True
     except Exception as e:
@@ -68,14 +65,13 @@ def main():
     print("-" * 40)
     
     # Print environment info for debugging
-    import sys
-    import os
     print(f"Python version: {sys.version}")
     print(f"Platform: {sys.platform}")
     print(f"Current directory: {os.getcwd()}")
     print(f"Python path: {sys.path[:3]}...")  # First 3 entries
-    print(f"Environment variables:")
-    for key in ["SDL_VIDEODRIVER", "SDL_AUDIODRIVER", "PYGAME_HIDE_SUPPORT_PROMPT"]:
+    print("Environment variables:")
+    for key in ["SDL_VIDEODRIVER", "SDL_AUDIODRIVER",
+                "PYGAME_HIDE_SUPPORT_PROMPT"]:
         print(f"  {key}: {os.environ.get(key, 'Not set')}")
     print("-" * 40)
 

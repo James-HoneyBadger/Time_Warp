@@ -90,16 +90,16 @@ except ImportError:
 try:
     # Try to import from actual modules first
     from games.engine import GameManager
-    from core.audio import AudioEngine
-    from core.hardware import (
+    from .audio import AudioEngine
+    from .hardware import (
         RPiController,
         RobotInterface,
         GameController,
         SensorVisualizer,
     )
-    from core.iot import IoTDeviceManager, SmartHomeHub, SensorNetwork
-    from core.utilities import Mixer, Tween, Timer, Particle
-    from core.networking import CollaborationManager
+    from .iot import IoTDeviceManager, SmartHomeHub, SensorNetwork
+    from .utilities import Mixer, Tween, Timer, Particle
+    from .networking import CollaborationManager
 
     ArduinoController = None  # Not implemented yet
     AdvancedRobotInterface = None  # Not implemented yet

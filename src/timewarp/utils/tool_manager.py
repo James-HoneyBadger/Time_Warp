@@ -14,7 +14,7 @@ from tkinter import ttk, messagebox
 
 # Import base plugin system
 from plugins import PluginManager, TimeWarpPlugin
-from core.framework import Time_WarpFramework, ToolPlugin
+from ..core.framework import Time_WarpFramework, ToolPlugin
 
 
 class ToolManager(PluginManager):
@@ -438,7 +438,7 @@ Required Files:
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from core.framework import ToolPlugin
+        from ..core.framework import ToolPlugin
 import tkinter as tk
 from tkinter import ttk
 
