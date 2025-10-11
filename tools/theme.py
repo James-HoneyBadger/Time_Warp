@@ -478,8 +478,15 @@ class ThemeManager:
         except Exception as e:
             print(f"TTK style configuration error: {e}")
 
-    def get_colors(self):
-        """Get current theme colors"""
+    def get_colors(self, theme_name=None):
+        """Get colors for specified theme or current theme"""
+        if theme_name:
+            # Temporarily switch to requested theme to get colors
+            old_theme = self.current_theme
+            self.set_theme(theme_name)
+            colors = self.current_colors.copy()
+            self.set_theme(old_theme)  # Switch back
+            return colors
         return self.current_colors
 
     def apply_text_widget_theme(self, text_widget):
