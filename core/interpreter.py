@@ -1323,6 +1323,10 @@ class Time_WarpInterpreter:
             self.current_language = language.lower()
             self.current_language_mode = language.lower()
         
+        # Preprocess Logo programs to handle multi-line REPEAT blocks
+        if language and language.lower() == 'logo':
+            program_text = self._preprocess_logo_program(program_text)
+        
         if not self.load_program(program_text):
             self.log_output("Error loading program")
             return False
@@ -1488,6 +1492,37 @@ class Time_WarpInterpreter:
             anchor="nw",
         )
         self.turtle_graphics["lines"].append(text_id)
+
+    def _preprocess_logo_program(self, program_text):
+        """Preprocess Logo program to handle multi-line REPEAT blocks"""
+        lines = program_text.split('\n')
+        processed_lines = []
+        i = 0
+        
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Check if this is a REPEAT command with opening bracket
+            if line.upper().startswith('REPEAT ') and '[' in line and ']' not in line:
+                # Multi-line REPEAT block
+                repeat_block = line
+                i += 1
+                bracket_depth = line.count('[') - line.count(']')
+                
+                # Collect lines until brackets are balanced
+                while i < len(lines) and bracket_depth > 0:
+                    next_line = lines[i].strip()
+                    if next_line and not next_line.startswith(';'):  # Skip empty and comments
+                        repeat_block += ' ' + next_line
+                        bracket_depth += next_line.count('[') - next_line.count(']')
+                    i += 1
+                
+                processed_lines.append(repeat_block)
+            else:
+                processed_lines.append(line)
+                i += 1
+        
+        return '\n'.join(processed_lines)
 
 
 def create_demo_program():

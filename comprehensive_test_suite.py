@@ -1,7 +1,23 @@
 #!/usr/bin/env python3
 """
-Comprehensive Time_Warp IDE Functionality Verification
-Tests all languages, input/output, graphics, and edge cases
+COMPREHENSIVE UNIT TESTING SUITE FOR TIME_WARP IDE
+==================================================
+
+This is an exhaustive test suite that will examine every component,
+feature, and functionality of the Time_Warp IDE to ensure it's
+working perfectly.
+
+Test Categories:
+1. Core Interpreter Tests
+2. Language Executor Tests (PILOT, BASIC, Logo, Python, JavaScript)
+3. GUI Component Tests
+4. Theme System Tests
+5. File Operations Tests
+6. Graphics System Tests
+7. Plugin System Tests
+8. Error Handling Tests
+9. Integration Tests
+10. Performance Tests
 """
 
 import tkinter as tk

@@ -195,7 +195,34 @@ class LogoExecutor:
         return "continue"
 
     def _handle_repeat(self, command):
-        """Handle REPEAT command"""
+        """Handle REPEAT command with support for multi-line syntax"""
+        # Preprocess multi-line REPEAT blocks by joining lines
+        command_lines = command.strip().split('\n')
+        
+        if len(command_lines) > 1:
+            # Multi-line format - join into single line
+            processed_command = ""
+            bracket_depth = 0
+            for line in command_lines:
+                line = line.strip()
+                if not line or line.startswith(';'):  # Skip empty and comment lines
+                    continue
+                    
+                # Track bracket depth
+                bracket_depth += line.count('[') - line.count(']')
+                
+                # Add line to processed command
+                if processed_command:
+                    processed_command += " " + line
+                else:
+                    processed_command = line
+                    
+                # If brackets are balanced, we have complete command
+                if bracket_depth == 0 and '[' in processed_command:
+                    break
+                    
+            command = processed_command
+        
         parsed = self._parse_repeat_nested(command.strip())
         if not parsed:
             self.interpreter.log_output("Malformed REPEAT syntax or unmatched brackets")
