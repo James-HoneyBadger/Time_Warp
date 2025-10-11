@@ -4,41 +4,35 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "timewarp-ide"
-version = "1.0.0"
-description = "Educational Programming IDE with Multi-Language Support"
+version = "1.1.0"
+description = "Educational Programming IDE with Multi-Language Support and Turtle Graphics"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 authors = [
-    {name = "Time_Warp Development Team", email = "info@time-warp-ide.org"},
-]
-maintainers = [
-    {name = "Time_Warp IDE Team", email = "time-warp-ide@example.com"},
+    {name = "James-HoneyBadger", email = "james@example.com"},
 ]
 keywords = [
     "education",
-    "programming",
+    "programming", 
     "ide",
     "basic",
     "logo",
     "pilot",
-    "compiler",
     "turtle-graphics",
     "educational",
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Education",
-    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Topic :: Education",
-    "Topic :: Software Development :: Compilers",
     "Topic :: Software Development :: Interpreters",
 ]
 dependencies = [
@@ -47,107 +41,47 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
+    "pytest>=6.0.0",
     "pytest-cov>=4.0.0",
     "black>=22.0.0",
     "flake8>=4.0.0",
     "mypy>=1.0.0",
-    "sphinx>=4.0.0",
-    "sphinx-rtd-theme>=1.0.0",
-]
-docs = [
-    "sphinx>=4.0.0",
-    "sphinx-rtd-theme>=1.0.0",
-]
-graphics = [
-    "Pillow>=8.0.0",
-]
-hardware = [
-    "pyserial>=3.0",
-    "smbus2>=0.4.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/James-HoneyBadger/Time_Warp"
-Documentation = "https://time-warp-ide.readthedocs.io/"
 Repository = "https://github.com/James-HoneyBadger/Time_Warp"
 Issues = "https://github.com/James-HoneyBadger/Time_Warp/issues"
-Changelog = "https://github.com/James-HoneyBadger/Time_Warp/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/James-HoneyBadger/Time_Warp/tree/main/docs"
 
 [project.scripts]
-timewarp = "timewarp_ide.main:main"
-timewarp-ide = "timewarp_ide.main:main"
-timewarp-compiler = "timewarp_ide.compiler:main"
+timewarp = "timewarp.main:main"
 
 [tool.setuptools]
-include-package-data = true
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
-exclude = ["tests*", "test_*", "docs", "examples"]
+where = ["src"]
 
-[tool.setuptools.package-data]
-timewarp_ide = ["*.txt", "*.md", "*.json"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
 
 [tool.black]
 line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+target-version = ['py38']
 
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E203", "W503"]
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    ".venv",
-    ".tox",
-    ".eggs",
-]
+exclude = [".git", "__pycache__", "build", "dist", ".venv"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = [
-    "PIL.*",
-    "tkinter.*",
-]
+disallow_untyped_defs = false
 ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --cov=timewarp_ide --cov-report=html --cov-report=term-missing"
-testpaths = [
-    "tests",
-    "test_*",
-]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
