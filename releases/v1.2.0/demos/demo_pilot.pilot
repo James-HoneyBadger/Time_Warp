@@ -1,0 +1,26 @@
+T: Welcome to Time_Warp IDE!
+T: This is a PILOT language demonstration.
+T: PILOT was designed for educational programming.
+T: 
+A: What is your name?
+Y: #name
+T: Hello, #name! Nice to meet you.
+T:
+T: Let's do some simple math practice.
+A: What is 5 + 3?
+Y: #answer
+J(#answer=8): correct
+T: That's not correct. The answer is 8.
+J: continue
+*correct
+T: Excellent! You got it right.
+*continue
+T:
+T: PILOT uses simple commands:
+T: T: = Type text
+T: A: = Accept input  
+T: Y: = Yes (store input)
+T: J: = Jump (conditional)
+T:
+T: Thank you for trying Time_Warp IDE, #name!
+T: Happy learning!
