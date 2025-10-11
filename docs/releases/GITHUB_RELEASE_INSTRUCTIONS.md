@@ -89,7 +89,7 @@ All release scripts have been executed successfully. Here's what has been accomp
 
    ## 📊 System Requirements
    - **Python**: 3.9+ (tested on 3.9, 3.10, 3.11, 3.12)
-   - **Operating System**: Linux, Windows, macOS
+   - **Operating System**: Linux
    - **Dependencies**: pygame 2.0+, tkinter (included with Python)
    - **Memory**: 256MB RAM minimum, 512MB recommended
 

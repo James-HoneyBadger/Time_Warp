@@ -47,7 +47,7 @@ python3 timewarp.py
 - **Python**: 3.7 or higher
 - **GUI**: tkinter (included with most Python installations)
 - **Optional**: PIL/Pillow for enhanced image features
-- **Platform**: Windows, macOS, Linux
+- **Platform**: Linux
 
 ## 🎮 Try These Examples
 

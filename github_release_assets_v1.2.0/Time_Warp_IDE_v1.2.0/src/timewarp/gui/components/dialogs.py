@@ -1315,12 +1315,8 @@ class VirtualEnvironmentManager:
         """Check if virtual environment already exists"""
         if os.path.exists(self.venv_dir):
             # Check if it has the basic structure
-            if os.name == "nt":  # Windows
-                python_path = os.path.join(self.venv_dir, "Scripts", "python.exe")
-                pip_path = os.path.join(self.venv_dir, "Scripts", "pip.exe")
-            else:  # Unix/Linux/macOS
-                python_path = os.path.join(self.venv_dir, "bin", "python")
-                pip_path = os.path.join(self.venv_dir, "bin", "pip")
+            python_path = os.path.join(self.venv_dir, "bin", "python")
+            pip_path = os.path.join(self.venv_dir, "bin", "pip")
 
             if os.path.exists(python_path) and os.path.exists(pip_path):
                 self.python_exe = python_path
@@ -1345,12 +1341,8 @@ class VirtualEnvironmentManager:
             venv.create(self.venv_dir, with_pip=True)
 
             # Set paths for executables
-            if os.name == "nt":  # Windows
-                self.python_exe = os.path.join(self.venv_dir, "Scripts", "python.exe")
-                self.pip_exe = os.path.join(self.venv_dir, "Scripts", "pip.exe")
-            else:  # Unix/Linux/macOS
-                self.python_exe = os.path.join(self.venv_dir, "bin", "python")
-                self.pip_exe = os.path.join(self.venv_dir, "bin", "pip")
+            self.python_exe = os.path.join(self.venv_dir, "bin", "python")
+            self.pip_exe = os.path.join(self.venv_dir, "bin", "pip")
 
             self.log_status(f"Virtual environment created at: {self.venv_dir}")
             return True

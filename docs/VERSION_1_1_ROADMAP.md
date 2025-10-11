@@ -111,8 +111,6 @@ Build upon the solid v1.0 foundation with practical enhancements that improve us
 
 ### **Cross-Platform Improvements**
 - **Portable Version** - USB-stick compatible installation
-- **Better Windows Support** - Native Windows installer
-- **macOS Bundle** - Proper macOS application package
 - **Linux Packages** - .deb and .rpm distributions
 
 ---
