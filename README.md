@@ -107,14 +107,43 @@ Professional color schemes for comfortable coding:
 ```
 Time_Warp/
 ├── src/timewarp/          # Main application package
+│   ├── __init__.py        # Package initialization
+│   ├── main.py            # Main application entry point
 │   ├── core/              # Core interpreter and language engines
 │   ├── gui/               # User interface components
 │   ├── utils/             # Utilities and theme management
 │   └── games/             # Game engine framework
 ├── tests/                 # Comprehensive test suite
+│   ├── unit/              # Unit tests
+│   ├── integration/       # Integration tests
+│   ├── fixtures/          # Test data and fixtures
+│   └── verification/      # Test verification tools
 ├── docs/                  # Documentation and guides
+│   ├── user-guide/        # End-user documentation
+│   ├── developer-guide/   # Contributing and development docs
+│   ├── api/               # API reference documentation
+│   ├── languages/         # Language-specific guides
+│   └── reports/           # Development and testing reports
 ├── examples/              # Sample programs and tutorials
-└── scripts/               # Development and build scripts
+│   ├── BASIC/             # BASIC language examples
+│   ├── Logo/              # Logo turtle graphics examples
+│   ├── PILOT/             # PILOT educational examples
+│   ├── Python/            # Python scripting examples
+│   └── games/             # Game development examples
+├── scripts/               # Development and build scripts
+│   ├── build/             # Build automation scripts
+│   └── development/       # Development tools
+├── plugins/               # Plugin system and extensions
+│   └── sample_plugin/     # Example plugin implementation
+├── marketing/             # Marketing materials and outreach
+│   ├── graphics/          # Marketing graphics and assets
+│   └── social_media/      # Social media content
+├── release/               # Release management
+│   └── v1.1/              # Version 1.1 release files
+├── timewarp.py            # Main entry point script
+├── pyproject.toml         # Modern Python project configuration
+├── requirements.txt       # Project dependencies
+└── pytest.ini            # Test configuration
 ```
 
 ## 🧪 Testing
