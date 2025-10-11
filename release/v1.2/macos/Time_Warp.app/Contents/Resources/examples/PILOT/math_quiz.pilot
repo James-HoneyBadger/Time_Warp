@@ -1,0 +1,72 @@
+T:MATHEMATICS QUIZ
+A:Welcome to the Mathematics Quiz!
+A:Let's test your addition skills.
+A:I'll ask you 5 questions.
+A:
+C:SCORE=0
+C:QUESTION=1
+A:
+*QUESTION
+T:Question #QUESTION#
+A:What is ANSWER1 + ANSWER2?
+A:Type your answer and press Enter.
+A:
+C:USER_ANSWER=#INPUT
+C:CORRECT_ANSWER=ANSWER1+ANSWER2
+A:
+J:(USER_ANSWER=CORRECT_ANSWER)*CORRECT
+J:(USER_ANSWER<>CORRECT_ANSWER)*WRONG
+A:
+*CORRECT
+T:Correct!
+A:Well done!
+A:
+C:SCORE=SCORE+1
+J:*NEXT_QUESTION
+A:
+*WRONG
+T:Not quite right.
+A:The correct answer is CORRECT_ANSWER.
+A:Better luck next time!
+A:
+J:*NEXT_QUESTION
+A:
+*NEXT_QUESTION
+C:QUESTION=QUESTION+1
+C:ANSWER1=#RANDOM(10)+1
+C:ANSWER2=#RANDOM(10)+1
+A:
+J:(QUESTION<=5)*QUESTION
+A:
+*RESULTS
+T:Quiz Complete!
+A:You got SCORE out of 5 correct.
+A:
+J:(SCORE>=4)*EXCELLENT
+J:(SCORE>=3)*GOOD
+J:(SCORE>=1)*TRY_AGAIN
+J:(SCORE=0)*STUDY_MORE
+A:
+*EXCELLENT
+T:Excellent work!
+A:You're a math whiz!
+A:
+E:
+A:
+*GOOD
+T:Good job!
+A:Keep practicing!
+A:
+E:
+A:
+*TRY_AGAIN
+T:Not bad!
+A:Try again to improve your score.
+A:
+E:
+A:
+*STUDY_MORE
+T:Keep studying!
+A:Practice makes perfect.
+A:
+E:

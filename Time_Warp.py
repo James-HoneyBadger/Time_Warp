@@ -1,12 +1,24 @@
 #!/usr/bin/env python3
 """
-Time_Warp IDE - Enhanced Multi-Tab Editor
-Updated main application with new features:
-- Multi-tab code editor
-- File explorer panel  
-- Enhanced graphics canvas
-- Better error handling
+Time_Warp IDE v1.2.0 - Enhanced Multi-Tab Educational Programming Environment
+An educational programming IDE supporting multiple languages with turtle graphics.
+
+Features:
+- Multi-tab code editor with syntax highlighting
+- PILOT, BASIC, Logo, Python, JavaScript support
+- Enhanced graphics canvas with turtle graphics
+- Interactive tutorials and gamification
+- Plugin system and theme management
+- AI-powered code assistance
+- Cross-platform compatibility (Windows, macOS, Linux)
+
+macOS Version: Optimized for Apple Silicon and Intel Macs
 """
+
+__version__ = "1.2.0"
+__author__ = "Time_Warp Development Team"
+__license__ = "MIT"
+__platform__ = "macOS"
 
 import sys
 import os

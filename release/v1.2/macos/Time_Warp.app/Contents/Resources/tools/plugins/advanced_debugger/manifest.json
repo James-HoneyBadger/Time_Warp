@@ -1,0 +1,12 @@
+{
+  "name": "Advanced Debugger",
+  "version": "1.0.0",
+  "author": "Time_Warp IDE Team",
+  "description": "Professional-grade debugging tool with breakpoints, variable inspection, call stack analysis, execution control, and memory monitoring",
+  "category": "debugging",
+  "entry_point": "plugin.py",
+  "api_version": "1.0",
+  "permissions": ["interpreter", "filesystem", "ui"],
+  "dependencies": [],
+  "keywords": ["debug", "breakpoints", "variables", "profiling"]
+}
