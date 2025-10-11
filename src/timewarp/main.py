@@ -21,31 +21,49 @@ import subprocess
 import platform
 
 # Import theme configuration functions
-from tools.theme import load_config, save_config, ThemeManager
+from .utils.theme import load_config, save_config, ThemeManager
 
 # Import core components
 try:
-    from core.interpreter import Time_WarpInterpreter
-    from plugins import PluginManager
+    from .core.interpreter import Time_WarpInterpreter
     CORE_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Core components not available: {e}")
     CORE_AVAILABLE = False
 
+# Import plugins (from root level)
+try:
+    import sys
+    import os
+    # Add root directory to path for plugins
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    if root_dir not in sys.path:
+        sys.path.insert(0, root_dir)
+    from plugins import PluginManager
+    PLUGINS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Plugin system not available: {e}")
+    PLUGINS_AVAILABLE = False
+
 # Import GUI components
 try:
-    from gui.components.multi_tab_editor import MultiTabEditor
-    from gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
+    from .gui.components.multi_tab_editor import MultiTabEditor
+    from .gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
     ENHANCED_GRAPHICS_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Enhanced components not available: {e}")
     ENHANCED_GRAPHICS_AVAILABLE = False
-from core.enhanced_error_handler import EnhancedErrorHandler, ErrorHighlighter
 
-# Feature modules
-from core.features.tutorial_system import TutorialSystem
-from core.features.ai_assistant import AICodeAssistant
-from core.features.gamification import GamificationSystem
+# Error handling and feature modules
+try:
+    from .core.enhanced_error_handler import EnhancedErrorHandler, ErrorHighlighter
+    from .core.features.tutorial_system import TutorialSystem
+    from .core.features.ai_assistant import AICodeAssistant
+    from .core.features.gamification import GamificationSystem
+    FEATURES_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Feature modules not available: {e}")
+    FEATURES_AVAILABLE = False
 
 
 class Time_WarpIDE:
@@ -68,7 +86,11 @@ class Time_WarpIDE:
         self.theme_manager = ThemeManager()
         self.current_theme = "forest"  # Default theme
         
-        self.plugin_manager = PluginManager(self)
+        # Initialize plugin manager if available
+        if PLUGINS_AVAILABLE:
+            self.plugin_manager = PluginManager(self)
+        else:
+            self.plugin_manager = None
         
         # Initialize interpreter
         self.interpreter = Time_WarpInterpreter()
@@ -2856,7 +2878,7 @@ License: MIT"""
         try:
             # Initialize theme manager if not already done
             if not hasattr(self, 'theme_manager'):
-                from tools.theme import ThemeManager
+                from .utils.theme import ThemeManager
                 self.theme_manager = ThemeManager()
             
             # Apply theme to the window
