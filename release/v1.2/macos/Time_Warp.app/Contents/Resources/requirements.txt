@@ -1,0 +1,23 @@
+# Time_Warp IDE Requirements
+# Core dependencies for the Educational Programming IDE
+
+# Runtime dependencies (most included with Python standard library)
+# - tkinter (GUI framework) 
+# - json (configuration management)
+# - os, sys (system interface)
+# - threading (concurrent execution)
+# - subprocess (process management)
+# - turtle (graphics engine)
+# - pathlib (file system operations)
+
+# Required runtime dependencies
+pygame>=2.0.0           # Graphics and multimedia support
+
+# Development dependencies
+pytest>=7.0.0          # Testing framework
+black>=22.0.0           # Code formatting
+flake8>=4.0.0          # Linting
+
+# Optional runtime dependencies for enhanced features  
+# PIL>=8.0.0           # Image processing (uncomment if needed)
+# numpy>=1.20.0        # Mathematical operations (uncomment if needed)

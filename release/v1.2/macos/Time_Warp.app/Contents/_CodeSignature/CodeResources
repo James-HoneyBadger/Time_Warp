@@ -4,9 +4,17 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Resources/CHANGELOG.md</key>
+		<data>
+		j3UXyhu2t7K4Tm7s0KKPuQO3ZrQ=
+		</data>
+		<key>Resources/README.md</key>
+		<data>
+		LhZPwp+faGwQT+fadC7T3YTuSCk=
+		</data>
 		<key>Resources/base_library.zip</key>
 		<data>
-		MDdhSC9IbjpvzNsvsNPfIB2nc9k=
+		+irCb4nJzsxrSPYzPN6pwLSKn90=
 		</data>
 		<key>Resources/core/Untitled-1</key>
 		<data>
@@ -284,6 +292,74 @@
 		<data>
 		W4hMMGCNy1Ko1eVICOMj0n699Sk=
 		</data>
+		<key>Resources/docs/COMING_SOON_FEATURES_IMPLEMENTED.md</key>
+		<data>
+		0VRy7frztH3kABAtnXWCoJcIL5M=
+		</data>
+		<key>Resources/docs/CONTRIBUTING.md</key>
+		<data>
+		3it4F1B4bmkABbnknuOmStSqE5A=
+		</data>
+		<key>Resources/docs/DEMO_GAMES.md</key>
+		<data>
+		5ECo0rVXf3WA1L+NhKCRI2u27sw=
+		</data>
+		<key>Resources/docs/DIRECTORY_STRUCTURE.md</key>
+		<data>
+		JB+FD0Q3sdJPLTAn+T3HkSTku50=
+		</data>
+		<key>Resources/docs/GITHUB_INTEGRATION.md</key>
+		<data>
+		8Tz/g2aQhE6wh/sLSnC6c1dXJ+8=
+		</data>
+		<key>Resources/docs/LICENSE</key>
+		<data>
+		nf/zttOAIUfVITB1GqXI7sQmZjk=
+		</data>
+		<key>Resources/docs/MODULAR_ARCHITECTURE.md</key>
+		<data>
+		9RiY2GepkN4ZEx1oeAHD4kfa4aI=
+		</data>
+		<key>Resources/docs/PILOT_EXTENDED_COMMANDS.md</key>
+		<data>
+		WWc0Pn8K80wKq821MG3W504WnE0=
+		</data>
+		<key>Resources/docs/PROJECT_STRUCTURE.md</key>
+		<data>
+		BAMb6EL+5G5TBJRsJyVGk2zhBaI=
+		</data>
+		<key>Resources/docs/README_v11.md</key>
+		<data>
+		dnRbW4LAnaFjjGu/WKDhIJWrksM=
+		</data>
+		<key>Resources/docs/THEME_SELECTOR_COMING_SOON_FIX.md</key>
+		<data>
+		G8f/abUciHb87nr/LGgzK4mJatk=
+		</data>
+		<key>Resources/docs/VERSION_1_1_ROADMAP.md</key>
+		<data>
+		5LRoGGDk4MN0ZLYEMhxJe4cuxeQ=
+		</data>
+		<key>Resources/docs/compiler.md</key>
+		<data>
+		VGgF7bBqJ8csKW9E02AswMNKyww=
+		</data>
+		<key>Resources/docs/development/FILE_ORGANIZATION.md</key>
+		<data>
+		XbD3ttmc5HOJYcAwMyBT7bX+l68=
+		</data>
+		<key>Resources/docs/languages/basic.md</key>
+		<data>
+		u+O+ZWiBiQHHm0nBaW3BshULleg=
+		</data>
+		<key>Resources/docs/languages/logo.md</key>
+		<data>
+		i3rBgoPpQr/z37H/yX06NkB63u0=
+		</data>
+		<key>Resources/docs/languages/pilot.md</key>
+		<data>
+		WJmBb57d6CCR+YG7NRda8+r024I=
+		</data>
 		<key>Resources/examples/BASIC/arrays.bas</key>
 		<data>
 		22/WEdQJjUaQdOWLjY6STxrLYcs=
@@ -488,9 +564,109 @@
 		<data>
 		2a3yuuWa5VjsKKqibAJFU6QNkAg=
 		</data>
+		<key>Resources/games/__init__.py</key>
+		<data>
+		WH6Z+c5960fIcnq8x9kwY01LMVE=
+		</data>
+		<key>Resources/games/engine/__init__.py</key>
+		<data>
+		jFvPlY+nRBD5/HTwKb6gc4iU4Hk=
+		</data>
+		<key>Resources/games/engine/game_manager.py</key>
+		<data>
+		UbXKpyq5OR9zSTs764/Og59gB7s=
+		</data>
+		<key>Resources/games/engine/game_objects.py</key>
+		<data>
+		KL7PIEd8ZWdYS6jYhwFaqO19JTE=
+		</data>
+		<key>Resources/games/engine/game_renderer.py</key>
+		<data>
+		OP7Nk2LTbCSjDZTvswShUX1L6pY=
+		</data>
+		<key>Resources/games/engine/physics.py</key>
+		<data>
+		fEdSVcE13qlX+85b9fVBZDqy0J4=
+		</data>
+		<key>Resources/gui/__init__.py</key>
+		<data>
+		c8sX6jzl1hIz91ZDG7JTZn4cnsg=
+		</data>
+		<key>Resources/gui/components/__init__.py</key>
+		<data>
+		+pHcEL+khcAi85MYfomt6ztdopc=
+		</data>
+		<key>Resources/gui/components/dialogs.py</key>
+		<data>
+		qigbdZ9AyZqd4C7BB5sPIFJpct4=
+		</data>
+		<key>Resources/gui/components/educational_debug.py</key>
+		<data>
+		owL/dZZMQimCSJxdv/DXYeInuRI=
+		</data>
+		<key>Resources/gui/components/enhanced_graphics_canvas.py</key>
+		<data>
+		8kIk8gSpVwUtPHsX4BAaUJSmGJY=
+		</data>
+		<key>Resources/gui/components/file_explorer.py</key>
+		<data>
+		Wg+sTKJVqz63O4Vf7JVBEzlLgys=
+		</data>
+		<key>Resources/gui/components/multi_tab_editor.py</key>
+		<data>
+		10WlzJ6Cl8EN+yc8Q2gNU+8sCbw=
+		</data>
+		<key>Resources/gui/components/project_explorer.py</key>
+		<data>
+		vPaPD/D64LXjO9hRzXwsMTlyUUY=
+		</data>
+		<key>Resources/gui/components/venv_manager.py</key>
+		<data>
+		igvnC8MhQk8Ird048tefygdOHVA=
+		</data>
+		<key>Resources/gui/editor/__init__.py</key>
+		<data>
+		INQY9Ij2Qf7k+OMUznaFuluRskY=
+		</data>
+		<key>Resources/gui/editor/features.py</key>
+		<data>
+		3hd05WYhZSy7FXwP6EeWx+FTZwI=
+		</data>
 		<key>Resources/icon-windowed.icns</key>
 		<data>
 		eEHOuYpZLB0vKGVIWGZOh5rH8+o=
+		</data>
+		<key>Resources/plugins/__init__.py</key>
+		<data>
+		w6wmk3Cn4PXXoM8iHkclTHED/G8=
+		</data>
+		<key>Resources/plugins/plugins/code_formatter/manifest.json</key>
+		<data>
+		2KRgd5RKLK2Cr8S0KfGB3LTPWnM=
+		</data>
+		<key>Resources/plugins/plugins/code_formatter/plugin.py</key>
+		<data>
+		c1tgqeYSXIp2zEE3JjoWIBUYnPQ=
+		</data>
+		<key>Resources/plugins/plugins/syntax_highlighter/manifest.json</key>
+		<data>
+		X2RQNRhj30kJA1RoZaeOyn6lJGo=
+		</data>
+		<key>Resources/plugins/plugins/syntax_highlighter/plugin.py</key>
+		<data>
+		2liP/bJnlSq/V3rtSbx8iN7tJhM=
+		</data>
+		<key>Resources/plugins/sample_plugin/README.md</key>
+		<data>
+		TPVkv2pRA9NqacozEa5c3W7YjOU=
+		</data>
+		<key>Resources/plugins/sample_plugin/manifest.json</key>
+		<data>
+		51Jv2wf3hudNunK+84LAXIiKi0U=
+		</data>
+		<key>Resources/plugins/sample_plugin/plugin.py</key>
+		<data>
+		QmrSyjvLp1CSwNB8Lfy32f9BQr4=
 		</data>
 		<key>Resources/pygame/freesansbold.ttf</key>
 		<data>
@@ -499,6 +675,10 @@
 		<key>Resources/pygame/pygame_icon_mac.bmp</key>
 		<data>
 		mB6onxFXamyON0aNRp0gVPiH2k8=
+		</data>
+		<key>Resources/requirements.txt</key>
+		<data>
+		3idDgzXdZxy5KRWF+ZYn5RGIzLg=
 		</data>
 		<key>Resources/tools/__init__.py</key>
 		<data>
@@ -587,6 +767,11 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Frameworks/CHANGELOG.md</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/CHANGELOG.md</string>
+		</dict>
 		<key>Frameworks/PIL/.dylibs</key>
 		<dict>
 			<key>symlink</key>
@@ -831,6 +1016,11 @@
 			<key>requirement</key>
 			<string>cdhash H"6bcd2657099e59bef7e56c5278151e81cfc70f46"</string>
 		</dict>
+		<key>Frameworks/README.md</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/README.md</string>
+		</dict>
 		<key>Frameworks/base_library.zip</key>
 		<dict>
 			<key>symlink</key>
@@ -841,10 +1031,25 @@
 			<key>symlink</key>
 			<string>../Resources/core</string>
 		</dict>
+		<key>Frameworks/docs</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/docs</string>
+		</dict>
 		<key>Frameworks/examples</key>
 		<dict>
 			<key>symlink</key>
 			<string>../Resources/examples</string>
+		</dict>
+		<key>Frameworks/games</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/games</string>
+		</dict>
+		<key>Frameworks/gui</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/gui</string>
 		</dict>
 		<key>Frameworks/libFLAC.8.dylib</key>
 		<dict>
@@ -909,7 +1114,7 @@
 		<key>Frameworks/libfreetype.6.dylib</key>
 		<dict>
 			<key>symlink</key>
-			<string>pygame/.dylibs/libfreetype.6.dylib</string>
+			<string>PIL/.dylibs/libfreetype.6.dylib</string>
 		</dict>
 		<key>Frameworks/libglib-2.0.0.dylib</key>
 		<dict>
@@ -989,7 +1194,7 @@
 		<key>Frameworks/libsharpyuv.0.dylib</key>
 		<dict>
 			<key>symlink</key>
-			<string>pygame/.dylibs/libsharpyuv.0.dylib</string>
+			<string>PIL/.dylibs/libsharpyuv.0.dylib</string>
 		</dict>
 		<key>Frameworks/libsndfile.1.0.34.dylib</key>
 		<dict>
@@ -1050,6 +1255,11 @@
 		<dict>
 			<key>symlink</key>
 			<string>PIL/.dylibs/libz.1.3.1.zlib-ng.dylib</string>
+		</dict>
+		<key>Frameworks/plugins</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/plugins</string>
 		</dict>
 		<key>Frameworks/pygame/.dylibs</key>
 		<dict>
@@ -1917,15 +2127,6 @@
 			<key>requirement</key>
 			<string>cdhash H"5bcee7ffad5d8a724d929301569fa1c5cd5afb02"</string>
 		</dict>
-		<key>Frameworks/python3__dot__9/lib-dynload/grp.cpython-39-darwin.so</key>
-		<dict>
-			<key>cdhash</key>
-			<data>
-			cx5z65C3wDI62xDav6W6LlOA6aU=
-			</data>
-			<key>requirement</key>
-			<string>cdhash H"731e73eb90b7c0323adb10dabfa5ba2e5380e9a5"</string>
-		</dict>
 		<key>Frameworks/python3__dot__9/lib-dynload/math.cpython-39-darwin.so</key>
 		<dict>
 			<key>cdhash</key>
@@ -2007,10 +2208,22 @@
 			<key>requirement</key>
 			<string>cdhash H"a3f69901edc14c2fbc24ad9b4d84982ee31dedb4"</string>
 		</dict>
+		<key>Frameworks/requirements.txt</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/requirements.txt</string>
+		</dict>
 		<key>Frameworks/tools</key>
 		<dict>
 			<key>symlink</key>
 			<string>../Resources/tools</string>
+		</dict>
+		<key>Resources/CHANGELOG.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			qgXIl90x/bJy1gIWcmipfPyIMemtggVBcasNMzCfvPA=
+			</data>
 		</dict>
 		<key>Resources/PIL</key>
 		<dict>
@@ -2027,11 +2240,18 @@
 			<key>symlink</key>
 			<string>../Frameworks/Python3.framework</string>
 		</dict>
+		<key>Resources/README.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			prkWhVWY/ko+V4qN4sYQ9UEH7yFN1+MGX4U5lY0pA0E=
+			</data>
+		</dict>
 		<key>Resources/base_library.zip</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			1vOsI9PBUrOHvi7cOKXyTbuICEznRLNoVBrTX2h30to=
+			UtPxCamUMkQepm+8rcDHjtYyGJOCmHJB+BkWHcCc+3k=
 			</data>
 		</dict>
 		<key>Resources/core/Untitled-1</key>
@@ -2517,6 +2737,125 @@
 			qrdIGgh40DTBoKVQ/2+QHcDf7aTliRuE4n9gkGHcAeE=
 			</data>
 		</dict>
+		<key>Resources/docs/COMING_SOON_FEATURES_IMPLEMENTED.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			65OrJbDhnbrWQhhDFYMdDPVYKV+5xXZuoEo46ES2iyE=
+			</data>
+		</dict>
+		<key>Resources/docs/CONTRIBUTING.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5oGutKHS4Mig+aIf6vvtqhu2jMMy/K+IkoF+bHneaKg=
+			</data>
+		</dict>
+		<key>Resources/docs/DEMO_GAMES.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			iE5x7p+2Mh+sAoe+V/nPRBHwTEeqFbOUNBlfM/JM2fM=
+			</data>
+		</dict>
+		<key>Resources/docs/DIRECTORY_STRUCTURE.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			f/e8uzXQblIl7muLl93IwSCjA73B3lD/Lrom1JJGIZk=
+			</data>
+		</dict>
+		<key>Resources/docs/GITHUB_INTEGRATION.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			wcTnCIWYwAv26kzlPJZrVrKocmZjFKwwSkPGY3NNk9Y=
+			</data>
+		</dict>
+		<key>Resources/docs/LICENSE</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GI171cbaZ1swogm/X2AEm6cUg3JrmGgivlWcJzfOb5E=
+			</data>
+		</dict>
+		<key>Resources/docs/MODULAR_ARCHITECTURE.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			3ynYwY9oBw7fDZ27kdKTEpfh3N2Y4G0Pqni0o704UTg=
+			</data>
+		</dict>
+		<key>Resources/docs/PILOT_EXTENDED_COMMANDS.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			WLNwzCDzioL21Zdb+JfcVdQZRr9xUphME9ApEksDk5w=
+			</data>
+		</dict>
+		<key>Resources/docs/PROJECT_STRUCTURE.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			t8VYUg/3IHJMtJOZAJOoZBxJQZIAGJWEb0yFrlkGpb0=
+			</data>
+		</dict>
+		<key>Resources/docs/README_v11.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			JF1N3NWBO/4XkMskL+eYMf4armllxUy+N4jpiZ7Rfu8=
+			</data>
+		</dict>
+		<key>Resources/docs/THEME_SELECTOR_COMING_SOON_FIX.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			eZjwBM9scieScctBA9hX4gBz3JsdSSY08tk5hWlaMD0=
+			</data>
+		</dict>
+		<key>Resources/docs/VERSION_1_1_ROADMAP.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			hcv43BW0tq7Jd+2hXSXo8KPIvj+nGEUR1wSShwaS6EE=
+			</data>
+		</dict>
+		<key>Resources/docs/compiler.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			cPUtPQC7AmdEqmLS8oV3jYoWvAK/hg80OhgNSiHCkto=
+			</data>
+		</dict>
+		<key>Resources/docs/development/FILE_ORGANIZATION.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			etKf/iNiI0RBrIs1yza2z5eqqwpJj7WcKPdZ6alTBq4=
+			</data>
+		</dict>
+		<key>Resources/docs/languages/basic.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			EOKfRMy/HIP3ZXDhAvqI3KRLJhf+xd1y2QrxvNgIRDo=
+			</data>
+		</dict>
+		<key>Resources/docs/languages/logo.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			kvT7BRNu2XhxhqMjvjxNqmlDxf8o59CtuscsmiKLuLA=
+			</data>
+		</dict>
+		<key>Resources/docs/languages/pilot.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			BGPdjl5Y+U7qfOVSuTXRJhvb7vFj+RtpPr1iMkIQobw=
+			</data>
+		</dict>
 		<key>Resources/examples/BASIC/arrays.bas</key>
 		<dict>
 			<key>hash2</key>
@@ -2874,6 +3213,125 @@
 			KHtiLY6Oe5B0bQqqGCkqd3/iexEon3kuHCnmEO2R0bY=
 			</data>
 		</dict>
+		<key>Resources/games/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			iQB5+zAfR+nP5kXRvmasqr9HbCEbCvNPTc0XvSH12js=
+			</data>
+		</dict>
+		<key>Resources/games/engine/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			X+wFiIoeVMg5R68j//plJ0/kAzATZ0zQSjOBUZz4LmA=
+			</data>
+		</dict>
+		<key>Resources/games/engine/game_manager.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			5aL778DyAF47kdcYYzIx8/aosXi4qYlZuPuC7WhbUnk=
+			</data>
+		</dict>
+		<key>Resources/games/engine/game_objects.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			k7ESBB4PMNJfsM73Z/UqJhmHM9GEd2xnKz/OAJLdz7k=
+			</data>
+		</dict>
+		<key>Resources/games/engine/game_renderer.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			oa4ExTlD84V/ANsl65WCXANMFo88C5rvvAfb7D/GmgE=
+			</data>
+		</dict>
+		<key>Resources/games/engine/physics.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			2XpIQQ1F88ApfCzcO/+7jBR7H8nBNFprjWoFA2pjhxI=
+			</data>
+		</dict>
+		<key>Resources/gui/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			/qYSrIEUFuDDCwGtDRkjPRccWNU3lxusaEMQIiHJ05o=
+			</data>
+		</dict>
+		<key>Resources/gui/components/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			s5FJXpzF6d61EvRqfwXyMBk8KUSEke+2gCQ2zOq81FQ=
+			</data>
+		</dict>
+		<key>Resources/gui/components/dialogs.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			u5lq1ALCVmrDXkJu7AS/UU77tsreZt5R1Uskcg3u5FM=
+			</data>
+		</dict>
+		<key>Resources/gui/components/educational_debug.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+y3nknHifq45SAIz1wxkWWfENp/aO+nymh/VudVXdDY=
+			</data>
+		</dict>
+		<key>Resources/gui/components/enhanced_graphics_canvas.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			AG+hL3vp2LLTTmPztsGGyEsYVAlrKA06Gti1Kgiko5Q=
+			</data>
+		</dict>
+		<key>Resources/gui/components/file_explorer.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			dNTpN6aFvT+lVtTsbpCNpqiksMe0CAkxHrwyaoFLy+o=
+			</data>
+		</dict>
+		<key>Resources/gui/components/multi_tab_editor.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			KeJVc/pMmA+faPpK5H8uoNviKex74fJHuDhtQ6yrzXY=
+			</data>
+		</dict>
+		<key>Resources/gui/components/project_explorer.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			APtnNwHOpatriwwLGLFw+p6oqFj+QyJ9N/X1hapKcSs=
+			</data>
+		</dict>
+		<key>Resources/gui/components/venv_manager.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+Ij8s6c+t7fqN/2KRCnJHmPHD9ZyqHcpNGh5FyDAFKM=
+			</data>
+		</dict>
+		<key>Resources/gui/editor/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CWs/diFI2gbsfEsQTmKtlg2o83aNOQRhfyQjm6wAdv4=
+			</data>
+		</dict>
+		<key>Resources/gui/editor/features.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			BR2dZjbLjGn/1nYDbn7p4i5mtKHQjf9yoHtnhaXhQ8U=
+			</data>
+		</dict>
 		<key>Resources/icon-windowed.icns</key>
 		<dict>
 			<key>hash2</key>
@@ -2944,7 +3402,7 @@
 		<key>Resources/libfreetype.6.dylib</key>
 		<dict>
 			<key>symlink</key>
-			<string>pygame/.dylibs/libfreetype.6.dylib</string>
+			<string>PIL/.dylibs/libfreetype.6.dylib</string>
 		</dict>
 		<key>Resources/libglib-2.0.0.dylib</key>
 		<dict>
@@ -3024,7 +3482,7 @@
 		<key>Resources/libsharpyuv.0.dylib</key>
 		<dict>
 			<key>symlink</key>
-			<string>pygame/.dylibs/libsharpyuv.0.dylib</string>
+			<string>PIL/.dylibs/libsharpyuv.0.dylib</string>
 		</dict>
 		<key>Resources/libsndfile.1.0.34.dylib</key>
 		<dict>
@@ -3085,6 +3543,62 @@
 		<dict>
 			<key>symlink</key>
 			<string>PIL/.dylibs/libz.1.3.1.zlib-ng.dylib</string>
+		</dict>
+		<key>Resources/plugins/__init__.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			UqxpJ2QC0P/Tt2tuvbEvVfytRdN8l3IcubdxZ49ewME=
+			</data>
+		</dict>
+		<key>Resources/plugins/plugins/code_formatter/manifest.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+m5MQM1bnxzPk/OmV+9qjO4DvsKztUqH/b0fVm8Wrgk=
+			</data>
+		</dict>
+		<key>Resources/plugins/plugins/code_formatter/plugin.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			lh5hA+RPQFmnCgANsVv/6vCZmmIjANxmuBLDKIbnPfw=
+			</data>
+		</dict>
+		<key>Resources/plugins/plugins/syntax_highlighter/manifest.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			yBHJXqwwoLEDKeWwmEteehkhzx3aogFxF1+wDA2Uzfs=
+			</data>
+		</dict>
+		<key>Resources/plugins/plugins/syntax_highlighter/plugin.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			WbucJcnC7s4DLRwmstg6LGfCumZcbGw1d+gGnzbC9t4=
+			</data>
+		</dict>
+		<key>Resources/plugins/sample_plugin/README.md</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Fjeal2j8szty7CJUN/3fh+1i9NbHIf1Af441JhP+E70=
+			</data>
+		</dict>
+		<key>Resources/plugins/sample_plugin/manifest.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GjdEoGaTitEb8O3x4HB78E1hfzQpDCrCOYZas9d5aOg=
+			</data>
+		</dict>
+		<key>Resources/plugins/sample_plugin/plugin.py</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ShTJ5RTmXKweT0u0f2sIgdCOHDJZysy6dL12EoqRx4w=
+			</data>
 		</dict>
 		<key>Resources/pygame/.dylibs</key>
 		<dict>
@@ -3244,6 +3758,13 @@
 		<dict>
 			<key>symlink</key>
 			<string>../Frameworks/python3.9</string>
+		</dict>
+		<key>Resources/requirements.txt</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			VV40GT4ePP9VYjdZEBqfauYu6jMyO7KfWQ8PiWvy2nY=
+			</data>
 		</dict>
 		<key>Resources/tools/__init__.py</key>
 		<dict>
