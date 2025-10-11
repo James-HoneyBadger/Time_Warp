@@ -1,0 +1,60 @@
+REM Time_Warp III Logo Graphics Example  
+REM Demonstrates turtle graphics
+
+PRINT "Logo Turtle Graphics Demo"
+PRINT "========================="
+
+REM Clear screen and go home
+CLEARSCREEN
+HOME
+
+REM Draw a square
+PRINT "Drawing a square..."
+PENDOWN
+REPEAT 4
+    FORWARD 100
+    RIGHT 90
+
+REM Move to new position
+PENUP
+FORWARD 150
+RIGHT 90
+FORWARD 50
+LEFT 90
+
+REM Draw a triangle
+PRINT "Drawing a triangle..."
+PENDOWN  
+REPEAT 3
+    FORWARD 80
+    RIGHT 120
+
+REM Draw a circle (approximated with polygon)
+PENUP
+HOME
+FORWARD 200
+PENDOWN
+PRINT "Drawing a circle (20-sided polygon)..."
+REPEAT 20
+    FORWARD 10
+    RIGHT 18
+
+REM Draw a spiral
+PENUP
+HOME
+BACKWARD 100
+PENDOWN
+PRINT "Drawing a spiral..."
+FOR I = 1 TO 50
+    FORWARD I * 2
+    RIGHT 91
+NEXT I
+
+REM Final position info
+PENUP
+PRINT "Final turtle position:"
+PRINT "X =", XCOR
+PRINT "Y =", YCOR  
+PRINT "Heading =", HEADING, "degrees"
+
+PRINT "Logo graphics demo complete!"
