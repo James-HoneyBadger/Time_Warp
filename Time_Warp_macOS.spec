@@ -41,7 +41,7 @@ for doc in ['README.md', 'requirements.txt', 'CHANGELOG.md']:
 
 # Hidden imports - modules that PyInstaller might miss
 hidden_imports = [
-    # Tkinter and GUI
+    # Tkinter and GUI - Enhanced for macOS stability
     'tkinter',
     'tkinter.ttk',
     'tkinter.filedialog',
@@ -50,6 +50,12 @@ hidden_imports = [
     'tkinter.simpledialog',
     'tkinter.colorchooser',
     'tkinter.font',
+    'tkinter.constants',
+    '_tkinter',
+    # macOS GUI support
+    'signal',
+    'atexit',
+    'traceback',
     # Pygame for enhanced graphics
     'pygame',
     'pygame.mixer',
