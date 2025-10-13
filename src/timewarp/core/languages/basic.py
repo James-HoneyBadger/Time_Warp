@@ -1,24 +1,32 @@
 """
-BASIC Language Executor for Time_Warp IDE
-========================================
+TW BASIC Language Executor for Time_Warp IDE
+=============================================
 
-BASIC (Beginner's All-purpose Symbolic Instruction Code) is a family of general-purpose,
-high-level programming languages designed for ease of use.
+TW BASIC (Time_Warp Beginner's All-purpose Symbolic Instruction Code) is an enhanced version of
+the classic BASIC programming language designed for educational use in Time_Warp IDE.
 
-This module handles BASIC command execution including:
+This module handles TW BASIC command execution including:
 - Variable assignment (LET)
 - Text output (PRINT)
 - User input (INPUT)
 - Control flow (IF/THEN, FOR/NEXT, GOTO, GOSUB/RETURN)
+- Math functions (SIN, COS, TAN, SQRT, ABS, INT, RND)
+- String operations (LEN, MID, LEFT, RIGHT, INSTR, STR, VAL)
+- File I/O (OPEN, CLOSE, READ, WRITE, EOF)
+- Enhanced graphics (LINE, BOX, TRIANGLE, ELLIPSE, FILL)
+- Sound commands (BEEP, PLAY, SOUND, NOTE)
+- Array operations (SORT, FIND, SUM, AVG, MIN, MAX)
 - Comments (REM)
 """
 
 import re
 import time
+import math
+import random
 
 
-class BasicExecutor:
-    """Handles BASIC language command execution"""
+class TwBasicExecutor:
+    """Handles TW BASIC language command execution"""
 
     def __init__(self, interpreter):
         """Initialize with reference to main interpreter"""
@@ -93,6 +101,24 @@ class BasicExecutor:
                 return self._handle_next(command)
             elif cmd == "DIM":
                 return self._handle_dim(command, parts)
+            # Math Functions
+            elif cmd in ["SIN", "COS", "TAN", "SQRT", "ABS", "INT", "RND"]:
+                return self._handle_math_functions(cmd, parts)
+            # String Functions
+            elif cmd in ["LEN", "MID", "LEFT", "RIGHT", "INSTR", "STR", "VAL"]:
+                return self._handle_string_functions(cmd, parts)
+            # File I/O Commands
+            elif cmd in ["OPEN", "CLOSE", "READ", "WRITE", "EOF"]:
+                return self._handle_file_commands(cmd, parts)
+            # Enhanced Graphics Commands
+            elif cmd in ["LINE", "BOX", "TRIANGLE", "ELLIPSE", "FILL"]:
+                return self._handle_enhanced_graphics(cmd, parts)
+            # Sound Commands
+            elif cmd in ["BEEP", "PLAY", "SOUND", "NOTE"]:
+                return self._handle_sound_commands(cmd, parts)
+            # Array Operations
+            elif cmd in ["SORT", "FIND", "SUM", "AVG", "MIN", "MAX"]:
+                return self._handle_array_operations(cmd, parts)
             # Game and Graphics Commands
             # Game Development Commands (BASIC style)
             elif cmd.startswith("GAME"):
@@ -442,6 +468,854 @@ class BasicExecutor:
                     )
         except Exception as e:
             self.interpreter.debug_output(f"DIM statement error: {e}")
+        return "continue"
+
+    def _handle_math_functions(self, cmd, parts):
+        """Handle mathematical functions"""
+        try:
+            if cmd == "SIN":
+                # SIN(angle) - sine of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = math.sin(math.radians(angle))
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"SIN({angle}°) = {result:.4f}")
+                else:
+                    self.interpreter.log_output("SIN requires an angle parameter")
+            elif cmd == "COS":
+                # COS(angle) - cosine of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = math.cos(math.radians(angle))
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"COS({angle}°) = {result:.4f}")
+                else:
+                    self.interpreter.log_output("COS requires an angle parameter")
+            elif cmd == "TAN":
+                # TAN(angle) - tangent of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = math.tan(math.radians(angle))
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"TAN({angle}°) = {result:.4f}")
+                else:
+                    self.interpreter.log_output("TAN requires an angle parameter")
+            elif cmd == "SQRT":
+                # SQRT(value) - square root
+                if len(parts) >= 2:
+                    value = float(self.interpreter.evaluate_expression(parts[1]))
+                    if value >= 0:
+                        result = math.sqrt(value)
+                        self.interpreter.variables["RESULT"] = result
+                        self.interpreter.log_output(f"SQRT({value}) = {result:.4f}")
+                    else:
+                        self.interpreter.log_output(
+                            "SQRT requires a non-negative value"
+                        )
+                else:
+                    self.interpreter.log_output("SQRT requires a value parameter")
+            elif cmd == "ABS":
+                # ABS(value) - absolute value
+                if len(parts) >= 2:
+                    value = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = abs(value)
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"ABS({value}) = {result}")
+                else:
+                    self.interpreter.log_output("ABS requires a value parameter")
+            elif cmd == "INT":
+                # INT(value) - integer part
+                if len(parts) >= 2:
+                    value = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = int(value)
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"INT({value}) = {result}")
+                else:
+                    self.interpreter.log_output("INT requires a value parameter")
+            elif cmd == "RND":
+                # RND() or RND(max) - random number
+                if len(parts) >= 2:
+                    max_val = float(self.interpreter.evaluate_expression(parts[1]))
+                    result = random.uniform(0, max_val)
+                else:
+                    result = random.random()
+                self.interpreter.variables["RESULT"] = result
+                self.interpreter.log_output(f"RND() = {result:.4f}")
+        except Exception as e:
+            self.interpreter.debug_output(f"Math function error: {e}")
+        return "continue"
+
+    def _handle_string_functions(self, cmd, parts):
+        """Handle string manipulation functions"""
+        try:
+            if cmd == "LEN":
+                # LEN(string) - length of string
+                if len(parts) >= 2:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    result = len(text)
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"LEN('{text}') = {result}")
+                else:
+                    self.interpreter.log_output("LEN requires a string parameter")
+            elif cmd == "MID":
+                # MID(string, start, length) - substring
+                if len(parts) >= 4:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    start = (
+                        int(self.interpreter.evaluate_expression(parts[2])) - 1
+                    )  # BASIC is 1-based
+                    length = int(self.interpreter.evaluate_expression(parts[3]))
+                    result = text[start : start + length]
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(
+                        f"MID('{text}', {start+1}, {length}) = '{result}'"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "MID requires string, start, and length parameters"
+                    )
+            elif cmd == "LEFT":
+                # LEFT(string, length) - left substring
+                if len(parts) >= 3:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    length = int(self.interpreter.evaluate_expression(parts[2]))
+                    result = text[:length]
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(
+                        f"LEFT('{text}', {length}) = '{result}'"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "LEFT requires string and length parameters"
+                    )
+            elif cmd == "RIGHT":
+                # RIGHT(string, length) - right substring
+                if len(parts) >= 3:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    length = int(self.interpreter.evaluate_expression(parts[2]))
+                    result = text[-length:]
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(
+                        f"RIGHT('{text}', {length}) = '{result}'"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "RIGHT requires string and length parameters"
+                    )
+            elif cmd == "INSTR":
+                # INSTR(string, search) - find substring position
+                if len(parts) >= 3:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    search = str(self.interpreter.evaluate_expression(parts[2]))
+                    pos = text.find(search)
+                    result = (
+                        pos + 1 if pos != -1 else 0
+                    )  # BASIC is 1-based, 0 means not found
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(
+                        f"INSTR('{text}', '{search}') = {result}"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "INSTR requires string and search parameters"
+                    )
+            elif cmd == "STR":
+                # STR(number) - convert number to string
+                if len(parts) >= 2:
+                    value = self.interpreter.evaluate_expression(parts[1])
+                    result = str(value)
+                    self.interpreter.variables["RESULT"] = result
+                    self.interpreter.log_output(f"STR({value}) = '{result}'")
+                else:
+                    self.interpreter.log_output("STR requires a value parameter")
+            elif cmd == "VAL":
+                # VAL(string) - convert string to number
+                if len(parts) >= 2:
+                    text = str(self.interpreter.evaluate_expression(parts[1]))
+                    try:
+                        result = float(text)
+                        self.interpreter.variables["RESULT"] = result
+                        self.interpreter.log_output(f"VAL('{text}') = {result}")
+                    except ValueError:
+                        result = 0
+                        self.interpreter.variables["RESULT"] = result
+                        self.interpreter.log_output(
+                            f"VAL('{text}') = {result} (conversion failed)"
+                        )
+                else:
+                    self.interpreter.log_output("VAL requires a string parameter")
+        except Exception as e:
+            self.interpreter.debug_output(f"String function error: {e}")
+        return "continue"
+
+    def _handle_file_commands(self, cmd, parts):
+        """Handle file I/O commands"""
+        try:
+            if cmd == "OPEN":
+                # OPEN "filename" FOR mode AS #handle
+                if (
+                    len(parts) >= 5
+                    and parts[2].upper() == "FOR"
+                    and parts[4].upper() == "AS"
+                ):
+                    filename = parts[1].strip('"')
+                    mode = parts[3].upper()
+                    handle_part = parts[5]
+                    if handle_part.startswith("#"):
+                        handle = int(handle_part[1:])
+
+                        mode_map = {"INPUT": "r", "OUTPUT": "w", "APPEND": "a"}
+                        if mode in mode_map:
+                            try:
+                                file_obj = open(filename, mode_map[mode])
+                                if not hasattr(self.interpreter, "open_files"):
+                                    self.interpreter.open_files = {}
+                                self.interpreter.open_files[handle] = file_obj
+                                self.interpreter.log_output(
+                                    f"File '{filename}' opened as #{handle} for {mode}"
+                                )
+                            except Exception as e:
+                                self.interpreter.log_output(f"Error opening file: {e}")
+                        else:
+                            self.interpreter.log_output(
+                                "Invalid file mode. Use INPUT, OUTPUT, or APPEND"
+                            )
+                    else:
+                        self.interpreter.log_output("File handle must start with #")
+                else:
+                    self.interpreter.log_output(
+                        'OPEN syntax: OPEN "filename" FOR mode AS #handle'
+                    )
+            elif cmd == "CLOSE":
+                # CLOSE #handle
+                if len(parts) >= 2 and parts[1].startswith("#"):
+                    handle = int(parts[1][1:])
+                    if (
+                        hasattr(self.interpreter, "open_files")
+                        and handle in self.interpreter.open_files
+                    ):
+                        self.interpreter.open_files[handle].close()
+                        del self.interpreter.open_files[handle]
+                        self.interpreter.log_output(f"File #{handle} closed")
+                    else:
+                        self.interpreter.log_output(f"File #{handle} not open")
+                else:
+                    self.interpreter.log_output("CLOSE syntax: CLOSE #handle")
+            elif cmd == "READ":
+                # READ #handle, variable
+                if len(parts) >= 3 and parts[1].startswith("#") and parts[2] == ",":
+                    handle = int(parts[1][1:])
+                    var_name = parts[3]
+                    if (
+                        hasattr(self.interpreter, "open_files")
+                        and handle in self.interpreter.open_files
+                    ):
+                        try:
+                            line = (
+                                self.interpreter.open_files[handle].readline().strip()
+                            )
+                            if line:
+                                # Try to parse as number, otherwise keep as string
+                                try:
+                                    self.interpreter.variables[var_name] = float(line)
+                                except ValueError:
+                                    self.interpreter.variables[var_name] = line
+                                self.interpreter.log_output(
+                                    f"Read '{line}' into {var_name}"
+                                )
+                            else:
+                                self.interpreter.variables["EOF"] = True
+                                self.interpreter.log_output("End of file reached")
+                        except Exception as e:
+                            self.interpreter.log_output(f"Error reading file: {e}")
+                    else:
+                        self.interpreter.log_output(f"File #{handle} not open")
+                else:
+                    self.interpreter.log_output("READ syntax: READ #handle, variable")
+            elif cmd == "WRITE":
+                # WRITE #handle, expression
+                if len(parts) >= 3 and parts[1].startswith("#") and parts[2] == ",":
+                    handle = int(parts[1][1:])
+                    expr = " ".join(parts[3:])
+                    if (
+                        hasattr(self.interpreter, "open_files")
+                        and handle in self.interpreter.open_files
+                    ):
+                        try:
+                            value = self.interpreter.evaluate_expression(expr)
+                            self.interpreter.open_files[handle].write(str(value) + "\n")
+                            self.interpreter.log_output(
+                                f"Wrote '{value}' to file #{handle}"
+                            )
+                        except Exception as e:
+                            self.interpreter.log_output(f"Error writing to file: {e}")
+                    else:
+                        self.interpreter.log_output(f"File #{handle} not open")
+                else:
+                    self.interpreter.log_output(
+                        "WRITE syntax: WRITE #handle, expression"
+                    )
+            elif cmd == "EOF":
+                # EOF(#handle) - check if end of file
+                if (
+                    len(parts) >= 2
+                    and parts[1].startswith("#(")
+                    and parts[1].endswith(")")
+                ):
+                    handle = int(parts[1][2:-1])
+                    if (
+                        hasattr(self.interpreter, "open_files")
+                        and handle in self.interpreter.open_files
+                    ):
+                        try:
+                            current_pos = self.interpreter.open_files[handle].tell()
+                            self.interpreter.open_files[handle].readline()
+                            eof = (
+                                self.interpreter.open_files[handle].tell()
+                                == current_pos
+                            )
+                            self.interpreter.open_files[handle].seek(
+                                current_pos
+                            )  # Reset position
+                            self.interpreter.variables["RESULT"] = eof
+                            self.interpreter.log_output(f"EOF(#{handle}) = {eof}")
+                        except Exception:
+                            self.interpreter.variables["RESULT"] = True
+                    else:
+                        self.interpreter.variables["RESULT"] = True
+                else:
+                    self.interpreter.log_output("EOF syntax: EOF(#handle)")
+        except Exception as e:
+            self.interpreter.debug_output(f"File command error: {e}")
+        return "continue"
+
+    def _handle_enhanced_graphics(self, cmd, parts):
+        """Handle enhanced graphics commands"""
+        try:
+            if cmd == "LINE":
+                # LINE (x1,y1)-(x2,y2), color
+                if len(parts) >= 2:
+                    coord_part = parts[1]
+                    color = parts[2] if len(parts) > 2 else None
+
+                    if "-" in coord_part and "(" in coord_part and ")" in coord_part:
+                        coords = coord_part.split("-")
+                        if len(coords) == 2:
+                            start_coord = coords[0].strip("()")
+                            end_coord = coords[1].strip("()")
+
+                            start_parts = start_coord.split(",")
+                            end_parts = end_coord.split(",")
+
+                            if len(start_parts) == 2 and len(end_parts) == 2:
+                                x1 = float(start_parts[0])
+                                y1 = float(start_parts[1])
+                                x2 = float(end_parts[0])
+                                y2 = float(end_parts[1])
+
+                                if (
+                                    hasattr(self.interpreter, "ide_turtle_canvas")
+                                    and self.interpreter.ide_turtle_canvas
+                                ):
+                                    canvas = self.interpreter.ide_turtle_canvas
+                                    color_name = color if color else "black"
+                                    canvas.create_line(
+                                        x1,
+                                        y1,
+                                        x2,
+                                        y2,
+                                        fill=color_name,
+                                        tags="game_objects",
+                                    )
+                                    self.interpreter.log_output(
+                                        f"Drew line from ({x1},{y1}) to ({x2},{y2})"
+                                    )
+                                elif self.pygame_screen:
+                                    import pygame
+
+                                    pygame.draw.line(
+                                        self.pygame_screen,
+                                        self.current_color,
+                                        (x1, y1),
+                                        (x2, y2),
+                                    )
+                                    self.interpreter.log_output(
+                                        f"Drew line from ({x1},{y1}) to ({x2},{y2})"
+                                    )
+                                else:
+                                    self.interpreter.log_output(
+                                        "Graphics not initialized"
+                                    )
+                            else:
+                                self.interpreter.log_output("Invalid LINE coordinates")
+                        else:
+                            self.interpreter.log_output(
+                                "LINE syntax: LINE (x1,y1)-(x2,y2) [,color]"
+                            )
+                    else:
+                        self.interpreter.log_output(
+                            "LINE syntax: LINE (x1,y1)-(x2,y2) [,color]"
+                        )
+            elif cmd == "BOX":
+                # BOX (x,y), width, height, filled
+                if len(parts) >= 4:
+                    coord_part = parts[1].strip("()")
+                    width = float(parts[2])
+                    height = float(parts[3])
+                    filled = parts[4].lower() == "true" if len(parts) > 4 else False
+
+                    coord_parts = coord_part.split(",")
+                    if len(coord_parts) == 2:
+                        x = float(coord_parts[0])
+                        y = float(coord_parts[1])
+
+                        if (
+                            hasattr(self.interpreter, "ide_turtle_canvas")
+                            and self.interpreter.ide_turtle_canvas
+                        ):
+                            canvas = self.interpreter.ide_turtle_canvas
+                            if filled:
+                                canvas.create_rectangle(
+                                    x,
+                                    y,
+                                    x + width,
+                                    y + height,
+                                    fill="black",
+                                    tags="game_objects",
+                                )
+                            else:
+                                canvas.create_rectangle(
+                                    x,
+                                    y,
+                                    x + width,
+                                    y + height,
+                                    outline="black",
+                                    tags="game_objects",
+                                )
+                            self.interpreter.log_output(
+                                f"Drew {'filled ' if filled else ''}box at ({x},{y}) size {width}x{height}"
+                            )
+                        elif self.pygame_screen:
+                            import pygame
+
+                            rect = pygame.Rect(x, y, width, height)
+                            if filled:
+                                pygame.draw.rect(
+                                    self.pygame_screen, self.current_color, rect
+                                )
+                            else:
+                                pygame.draw.rect(
+                                    self.pygame_screen, self.current_color, rect, 2
+                                )
+                            self.interpreter.log_output(
+                                f"Drew {'filled ' if filled else ''}box at ({x},{y}) size {width}x{height}"
+                            )
+                        else:
+                            self.interpreter.log_output("Graphics not initialized")
+                    else:
+                        self.interpreter.log_output("Invalid BOX coordinates")
+                else:
+                    self.interpreter.log_output(
+                        "BOX syntax: BOX (x,y), width, height [,filled]"
+                    )
+            elif cmd == "TRIANGLE":
+                # TRIANGLE (x1,y1)-(x2,y2)-(x3,y3), filled
+                if len(parts) >= 2:
+                    coord_part = parts[1]
+                    filled = parts[2].lower() == "true" if len(parts) > 2 else False
+
+                    if coord_part.count("-") == 2:
+                        coords = coord_part.split("-")
+                        points = []
+                        valid = True
+                        for coord in coords:
+                            coord = coord.strip("()")
+                            parts_coord = coord.split(",")
+                            if len(parts_coord) == 2:
+                                try:
+                                    x = float(parts_coord[0])
+                                    y = float(parts_coord[1])
+                                    points.extend([x, y])
+                                except ValueError:
+                                    valid = False
+                                    break
+                            else:
+                                valid = False
+                                break
+
+                        if valid and len(points) == 6:
+                            if (
+                                hasattr(self.interpreter, "ide_turtle_canvas")
+                                and self.interpreter.ide_turtle_canvas
+                            ):
+                                canvas = self.interpreter.ide_turtle_canvas
+                                if filled:
+                                    canvas.create_polygon(
+                                        points, fill="black", tags="game_objects"
+                                    )
+                                else:
+                                    canvas.create_polygon(
+                                        points,
+                                        outline="black",
+                                        fill="",
+                                        tags="game_objects",
+                                    )
+                                self.interpreter.log_output(
+                                    f"Drew {'filled ' if filled else ''}triangle"
+                                )
+                            elif self.pygame_screen:
+                                import pygame
+
+                                if filled:
+                                    pygame.draw.polygon(
+                                        self.pygame_screen,
+                                        self.current_color,
+                                        [
+                                            (points[i], points[i + 1])
+                                            for i in range(0, 6, 2)
+                                        ],
+                                    )
+                                else:
+                                    pygame.draw.polygon(
+                                        self.pygame_screen,
+                                        self.current_color,
+                                        [
+                                            (points[i], points[i + 1])
+                                            for i in range(0, 6, 2)
+                                        ],
+                                        2,
+                                    )
+                                self.interpreter.log_output(
+                                    f"Drew {'filled ' if filled else ''}triangle"
+                                )
+                            else:
+                                self.interpreter.log_output("Graphics not initialized")
+                        else:
+                            self.interpreter.log_output("Invalid TRIANGLE coordinates")
+                    else:
+                        self.interpreter.log_output(
+                            "TRIANGLE syntax: TRIANGLE (x1,y1)-(x2,y2)-(x3,y3) [,filled]"
+                        )
+            elif cmd == "ELLIPSE":
+                # ELLIPSE (x,y), width, height, filled
+                if len(parts) >= 4:
+                    coord_part = parts[1].strip("()")
+                    width = float(parts[2])
+                    height = float(parts[3])
+                    filled = parts[4].lower() == "true" if len(parts) > 4 else False
+
+                    coord_parts = coord_part.split(",")
+                    if len(coord_parts) == 2:
+                        x = float(coord_parts[0])
+                        y = float(coord_parts[1])
+
+                        if (
+                            hasattr(self.interpreter, "ide_turtle_canvas")
+                            and self.interpreter.ide_turtle_canvas
+                        ):
+                            canvas = self.interpreter.ide_turtle_canvas
+                            if filled:
+                                canvas.create_oval(
+                                    x,
+                                    y,
+                                    x + width,
+                                    y + height,
+                                    fill="black",
+                                    tags="game_objects",
+                                )
+                            else:
+                                canvas.create_oval(
+                                    x,
+                                    y,
+                                    x + width,
+                                    y + height,
+                                    outline="black",
+                                    tags="game_objects",
+                                )
+                            self.interpreter.log_output(
+                                f"Drew {'filled ' if filled else ''}ellipse at ({x},{y}) size {width}x{height}"
+                            )
+                        elif self.pygame_screen:
+                            import pygame
+
+                            rect = pygame.Rect(x, y, width, height)
+                            if filled:
+                                pygame.draw.ellipse(
+                                    self.pygame_screen, self.current_color, rect
+                                )
+                            else:
+                                pygame.draw.ellipse(
+                                    self.pygame_screen, self.current_color, rect, 2
+                                )
+                            self.interpreter.log_output(
+                                f"Drew {'filled ' if filled else ''}ellipse at ({x},{y}) size {width}x{height}"
+                            )
+                        else:
+                            self.interpreter.log_output("Graphics not initialized")
+                    else:
+                        self.interpreter.log_output("Invalid ELLIPSE coordinates")
+                else:
+                    self.interpreter.log_output(
+                        "ELLIPSE syntax: ELLIPSE (x,y), width, height [,filled]"
+                    )
+            elif cmd == "FILL":
+                # FILL (x,y), color - flood fill from point
+                if len(parts) >= 2:
+                    coord_part = parts[1].strip("()")
+                    color = parts[2] if len(parts) > 2 else "black"
+
+                    coord_parts = coord_part.split(",")
+                    if len(coord_parts) == 2:
+                        x = float(coord_parts[0])
+                        y = float(coord_parts[1])
+
+                        # Flood fill is complex - for now just draw a small filled circle
+                        if (
+                            hasattr(self.interpreter, "ide_turtle_canvas")
+                            and self.interpreter.ide_turtle_canvas
+                        ):
+                            canvas = self.interpreter.ide_turtle_canvas
+                            canvas.create_oval(
+                                x - 5,
+                                y - 5,
+                                x + 5,
+                                y + 5,
+                                fill=color,
+                                tags="game_objects",
+                            )
+                            self.interpreter.log_output(
+                                f"Flood fill at ({x},{y}) with {color}"
+                            )
+                        elif self.pygame_screen:
+                            import pygame
+
+                            pygame.draw.circle(
+                                self.pygame_screen, self.current_color, (x, y), 5
+                            )
+                            self.interpreter.log_output(
+                                f"Flood fill at ({x},{y}) with {color}"
+                            )
+                        else:
+                            self.interpreter.log_output("Graphics not initialized")
+                    else:
+                        self.interpreter.log_output("Invalid FILL coordinates")
+                else:
+                    self.interpreter.log_output("FILL syntax: FILL (x,y) [,color]")
+        except Exception as e:
+            self.interpreter.debug_output(f"Enhanced graphics error: {e}")
+        return "continue"
+
+    def _handle_sound_commands(self, cmd, parts):
+        """Handle sound and music commands"""
+        try:
+            if cmd == "BEEP":
+                # BEEP frequency, duration
+                frequency = 800 if len(parts) < 2 else float(parts[1])
+                duration = 0.5 if len(parts) < 3 else float(parts[2])
+
+                try:
+                    import winsound
+
+                    winsound.Beep(int(frequency), int(duration * 1000))
+                    self.interpreter.log_output(f"Beep: {frequency}Hz for {duration}s")
+                except ImportError:
+                    # On non-Windows systems, just log
+                    self.interpreter.log_output(
+                        f"Beep: {frequency}Hz for {duration}s (simulated)"
+                    )
+            elif cmd == "PLAY":
+                # PLAY "note" or PLAY frequency
+                if len(parts) >= 2:
+                    note_or_freq = parts[1].strip('"')
+
+                    # Simple note to frequency mapping
+                    note_freqs = {
+                        "C4": 261.63,
+                        "D4": 293.66,
+                        "E4": 329.63,
+                        "F4": 349.23,
+                        "G4": 392.00,
+                        "A4": 440.00,
+                        "B4": 493.88,
+                        "C5": 523.25,
+                    }
+
+                    if note_or_freq.upper() in note_freqs:
+                        frequency = note_freqs[note_or_freq.upper()]
+                    else:
+                        try:
+                            frequency = float(note_or_freq)
+                        except ValueError:
+                            frequency = 440  # Default A4
+
+                    duration = 0.5 if len(parts) < 3 else float(parts[2])
+
+                    try:
+                        import winsound
+
+                        winsound.Beep(int(frequency), int(duration * 1000))
+                        self.interpreter.log_output(
+                            f"Played {note_or_freq} for {duration}s"
+                        )
+                    except ImportError:
+                        self.interpreter.log_output(
+                            f"Played {note_or_freq} for {duration}s (simulated)"
+                        )
+                else:
+                    self.interpreter.log_output("PLAY syntax: PLAY note [,duration]")
+            elif cmd == "SOUND":
+                # SOUND frequency, duration, volume
+                if len(parts) >= 3:
+                    frequency = float(parts[1])
+                    duration = float(parts[2])
+                    volume = float(parts[3]) if len(parts) > 3 else 1.0
+
+                    self.interpreter.log_output(
+                        f"Sound: {frequency}Hz, {duration}s, volume {volume}"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "SOUND syntax: SOUND frequency, duration [,volume]"
+                    )
+            elif cmd == "NOTE":
+                # NOTE note_name, octave, duration
+                if len(parts) >= 3:
+                    note = parts[1].strip('"')
+                    octave = int(parts[2])
+                    duration = float(parts[3]) if len(parts) > 3 else 0.5
+
+                    # Calculate frequency from note and octave
+                    note_values = {
+                        "C": 0,
+                        "C#": 1,
+                        "D": 2,
+                        "D#": 3,
+                        "E": 4,
+                        "F": 4,
+                        "F#": 5,
+                        "G": 6,
+                        "G#": 7,
+                        "A": 8,
+                        "A#": 9,
+                        "B": 10,
+                    }
+
+                    if note.upper() in note_values:
+                        semitone = note_values[note.upper()] + (octave - 4) * 12
+                        frequency = 440 * (2 ** (semitone / 12.0))
+
+                        try:
+                            import winsound
+
+                            winsound.Beep(int(frequency), int(duration * 1000))
+                            self.interpreter.log_output(
+                                f"Note: {note}{octave} for {duration}s"
+                            )
+                        except ImportError:
+                            self.interpreter.log_output(
+                                f"Note: {note}{octave} for {duration}s (simulated)"
+                            )
+                    else:
+                        self.interpreter.log_output("Invalid note name")
+                else:
+                    self.interpreter.log_output(
+                        "NOTE syntax: NOTE note, octave [,duration]"
+                    )
+        except Exception as e:
+            self.interpreter.debug_output(f"Sound command error: {e}")
+        return "continue"
+
+    def _handle_array_operations(self, cmd, parts):
+        """Handle array operations"""
+        try:
+            if cmd == "SORT":
+                # SORT array_name
+                if len(parts) >= 2:
+                    array_name = parts[1]
+                    if array_name in self.interpreter.variables:
+                        array = self.interpreter.variables[array_name]
+                        if isinstance(array, list):
+                            try:
+                                sorted_array = sorted(array)
+                                self.interpreter.variables[array_name] = sorted_array
+                                self.interpreter.log_output(
+                                    f"Array {array_name} sorted"
+                                )
+                            except Exception:
+                                self.interpreter.log_output(
+                                    "Array contains non-comparable elements"
+                                )
+                        else:
+                            self.interpreter.log_output(f"{array_name} is not an array")
+                    else:
+                        self.interpreter.log_output(f"Array {array_name} not found")
+                else:
+                    self.interpreter.log_output("SORT syntax: SORT array_name")
+            elif cmd == "FIND":
+                # FIND array_name, value
+                if len(parts) >= 3:
+                    array_name = parts[1]
+                    search_value = self.interpreter.evaluate_expression(parts[2])
+
+                    if array_name in self.interpreter.variables:
+                        array = self.interpreter.variables[array_name]
+                        if isinstance(array, list):
+                            try:
+                                index = array.index(search_value)
+                                self.interpreter.variables["RESULT"] = index
+                                self.interpreter.log_output(
+                                    f"Found {search_value} at index {index} in {array_name}"
+                                )
+                            except ValueError:
+                                self.interpreter.variables["RESULT"] = -1
+                                self.interpreter.log_output(
+                                    f"Value {search_value} not found in {array_name}"
+                                )
+                        else:
+                            self.interpreter.log_output(f"{array_name} is not an array")
+                    else:
+                        self.interpreter.log_output(f"Array {array_name} not found")
+                else:
+                    self.interpreter.log_output("FIND syntax: FIND array_name, value")
+            elif cmd in ["SUM", "AVG", "MIN", "MAX"]:
+                # SUM/AVG/MIN/MAX array_name
+                if len(parts) >= 2:
+                    array_name = parts[1]
+                    if array_name in self.interpreter.variables:
+                        array = self.interpreter.variables[array_name]
+                        if isinstance(array, list) and array:
+                            try:
+                                if cmd == "SUM":
+                                    result = sum(array)
+                                    operation = "sum"
+                                elif cmd == "AVG":
+                                    result = sum(array) / len(array)
+                                    operation = "average"
+                                elif cmd == "MIN":
+                                    result = min(array)
+                                    operation = "minimum"
+                                elif cmd == "MAX":
+                                    result = max(array)
+                                    operation = "maximum"
+
+                                self.interpreter.variables["RESULT"] = result
+                                self.interpreter.log_output(
+                                    f"Array {array_name} {operation}: {result}"
+                                )
+                            except Exception:
+                                self.interpreter.log_output(
+                                    "Array contains non-numeric elements"
+                                )
+                        else:
+                            self.interpreter.log_output(
+                                f"{array_name} is not a valid array"
+                            )
+                    else:
+                        self.interpreter.log_output(f"Array {array_name} not found")
+                else:
+                    self.interpreter.log_output(f"{cmd} syntax: {cmd} array_name")
+        except Exception as e:
+            self.interpreter.debug_output(f"Array operation error: {e}")
         return "continue"
 
     def _handle_game_commands(self, command, cmd, parts):

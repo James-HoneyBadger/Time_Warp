@@ -1,15 +1,21 @@
 """
-Logo Language Executor for Time_Warp IDE
-=======================================
+TW Logo Language Executor for Time_Warp IDE
+===========================================
 
-Logo is an educational programming language known for its turtle graphics capabilities.
-It was designed to teach programming concepts to children through visual feedback.
+TW Logo is an enhanced educational programming language known for its advanced turtle graphics
+capabilities. It was designed to teach programming concepts through visual feedback in Time_Warp IDE.
 
-This module handles Logo command execution including:
+This module handles TW Logo command execution including:
 - Turtle movement (FORWARD, BACK, LEFT, RIGHT)
 - Pen control (PENUP, PENDOWN)
 - Screen management (CLEARSCREEN, HOME)
 - Drawing commands (CIRCLE, DOT, RECT, TEXT)
+- Enhanced turtle operations (ARC, POLYGON, FILL, CLONE, STAMP)
+- Mathematical functions (SIN, COS, TAN, SQRT, POWER, LOG)
+- List processing (LIST, ITEM, FIRST, LAST, BUTFIRST, BUTLAST)
+- File operations (SAVE, LOAD, EXPORT)
+- Sound generation (PLAYNOTE, PLAYTUNE, SETSOUND)
+- 3D graphics primitives (CUBE, SPHERE, CYLINDER, PYRAMID)
 - Control structures (REPEAT)
 - Macros (DEFINE, CALL)
 """
@@ -19,8 +25,8 @@ import math
 import time
 
 
-class LogoExecutor:
-    """Handles Logo language command execution"""
+class TwLogoExecutor:
+    """Handles TW Logo language command execution"""
 
     def __init__(self, interpreter):
         """Initialize with reference to main interpreter"""
@@ -129,6 +135,20 @@ class LogoExecutor:
             ):
                 return self._handle_audio_commands(cmd, parts)
 
+            # Enhanced Commands
+            elif cmd in ["ARC", "POLYGON", "FILL", "CLONE", "STAMP"]:
+                return self._handle_enhanced_turtle(cmd, parts)
+            elif cmd in ["SIN", "COS", "TAN", "SQRT", "POWER", "LOG"]:
+                return self._handle_math_functions(cmd, parts)
+            elif cmd in ["LIST", "ITEM", "FIRST", "LAST", "BUTFIRST", "BUTLAST"]:
+                return self._handle_list_operations(cmd, parts)
+            elif cmd in ["SAVE", "LOAD", "EXPORT"]:
+                return self._handle_file_operations(cmd, parts)
+            elif cmd in ["PLAYNOTE", "PLAYTUNE", "SETSOUND"]:
+                return self._handle_sound_generation(cmd, parts)
+            elif cmd in ["CUBE", "SPHERE", "CYLINDER", "PYRAMID"]:
+                return self._handle_3d_primitives(cmd, parts)
+
             else:
                 self.interpreter.log_output(f"Unknown Logo command: {cmd}")
 
@@ -197,32 +217,32 @@ class LogoExecutor:
     def _handle_repeat(self, command):
         """Handle REPEAT command with support for multi-line syntax"""
         # Preprocess multi-line REPEAT blocks by joining lines
-        command_lines = command.strip().split('\n')
-        
+        command_lines = command.strip().split("\n")
+
         if len(command_lines) > 1:
             # Multi-line format - join into single line
             processed_command = ""
             bracket_depth = 0
             for line in command_lines:
                 line = line.strip()
-                if not line or line.startswith(';'):  # Skip empty and comment lines
+                if not line or line.startswith(";"):  # Skip empty and comment lines
                     continue
-                    
+
                 # Track bracket depth
-                bracket_depth += line.count('[') - line.count(']')
-                
+                bracket_depth += line.count("[") - line.count("]")
+
                 # Add line to processed command
                 if processed_command:
                     processed_command += " " + line
                 else:
                     processed_command = line
-                    
+
                 # If brackets are balanced, we have complete command
-                if bracket_depth == 0 and '[' in processed_command:
+                if bracket_depth == 0 and "[" in processed_command:
                     break
-                    
+
             command = processed_command
-        
+
         parsed = self._parse_repeat_nested(command.strip())
         if not parsed:
             self.interpreter.log_output("Malformed REPEAT syntax or unmatched brackets")
@@ -531,6 +551,696 @@ class LogoExecutor:
     def _handle_audio_commands(self, cmd, parts):
         """Handle audio commands in Logo style"""
         self.interpreter.log_output(f"Audio command: {cmd} {' '.join(parts[1:])}")
+        return "continue"
+
+    def _handle_enhanced_turtle(self, cmd, parts):
+        """Handle enhanced turtle graphics commands"""
+        try:
+            if cmd == "ARC":
+                # ARC radius, angle [,steps]
+                if len(parts) >= 2:
+                    radius = float(parts[1])
+                    angle = float(parts[2]) if len(parts) > 2 else 360
+                    steps = int(parts[3]) if len(parts) > 3 else 36
+
+                    # Draw an arc by moving in small steps
+                    step_angle = angle / steps
+                    step_size = (2 * math.pi * radius * step_angle) / 360
+
+                    for _ in range(steps):
+                        self.interpreter.turtle_forward(step_size)
+                        self.interpreter.turtle_turn(step_angle)
+
+                    self.interpreter.log_output(
+                        f"Drew arc with radius {radius}, angle {angle}°"
+                    )
+
+            elif cmd == "POLYGON":
+                # POLYGON sides, size [,angle]
+                if len(parts) >= 3:
+                    sides = int(parts[1])
+                    size = float(parts[2])
+                    angle = float(parts[3]) if len(parts) > 3 else 0
+
+                    if sides >= 3:
+                        # Turn to starting angle
+                        if angle != 0:
+                            self.interpreter.turtle_turn(angle)
+
+                        # Draw the polygon
+                        exterior_angle = 360 / sides
+                        for _ in range(sides):
+                            self.interpreter.turtle_forward(size)
+                            self.interpreter.turtle_turn(exterior_angle)
+
+                        self.interpreter.log_output(
+                            f"Drew {sides}-sided polygon with side length {size}"
+                        )
+                    else:
+                        self.interpreter.log_output(
+                            "Polygon must have at least 3 sides"
+                        )
+
+            elif cmd == "FILL":
+                # FILL - flood fill current area with current color
+                # This is a simplified implementation - just draw a filled circle at current position
+                current_color = self.interpreter.turtle_graphics.get(
+                    "pen_color", "black"
+                )
+                if (
+                    hasattr(self.interpreter, "ide_turtle_canvas")
+                    and self.interpreter.ide_turtle_canvas
+                ):
+                    canvas = self.interpreter.ide_turtle_canvas
+                    x = self.interpreter.turtle_graphics["x"]
+                    y = self.interpreter.turtle_graphics["y"]
+                    # Draw a filled circle to simulate flood fill
+                    canvas.create_oval(
+                        x - 20,
+                        y - 20,
+                        x + 20,
+                        y + 20,
+                        fill=current_color,
+                        outline=current_color,
+                        tags="game_objects",
+                    )
+                    self.interpreter.log_output(
+                        f"Flood filled area at ({x:.1f}, {y:.1f}) with {current_color}"
+                    )
+                else:
+                    self.interpreter.log_output("FILL command requires graphics canvas")
+
+            elif cmd == "CLONE":
+                # CLONE - create a copy of the turtle at current position
+                # This would create a visual clone - simplified implementation
+                current_x = self.interpreter.turtle_graphics["x"]
+                current_y = self.interpreter.turtle_graphics["y"]
+                current_heading = self.interpreter.turtle_graphics["heading"]
+
+                # Store clone information
+                if not hasattr(self.interpreter, "turtle_clones"):
+                    self.interpreter.turtle_clones = []
+
+                clone_info = {
+                    "x": current_x,
+                    "y": current_y,
+                    "heading": current_heading,
+                    "color": self.interpreter.turtle_graphics.get("pen_color", "black"),
+                    "visible": True,
+                }
+                self.interpreter.turtle_clones.append(clone_info)
+
+                self.interpreter.log_output(
+                    f"Created turtle clone at ({current_x:.1f}, {current_y:.1f})"
+                )
+
+            elif cmd == "STAMP":
+                # STAMP - leave an imprint of the turtle shape
+                current_x = self.interpreter.turtle_graphics["x"]
+                current_y = self.interpreter.turtle_graphics["y"]
+                current_color = self.interpreter.turtle_graphics.get(
+                    "pen_color", "black"
+                )
+
+                if (
+                    hasattr(self.interpreter, "ide_turtle_canvas")
+                    and self.interpreter.ide_turtle_canvas
+                ):
+                    canvas = self.interpreter.ide_turtle_canvas
+                    # Draw a small triangle to represent turtle stamp
+                    size = 8
+                    canvas.create_polygon(
+                        current_x,
+                        current_y - size,
+                        current_x - size // 2,
+                        current_y + size // 2,
+                        current_x + size // 2,
+                        current_y + size // 2,
+                        fill=current_color,
+                        outline=current_color,
+                        tags="game_objects",
+                    )
+                    self.interpreter.log_output(
+                        f"Stamped turtle at ({current_x:.1f}, {current_y:.1f})"
+                    )
+                else:
+                    self.interpreter.log_output(
+                        "STAMP command requires graphics canvas"
+                    )
+
+        except Exception as e:
+            self.interpreter.debug_output(f"Enhanced turtle command error: {e}")
+        return "continue"
+
+    def _handle_math_functions(self, cmd, parts):
+        """Handle mathematical functions in Logo"""
+        try:
+            if cmd == "SIN":
+                # SIN angle - sine of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(parts[1])
+                    result = math.sin(math.radians(angle))
+                    self.interpreter.variables["MATH_RESULT"] = result
+                    self.interpreter.log_output(f"SIN {angle}° = {result:.4f}")
+
+            elif cmd == "COS":
+                # COS angle - cosine of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(parts[1])
+                    result = math.cos(math.radians(angle))
+                    self.interpreter.variables["MATH_RESULT"] = result
+                    self.interpreter.log_output(f"COS {angle}° = {result:.4f}")
+
+            elif cmd == "TAN":
+                # TAN angle - tangent of angle in degrees
+                if len(parts) >= 2:
+                    angle = float(parts[1])
+                    result = math.tan(math.radians(angle))
+                    self.interpreter.variables["MATH_RESULT"] = result
+                    self.interpreter.log_output(f"TAN {angle}° = {result:.4f}")
+
+            elif cmd == "SQRT":
+                # SQRT value - square root
+                if len(parts) >= 2:
+                    value = float(parts[1])
+                    if value >= 0:
+                        result = math.sqrt(value)
+                        self.interpreter.variables["MATH_RESULT"] = result
+                        self.interpreter.log_output(f"SQRT {value} = {result:.4f}")
+                    else:
+                        self.interpreter.log_output("SQRT requires non-negative value")
+
+            elif cmd == "POWER":
+                # POWER base, exponent
+                if len(parts) >= 3:
+                    base = float(parts[1])
+                    exponent = float(parts[2])
+                    result = math.pow(base, exponent)
+                    self.interpreter.variables["MATH_RESULT"] = result
+                    self.interpreter.log_output(
+                        f"POWER {base} {exponent} = {result:.4f}"
+                    )
+
+            elif cmd == "LOG":
+                # LOG value [,base] - logarithm (default base 10)
+                if len(parts) >= 2:
+                    value = float(parts[1])
+                    base = float(parts[2]) if len(parts) > 2 else 10
+                    if value > 0 and base > 0 and base != 1:
+                        result = math.log(value, base)
+                        self.interpreter.variables["MATH_RESULT"] = result
+                        self.interpreter.log_output(
+                            f"LOG {value} {base} = {result:.4f}"
+                        )
+                    else:
+                        self.interpreter.log_output(
+                            "LOG requires positive value and valid base"
+                        )
+
+        except Exception as e:
+            self.interpreter.debug_output(f"Math function error: {e}")
+        return "continue"
+
+    def _handle_list_operations(self, cmd, parts):
+        """Handle list processing operations in Logo"""
+        try:
+            if cmd == "LIST":
+                # LIST item1 item2 ... - create a list
+                if len(parts) >= 2:
+                    items = []
+                    for part in parts[1:]:
+                        # Try to evaluate as number, otherwise keep as string
+                        try:
+                            items.append(float(part))
+                        except ValueError:
+                            items.append(part.strip('"'))
+
+                    list_name = f"LIST_{len(self.interpreter.variables)}"
+                    self.interpreter.variables[list_name] = items
+                    self.interpreter.log_output(
+                        f"Created list {list_name} with {len(items)} items"
+                    )
+                    self.interpreter.variables["LAST_LIST"] = list_name
+
+            elif cmd in ["ITEM", "FIRST", "LAST", "BUTFIRST", "BUTLAST"]:
+                # These operations work on the last created list or a specified list
+                list_name = (
+                    parts[1]
+                    if len(parts) > 1
+                    else self.interpreter.variables.get("LAST_LIST")
+                )
+
+                if list_name and list_name in self.interpreter.variables:
+                    lst = self.interpreter.variables[list_name]
+                    if isinstance(lst, list) and lst:
+
+                        if cmd == "ITEM":
+                            # ITEM index list
+                            if len(parts) >= 3:
+                                try:
+                                    index = int(parts[1]) - 1  # Logo is 1-based
+                                    list_name = parts[2]
+                                    if list_name in self.interpreter.variables:
+                                        lst = self.interpreter.variables[list_name]
+                                        if isinstance(lst, list) and 0 <= index < len(
+                                            lst
+                                        ):
+                                            result = lst[index]
+                                            self.interpreter.variables[
+                                                "LIST_RESULT"
+                                            ] = result
+                                            self.interpreter.log_output(
+                                                f"ITEM {index+1} of {list_name} = {result}"
+                                            )
+                                        else:
+                                            self.interpreter.log_output(
+                                                "Invalid index or list"
+                                            )
+                                except ValueError:
+                                    self.interpreter.log_output(
+                                        "ITEM requires numeric index"
+                                    )
+
+                        elif cmd == "FIRST":
+                            result = lst[0]
+                            self.interpreter.variables["LIST_RESULT"] = result
+                            self.interpreter.log_output(
+                                f"FIRST of {list_name} = {result}"
+                            )
+
+                        elif cmd == "LAST":
+                            result = lst[-1]
+                            self.interpreter.variables["LIST_RESULT"] = result
+                            self.interpreter.log_output(
+                                f"LAST of {list_name} = {result}"
+                            )
+
+                        elif cmd == "BUTFIRST":
+                            result = lst[1:]
+                            self.interpreter.variables["LIST_RESULT"] = result
+                            self.interpreter.log_output(
+                                f"BUTFIRST of {list_name} = {result}"
+                            )
+
+                        elif cmd == "BUTLAST":
+                            result = lst[:-1]
+                            self.interpreter.variables["LIST_RESULT"] = result
+                            self.interpreter.log_output(
+                                f"BUTLAST of {list_name} = {result}"
+                            )
+                    else:
+                        self.interpreter.log_output("Invalid or empty list")
+                else:
+                    self.interpreter.log_output("No list available")
+
+        except Exception as e:
+            self.interpreter.debug_output(f"List operation error: {e}")
+        return "continue"
+
+    def _handle_file_operations(self, cmd, parts):
+        """Handle file operations in Logo"""
+        try:
+            if cmd == "SAVE":
+                # SAVE "filename" - save current canvas/turtle state
+                if len(parts) >= 2:
+                    filename = parts[1].strip('"')
+
+                    # Save turtle state and any drawings
+                    state = {
+                        "turtle": self.interpreter.turtle_graphics.copy(),
+                        "variables": dict(self.interpreter.variables),
+                        "timestamp": time.time(),
+                    }
+
+                    import json
+
+                    try:
+                        with open(filename, "w", encoding="utf-8") as f:
+                            json.dump(state, f, indent=2, default=str)
+                        self.interpreter.log_output(
+                            f"Saved turtle state to '{filename}'"
+                        )
+                    except Exception as e:
+                        self.interpreter.debug_output(f"SAVE error: {e}")
+
+            elif cmd == "LOAD":
+                # LOAD "filename" - load turtle state
+                if len(parts) >= 2:
+                    filename = parts[1].strip('"')
+
+                    import json
+
+                    try:
+                        with open(filename, "r", encoding="utf-8") as f:
+                            state = json.load(f)
+
+                        # Restore turtle state
+                        if "turtle" in state:
+                            self.interpreter.turtle_graphics.update(state["turtle"])
+
+                        # Restore variables
+                        if "variables" in state:
+                            self.interpreter.variables.update(state["variables"])
+
+                        self.interpreter.log_output(
+                            f"Loaded turtle state from '{filename}'"
+                        )
+
+                        # Update display
+                        if hasattr(self.interpreter, "update_turtle_display"):
+                            self.interpreter.update_turtle_display()
+
+                    except Exception as e:
+                        self.interpreter.debug_output(f"LOAD error: {e}")
+
+            elif cmd == "EXPORT":
+                # EXPORT "filename" - export canvas as image
+                if len(parts) >= 2:
+                    filename = parts[1].strip('"')
+
+                    # This would export the current canvas as an image
+                    # Simplified implementation - just log for now
+                    self.interpreter.log_output(
+                        f"Exported canvas to '{filename}' (simulated)"
+                    )
+
+        except Exception as e:
+            self.interpreter.debug_output(f"File operation error: {e}")
+        return "continue"
+
+    def _handle_sound_generation(self, cmd, parts):
+        """Handle sound generation commands in Logo"""
+        try:
+            if cmd == "PLAYNOTE":
+                # PLAYNOTE note duration - play a musical note
+                if len(parts) >= 3:
+                    note = parts[1].strip('"')
+                    duration = float(parts[2])
+
+                    # Simple note to frequency mapping
+                    note_freqs = {
+                        "C4": 261.63,
+                        "C#4": 277.18,
+                        "D4": 293.66,
+                        "D#4": 311.13,
+                        "E4": 329.63,
+                        "F4": 349.23,
+                        "F#4": 369.99,
+                        "G4": 392.00,
+                        "G#4": 415.30,
+                        "A4": 440.00,
+                        "A#4": 466.16,
+                        "B4": 493.88,
+                        "C5": 523.25,
+                    }
+
+                    if note.upper() in note_freqs:
+                        frequency = note_freqs[note.upper()]
+                        try:
+                            import winsound
+
+                            winsound.Beep(int(frequency), int(duration * 1000))
+                            self.interpreter.log_output(
+                                f"Played note {note} for {duration}s"
+                            )
+                        except ImportError:
+                            self.interpreter.log_output(
+                                f"Played note {note} for {duration}s (simulated)"
+                            )
+                    else:
+                        self.interpreter.log_output("Unknown note")
+
+            elif cmd == "PLAYTUNE":
+                # PLAYTUNE "notes" - play a sequence of notes
+                if len(parts) >= 2:
+                    notes_str = parts[1].strip('"')
+                    notes = [n.strip() for n in notes_str.split()]
+
+                    note_freqs = {
+                        "C": 261.63,
+                        "D": 293.66,
+                        "E": 329.63,
+                        "F": 349.23,
+                        "G": 392.00,
+                        "A": 440.00,
+                        "B": 493.88,
+                    }
+
+                    duration = 0.3  # Default note duration
+                    for note in notes:
+                        if note.upper() in note_freqs:
+                            frequency = note_freqs[note.upper()]
+                            try:
+                                import winsound
+
+                                winsound.Beep(int(frequency), int(duration * 1000))
+                            except ImportError:
+                                pass  # Simulated
+                            time.sleep(0.1)  # Brief pause between notes
+
+                    self.interpreter.log_output(f"Played tune: {notes_str}")
+
+            elif cmd == "SETSOUND":
+                # SETSOUND frequency duration - set sound parameters
+                if len(parts) >= 3:
+                    frequency = float(parts[1])
+                    duration = float(parts[2])
+
+                    # Store sound settings
+                    self.interpreter.variables["SOUND_FREQUENCY"] = frequency
+                    self.interpreter.variables["SOUND_DURATION"] = duration
+
+                    self.interpreter.log_output(
+                        f"Set sound: {frequency}Hz for {duration}s"
+                    )
+
+        except Exception as e:
+            self.interpreter.debug_output(f"Sound generation error: {e}")
+        return "continue"
+
+    def _handle_3d_primitives(self, cmd, parts):
+        """Handle 3D graphics primitives in Logo"""
+        try:
+            # These are simplified 2D representations of 3D shapes
+            if cmd == "CUBE":
+                # CUBE size - draw a cube (simplified as square with 3D effect)
+                if len(parts) >= 2:
+                    size = float(parts[1])
+
+                    # Draw a simple cube representation
+                    current_x = self.interpreter.turtle_graphics["x"]
+                    current_y = self.interpreter.turtle_graphics["y"]
+
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
+                        canvas = self.interpreter.ide_turtle_canvas
+                        # Draw front face
+                        canvas.create_rectangle(
+                            current_x,
+                            current_y,
+                            current_x + size,
+                            current_y + size,
+                            outline="black",
+                            tags="game_objects",
+                        )
+                        # Draw back face (offset)
+                        offset = size * 0.3
+                        canvas.create_rectangle(
+                            current_x + offset,
+                            current_y - offset,
+                            current_x + size + offset,
+                            current_y + size - offset,
+                            outline="gray",
+                            tags="game_objects",
+                        )
+                        # Connect corners
+                        canvas.create_line(
+                            current_x,
+                            current_y,
+                            current_x + offset,
+                            current_y - offset,
+                            tags="game_objects",
+                        )
+                        canvas.create_line(
+                            current_x + size,
+                            current_y,
+                            current_x + size + offset,
+                            current_y - offset,
+                            tags="game_objects",
+                        )
+                        canvas.create_line(
+                            current_x + size,
+                            current_y + size,
+                            current_x + size + offset,
+                            current_y + size - offset,
+                            tags="game_objects",
+                        )
+                        canvas.create_line(
+                            current_x,
+                            current_y + size,
+                            current_x + offset,
+                            current_y + size - offset,
+                            tags="game_objects",
+                        )
+
+                        self.interpreter.log_output(f"Drew 3D cube (size {size})")
+                    else:
+                        self.interpreter.log_output(
+                            "CUBE command requires graphics canvas"
+                        )
+
+            elif cmd == "SPHERE":
+                # SPHERE radius - draw a sphere (simplified as circle with shading)
+                if len(parts) >= 2:
+                    radius = float(parts[1])
+
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
+                        canvas = self.interpreter.ide_turtle_canvas
+                        current_x = self.interpreter.turtle_graphics["x"]
+                        current_y = self.interpreter.turtle_graphics["y"]
+
+                        # Draw main circle
+                        canvas.create_oval(
+                            current_x - radius,
+                            current_y - radius,
+                            current_x + radius,
+                            current_y + radius,
+                            fill="lightblue",
+                            outline="blue",
+                            tags="game_objects",
+                        )
+                        # Add highlight
+                        canvas.create_oval(
+                            current_x - radius * 0.7,
+                            current_y - radius * 0.7,
+                            current_x - radius * 0.3,
+                            current_y - radius * 0.3,
+                            fill="white",
+                            outline="white",
+                            tags="game_objects",
+                        )
+
+                        self.interpreter.log_output(f"Drew 3D sphere (radius {radius})")
+                    else:
+                        self.interpreter.log_output(
+                            "SPHERE command requires graphics canvas"
+                        )
+
+            elif cmd == "CYLINDER":
+                # CYLINDER radius height - draw a cylinder
+                if len(parts) >= 3:
+                    radius = float(parts[1])
+                    height = float(parts[2])
+
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
+                        canvas = self.interpreter.ide_turtle_canvas
+                        current_x = self.interpreter.turtle_graphics["x"]
+                        current_y = self.interpreter.turtle_graphics["y"]
+
+                        # Draw top ellipse
+                        canvas.create_oval(
+                            current_x - radius,
+                            current_y - radius,
+                            current_x + radius,
+                            current_y + radius,
+                            fill="lightgray",
+                            outline="black",
+                            tags="game_objects",
+                        )
+                        # Draw bottom ellipse
+                        canvas.create_oval(
+                            current_x - radius,
+                            current_y + height - radius,
+                            current_x + radius,
+                            current_y + height + radius,
+                            fill="darkgray",
+                            outline="black",
+                            tags="game_objects",
+                        )
+                        # Draw connecting lines
+                        canvas.create_line(
+                            current_x - radius,
+                            current_y,
+                            current_x - radius,
+                            current_y + height,
+                            tags="game_objects",
+                        )
+                        canvas.create_line(
+                            current_x + radius,
+                            current_y,
+                            current_x + radius,
+                            current_y + height,
+                            tags="game_objects",
+                        )
+
+                        self.interpreter.log_output(
+                            f"Drew 3D cylinder (radius {radius}, height {height})"
+                        )
+                    else:
+                        self.interpreter.log_output(
+                            "CYLINDER command requires graphics canvas"
+                        )
+
+            elif cmd == "PYRAMID":
+                # PYRAMID base_size height - draw a pyramid
+                if len(parts) >= 3:
+                    base_size = float(parts[1])
+                    height = float(parts[2])
+
+                    if (
+                        hasattr(self.interpreter, "ide_turtle_canvas")
+                        and self.interpreter.ide_turtle_canvas
+                    ):
+                        canvas = self.interpreter.ide_turtle_canvas
+                        current_x = self.interpreter.turtle_graphics["x"]
+                        current_y = self.interpreter.turtle_graphics["y"]
+
+                        half_base = base_size / 2
+                        # Draw base
+                        canvas.create_polygon(
+                            current_x - half_base,
+                            current_y + height,
+                            current_x + half_base,
+                            current_y + height,
+                            current_x + half_base,
+                            current_y + height + base_size,
+                            current_x - half_base,
+                            current_y + height + base_size,
+                            fill="lightgray",
+                            outline="black",
+                            tags="game_objects",
+                        )
+                        # Draw sides
+                        canvas.create_polygon(
+                            current_x,
+                            current_y,
+                            current_x - half_base,
+                            current_y + height,
+                            current_x + half_base,
+                            current_y + height,
+                            fill="gray",
+                            outline="black",
+                            tags="game_objects",
+                        )
+
+                        self.interpreter.log_output(
+                            f"Drew 3D pyramid (base {base_size}, height {height})"
+                        )
+                    else:
+                        self.interpreter.log_output(
+                            "PYRAMID command requires graphics canvas"
+                        )
+
+        except Exception as e:
+            self.interpreter.debug_output(f"3D primitive error: {e}")
         return "continue"
 
     # Helper methods for parsing

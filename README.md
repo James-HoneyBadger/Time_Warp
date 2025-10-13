@@ -10,9 +10,9 @@
 
 ### 🔤 **Multi-Language Support**
 
-- **BASIC** - Classic line-numbered programming with variables and loops
-- **PILOT** - Educational programming with turtle graphics and text commands
-- **Logo** - Turtle graphics programming for visual learning
+- **TW BASIC** - Classic line-numbered programming with variables and loops
+- **TW PILOT** - Educational programming with turtle graphics and text commands
+- **TW Logo** - Turtle graphics programming for visual learning
 - **Python** - Modern scripting with full library support
 - **JavaScript** - Web development and scripting (Node.js)
 - **Perl** - Text processing and system scripting
@@ -59,7 +59,7 @@ python timewarp.py
 ## 📋 Language Examples
 
 <details>
-<summary><strong>BASIC - Classic Programming</strong></summary>
+<summary><strong>TW BASIC - Classic Programming</strong></summary>
 
 ```basic
 10 PRINT "Welcome to BASIC!"
@@ -72,7 +72,7 @@ python timewarp.py
 </details>
 
 <details>
-<summary><strong>Logo - Turtle Graphics</strong></summary>
+<summary><strong>TW Logo - Turtle Graphics</strong></summary>
 
 ```logo
 ; Draw a colorful flower
@@ -85,7 +85,7 @@ REPEAT 8 [
 </details>
 
 <details>
-<summary><strong>PILOT - Educational Programming</strong></summary>
+<summary><strong>TW PILOT - Educational Programming</strong></summary>
 
 ```pilot
 T:Welcome to PILOT programming!

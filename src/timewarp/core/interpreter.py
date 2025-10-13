@@ -51,9 +51,9 @@ except ImportError:
 
 # Import language executors
 from .languages import (
-    PilotExecutor,
-    BasicExecutor,
-    LogoExecutor,
+    TwPilotExecutor,
+    TwBasicExecutor,
+    TwLogoExecutor,
     PerlExecutor,
     PythonExecutor,
     JavaScriptExecutor,
@@ -538,9 +538,9 @@ class Time_WarpInterpreter:
             self.advanced_robot.simulation_mode = True
 
         # Initialize language executors
-        self.pilot_executor = PilotExecutor(self)
-        self.basic_executor = BasicExecutor(self)
-        self.logo_executor = LogoExecutor(self)
+        self.pilot_executor = TwPilotExecutor(self)
+        self.basic_executor = TwBasicExecutor(self)
+        self.logo_executor = TwLogoExecutor(self)
         self.perl_executor = PerlExecutor(self)
         self.python_executor = PythonExecutor(self)
         self.javascript_executor = JavaScriptExecutor(self)
@@ -1312,7 +1312,7 @@ class Time_WarpInterpreter:
 
     def run_program(self, program_text, language=None):
         """Run a complete program
-        
+
         Args:
             program_text (str): The program code to execute
             language (str, optional): The programming language ('pilot', 'basic', 'logo', etc.)
@@ -1322,11 +1322,11 @@ class Time_WarpInterpreter:
         if language:
             self.current_language = language.lower()
             self.current_language_mode = language.lower()
-        
+
         # Preprocess Logo programs to handle multi-line REPEAT blocks
-        if language and language.lower() == 'logo':
+        if language and language.lower() == "logo":
             program_text = self._preprocess_logo_program(program_text)
-        
+
         if not self.load_program(program_text):
             self.log_output("Error loading program")
             return False
@@ -1495,34 +1495,36 @@ class Time_WarpInterpreter:
 
     def _preprocess_logo_program(self, program_text):
         """Preprocess Logo program to handle multi-line REPEAT blocks"""
-        lines = program_text.split('\n')
+        lines = program_text.split("\n")
         processed_lines = []
         i = 0
-        
+
         while i < len(lines):
             line = lines[i].strip()
-            
+
             # Check if this is a REPEAT command with opening bracket
-            if line.upper().startswith('REPEAT ') and '[' in line and ']' not in line:
+            if line.upper().startswith("REPEAT ") and "[" in line and "]" not in line:
                 # Multi-line REPEAT block
                 repeat_block = line
                 i += 1
-                bracket_depth = line.count('[') - line.count(']')
-                
+                bracket_depth = line.count("[") - line.count("]")
+
                 # Collect lines until brackets are balanced
                 while i < len(lines) and bracket_depth > 0:
                     next_line = lines[i].strip()
-                    if next_line and not next_line.startswith(';'):  # Skip empty and comments
-                        repeat_block += ' ' + next_line
-                        bracket_depth += next_line.count('[') - next_line.count(']')
+                    if next_line and not next_line.startswith(
+                        ";"
+                    ):  # Skip empty and comments
+                        repeat_block += " " + next_line
+                        bracket_depth += next_line.count("[") - next_line.count("]")
                     i += 1
-                
+
                 processed_lines.append(repeat_block)
             else:
                 processed_lines.append(line)
                 i += 1
-        
-        return '\n'.join(processed_lines)
+
+        return "\n".join(processed_lines)
 
 
 def create_demo_program():

@@ -433,7 +433,7 @@ class Time_WarpIDE:
 
         # Language indicator
         self.language_label = ttk.Label(
-            status_frame, text="PILOT", relief=tk.SUNKEN, width=10
+            status_frame, text="TW PILOT", relief=tk.SUNKEN, width=12
         )
         self.language_label.pack(side=tk.RIGHT, padx=2)
 
@@ -558,9 +558,9 @@ class Time_WarpIDE:
             filetypes=[
                 ("All Time_Warp files", "*.py *.js *.pilot *.bas *.logo *.pl"),
                 ("Python files", "*.py"),
-                ("BASIC files", "*.bas"),
-                ("Logo files", "*.logo"),
-                ("PILOT files", "*.pilot"),
+                ("TW BASIC files", "*.bas"),
+                ("TW Logo files", "*.logo"),
+                ("TW PILOT files", "*.pilot"),
                 ("JavaScript files", "*.js"),
                 ("Perl files", "*.pl"),
                 ("All files", "*.*"),
@@ -818,7 +818,7 @@ class Time_WarpIDE:
                             f"🔧 {language.upper()} language support coming soon!\n"
                         )
                         self.write_to_console(
-                            f"Currently supported: PILOT, BASIC, Logo, Python, JavaScript, Perl\n"
+                            f"Currently supported: TW PILOT, TW BASIC, TW Logo, Python, JavaScript, Perl\n"
                         )
                         result = False
 
@@ -969,11 +969,11 @@ class Time_WarpIDE:
 
         filename = filename.lower()
         if filename.endswith(".pilot"):
-            return "PILOT"
+            return "TW PILOT"
         elif filename.endswith(".bas") or filename.endswith(".basic"):
-            return "BASIC"
+            return "TW BASIC"
         elif filename.endswith(".logo"):
-            return "Logo"
+            return "TW Logo"
         elif filename.endswith(".py"):
             return "Python"
         elif filename.endswith(".js"):
@@ -992,19 +992,19 @@ class Time_WarpIDE:
         content_lower = content.lower()
         lines = content.split("\n")
 
-        # Check for line numbers (BASIC)
+        # Check for line numbers (TW BASIC)
         has_line_numbers = any(
             line.strip() and line.strip()[0].isdigit() for line in lines[:5]
         )
         if has_line_numbers and any(
             word in content_lower for word in ["print", "let", "goto", "if"]
         ):
-            return "BASIC"
+            return "TW BASIC"
 
         # Check for PILOT commands
         pilot_commands = ["t:", "a:", "j:", "y:", "n:", "c:", "e:", "m:"]
         if any(cmd in content_lower for cmd in pilot_commands):
-            return "PILOT"
+            return "TW PILOT"
 
         # Check for Logo commands
         logo_commands = [
@@ -1017,7 +1017,7 @@ class Time_WarpIDE:
             "repeat",
         ]
         if any(cmd in content_lower for cmd in logo_commands):
-            return "Logo"
+            return "TW Logo"
 
         # Check for Python
         python_keywords = ["def ", "import ", "from ", "class ", "if __name__"]
@@ -1095,9 +1095,9 @@ class Time_WarpIDE:
 Welcome to Time_Warp IDE! Let's learn the fundamentals:
 
 1. CHOOSING A LANGUAGE:
-   • PILOT (1962) - Great for beginners, simple commands
-   • BASIC - Classic line-numbered programming
-   • Logo - Perfect for graphics and turtle programming
+   • TW PILOT (1962) - Great for beginners, simple commands
+   • TW BASIC - Classic line-numbered programming
+   • TW Logo - Perfect for graphics and turtle programming
    • Python - Modern, powerful scripting
 
 2. YOUR FIRST PILOT PROGRAM:
@@ -1138,7 +1138,7 @@ Welcome to Time_Warp IDE! Let's learn the fundamentals:
 
             # PILOT Language Tutorial
             pilot_frame = ttk.Frame(notebook)
-            notebook.add(pilot_frame, text="🚁 PILOT Language")
+            notebook.add(pilot_frame, text="🚁 TW PILOT Language")
 
             pilot_text = tk.Text(pilot_frame, wrap=tk.WORD, font=("Consolas", 11))
             pilot_scrollbar = ttk.Scrollbar(
@@ -1203,7 +1203,7 @@ Copy any example above into the editor and press F5!"""
 
             # BASIC Language Tutorial
             basic_lang_frame = ttk.Frame(notebook)
-            notebook.add(basic_lang_frame, text="📊 BASIC Language")
+            notebook.add(basic_lang_frame, text="📊 TW BASIC Language")
 
             basic_lang_text = tk.Text(
                 basic_lang_frame, wrap=tk.WORD, font=("Consolas", 11)
@@ -1276,7 +1276,7 @@ VARIABLES:
 
             # Logo Language Tutorial
             logo_frame = ttk.Frame(notebook)
-            notebook.add(logo_frame, text="🐢 Logo Language")
+            notebook.add(logo_frame, text="🐢 TW Logo Language")
 
             logo_text = tk.Text(logo_frame, wrap=tk.WORD, font=("Consolas", 11))
             logo_scrollbar = ttk.Scrollbar(
@@ -1404,11 +1404,11 @@ TIPS:
             lang_frame.pack(fill=tk.X, pady=(0, 10))
 
             ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
-            lang_var = tk.StringVar(value="PILOT")
+            lang_var = tk.StringVar(value="TW PILOT")
             lang_combo = ttk.Combobox(
                 lang_frame,
                 textvariable=lang_var,
-                values=["PILOT", "BASIC", "Logo", "Python"],
+                values=["TW PILOT", "TW BASIC", "TW Logo", "Python"],
                 state="readonly",
                 width=10,
             )
@@ -1963,11 +1963,11 @@ This Week: "Retro Game Recreation"
             lang_frame.pack(fill=tk.X, pady=(0, 10))
 
             ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
-            lang_var = tk.StringVar(value="PILOT")
+            lang_var = tk.StringVar(value="TW PILOT")
             lang_combo = ttk.Combobox(
                 lang_frame,
                 textvariable=lang_var,
-                values=["PILOT", "BASIC", "Logo", "Python"],
+                values=["TW PILOT", "TW BASIC", "TW Logo", "Python"],
                 state="readonly",
                 width=10,
             )
@@ -2636,17 +2636,17 @@ Write some code and run the analyzer again!"""
         if any(
             line.strip().startswith(("T:", "A:", "J:", "Y:", "N:")) for line in lines
         ):
-            language = "PILOT"
+            language = "TW PILOT"
         elif any(
             line.strip().split()[0].isdigit() if line.strip().split() else False
             for line in lines
         ):
-            language = "BASIC"
+            language = "TW BASIC"
         elif any(
             word in code.upper()
             for word in ["FORWARD", "BACK", "LEFT", "RIGHT", "REPEAT"]
         ):
-            language = "Logo"
+            language = "TW Logo"
         elif any(word in code for word in ["print(", "def ", "import ", "if __name__"]):
             language = "Python"
 
@@ -2717,15 +2717,15 @@ Keep coding and improving! 🚀"""
     def get_language_tips(self, language):
         """Get language-specific coding tips"""
         tips = {
-            "PILOT": """• Use labels (*LABEL) for better organization
+            "TW PILOT": """• Use labels (*LABEL) for better organization
 • Match statements (M:) are case-sensitive
 • Variables are referenced with $ (e.g., $INPUT)
 • Use E: to end program sections cleanly""",
-            "BASIC": """• Line numbers help organize program flow
+            "TW BASIC": """• Line numbers help organize program flow
 • Use meaningful variable names (A$, NAME$, etc.)
 • FOR...NEXT loops are very efficient
 • DIM arrays before using them""",
-            "Logo": """• PENUP/PENDOWN control drawing
+            "TW Logo": """• PENUP/PENDOWN control drawing
 • Use procedures (TO...END) for reusable code
 • REPEAT is more efficient than multiple commands
 • Variables start with : (e.g., :SIZE)""",
@@ -2952,9 +2952,9 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 • F1 - This help
 
 🎯 LANGUAGES SUPPORTED:
-• PILOT (Educational programming)
-• BASIC (Classic line-numbered)
-• Logo (Turtle graphics)
+• TW PILOT (Educational programming)
+• TW BASIC (Classic line-numbered)
+• TW Logo (Turtle graphics)
 • Python (Modern scripting)
 • JavaScript (Web scripting)
 • Perl (Text processing)

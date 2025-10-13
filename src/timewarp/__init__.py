@@ -1,7 +1,7 @@
 """
 Time_Warp IDE - Educational Programming Environment
 
-A multi-language educational IDE supporting BASIC, PILOT, Logo, Python, JavaScript, and Perl
+A multi-language educational IDE supporting TW BASIC, TW PILOT, TW Logo, Python, JavaScript, and Perl
 with integrated turtle graphics, themes, and comprehensive learning tools.
 """
 
