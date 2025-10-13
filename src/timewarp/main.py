@@ -555,6 +555,8 @@ class Time_WarpIDE:
     def new_file(self):
         """Create new file in editor"""
         self.multi_tab_editor.new_tab()
+        # Reapply theme to ensure new tab gets proper colors
+        self.apply_theme()
         self.update_status("New file created")
 
     def open_file(self):
@@ -574,6 +576,8 @@ class Time_WarpIDE:
         )
         if file_path:
             self.multi_tab_editor.open_file(file_path)
+            # Reapply theme to ensure new tab gets proper colors
+            self.apply_theme()
             self.update_status(f"Opened: {os.path.basename(file_path)}")
 
     def open_folder(self):
