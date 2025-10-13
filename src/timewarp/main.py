@@ -3,7 +3,7 @@
 Time_Warp IDE - Enhanced Multi-Tab Editor
 Updated main application with new features:
 - Multi-tab code editor
-- File explorer panel  
+- File explorer panel
 - Enhanced graphics canvas
 - Better error handling
 """
@@ -21,11 +21,18 @@ import subprocess
 import platform
 
 # Import theme configuration functions
-from .utils.theme import load_config, save_config, ThemeManager
+from .utils.theme import (
+    load_config,
+    save_config,
+    ThemeManager,
+    available_themes,
+    get_theme_preview,
+)
 
 # Import core components
 try:
     from .core.interpreter import Time_WarpInterpreter
+
     CORE_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Core components not available: {e}")
@@ -35,11 +42,13 @@ except ImportError as e:
 try:
     import sys
     import os
+
     # Add root directory to path for plugins
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     if root_dir not in sys.path:
         sys.path.insert(0, root_dir)
     from plugins import PluginManager
+
     PLUGINS_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Plugin system not available: {e}")
@@ -49,6 +58,7 @@ except ImportError as e:
 try:
     from .gui.components.multi_tab_editor import MultiTabEditor
     from .gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
+
     ENHANCED_GRAPHICS_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Enhanced components not available: {e}")
@@ -60,6 +70,7 @@ try:
     from .core.features.tutorial_system import TutorialSystem
     from .core.features.ai_assistant import AICodeAssistant
     from .core.features.gamification import GamificationSystem
+
     FEATURES_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️ Feature modules not available: {e}")
@@ -77,7 +88,7 @@ class Time_WarpIDE:
         print("🚀 Starting Time_Warp IDE 1.2...")
         print("⏰ Enhanced Educational Programming Environment")
         print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
-        
+
         # Initialize main window
         self.root = tk.Tk()
         self._setup_window()
@@ -85,55 +96,57 @@ class Time_WarpIDE:
         # Initialize core systems
         self.theme_manager = ThemeManager()
         self.current_theme = "forest"  # Default theme
-        
+
         # Initialize plugin manager if available
         if PLUGINS_AVAILABLE:
             self.plugin_manager = PluginManager(self)
         else:
             self.plugin_manager = None
-        
+
         # Initialize interpreter
         self.interpreter = Time_WarpInterpreter()
-        
+
         # Initialize execution tracking
         self.execution_thread = None
         self.stop_execution_flag = False
-        
+
         # Setup UI
         self.setup_ui()
-        
+
         # Initialize other components
         self.load_theme_config()
-        
+
         # Setup keyboard shortcuts
         self.setup_keyboard_shortcuts()
-        
+
         # Initialize features
         self.init_features()
-        
+
         # Apply initial theme (after all UI components are created)
         self.apply_theme()
-        
+
         # Ensure theme is applied to multi-tab editor specifically
-        if hasattr(self, 'multi_tab_editor'):
+        if hasattr(self, "multi_tab_editor"):
             try:
                 colors = self.theme_manager.get_colors()
                 self.multi_tab_editor.apply_theme(colors)
                 print("✅ Initial theme applied to multi-tab editor")
             except Exception as e:
                 print(f"⚠️ Failed to apply initial theme to editor: {e}")
-        
+
         # Load plugins
         self.load_plugins()
-        
+
         print("🚀 Time_Warp IDE 1.2 - Clean two-panel layout ready!")
-        
+
         # Handle any initialization errors gracefully
 
     def load_theme_config(self):
         """Load theme configuration"""
         try:
-            self.current_theme = self.theme_manager.config.get("current_theme", "forest")
+            self.current_theme = self.theme_manager.config.get(
+                "current_theme", "forest"
+            )
             print(f"🎨 Loaded theme: {self.current_theme}")
         except Exception as e:
             print(f"⚠️ Theme loading error: {e}")
@@ -144,7 +157,7 @@ class Time_WarpIDE:
         self.root.title("⏰ Time Warp IDE - Journey Through Code")
         self.root.geometry("1200x800")
         self.root.minsize(800, 600)
-        
+
         # Set window icon if available
         try:
             # Try to set an icon (optional)
@@ -161,10 +174,10 @@ class Time_WarpIDE:
         try:
             # Initialize error handler
             self.error_handler = EnhancedErrorHandler()
-            
+
             # Simplified feature initialization for 1.1
             # Advanced features will be added in future versions
-            
+
         except Exception as e:
             print(f"⚠️ Feature initialization error: {e}")
 
@@ -201,22 +214,42 @@ class Time_WarpIDE:
         # File menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="📄 New File", command=self.new_file, accelerator="Ctrl+N")
-        file_menu.add_command(label="📂 Open File", command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label="📁 Open Folder", command=self.open_folder, accelerator="Ctrl+Shift+O")
+        file_menu.add_command(
+            label="📄 New File", command=self.new_file, accelerator="Ctrl+N"
+        )
+        file_menu.add_command(
+            label="📂 Open File", command=self.open_file, accelerator="Ctrl+O"
+        )
+        file_menu.add_command(
+            label="📁 Open Folder", command=self.open_folder, accelerator="Ctrl+Shift+O"
+        )
         file_menu.add_separator()
-        file_menu.add_command(label="💾 Save", command=self.save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label="💾 Save As", command=self.save_as_file, accelerator="Ctrl+Shift+S")
-        file_menu.add_command(label="💾 Save All", command=self.save_all_files, accelerator="Ctrl+Alt+S")
+        file_menu.add_command(
+            label="💾 Save", command=self.save_file, accelerator="Ctrl+S"
+        )
+        file_menu.add_command(
+            label="💾 Save As", command=self.save_as_file, accelerator="Ctrl+Shift+S"
+        )
+        file_menu.add_command(
+            label="💾 Save All", command=self.save_all_files, accelerator="Ctrl+Alt+S"
+        )
         file_menu.add_separator()
-        file_menu.add_command(label="❌ Close Tab", command=self.close_current_tab, accelerator="Ctrl+W")
-        file_menu.add_command(label="🚪 Exit", command=self.quit_app, accelerator="Ctrl+Q")
+        file_menu.add_command(
+            label="❌ Close Tab", command=self.close_current_tab, accelerator="Ctrl+W"
+        )
+        file_menu.add_command(
+            label="🚪 Exit", command=self.quit_app, accelerator="Ctrl+Q"
+        )
 
         # Edit menu
         edit_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Edit", menu=edit_menu)
-        edit_menu.add_command(label="🔍 Find", command=self.find_text, accelerator="Ctrl+F")
-        edit_menu.add_command(label="🔁 Replace", command=self.replace_text, accelerator="Ctrl+H")
+        edit_menu.add_command(
+            label="🔍 Find", command=self.find_text, accelerator="Ctrl+F"
+        )
+        edit_menu.add_command(
+            label="🔁 Replace", command=self.replace_text, accelerator="Ctrl+H"
+        )
         edit_menu.add_separator()
         edit_menu.add_command(label="↩️ Undo", accelerator="Ctrl+Z")
         edit_menu.add_command(label="↪️ Redo", accelerator="Ctrl+Y")
@@ -224,35 +257,32 @@ class Time_WarpIDE:
         # View menu (NEW)
         view_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="View", menu=view_menu)
-        view_menu.add_command(label="🔍 Zoom In", command=self.zoom_in, accelerator="Ctrl++")
-        view_menu.add_command(label="🔍 Zoom Out", command=self.zoom_out, accelerator="Ctrl+-")
-        view_menu.add_command(label="🔍 Reset Zoom", command=self.reset_zoom, accelerator="Ctrl+0")
+        view_menu.add_command(
+            label="🔍 Zoom In", command=self.zoom_in, accelerator="Ctrl++"
+        )
+        view_menu.add_command(
+            label="🔍 Zoom Out", command=self.zoom_out, accelerator="Ctrl+-"
+        )
+        view_menu.add_command(
+            label="🔍 Reset Zoom", command=self.reset_zoom, accelerator="Ctrl+0"
+        )
         view_menu.add_separator()
-        view_menu.add_command(label="🎨 Toggle Graphics Panel", command=self.toggle_graphics_panel)
+        view_menu.add_command(
+            label="🎨 Toggle Graphics Panel", command=self.toggle_graphics_panel
+        )
         view_menu.add_separator()
-        
-        # Theme selector submenu
-        theme_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label="🎨 Themes", menu=theme_menu)
-        
-        # Dark themes
-        theme_menu.add_command(label="🌙 Dracula", command=lambda: self.change_theme("dracula"))
-        theme_menu.add_command(label="🌙 Monokai", command=lambda: self.change_theme("monokai"))
-        theme_menu.add_command(label="🌙 Solarized Dark", command=lambda: self.change_theme("solarized"))
-        theme_menu.add_command(label="🌙 Ocean", command=lambda: self.change_theme("ocean"))
-        theme_menu.add_separator()
-        
-        # Light themes
-        theme_menu.add_command(label="☀️ Spring", command=lambda: self.change_theme("spring"))
-        theme_menu.add_command(label="☀️ Sunset", command=lambda: self.change_theme("sunset"))
-        theme_menu.add_command(label="☀️ Candy", command=lambda: self.change_theme("candy"))
-        theme_menu.add_command(label="☀️ Forest", command=lambda: self.change_theme("forest"))
 
-        # Run menu  
+        # Theme settings moved to Tools menu (use Tools -> Theme Settings...)
+
+        # Run menu
         run_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Run", menu=run_menu)
-        run_menu.add_command(label="▶️ Run Code", command=self.run_code, accelerator="F5")
-        run_menu.add_command(label="⏹️ Stop", command=self.stop_execution, accelerator="Shift+F5")
+        run_menu.add_command(
+            label="▶️ Run Code", command=self.run_code, accelerator="F5"
+        )
+        run_menu.add_command(
+            label="⏹️ Stop", command=self.stop_execution, accelerator="Shift+F5"
+        )
         run_menu.add_separator()
         run_menu.add_command(label="🗑️ Clear Output", command=self.clear_output)
         run_menu.add_command(label="🗑️ Clear Graphics", command=self.clear_graphics)
@@ -261,24 +291,40 @@ class Time_WarpIDE:
         tools_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Tools", menu=tools_menu)
         tools_menu.add_command(label="⚙️ Settings", command=self.show_settings)
-        tools_menu.add_command(label="🔌 Plugin Manager", command=self.show_plugin_manager)
+        tools_menu.add_command(
+            label="🔌 Plugin Manager", command=self.show_plugin_manager
+        )
 
         # Features menu
         features_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Features", menu=features_menu)
-        features_menu.add_command(label="📚 Tutorial System", command=self.show_tutorial_system)
-        features_menu.add_command(label="🤖 AI Assistant", command=self.show_ai_assistant)
-        features_menu.add_command(label="🎮 Gamification", command=self.show_gamification_dashboard)
+        features_menu.add_command(
+            label="📚 Tutorial System", command=self.show_tutorial_system
+        )
+        features_menu.add_command(
+            label="🤖 AI Assistant", command=self.show_ai_assistant
+        )
+        features_menu.add_command(
+            label="🎮 Gamification", command=self.show_gamification_dashboard
+        )
         features_menu.add_separator()
-        features_menu.add_command(label="📝 Code Templates", command=self.show_code_templates)
-        features_menu.add_command(label="🔍 Code Analyzer", command=self.show_code_analyzer)
-        features_menu.add_command(label="📊 Learning Progress", command=self.show_learning_progress)
+        features_menu.add_command(
+            label="📝 Code Templates", command=self.show_code_templates
+        )
+        features_menu.add_command(
+            label="🔍 Code Analyzer", command=self.show_code_analyzer
+        )
+        features_menu.add_command(
+            label="📊 Learning Progress", command=self.show_learning_progress
+        )
 
         # Help menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
         self.menubar.add_cascade(label="Help", menu=help_menu)
         help_menu.add_command(label="📖 Documentation", command=self.show_documentation)
-        help_menu.add_command(label="🆘 Quick Help", command=self.show_quick_help, accelerator="F1")
+        help_menu.add_command(
+            label="🆘 Quick Help", command=self.show_quick_help, accelerator="F1"
+        )
         help_menu.add_separator()
         help_menu.add_command(label="ℹ️ About Time_Warp IDE", command=self.show_about)
 
@@ -289,31 +335,28 @@ class Time_WarpIDE:
         editor_frame.pack(fill=tk.BOTH, expand=True)
 
         # Multi-tab editor
-        self.multi_tab_editor = MultiTabEditor(editor_frame, language_callback=self.update_language_indicator)
+        self.multi_tab_editor = MultiTabEditor(
+            editor_frame, language_callback=self.update_language_indicator
+        )
 
         # Status bar for editor
         status_frame = ttk.Frame(editor_frame)
         status_frame.pack(fill=tk.X, side=tk.BOTTOM)
 
         self.status_label = ttk.Label(
-            status_frame, 
-            text="Ready", 
-            relief=tk.SUNKEN,
-            anchor=tk.W
+            status_frame, text="Ready", relief=tk.SUNKEN, anchor=tk.W
         )
         self.status_label.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=2)
 
         # Language indicator
         self.language_label = ttk.Label(
-            status_frame,
-            text="PILOT",
-            relief=tk.SUNKEN,
-            width=10
+            status_frame, text="PILOT", relief=tk.SUNKEN, width=10
         )
         self.language_label.pack(side=tk.RIGHT, padx=2)
-        
+
         # Initialize language indicator
         self.root.after_idle(self.update_language_indicator)
+        # end of setup_multi_tab_editor
 
     def setup_output_graphics_panel(self):
         """Setup right panel with output and graphics"""
@@ -326,27 +369,24 @@ class Time_WarpIDE:
         self.graphics_notebook.add(output_frame, text="📺 Output")
 
         self.output_text = scrolledtext.ScrolledText(
-            output_frame,
-            state=tk.DISABLED,
-            wrap=tk.WORD,
-            font=('Consolas', 10)
+            output_frame, state=tk.DISABLED, wrap=tk.WORD, font=("Consolas", 10)
         )
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
+
         # Connect interpreter to output widget with custom handler
         # Create a custom output handler that respects our GUI's disabled state
         class OutputHandler:
             def __init__(self, gui_instance):
                 self.gui = gui_instance
-            
+
             def insert(self, position, text):
                 # Use the GUI's write_to_console method which handles state properly
                 self.gui.write_to_console(text)
-            
+
             def see(self, position):
                 # Already handled by write_to_console
                 pass
-        
+
         self.interpreter.output_widget = OutputHandler(self)
 
         # Graphics tab
@@ -356,17 +396,17 @@ class Time_WarpIDE:
         # Enhanced graphics canvas
         if ENHANCED_GRAPHICS_AVAILABLE:
             self.enhanced_graphics = EnhancedGraphicsCanvas(graphics_frame, 380, 300)
-            
+
             # Connect to interpreter (using correct interface)
             try:
                 # Set the ide_turtle_canvas that the interpreter expects
                 self.interpreter.ide_turtle_canvas = self.enhanced_graphics.get_canvas()
-                
+
                 # Also maintain the turtle_graphics dict for compatibility
                 self.interpreter.turtle_graphics = {
-                    'canvas': self.enhanced_graphics.get_canvas(),
-                    'screen': self.enhanced_graphics.get_screen(),
-                    'turtle': self.enhanced_graphics.get_turtle()
+                    "canvas": self.enhanced_graphics.get_canvas(),
+                    "screen": self.enhanced_graphics.get_screen(),
+                    "turtle": self.enhanced_graphics.get_turtle(),
                 }
             except AttributeError:
                 print("⚠️ Turtle graphics integration needs updating")
@@ -381,42 +421,42 @@ class Time_WarpIDE:
                 highlightbackground="#cccccc",
             )
             self.basic_canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-            
+
             # Basic turtle setup
             import turtle
+
             screen = turtle.TurtleScreen(self.basic_canvas)
             screen.bgcolor("white")
             turtle_obj = turtle.RawTurtle(screen)
             turtle_obj.speed(5)
             turtle_obj.shape("turtle")
-            
+
             self.interpreter.turtle_graphics = {
-                'canvas': self.basic_canvas,
-                'screen': screen,
-                'turtle': turtle_obj
+                "canvas": self.basic_canvas,
+                "screen": screen,
+                "turtle": turtle_obj,
             }
-            
+
             # Add reference to the graphics canvas for updates
             self.interpreter.graphics_canvas = self.basic_canvas
 
     def setup_keybindings(self):
         """Setup keyboard shortcuts"""
         keybindings = {
-            '<Control-n>': self.new_file,
-            '<Control-o>': self.open_file,
-            '<Control-s>': self.save_file,
-            '<Control-Shift-S>': self.save_as_file,
-            '<Control-w>': self.close_current_tab,
-            '<Control-q>': self.quit_app,
-            '<F5>': self.run_code,
-            '<Shift-F5>': self.stop_execution,
-            '<Control-f>': self.find_text,
-            '<Control-h>': self.replace_text,
-
-            '<F1>': self.show_quick_help,
-            '<Control-plus>': self.zoom_in,
-            '<Control-minus>': self.zoom_out,
-            '<Control-0>': self.reset_zoom
+            "<Control-n>": self.new_file,
+            "<Control-o>": self.open_file,
+            "<Control-s>": self.save_file,
+            "<Control-Shift-S>": self.save_as_file,
+            "<Control-w>": self.close_current_tab,
+            "<Control-q>": self.quit_app,
+            "<F5>": self.run_code,
+            "<Shift-F5>": self.stop_execution,
+            "<Control-f>": self.find_text,
+            "<Control-h>": self.replace_text,
+            "<F1>": self.show_quick_help,
+            "<Control-plus>": self.zoom_in,
+            "<Control-minus>": self.zoom_out,
+            "<Control-0>": self.reset_zoom,
         }
 
         for key, command in keybindings.items():
@@ -440,8 +480,8 @@ class Time_WarpIDE:
                 ("PILOT files", "*.pilot"),
                 ("JavaScript files", "*.js"),
                 ("Perl files", "*.pl"),
-                ("All files", "*.*")
-            ]
+                ("All files", "*.*"),
+            ],
         )
         if file_path:
             self.multi_tab_editor.open_file(file_path)
@@ -487,18 +527,18 @@ class Time_WarpIDE:
         if not self.multi_tab_editor.active_tab:
             self.update_status("No active tab to search")
             return
-            
+
         search_term = simpledialog.askstring("Find", "Enter text to find:")
         if search_term:
             text_widget = self.multi_tab_editor.active_tab.text_editor
-            
+
             # Clear previous search highlights
             text_widget.tag_remove("search_highlight", "1.0", tk.END)
-            
+
             # Search for the term
             start_pos = "1.0"
             found_positions = []
-            
+
             while True:
                 pos = text_widget.search(search_term, start_pos, tk.END)
                 if not pos:
@@ -508,15 +548,19 @@ class Time_WarpIDE:
                 end_pos = f"{pos}+{len(search_term)}c"
                 text_widget.tag_add("search_highlight", pos, end_pos)
                 start_pos = end_pos
-            
+
             # Configure highlight style
-            text_widget.tag_configure("search_highlight", background="yellow", foreground="black")
-            
+            text_widget.tag_configure(
+                "search_highlight", background="yellow", foreground="black"
+            )
+
             if found_positions:
                 # Move to first occurrence
                 text_widget.see(found_positions[0])
                 text_widget.mark_set("insert", found_positions[0])
-                self.update_status(f"Found {len(found_positions)} occurrence(s) of '{search_term}'")
+                self.update_status(
+                    f"Found {len(found_positions)} occurrence(s) of '{search_term}'"
+                )
             else:
                 self.update_status(f"'{search_term}' not found")
         else:
@@ -527,49 +571,55 @@ class Time_WarpIDE:
         if not self.multi_tab_editor.active_tab:
             self.update_status("No active tab for replacement")
             return
-            
+
         # Create replace dialog window
         replace_window = tk.Toplevel(self.root)
         replace_window.title("Find and Replace")
         replace_window.geometry("400x150")
         replace_window.resizable(False, False)
-        
+
         # Center the window
         replace_window.transient(self.root)
         replace_window.grab_set()
-        
+
         # Find field
-        tk.Label(replace_window, text="Find:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        tk.Label(replace_window, text="Find:").grid(
+            row=0, column=0, sticky="w", padx=10, pady=5
+        )
         find_entry = tk.Entry(replace_window, width=30)
         find_entry.grid(row=0, column=1, padx=10, pady=5)
         find_entry.focus()
-        
+
         # Replace field
-        tk.Label(replace_window, text="Replace with:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        tk.Label(replace_window, text="Replace with:").grid(
+            row=1, column=0, sticky="w", padx=10, pady=5
+        )
         replace_entry = tk.Entry(replace_window, width=30)
         replace_entry.grid(row=1, column=1, padx=10, pady=5)
-        
+
         # Button frame
         button_frame = tk.Frame(replace_window)
         button_frame.grid(row=2, column=0, columnspan=2, pady=10)
-        
+
         def do_find():
             search_term = find_entry.get()
             if search_term and self.multi_tab_editor.active_tab:
                 text_widget = self.multi_tab_editor.active_tab.text_editor
                 text_widget.tag_remove("search_highlight", "1.0", tk.END)
-                
+
                 pos = text_widget.search(search_term, "insert", tk.END)
                 if pos:
                     end_pos = f"{pos}+{len(search_term)}c"
                     text_widget.tag_add("search_highlight", pos, end_pos)
-                    text_widget.tag_configure("search_highlight", background="yellow", foreground="black")
+                    text_widget.tag_configure(
+                        "search_highlight", background="yellow", foreground="black"
+                    )
                     text_widget.see(pos)
                     text_widget.mark_set("insert", pos)
                     self.update_status(f"Found '{search_term}'")
                 else:
                     self.update_status(f"'{search_term}' not found")
-        
+
         def do_replace():
             search_term = find_entry.get()
             replace_term = replace_entry.get()
@@ -577,7 +627,7 @@ class Time_WarpIDE:
                 text_widget = self.multi_tab_editor.active_tab.text_editor
                 content = text_widget.get("1.0", tk.END)
                 new_content = content.replace(search_term, replace_term)
-                
+
                 if content != new_content:
                     text_widget.delete("1.0", tk.END)
                     text_widget.insert("1.0", new_content)
@@ -588,34 +638,38 @@ class Time_WarpIDE:
                 else:
                     self.update_status("No replacements made")
                 replace_window.destroy()
-        
+
         # Buttons
-        tk.Button(button_frame, text="Find Next", command=do_find).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="Replace All", command=do_replace).pack(side=tk.LEFT, padx=5)
-        tk.Button(button_frame, text="Cancel", command=replace_window.destroy).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Find Next", command=do_find).pack(
+            side=tk.LEFT, padx=5
+        )
+        tk.Button(button_frame, text="Replace All", command=do_replace).pack(
+            side=tk.LEFT, padx=5
+        )
+        tk.Button(button_frame, text="Cancel", command=replace_window.destroy).pack(
+            side=tk.LEFT, padx=5
+        )
 
     # View operations
     def zoom_in(self):
         """Zoom in graphics canvas"""
-        if hasattr(self.enhanced_graphics, 'zoom_in'):
+        if hasattr(self.enhanced_graphics, "zoom_in"):
             self.enhanced_graphics.zoom_in()
 
     def zoom_out(self):
         """Zoom out graphics canvas"""
-        if hasattr(self.enhanced_graphics, 'zoom_out'):
+        if hasattr(self.enhanced_graphics, "zoom_out"):
             self.enhanced_graphics.zoom_out()
 
     def reset_zoom(self):
         """Reset graphics canvas zoom"""
-        if hasattr(self.enhanced_graphics, 'zoom_fit'):
+        if hasattr(self.enhanced_graphics, "zoom_fit"):
             self.enhanced_graphics.zoom_fit()
-
-
 
     def toggle_graphics_panel(self):
         """Toggle graphics panel visibility"""
         try:
-            if hasattr(self, 'graphics_output_panel'):
+            if hasattr(self, "graphics_output_panel"):
                 # Check current state
                 if self.graphics_output_panel.winfo_viewable():
                     # Hide the panel by removing it from the container
@@ -624,7 +678,9 @@ class Time_WarpIDE:
                 else:
                     # Show the panel by adding it back
                     try:
-                        self.main_container.add(self.graphics_output_panel, weight=1, minsize=350)
+                        self.main_container.add(
+                            self.graphics_output_panel, weight=1, minsize=350
+                        )
                     except:
                         self.main_container.add(self.graphics_output_panel, weight=1)
                     self.update_status("Graphics panel shown")
@@ -649,54 +705,78 @@ class Time_WarpIDE:
             language = "python"  # Default
 
         self.update_status(f"Running {language.upper()} code...")
-        
+
         # Clear previous output
         self.clear_output()
-        
+
         # Reset stop flag
         self.stop_execution_flag = False
-        
+
         # Run code in a separate thread for better responsiveness
         def run_in_thread():
             try:
                 self.write_to_console(f"▶️ Starting {language.upper()} execution...\n")
-                
+
                 # Execute code using the interpreter for all supported languages
                 try:
                     # Check for stop flag
                     if self.stop_execution_flag:
                         self.write_to_console("🛑 Execution stopped by user\n")
                         return
-                    
+
                     # Use the interpreter's run_program method which handles all languages
-                    result = self.interpreter.run_program(code, language=language.lower())
-                    
+                    result = self.interpreter.run_program(
+                        code, language=language.lower()
+                    )
+
                     if result is None:
                         # If run_program returns None, it means the language isn't supported yet
-                        self.write_to_console(f"🔧 {language.upper()} language support coming soon!\n")
-                        self.write_to_console(f"Currently supported: PILOT, BASIC, Logo, Python, JavaScript, Perl\n")
+                        self.write_to_console(
+                            f"🔧 {language.upper()} language support coming soon!\n"
+                        )
+                        self.write_to_console(
+                            f"Currently supported: PILOT, BASIC, Logo, Python, JavaScript, Perl\n"
+                        )
                         result = False
-                    
+
                 except Exception as e:
-                    self.write_to_console(f"❌ {language.upper()} Execution Error: {str(e)}\n")
+                    self.write_to_console(
+                        f"❌ {language.upper()} Execution Error: {str(e)}\n"
+                    )
                     result = False
-                
+
                 if not self.stop_execution_flag:
                     if result:
-                        self.write_to_console(f"✅ {language.upper()} execution completed\n")
-                        self.root.after(0, lambda: self.update_status(f"{language.upper()} code executed successfully"))
-                        
+                        self.write_to_console(
+                            f"✅ {language.upper()} execution completed\n"
+                        )
+                        self.root.after(
+                            0,
+                            lambda: self.update_status(
+                                f"{language.upper()} code executed successfully"
+                            ),
+                        )
+
                         # Force graphics update for Logo programs
-                        if language.lower() == 'logo':
+                        if language.lower() == "logo":
                             self.root.after(0, self.update_graphics_display)
                     else:
-                        self.write_to_console(f"❌ {language.upper()} execution failed\n")
-                        self.root.after(0, lambda: self.update_status(f"{language.upper()} execution failed"))
-                        
+                        self.write_to_console(
+                            f"❌ {language.upper()} execution failed\n"
+                        )
+                        self.root.after(
+                            0,
+                            lambda: self.update_status(
+                                f"{language.upper()} execution failed"
+                            ),
+                        )
+
             except Exception as e:
                 self.write_to_console(f"💥 Execution error: {str(e)}\n")
-                self.root.after(0, lambda: self.update_status(f"Execution error: {str(e)}"))
-        
+                self.root.after(
+                    0, lambda: self.update_status(f"Execution error: {str(e)}")
+                )
+
         # Start execution thread
         self.execution_thread = threading.Thread(target=run_in_thread, daemon=True)
         self.execution_thread.start()
@@ -705,47 +785,57 @@ class Time_WarpIDE:
         """Stop code execution"""
         try:
             # If there's an active execution thread, try to stop it
-            if hasattr(self, 'execution_thread') and self.execution_thread and self.execution_thread.is_alive():
+            if (
+                hasattr(self, "execution_thread")
+                and self.execution_thread
+                and self.execution_thread.is_alive()
+            ):
                 # Set a stop flag for graceful termination
-                if hasattr(self, 'stop_execution_flag'):
+                if hasattr(self, "stop_execution_flag"):
                     self.stop_execution_flag = True
-                
+
                 self.write_to_console("🛑 Execution stop requested...\n")
                 self.update_status("Stopping execution...")
-                
+
                 # Give thread a moment to stop gracefully
                 import time
+
                 time.sleep(0.1)
-                
+
                 if self.execution_thread.is_alive():
-                    self.write_to_console("⚠️ Force stopping execution (may not work for all code)\n")
-                
+                    self.write_to_console(
+                        "⚠️ Force stopping execution (may not work for all code)\n"
+                    )
+
                 self.update_status("Execution stopped")
             else:
                 self.write_to_console("ℹ️ No active execution to stop\n")
                 self.update_status("No running code to stop")
-                
+
         except Exception as e:
             self.update_status(f"Stop execution error: {e}")
 
     def clear_output(self):
         """Clear output console"""
         self.output_text.config(state=tk.NORMAL)
-        self.output_text.delete('1.0', tk.END)
+        self.output_text.delete("1.0", tk.END)
         self.output_text.config(state=tk.DISABLED)
         self.update_status("Output cleared")
 
     def clear_graphics(self):
         """Clear graphics canvas"""
-        if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, 'enhanced_graphics'):
-            if hasattr(self.enhanced_graphics, 'clear_canvas'):
+        if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, "enhanced_graphics"):
+            if hasattr(self.enhanced_graphics, "clear_canvas"):
                 self.enhanced_graphics.clear_canvas()
-        elif hasattr(self, 'basic_canvas'):
+        elif hasattr(self, "basic_canvas"):
             self.basic_canvas.delete("all")
             # Reset turtle to center
-            if hasattr(self.interpreter, 'turtle_graphics') and self.interpreter.turtle_graphics:
-                screen = self.interpreter.turtle_graphics.get('screen')
-                turtle_obj = self.interpreter.turtle_graphics.get('turtle')
+            if (
+                hasattr(self.interpreter, "turtle_graphics")
+                and self.interpreter.turtle_graphics
+            ):
+                screen = self.interpreter.turtle_graphics.get("screen")
+                turtle_obj = self.interpreter.turtle_graphics.get("turtle")
                 if screen and turtle_obj:
                     turtle_obj.home()
                     screen.update()
@@ -753,16 +843,19 @@ class Time_WarpIDE:
     def update_graphics_display(self):
         """Force update of graphics display after Logo execution"""
         try:
-            if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, 'enhanced_graphics'):
+            if ENHANCED_GRAPHICS_AVAILABLE and hasattr(self, "enhanced_graphics"):
                 # Update enhanced graphics canvas
                 canvas = self.enhanced_graphics.get_canvas()
                 if canvas:
                     canvas.update_idletasks()
                     canvas.update()
-            elif hasattr(self, 'basic_canvas'):
+            elif hasattr(self, "basic_canvas"):
                 # Update basic turtle graphics
-                if hasattr(self.interpreter, 'turtle_graphics') and self.interpreter.turtle_graphics:
-                    screen = self.interpreter.turtle_graphics.get('screen')
+                if (
+                    hasattr(self.interpreter, "turtle_graphics")
+                    and self.interpreter.turtle_graphics
+                ):
+                    screen = self.interpreter.turtle_graphics.get("screen")
                     if screen:
                         screen.update()
                         print("🎨 Graphics display updated")
@@ -781,7 +874,7 @@ class Time_WarpIDE:
 
     def update_status(self, message: str):
         """Update status bar"""
-        if hasattr(self, 'status_label'):
+        if hasattr(self, "status_label"):
             self.status_label.config(text=message)
             # Clear after 3 seconds
             self.root.after(3000, lambda: self.status_label.config(text="Ready"))
@@ -790,19 +883,19 @@ class Time_WarpIDE:
         """Detect language from file extension"""
         if not filename:
             return "Text"
-        
+
         filename = filename.lower()
-        if filename.endswith('.pilot'):
+        if filename.endswith(".pilot"):
             return "PILOT"
-        elif filename.endswith('.bas') or filename.endswith('.basic'):
+        elif filename.endswith(".bas") or filename.endswith(".basic"):
             return "BASIC"
-        elif filename.endswith('.logo'):
+        elif filename.endswith(".logo"):
             return "Logo"
-        elif filename.endswith('.py'):
+        elif filename.endswith(".py"):
             return "Python"
-        elif filename.endswith('.js'):
+        elif filename.endswith(".js"):
             return "JavaScript"
-        elif filename.endswith('.pl'):
+        elif filename.endswith(".pl"):
             return "Perl"
         # Removed .jtc and .time_warp extensions - these were TempleCode remnants
         else:
@@ -812,58 +905,74 @@ class Time_WarpIDE:
         """Detect language from code content"""
         if not content:
             return "Text"
-        
+
         content_lower = content.lower()
-        lines = content.split('\n')
-        
+        lines = content.split("\n")
+
         # Check for line numbers (BASIC)
-        has_line_numbers = any(line.strip() and line.strip()[0].isdigit() for line in lines[:5])
-        if has_line_numbers and any(word in content_lower for word in ['print', 'let', 'goto', 'if']):
+        has_line_numbers = any(
+            line.strip() and line.strip()[0].isdigit() for line in lines[:5]
+        )
+        if has_line_numbers and any(
+            word in content_lower for word in ["print", "let", "goto", "if"]
+        ):
             return "BASIC"
-        
+
         # Check for PILOT commands
-        pilot_commands = ['t:', 'a:', 'j:', 'y:', 'n:', 'c:', 'e:', 'm:']
+        pilot_commands = ["t:", "a:", "j:", "y:", "n:", "c:", "e:", "m:"]
         if any(cmd in content_lower for cmd in pilot_commands):
             return "PILOT"
-        
+
         # Check for Logo commands
-        logo_commands = ['forward', 'back', 'left', 'right', 'penup', 'pendown', 'repeat']
+        logo_commands = [
+            "forward",
+            "back",
+            "left",
+            "right",
+            "penup",
+            "pendown",
+            "repeat",
+        ]
         if any(cmd in content_lower for cmd in logo_commands):
             return "Logo"
-        
+
         # Check for Python
-        python_keywords = ['def ', 'import ', 'from ', 'class ', 'if __name__']
+        python_keywords = ["def ", "import ", "from ", "class ", "if __name__"]
         if any(keyword in content_lower for keyword in python_keywords):
             return "Python"
-        
+
         # Check for JavaScript
-        js_keywords = ['function', 'var ', 'let ', 'const ', 'document.', 'window.']
+        js_keywords = ["function", "var ", "let ", "const ", "document.", "window."]
         if any(keyword in content_lower for keyword in js_keywords):
             return "JavaScript"
-        
+
         return "Text"
 
     def update_language_indicator(self):
         """Update the language indicator based on current tab"""
         try:
-            if hasattr(self, 'language_label') and hasattr(self, 'multi_tab_editor'):
+            if hasattr(self, "language_label") and hasattr(self, "multi_tab_editor"):
                 active_tab = self.multi_tab_editor.active_tab
                 if active_tab:
                     # Get filename from tab's file_path or filename attribute
-                    filename = getattr(active_tab, 'file_path', '') or getattr(active_tab, 'filename', '') or ''
-                    content = self.multi_tab_editor.get_active_content() or ''
-                    
+                    filename = (
+                        getattr(active_tab, "file_path", "")
+                        or getattr(active_tab, "filename", "")
+                        or ""
+                    )
+                    content = self.multi_tab_editor.get_active_content() or ""
+
                     # Try extension first, then content
                     detected_lang = self.detect_language_from_extension(filename)
                     if detected_lang == "Text" and content:
                         detected_lang = self.detect_language_from_content(content)
-                    
+
                     # Update the label
                     self.language_label.config(text=f"Lang: {detected_lang}")
                     print(f"🔄 Language updated to: {detected_lang}")
-                    
+
                     # Update editor syntax highlighting if needed
-                    if hasattr(active_tab, 'apply_syntax_highlighting'):
+                    if hasattr(active_tab, "apply_syntax_highlighting"):
                         active_tab.apply_syntax_highlighting()
                 else:
                     self.language_label.config(text="Lang: None")
@@ -880,22 +989,24 @@ class Time_WarpIDE:
             tutorial_window.geometry("800x600")
             tutorial_window.transient(self.root)
             tutorial_window.grab_set()
-            
+
             # Apply current theme to tutorial window
             self.apply_theme_to_window(tutorial_window)
-            
+
             # Create notebook for tutorial categories
             notebook = ttk.Notebook(tutorial_window)
             notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Basic Programming Tutorial
             basic_frame = ttk.Frame(notebook)
             notebook.add(basic_frame, text="🎯 Basic Programming")
-            
+
             basic_text = tk.Text(basic_frame, wrap=tk.WORD, font=("Consolas", 11))
-            basic_scrollbar = ttk.Scrollbar(basic_frame, orient=tk.VERTICAL, command=basic_text.yview)
+            basic_scrollbar = ttk.Scrollbar(
+                basic_frame, orient=tk.VERTICAL, command=basic_text.yview
+            )
             basic_text.configure(yscrollcommand=basic_scrollbar.set)
-            
+
             basic_content = """🎯 BASIC PROGRAMMING TUTORIAL
 
 Welcome to Time_Warp IDE! Let's learn the fundamentals:
@@ -935,21 +1046,23 @@ Welcome to Time_Warp IDE! Let's learn the fundamentals:
    • Use the graphics panel to see turtle drawings
    • Check the output panel for results
    • Try different themes in View → Themes"""
-            
+
             basic_text.insert(tk.END, basic_content)
             basic_text.config(state=tk.DISABLED)
-            
+
             basic_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             basic_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # PILOT Language Tutorial
             pilot_frame = ttk.Frame(notebook)
             notebook.add(pilot_frame, text="🚁 PILOT Language")
-            
+
             pilot_text = tk.Text(pilot_frame, wrap=tk.WORD, font=("Consolas", 11))
-            pilot_scrollbar = ttk.Scrollbar(pilot_frame, orient=tk.VERTICAL, command=pilot_text.yview)
+            pilot_scrollbar = ttk.Scrollbar(
+                pilot_frame, orient=tk.VERTICAL, command=pilot_text.yview
+            )
             pilot_text.configure(yscrollcommand=pilot_scrollbar.set)
-            
+
             pilot_content = """🚁 PILOT LANGUAGE TUTORIAL
 
 PILOT is perfect for interactive learning!
@@ -998,21 +1111,25 @@ EXAMPLES:
 
 TRY IT NOW:
 Copy any example above into the editor and press F5!"""
-            
+
             pilot_text.insert(tk.END, pilot_content)
             pilot_text.config(state=tk.DISABLED)
-            
+
             pilot_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             pilot_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # BASIC Language Tutorial
             basic_lang_frame = ttk.Frame(notebook)
             notebook.add(basic_lang_frame, text="📊 BASIC Language")
-            
-            basic_lang_text = tk.Text(basic_lang_frame, wrap=tk.WORD, font=("Consolas", 11))
-            basic_lang_scrollbar = ttk.Scrollbar(basic_lang_frame, orient=tk.VERTICAL, command=basic_lang_text.yview)
+
+            basic_lang_text = tk.Text(
+                basic_lang_frame, wrap=tk.WORD, font=("Consolas", 11)
+            )
+            basic_lang_scrollbar = ttk.Scrollbar(
+                basic_lang_frame, orient=tk.VERTICAL, command=basic_lang_text.yview
+            )
             basic_lang_text.configure(yscrollcommand=basic_lang_scrollbar.set)
-            
+
             basic_lang_content = """📊 BASIC LANGUAGE TUTORIAL
 
 BASIC uses line numbers and is great for structured programs!
@@ -1067,21 +1184,23 @@ VARIABLES:
 • Use A, B, C for numbers
 • Use A$, B$, C$ for text (strings)
 • Arrays: DIM A(100) for 100 numbers"""
-            
+
             basic_lang_text.insert(tk.END, basic_lang_content)
             basic_lang_text.config(state=tk.DISABLED)
-            
+
             basic_lang_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             basic_lang_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Logo Language Tutorial
             logo_frame = ttk.Frame(notebook)
             notebook.add(logo_frame, text="🐢 Logo Language")
-            
+
             logo_text = tk.Text(logo_frame, wrap=tk.WORD, font=("Consolas", 11))
-            logo_scrollbar = ttk.Scrollbar(logo_frame, orient=tk.VERTICAL, command=logo_text.yview)
+            logo_scrollbar = ttk.Scrollbar(
+                logo_frame, orient=tk.VERTICAL, command=logo_text.yview
+            )
             logo_text.configure(yscrollcommand=logo_scrollbar.set)
-            
+
             logo_content = """🐢 LOGO LANGUAGE TUTORIAL
 
 Logo is perfect for graphics and turtle programming!
@@ -1145,22 +1264,25 @@ TIPS:
 • Try different colors and patterns
 • Use REPEAT for loops
 • Create your own procedures with TO...END"""
-            
+
             logo_text.insert(tk.END, logo_content)
             logo_text.config(state=tk.DISABLED)
-            
+
             logo_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             logo_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Close button
-            close_btn = ttk.Button(tutorial_window, text="Close Tutorial", 
-                                  command=tutorial_window.destroy)
+            close_btn = ttk.Button(
+                tutorial_window, text="Close Tutorial", command=tutorial_window.destroy
+            )
             close_btn.pack(pady=10)
-            
+
             print("📚 Tutorial system opened")
-            
+
         except Exception as e:
-            messagebox.showerror("Tutorial Error", f"Failed to open tutorial system:\n{str(e)}")
+            messagebox.showerror(
+                "Tutorial Error", f"Failed to open tutorial system:\n{str(e)}"
+            )
             print(f"❌ Tutorial system error: {e}")
 
     def show_ai_assistant(self):
@@ -1172,106 +1294,125 @@ TIPS:
             ai_window.geometry("700x500")
             ai_window.transient(self.root)
             ai_window.grab_set()
-            
+
             # Apply current theme
             self.apply_theme_to_window(ai_window)
-            
+
             # Create main frame
             main_frame = ttk.Frame(ai_window)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Title
-            title_label = ttk.Label(main_frame, text="🤖 AI Coding Assistant", 
-                                   font=("Arial", 14, "bold"))
+            title_label = ttk.Label(
+                main_frame, text="🤖 AI Coding Assistant", font=("Arial", 14, "bold")
+            )
             title_label.pack(pady=(0, 10))
-            
+
             # Create notebook for different AI features
             notebook = ttk.Notebook(main_frame)
             notebook.pack(fill=tk.BOTH, expand=True)
-            
+
             # Code Helper Tab
             helper_frame = ttk.Frame(notebook)
             notebook.add(helper_frame, text="💡 Code Helper")
-            
+
             # Language selection
             lang_frame = ttk.Frame(helper_frame)
             lang_frame.pack(fill=tk.X, pady=(0, 10))
-            
+
             ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
             lang_var = tk.StringVar(value="PILOT")
-            lang_combo = ttk.Combobox(lang_frame, textvariable=lang_var, 
-                                     values=["PILOT", "BASIC", "Logo", "Python"],
-                                     state="readonly", width=10)
+            lang_combo = ttk.Combobox(
+                lang_frame,
+                textvariable=lang_var,
+                values=["PILOT", "BASIC", "Logo", "Python"],
+                state="readonly",
+                width=10,
+            )
             lang_combo.pack(side=tk.LEFT, padx=(5, 0))
-            
+
             # Query input
             ttk.Label(helper_frame, text="Ask the AI:").pack(anchor=tk.W, pady=(0, 5))
             query_text = tk.Text(helper_frame, height=3, wrap=tk.WORD)
             query_text.pack(fill=tk.X, pady=(0, 10))
             query_text.insert(tk.END, "How do I draw a circle in Logo?")
-            
+
             # Response area
             ttk.Label(helper_frame, text="AI Response:").pack(anchor=tk.W, pady=(0, 5))
-            response_text = tk.Text(helper_frame, height=15, wrap=tk.WORD, font=("Consolas", 10))
-            response_scrollbar = ttk.Scrollbar(helper_frame, orient=tk.VERTICAL, command=response_text.yview)
+            response_text = tk.Text(
+                helper_frame, height=15, wrap=tk.WORD, font=("Consolas", 10)
+            )
+            response_scrollbar = ttk.Scrollbar(
+                helper_frame, orient=tk.VERTICAL, command=response_text.yview
+            )
             response_text.configure(yscrollcommand=response_scrollbar.set)
-            
+
             response_frame = ttk.Frame(helper_frame)
             response_frame.pack(fill=tk.BOTH, expand=True)
-            response_text.pack(in_=response_frame, side=tk.LEFT, fill=tk.BOTH, expand=True)
+            response_text.pack(
+                in_=response_frame, side=tk.LEFT, fill=tk.BOTH, expand=True
+            )
             response_scrollbar.pack(in_=response_frame, side=tk.RIGHT, fill=tk.Y)
-            
+
             def ask_ai():
                 """Generate AI response based on query"""
                 query = query_text.get("1.0", tk.END).strip()
                 language = lang_var.get()
-                
+
                 # Simple AI responses based on common questions
                 responses = {
                     "PILOT": {
                         "hello": "T:Hello, World!\nT:Welcome to PILOT programming!\n\nThis displays two lines of text.",
                         "input": "T:What's your name?\nA:\nT:Nice to meet you!\n\nA: accepts user input",
                         "loop": "Use labels and J: (Jump) for loops:\n*START\nT:Count: $COUNT\nC:COUNT + 1\nY(START):COUNT < 10",
-                        "graphics": "FORWARD 100  # Move forward\nRIGHT 90     # Turn right\nFORWARD 50   # Draw a line"
+                        "graphics": "FORWARD 100  # Move forward\nRIGHT 90     # Turn right\nFORWARD 50   # Draw a line",
                     },
                     "BASIC": {
-                        "hello": "10 PRINT \"Hello, World!\"\n20 END\n\nThis prints text and ends the program.",
-                        "input": "10 PRINT \"Enter your name:\"\n20 INPUT N$\n30 PRINT \"Hello \"; N$\n40 END",
-                        "loop": "10 FOR I = 1 TO 10\n20 PRINT \"Count: \"; I\n30 NEXT I\n40 END",
-                        "graphics": "10 FOR I = 1 TO 4\n20 FORWARD 100\n30 RIGHT 90\n40 NEXT I\n50 END"
+                        "hello": '10 PRINT "Hello, World!"\n20 END\n\nThis prints text and ends the program.',
+                        "input": '10 PRINT "Enter your name:"\n20 INPUT N$\n30 PRINT "Hello "; N$\n40 END',
+                        "loop": '10 FOR I = 1 TO 10\n20 PRINT "Count: "; I\n30 NEXT I\n40 END',
+                        "graphics": "10 FOR I = 1 TO 4\n20 FORWARD 100\n30 RIGHT 90\n40 NEXT I\n50 END",
                     },
                     "Logo": {
                         "circle": "REPEAT 360 [FORWARD 1 RIGHT 1]\n\nThis draws a circle by moving forward 1 unit and turning right 1 degree, repeated 360 times.",
                         "square": "REPEAT 4 [FORWARD 100 RIGHT 90]\n\nDraws a square with 100-unit sides.",
                         "spiral": "REPEAT 100 [FORWARD :I RIGHT 91]\n\nCreates a spiral pattern.",
-                        "flower": "REPEAT 36 [\n  REPEAT 4 [FORWARD 50 RIGHT 90]\n  RIGHT 10\n]\n\nDraws a flower pattern with 36 squares."
+                        "flower": "REPEAT 36 [\n  REPEAT 4 [FORWARD 50 RIGHT 90]\n  RIGHT 10\n]\n\nDraws a flower pattern with 36 squares.",
                     },
                     "Python": {
-                        "hello": "print(\"Hello, World!\")\n\nSimple text output in Python.",
-                        "input": "name = input(\"What's your name? \")\nprint(f\"Hello, {name}!\")",
-                        "loop": "for i in range(1, 11):\n    print(f\"Count: {i}\")",
-                        "function": "def greet(name):\n    return f\"Hello, {name}!\"\n\nprint(greet(\"World\"))"
-                    }
+                        "hello": 'print("Hello, World!")\n\nSimple text output in Python.',
+                        "input": 'name = input("What\'s your name? ")\nprint(f"Hello, {name}!")',
+                        "loop": 'for i in range(1, 11):\n    print(f"Count: {i}")',
+                        "function": 'def greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("World"))',
+                    },
                 }
-                
+
                 # Generate response
                 lang_responses = responses.get(language, {})
                 response = "I'd be happy to help! Here are some examples:\n\n"
-                
+
                 # Check for keywords in query
                 query_lower = query.lower()
                 if "hello" in query_lower or "world" in query_lower:
-                    response += lang_responses.get("hello", "Try: print('Hello, World!')")
+                    response += lang_responses.get(
+                        "hello", "Try: print('Hello, World!')"
+                    )
                 elif "input" in query_lower or "name" in query_lower:
-                    response += lang_responses.get("input", "Use input() to get user input")
+                    response += lang_responses.get(
+                        "input", "Use input() to get user input"
+                    )
                 elif "loop" in query_lower or "repeat" in query_lower:
                     response += lang_responses.get("loop", "Use loops to repeat code")
                 elif "circle" in query_lower and language == "Logo":
-                    response += lang_responses.get("circle", "Use REPEAT to draw circles")
+                    response += lang_responses.get(
+                        "circle", "Use REPEAT to draw circles"
+                    )
                 elif "square" in query_lower and language == "Logo":
                     response += lang_responses.get("square", "Use REPEAT 4 for squares")
                 elif "function" in query_lower and language == "Python":
-                    response += lang_responses.get("function", "Use def to create functions")
+                    response += lang_responses.get(
+                        "function", "Use def to create functions"
+                    )
                 else:
                     # General help
                     response += f"For {language} programming:\n\n"
@@ -1283,24 +1424,26 @@ TIPS:
                         response += "• FORWARD/BACK - Move turtle\n• LEFT/RIGHT - Turn turtle\n• REPEAT - Loop commands\n• PENUP/PENDOWN - Control drawing"
                     elif language == "Python":
                         response += "• print() - Display text\n• input() - Get input\n• for/while - Loops\n• if/elif/else - Conditions"
-                
+
                 response += f"\n\n💡 Try running this code in Time_Warp IDE!"
-                
+
                 response_text.delete("1.0", tk.END)
                 response_text.insert(tk.END, response)
-            
+
             # Ask button
             ask_btn = ttk.Button(helper_frame, text="Ask AI", command=ask_ai)
             ask_btn.pack(pady=10)
-            
+
             # Code Examples Tab
             examples_frame = ttk.Frame(notebook)
             notebook.add(examples_frame, text="📝 Examples")
-            
+
             examples_text = tk.Text(examples_frame, wrap=tk.WORD, font=("Consolas", 10))
-            examples_scrollbar = ttk.Scrollbar(examples_frame, orient=tk.VERTICAL, command=examples_text.yview)
+            examples_scrollbar = ttk.Scrollbar(
+                examples_frame, orient=tk.VERTICAL, command=examples_text.yview
+            )
             examples_text.configure(yscrollcommand=examples_scrollbar.set)
-            
+
             examples_content = """📝 CODE EXAMPLES FOR ALL LANGUAGES
 
 🚁 PILOT EXAMPLES:
@@ -1369,25 +1512,28 @@ else:
     print(f"Wrong! It was {number}")
 
 💡 TIP: Copy any example and paste it into Time_Warp IDE!"""
-            
+
             examples_text.insert(tk.END, examples_content)
             examples_text.config(state=tk.DISABLED)
-            
+
             examples_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             examples_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Close button
-            close_btn = ttk.Button(main_frame, text="Close Assistant", 
-                                  command=ai_window.destroy)
+            close_btn = ttk.Button(
+                main_frame, text="Close Assistant", command=ai_window.destroy
+            )
             close_btn.pack(pady=10)
-            
+
             # Initial AI response
             ask_ai()
-            
+
             print("🤖 AI Assistant opened")
-            
+
         except Exception as e:
-            messagebox.showerror("AI Assistant Error", f"Failed to open AI assistant:\n{str(e)}")
+            messagebox.showerror(
+                "AI Assistant Error", f"Failed to open AI assistant:\n{str(e)}"
+            )
             print(f"❌ AI Assistant error: {e}")
 
     def show_gamification_dashboard(self):
@@ -1399,32 +1545,39 @@ else:
             game_window.geometry("800x600")
             game_window.transient(self.root)
             game_window.grab_set()
-            
+
             # Apply current theme
             self.apply_theme_to_window(game_window)
-            
+
             # Create main frame
             main_frame = ttk.Frame(game_window)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Title
-            title_label = ttk.Label(main_frame, text="🎮 Time_Warp IDE Gamification", 
-                                   font=("Arial", 16, "bold"))
+            title_label = ttk.Label(
+                main_frame,
+                text="🎮 Time_Warp IDE Gamification",
+                font=("Arial", 16, "bold"),
+            )
             title_label.pack(pady=(0, 20))
-            
+
             # Create notebook for different sections
             notebook = ttk.Notebook(main_frame)
             notebook.pack(fill=tk.BOTH, expand=True)
-            
+
             # Achievements Tab
             achievements_frame = ttk.Frame(notebook)
             notebook.add(achievements_frame, text="🏆 Achievements")
-            
+
             # Achievement list
-            achievements_text = tk.Text(achievements_frame, wrap=tk.WORD, font=("Arial", 11))
-            achievements_scrollbar = ttk.Scrollbar(achievements_frame, orient=tk.VERTICAL, command=achievements_text.yview)
+            achievements_text = tk.Text(
+                achievements_frame, wrap=tk.WORD, font=("Arial", 11)
+            )
+            achievements_scrollbar = ttk.Scrollbar(
+                achievements_frame, orient=tk.VERTICAL, command=achievements_text.yview
+            )
             achievements_text.configure(yscrollcommand=achievements_scrollbar.set)
-            
+
             achievements_content = """🏆 ACHIEVEMENT SYSTEM
 
 Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achievements and level up your programming skills!
@@ -1478,83 +1631,115 @@ Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achie
 
 🔥 STREAK COUNTER: 0 days
 Keep coding daily to build your streak!"""
-            
+
             achievements_text.insert(tk.END, achievements_content)
             achievements_text.config(state=tk.DISABLED)
-            
+
             achievements_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             achievements_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Progress Tab
             progress_frame = ttk.Frame(notebook)
             notebook.add(progress_frame, text="📊 Progress")
-            
+
             # Create progress indicators
             progress_main = ttk.Frame(progress_frame)
             progress_main.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-            
+
             # Level display
             level_frame = ttk.LabelFrame(progress_main, text="Your Level", padding=10)
             level_frame.pack(fill=tk.X, pady=(0, 20))
-            
-            ttk.Label(level_frame, text="🌟 Level 1: Novice Programmer", 
-                     font=("Arial", 14, "bold")).pack()
+
+            ttk.Label(
+                level_frame,
+                text="🌟 Level 1: Novice Programmer",
+                font=("Arial", 14, "bold"),
+            ).pack()
             ttk.Label(level_frame, text="XP: 0 / 100", font=("Arial", 12)).pack()
-            
+
             # Progress bar
-            level_progress = ttk.Progressbar(level_frame, length=300, mode='determinate')
-            level_progress['value'] = 0
+            level_progress = ttk.Progressbar(
+                level_frame, length=300, mode="determinate"
+            )
+            level_progress["value"] = 0
             level_progress.pack(pady=10)
-            
+
             # Stats
             stats_frame = ttk.LabelFrame(progress_main, text="Statistics", padding=10)
             stats_frame.pack(fill=tk.X, pady=(0, 20))
-            
+
             stats_grid = ttk.Frame(stats_frame)
             stats_grid.pack(fill=tk.X)
-            
+
             # Left column
             left_stats = ttk.Frame(stats_grid)
             left_stats.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-            
-            ttk.Label(left_stats, text="📝 Programs Written: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(left_stats, text="🚀 Programs Run: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(left_stats, text="💾 Files Saved: 0", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(left_stats, text="🔤 Languages Used: 0/4", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            
+
+            ttk.Label(
+                left_stats, text="📝 Programs Written: 0", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+            ttk.Label(left_stats, text="🚀 Programs Run: 0", font=("Arial", 11)).pack(
+                anchor=tk.W, pady=2
+            )
+            ttk.Label(left_stats, text="💾 Files Saved: 0", font=("Arial", 11)).pack(
+                anchor=tk.W, pady=2
+            )
+            ttk.Label(
+                left_stats, text="🔤 Languages Used: 0/4", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+
             # Right column
             right_stats = ttk.Frame(stats_grid)
             right_stats.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-            
-            ttk.Label(right_stats, text="🏆 Achievements: 0/25", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(right_stats, text="🎨 Themes Tried: 1/8", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(right_stats, text="🔥 Current Streak: 0 days", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            ttk.Label(right_stats, text="⏱️ Time Coding: 0 minutes", font=("Arial", 11)).pack(anchor=tk.W, pady=2)
-            
+
+            ttk.Label(
+                right_stats, text="🏆 Achievements: 0/25", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+            ttk.Label(
+                right_stats, text="🎨 Themes Tried: 1/8", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+            ttk.Label(
+                right_stats, text="🔥 Current Streak: 0 days", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+            ttk.Label(
+                right_stats, text="⏱️ Time Coding: 0 minutes", font=("Arial", 11)
+            ).pack(anchor=tk.W, pady=2)
+
             # Language proficiency
-            proficiency_frame = ttk.LabelFrame(progress_main, text="Language Proficiency", padding=10)
+            proficiency_frame = ttk.LabelFrame(
+                progress_main, text="Language Proficiency", padding=10
+            )
             proficiency_frame.pack(fill=tk.X)
-            
-            languages = [("🚁 PILOT", 0), ("🔢 BASIC", 0), ("🐢 Logo", 0), ("🐍 Python", 0)]
-            
+
+            languages = [
+                ("🚁 PILOT", 0),
+                ("🔢 BASIC", 0),
+                ("🐢 Logo", 0),
+                ("🐍 Python", 0),
+            ]
+
             for lang, level in languages:
                 lang_frame = ttk.Frame(proficiency_frame)
                 lang_frame.pack(fill=tk.X, pady=2)
-                
+
                 ttk.Label(lang_frame, text=lang, width=15).pack(side=tk.LEFT)
-                prog = ttk.Progressbar(lang_frame, length=200, mode='determinate')
-                prog['value'] = level
+                prog = ttk.Progressbar(lang_frame, length=200, mode="determinate")
+                prog["value"] = level
                 prog.pack(side=tk.LEFT, padx=(10, 5))
                 ttk.Label(lang_frame, text=f"{level}%").pack(side=tk.LEFT)
-            
+
             # Challenges Tab
             challenges_frame = ttk.Frame(notebook)
             notebook.add(challenges_frame, text="🎯 Challenges")
-            
-            challenges_text = tk.Text(challenges_frame, wrap=tk.WORD, font=("Arial", 11))
-            challenges_scrollbar = ttk.Scrollbar(challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview)
+
+            challenges_text = tk.Text(
+                challenges_frame, wrap=tk.WORD, font=("Arial", 11)
+            )
+            challenges_scrollbar = ttk.Scrollbar(
+                challenges_frame, orient=tk.VERTICAL, command=challenges_text.yview
+            )
             challenges_text.configure(yscrollcommand=challenges_scrollbar.set)
-            
+
             challenges_content = """🎯 PROGRAMMING CHALLENGES
 
 Ready to test your skills? Complete these challenges to earn XP and achievements!
@@ -1645,22 +1830,26 @@ This Week: "Retro Game Recreation"
 • 10 challenges: "Problem Solver" badge  
 • 15 challenges: "Challenge Master" badge
 • All challenges: "Time_Warp Champion" title"""
-            
+
             challenges_text.insert(tk.END, challenges_content)
             challenges_text.config(state=tk.DISABLED)
-            
+
             challenges_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             challenges_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Close button
-            close_btn = ttk.Button(main_frame, text="Close Dashboard", 
-                                  command=game_window.destroy)
+            close_btn = ttk.Button(
+                main_frame, text="Close Dashboard", command=game_window.destroy
+            )
             close_btn.pack(pady=10)
-            
+
             print("🎮 Gamification dashboard opened")
-            
+
         except Exception as e:
-            messagebox.showerror("Gamification Error", f"Failed to open gamification dashboard:\n{str(e)}")
+            messagebox.showerror(
+                "Gamification Error",
+                f"Failed to open gamification dashboard:\n{str(e)}",
+            )
             print(f"❌ Gamification error: {e}")
 
     def show_code_templates(self):
@@ -1672,44 +1861,62 @@ This Week: "Retro Game Recreation"
             templates_window.geometry("800x600")
             templates_window.transient(self.root)
             templates_window.grab_set()
-            
+
             # Apply current theme
             self.apply_theme_to_window(templates_window)
-            
+
             # Create main frame
             main_frame = ttk.Frame(templates_window)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Title
-            title_label = ttk.Label(main_frame, text="📝 Code Templates", 
-                                   font=("Arial", 14, "bold"))
+            title_label = ttk.Label(
+                main_frame, text="📝 Code Templates", font=("Arial", 14, "bold")
+            )
             title_label.pack(pady=(0, 10))
-            
+
             # Language selection
             lang_frame = ttk.Frame(main_frame)
             lang_frame.pack(fill=tk.X, pady=(0, 10))
-            
+
             ttk.Label(lang_frame, text="Language:").pack(side=tk.LEFT)
             lang_var = tk.StringVar(value="PILOT")
-            lang_combo = ttk.Combobox(lang_frame, textvariable=lang_var, 
-                                     values=["PILOT", "BASIC", "Logo", "Python"],
-                                     state="readonly", width=10)
+            lang_combo = ttk.Combobox(
+                lang_frame,
+                textvariable=lang_var,
+                values=["PILOT", "BASIC", "Logo", "Python"],
+                state="readonly",
+                width=10,
+            )
             lang_combo.pack(side=tk.LEFT, padx=(5, 20))
-            
+
             # Template categories
             ttk.Label(lang_frame, text="Category:").pack(side=tk.LEFT)
             category_var = tk.StringVar(value="Basic")
-            category_combo = ttk.Combobox(lang_frame, textvariable=category_var,
-                                         values=["Basic", "Loops", "Graphics", "Games", "Math"],
-                                         state="readonly", width=10)
+            category_combo = ttk.Combobox(
+                lang_frame,
+                textvariable=category_var,
+                values=["Basic", "Loops", "Graphics", "Games", "Math"],
+                state="readonly",
+                width=10,
+            )
             category_combo.pack(side=tk.LEFT, padx=(5, 0))
-            
+
             # Templates display
-            templates_text = tk.Text(main_frame, height=25, wrap=tk.NONE, font=("Consolas", 10))
-            templates_scrollbar_y = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=templates_text.yview)
-            templates_scrollbar_x = ttk.Scrollbar(main_frame, orient=tk.HORIZONTAL, command=templates_text.xview)
-            templates_text.configure(yscrollcommand=templates_scrollbar_y.set, xscrollcommand=templates_scrollbar_x.set)
-            
+            templates_text = tk.Text(
+                main_frame, height=25, wrap=tk.NONE, font=("Consolas", 10)
+            )
+            templates_scrollbar_y = ttk.Scrollbar(
+                main_frame, orient=tk.VERTICAL, command=templates_text.yview
+            )
+            templates_scrollbar_x = ttk.Scrollbar(
+                main_frame, orient=tk.HORIZONTAL, command=templates_text.xview
+            )
+            templates_text.configure(
+                yscrollcommand=templates_scrollbar_y.set,
+                xscrollcommand=templates_scrollbar_x.set,
+            )
+
             # Template data
             templates = {
                 "PILOT": {
@@ -1844,7 +2051,7 @@ C:I = 1
 C:RESULT = NUM * I
 T:$NUM x $I = $RESULT
 C:I + 1
-Y(TABLE):I <= 12"""
+Y(TABLE):I <= 12""",
                 },
                 "BASIC": {
                     "Basic": """📝 BASIC BASIC TEMPLATES
@@ -1958,7 +2165,7 @@ Y(TABLE):I <= 12"""
 50 NEXT I
 60 IF P = 1 THEN PRINT N; " is prime"
 70 IF P = 0 THEN PRINT N; " is not prime"
-80 END"""
+80 END""",
                 },
                 "Logo": {
                     "Basic": """📝 LOGO BASIC TEMPLATES
@@ -2066,7 +2273,7 @@ REPEAT 10 [
   FORWARD :SIZE
   RIGHT 90
   MAKE "SIZE :SIZE * 0.8
-]"""
+]""",
                 },
                 "Python": {
                     "Basic": """📝 PYTHON BASIC TEMPLATES
@@ -2191,36 +2398,38 @@ def factorial(n):
     return n * factorial(n - 1)
 
 num = int(input("Enter a number: "))
-print(f"{num}! = {factorial(num)}")"""
-                }
+print(f"{num}! = {factorial(num)}")""",
+                },
             }
-            
+
             def update_templates():
                 """Update templates based on language and category selection"""
                 language = lang_var.get()
-                category = category_var.get() 
-                
-                content = templates.get(language, {}).get(category, "No templates available for this combination.")
-                
+                category = category_var.get()
+
+                content = templates.get(language, {}).get(
+                    category, "No templates available for this combination."
+                )
+
                 templates_text.delete("1.0", tk.END)
                 templates_text.insert(tk.END, content)
-            
+
             # Bind combo box changes
             lang_combo.bind("<<ComboboxSelected>>", lambda e: update_templates())
             category_combo.bind("<<ComboboxSelected>>", lambda e: update_templates())
-            
+
             # Pack text widget with scrollbars
             text_frame = ttk.Frame(main_frame)
             text_frame.pack(fill=tk.BOTH, expand=True)
-            
+
             templates_text.pack(in_=text_frame, side=tk.LEFT, fill=tk.BOTH, expand=True)
             templates_scrollbar_y.pack(in_=text_frame, side=tk.RIGHT, fill=tk.Y)
             templates_scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
-            
+
             # Buttons
             button_frame = ttk.Frame(main_frame)
             button_frame.pack(fill=tk.X, pady=10)
-            
+
             def copy_template():
                 """Copy selected template to clipboard"""
                 try:
@@ -2230,20 +2439,30 @@ print(f"{num}! = {factorial(num)}")"""
                         templates_window.clipboard_append(selected_text)
                         messagebox.showinfo("Copied", "Template copied to clipboard!")
                     else:
-                        messagebox.showwarning("No Selection", "Please select text to copy.")
+                        messagebox.showwarning(
+                            "No Selection", "Please select text to copy."
+                        )
                 except tk.TclError:
-                    messagebox.showwarning("No Selection", "Please select text to copy.")
-            
-            ttk.Button(button_frame, text="Copy Selected", command=copy_template).pack(side=tk.LEFT, padx=(0, 10))
-            ttk.Button(button_frame, text="Close", command=templates_window.destroy).pack(side=tk.RIGHT)
-            
+                    messagebox.showwarning(
+                        "No Selection", "Please select text to copy."
+                    )
+
+            ttk.Button(button_frame, text="Copy Selected", command=copy_template).pack(
+                side=tk.LEFT, padx=(0, 10)
+            )
+            ttk.Button(
+                button_frame, text="Close", command=templates_window.destroy
+            ).pack(side=tk.RIGHT)
+
             # Load initial templates
             update_templates()
-            
+
             print("📝 Code templates opened")
-            
+
         except Exception as e:
-            messagebox.showerror("Templates Error", f"Failed to open code templates:\n{str(e)}")
+            messagebox.showerror(
+                "Templates Error", f"Failed to open code templates:\n{str(e)}"
+            )
             print(f"❌ Templates error: {e}")
 
     def show_code_analyzer(self):
@@ -2255,47 +2474,55 @@ print(f"{num}! = {factorial(num)}")"""
             analyzer_window.geometry("700x500")
             analyzer_window.transient(self.root)
             analyzer_window.grab_set()
-            
+
             # Apply current theme
             self.apply_theme_to_window(analyzer_window)
-            
+
             # Create main frame
             main_frame = ttk.Frame(analyzer_window)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Title
-            title_label = ttk.Label(main_frame, text="🔍 Code Analyzer", 
-                                   font=("Arial", 14, "bold"))
+            title_label = ttk.Label(
+                main_frame, text="🔍 Code Analyzer", font=("Arial", 14, "bold")
+            )
             title_label.pack(pady=(0, 10))
-            
+
             # Get current code
             current_code = ""
-            if hasattr(self, 'multi_tab_editor') and self.multi_tab_editor.tabs:
+            if hasattr(self, "multi_tab_editor") and self.multi_tab_editor.tabs:
                 current_code = self.multi_tab_editor.get_active_content()
-            
+
             # Analysis results
-            results_text = tk.Text(main_frame, wrap=tk.WORD, font=("Consolas", 10), height=25)
-            results_scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=results_text.yview)
+            results_text = tk.Text(
+                main_frame, wrap=tk.WORD, font=("Consolas", 10), height=25
+            )
+            results_scrollbar = ttk.Scrollbar(
+                main_frame, orient=tk.VERTICAL, command=results_text.yview
+            )
             results_text.configure(yscrollcommand=results_scrollbar.set)
-            
+
             # Perform analysis
             analysis = self.analyze_code(current_code)
-            
+
             results_text.insert(tk.END, analysis)
             results_text.config(state=tk.DISABLED)
-            
+
             results_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             results_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Close button
-            close_btn = ttk.Button(main_frame, text="Close Analyzer", 
-                                  command=analyzer_window.destroy)
+            close_btn = ttk.Button(
+                main_frame, text="Close Analyzer", command=analyzer_window.destroy
+            )
             close_btn.pack(pady=10)
-            
+
             print("🔍 Code analyzer opened")
-            
+
         except Exception as e:
-            messagebox.showerror("Analyzer Error", f"Failed to open code analyzer:\n{str(e)}")
+            messagebox.showerror(
+                "Analyzer Error", f"Failed to open code analyzer:\n{str(e)}"
+            )
             print(f"❌ Analyzer error: {e}")
 
     def analyze_code(self, code):
@@ -2313,42 +2540,63 @@ The Code Analyzer can help you with:
 • Language-specific advice
 
 Write some code and run the analyzer again!"""
-        
-        lines = code.split('\n')
+
+        lines = code.split("\n")
         total_lines = len(lines)
         non_empty_lines = len([line for line in lines if line.strip()])
-        comment_lines = len([line for line in lines if line.strip().startswith(('#', 'REM', '//'))])
-        
+        comment_lines = len(
+            [line for line in lines if line.strip().startswith(("#", "REM", "//"))]
+        )
+
         # Detect language
         language = "Unknown"
-        if any(line.strip().startswith(('T:', 'A:', 'J:', 'Y:', 'N:')) for line in lines):
+        if any(
+            line.strip().startswith(("T:", "A:", "J:", "Y:", "N:")) for line in lines
+        ):
             language = "PILOT"
-        elif any(line.strip().split()[0].isdigit() if line.strip().split() else False for line in lines):
+        elif any(
+            line.strip().split()[0].isdigit() if line.strip().split() else False
+            for line in lines
+        ):
             language = "BASIC"
-        elif any(word in code.upper() for word in ['FORWARD', 'BACK', 'LEFT', 'RIGHT', 'REPEAT']):
+        elif any(
+            word in code.upper()
+            for word in ["FORWARD", "BACK", "LEFT", "RIGHT", "REPEAT"]
+        ):
             language = "Logo"
-        elif any(word in code for word in ['print(', 'def ', 'import ', 'if __name__']):
+        elif any(word in code for word in ["print(", "def ", "import ", "if __name__"]):
             language = "Python"
-        
+
         # Calculate complexity
-        complexity_keywords = ['IF', 'FOR', 'WHILE', 'REPEAT', 'Y:', 'N:', 'J:']
-        complexity_score = sum(1 for line in lines for keyword in complexity_keywords if keyword in line.upper())
-        
+        complexity_keywords = ["IF", "FOR", "WHILE", "REPEAT", "Y:", "N:", "J:"]
+        complexity_score = sum(
+            1
+            for line in lines
+            for keyword in complexity_keywords
+            if keyword in line.upper()
+        )
+
         # Generate suggestions
         suggestions = []
         if comment_lines == 0 and non_empty_lines > 5:
             suggestions.append("• Add comments to explain your code")
         if total_lines > 50:
-            suggestions.append("• Consider breaking long programs into smaller functions")
+            suggestions.append(
+                "• Consider breaking long programs into smaller functions"
+            )
         if complexity_score > 10:
-            suggestions.append("• High complexity detected - consider simplifying logic")
-        if language == "PILOT" and 'E:' not in code:
-            suggestions.append("• Consider adding E: (End) statements for better structure")
-        if language == "BASIC" and 'END' not in code.upper():
+            suggestions.append(
+                "• High complexity detected - consider simplifying logic"
+            )
+        if language == "PILOT" and "E:" not in code:
+            suggestions.append(
+                "• Consider adding E: (End) statements for better structure"
+            )
+        if language == "BASIC" and "END" not in code.upper():
             suggestions.append("• Don't forget to add END statement")
         if not suggestions:
             suggestions.append("• Code looks good! Keep up the great work!")
-        
+
         return f"""🔍 CODE ANALYSIS RESULTS
 
 📊 BASIC METRICS:
@@ -2390,26 +2638,22 @@ Keep coding and improving! 🚀"""
 • Match statements (M:) are case-sensitive
 • Variables are referenced with $ (e.g., $INPUT)
 • Use E: to end program sections cleanly""",
-            
             "BASIC": """• Line numbers help organize program flow
 • Use meaningful variable names (A$, NAME$, etc.)
 • FOR...NEXT loops are very efficient
 • DIM arrays before using them""",
-            
             "Logo": """• PENUP/PENDOWN control drawing
 • Use procedures (TO...END) for reusable code
 • REPEAT is more efficient than multiple commands
 • Variables start with : (e.g., :SIZE)""",
-            
             "Python": """• Follow PEP 8 style guidelines
 • Use list comprehensions for efficiency
 • Handle exceptions with try/except
 • Use f-strings for string formatting""",
-            
             "Unknown": """• Write clear, readable code
 • Use consistent indentation
 • Add comments for complex logic
-• Test your code thoroughly"""
+• Test your code thoroughly""",
         }
         return tips.get(language, tips["Unknown"])
 
@@ -2422,24 +2666,29 @@ Keep coding and improving! 🚀"""
             progress_window.geometry("600x500")
             progress_window.transient(self.root)
             progress_window.grab_set()
-            
+
             # Apply current theme
             self.apply_theme_to_window(progress_window)
-            
+
             # Create main frame
             main_frame = ttk.Frame(progress_window)
             main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-            
+
             # Title
-            title_label = ttk.Label(main_frame, text="📊 Your Learning Progress", 
-                                   font=("Arial", 14, "bold"))
+            title_label = ttk.Label(
+                main_frame, text="📊 Your Learning Progress", font=("Arial", 14, "bold")
+            )
             title_label.pack(pady=(0, 20))
-            
+
             # Progress content
-            progress_text = tk.Text(main_frame, wrap=tk.WORD, font=("Arial", 11), height=28)
-            progress_scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=progress_text.yview)
+            progress_text = tk.Text(
+                main_frame, wrap=tk.WORD, font=("Arial", 11), height=28
+            )
+            progress_scrollbar = ttk.Scrollbar(
+                main_frame, orient=tk.VERTICAL, command=progress_text.yview
+            )
             progress_text.configure(yscrollcommand=progress_scrollbar.set)
-            
+
             progress_content = """📊 LEARNING PROGRESS TRACKER
 
 Welcome to your personal learning journey with Time_Warp IDE!
@@ -2570,27 +2819,32 @@ Welcome to your personal learning journey with Time_Warp IDE!
 🌟 You're doing great! Keep up the excellent work!
 
 Remember: Every expert was once a beginner. Your coding journey is unique and valuable. Celebrate your progress and keep learning! 🚀"""
-            
+
             progress_text.insert(tk.END, progress_content)
             progress_text.config(state=tk.DISABLED)
-            
+
             progress_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             progress_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            
+
             # Close button
-            close_btn = ttk.Button(main_frame, text="Close Progress", 
-                                  command=progress_window.destroy)
+            close_btn = ttk.Button(
+                main_frame, text="Close Progress", command=progress_window.destroy
+            )
             close_btn.pack(pady=10)
-            
+
             print("📊 Learning progress opened")
-            
+
         except Exception as e:
-            messagebox.showerror("Progress Error", f"Failed to open learning progress:\n{str(e)}")
+            messagebox.showerror(
+                "Progress Error", f"Failed to open learning progress:\n{str(e)}"
+            )
             print(f"❌ Progress error: {e}")
 
     def show_plugin_manager(self):
         """Show plugin manager"""
-        messagebox.showinfo("Plugin Manager", "Plugin management - Coming in next update!")
+        messagebox.showinfo(
+            "Plugin Manager", "Plugin management - Coming in next update!"
+        )
 
     def show_documentation(self):
         """Show documentation"""
@@ -2623,116 +2877,277 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 • Perl (Text processing)
 
 🚀 Happy coding through time!"""
-        
+
         messagebox.showinfo("Time_Warp IDE 1.2 - Quick Help", help_text)
 
     # Theme and settings
 
-
     def show_settings(self):
         """Show settings dialog"""
+        # Remember original theme for this settings session so we can revert previews
+        self._settings_original_theme = self.current_theme
+        self._preview_original_theme = None
+
         settings_window = tk.Toplevel(self.root)
         settings_window.title("⚙️ Time_Warp IDE Settings")
         settings_window.geometry("500x400")
         settings_window.resizable(True, True)
-        
+
         # Center the window
         settings_window.transient(self.root)
         settings_window.grab_set()
-        
+
         # Create notebook for different settings categories
         notebook = ttk.Notebook(settings_window)
         notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
+
         # Editor Settings Tab
         editor_frame = ttk.Frame(notebook)
         notebook.add(editor_frame, text="📝 Editor")
-        
+
         # Font settings
         font_frame = ttk.LabelFrame(editor_frame, text="Font Settings")
         font_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Label(font_frame, text="Font Family:").grid(row=0, column=0, sticky="w", padx=5, pady=2)
+
+        tk.Label(font_frame, text="Font Family:").grid(
+            row=0, column=0, sticky="w", padx=5, pady=2
+        )
         font_var = tk.StringVar(value="Consolas")
-        font_combo = ttk.Combobox(font_frame, textvariable=font_var, 
-                                 values=["Consolas", "Monaco", "DejaVu Sans Mono", "Courier New"])
+        font_combo = ttk.Combobox(
+            font_frame,
+            textvariable=font_var,
+            values=["Consolas", "Monaco", "DejaVu Sans Mono", "Courier New"],
+        )
         font_combo.grid(row=0, column=1, padx=5, pady=2)
-        
-        tk.Label(font_frame, text="Font Size:").grid(row=1, column=0, sticky="w", padx=5, pady=2)
+
+        tk.Label(font_frame, text="Font Size:").grid(
+            row=1, column=0, sticky="w", padx=5, pady=2
+        )
         size_var = tk.IntVar(value=10)
-        size_spin = tk.Spinbox(font_frame, from_=8, to=24, textvariable=size_var, width=10)
+        size_spin = tk.Spinbox(
+            font_frame, from_=8, to=24, textvariable=size_var, width=10
+        )
         size_spin.grid(row=1, column=1, padx=5, pady=2)
-        
+
         # Editor behavior
         behavior_frame = ttk.LabelFrame(editor_frame, text="Editor Behavior")
         behavior_frame.pack(fill=tk.X, padx=10, pady=5)
-        
+
         line_numbers_var = tk.BooleanVar(value=True)
-        tk.Checkbutton(behavior_frame, text="Show line numbers", 
-                      variable=line_numbers_var).pack(anchor="w", padx=5, pady=2)
-        
+        tk.Checkbutton(
+            behavior_frame, text="Show line numbers", variable=line_numbers_var
+        ).pack(anchor="w", padx=5, pady=2)
+
         auto_indent_var = tk.BooleanVar(value=True)
-        tk.Checkbutton(behavior_frame, text="Auto-indent", 
-                      variable=auto_indent_var).pack(anchor="w", padx=5, pady=2)
-        
+        tk.Checkbutton(
+            behavior_frame, text="Auto-indent", variable=auto_indent_var
+        ).pack(anchor="w", padx=5, pady=2)
+
         word_wrap_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(behavior_frame, text="Word wrap", 
-                      variable=word_wrap_var).pack(anchor="w", padx=5, pady=2)
-        
+        tk.Checkbutton(behavior_frame, text="Word wrap", variable=word_wrap_var).pack(
+            anchor="w", padx=5, pady=2
+        )
+
         # Theme Settings Tab
         theme_frame = ttk.Frame(notebook)
         notebook.add(theme_frame, text="🎨 Themes")
-        
+
         current_theme_frame = ttk.LabelFrame(theme_frame, text="Current Theme")
         current_theme_frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        tk.Label(current_theme_frame, text=f"Active Theme: {self.current_theme.title()}").pack(pady=10)
-        
+
+        tk.Label(
+            current_theme_frame, text=f"Active Theme: {self.current_theme.title()}"
+        ).pack(pady=10)
+
         theme_list_frame = ttk.LabelFrame(theme_frame, text="Available Themes")
         theme_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        
-        themes = ["dracula", "monokai", "solarized", "ocean", "spring", "sunset", "candy", "forest"]
+        # Dynamically load all available themes and show a color swatch
+        themes = available_themes()
         theme_var = tk.StringVar(value=self.current_theme)
-        
+
+        # Preview toggle - when enabled, clicking a swatch will preview without saving
+        preview_var = tk.BooleanVar(value=False)
+        preview_chk = tk.Checkbutton(
+            theme_frame, text="Preview on click", variable=preview_var
+        )
+        preview_chk.pack(anchor="w", padx=12, pady=(0, 6))
+
+        def on_swatch_click(selected_theme):
+            # Update the radio selection immediately
+            theme_var.set(selected_theme)
+
+            if preview_var.get():
+                # Show a temporary preview (do not persist)
+                try:
+                    self.preview_theme(selected_theme)
+                except Exception as e:
+                    print(f"⚠️ Preview failed: {e}")
+            else:
+                # Persist immediately
+                try:
+                    self.change_theme(selected_theme)
+                except Exception as e:
+                    print(f"⚠️ Theme apply failed: {e}")
+
+        def add_theme_row(theme_name):
+            """Helper to add one theme row with swatch + radio."""
+            row = ttk.Frame(theme_list_frame)
+            row.pack(fill=tk.X, padx=5, pady=4)
+
+            try:
+                sw_bg, sw_bg2, sw_accent = get_theme_preview(theme_name)
+            except Exception:
+                sw_bg, sw_bg2, sw_accent = ("#ffffff", "#cccccc", "#888888")
+
+            sw = tk.Canvas(row, width=48, height=28, bd=0, highlightthickness=1)
+            rect = sw.create_rectangle(0, 0, 48, 28, fill=sw_bg, outline=sw_bg2)
+            sw.create_rectangle(0, 20, 48, 28, fill=sw_accent, outline=sw_accent)
+            sw.pack(side=tk.LEFT, padx=(0, 10))
+
+            def on_enter(e, r=rect, o=sw_accent):
+                try:
+                    sw.itemconfig(r, outline=o)
+                except Exception:
+                    sw.itemconfig(r, outline="#888888")
+
+            def on_leave(e, r=rect, o=sw_bg2):
+                sw.itemconfig(r, outline=o)
+
+            sw.bind("<Enter>", on_enter)
+            sw.bind("<Leave>", on_leave)
+            sw.bind("<Button-1>", lambda e, t=theme_name: on_swatch_click(t))
+
+            rb = tk.Radiobutton(
+                row, text=theme_name.title(), variable=theme_var, value=theme_name
+            )
+            rb.pack(side=tk.LEFT, anchor="w")
+
+            return row
+
         for theme in themes:
-            rb = tk.Radiobutton(theme_list_frame, text=theme.title(), 
-                               variable=theme_var, value=theme)
-            rb.pack(anchor="w", padx=5, pady=2)
-        
+            add_theme_row(theme)
+
+        # I/O controls (export, import, restore defaults)
+        io_frame = ttk.Frame(theme_frame)
+        io_frame.pack(fill=tk.X, padx=10, pady=(6, 2))
+
+        def export_theme_handler():
+            sel = theme_var.get()
+            if not sel:
+                messagebox.showwarning("Export Theme", "No theme selected to export.")
+                return
+            fp = filedialog.asksaveasfilename(
+                title="Export Theme",
+                defaultextension=".json",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            )
+            if not fp:
+                return
+            ok = self.theme_manager.export_theme(sel, fp)
+            if ok:
+                messagebox.showinfo("Export Theme", f"Theme '{sel}' exported to {fp}")
+            else:
+                messagebox.showerror("Export Theme", "Failed to export theme.")
+
+        def import_theme_handler():
+            fp = filedialog.askopenfilename(
+                title="Import Theme",
+                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            )
+            if not fp:
+                return
+            new_name = self.theme_manager.import_theme_from_file(fp)
+            if new_name:
+                add_theme_row(new_name)
+                messagebox.showinfo("Import Theme", f"Imported theme as '{new_name}'")
+            else:
+                messagebox.showerror("Import Theme", "Failed to import theme file.")
+
+        def restore_defaults_handler():
+            ok = messagebox.askyesno(
+                "Restore Defaults", "Restore default settings and remove custom themes?"
+            )
+            if not ok:
+                return
+            if self.theme_manager.restore_defaults():
+                # Rebuild theme rows
+                for child in theme_list_frame.winfo_children():
+                    child.destroy()
+                for th in available_themes():
+                    add_theme_row(th)
+                # Apply default theme
+                self.change_theme(self.theme_manager.current_theme)
+                messagebox.showinfo("Restore Defaults", "Defaults restored")
+            else:
+                messagebox.showerror("Restore Defaults", "Failed to restore defaults")
+
+        ttk.Button(io_frame, text="Export Theme", command=export_theme_handler).pack(
+            side=tk.LEFT
+        )
+        ttk.Button(io_frame, text="Import Theme", command=import_theme_handler).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(
+            io_frame, text="Restore Defaults", command=restore_defaults_handler
+        ).pack(side=tk.RIGHT)
+
         # General Settings Tab
         general_frame = ttk.Frame(notebook)
         notebook.add(general_frame, text="⚙️ General")
-        
+
         startup_frame = ttk.LabelFrame(general_frame, text="Startup Options")
         startup_frame.pack(fill=tk.X, padx=10, pady=5)
-        
+
         remember_tabs_var = tk.BooleanVar(value=True)
-        tk.Checkbutton(startup_frame, text="Remember open tabs", 
-                      variable=remember_tabs_var).pack(anchor="w", padx=5, pady=2)
-        
+        tk.Checkbutton(
+            startup_frame, text="Remember open tabs", variable=remember_tabs_var
+        ).pack(anchor="w", padx=5, pady=2)
+
         auto_save_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(startup_frame, text="Auto-save files", 
-                      variable=auto_save_var).pack(anchor="w", padx=5, pady=2)
-        
+        tk.Checkbutton(
+            startup_frame, text="Auto-save files", variable=auto_save_var
+        ).pack(anchor="w", padx=5, pady=2)
+
         # Button frame
         button_frame = tk.Frame(settings_window)
         button_frame.pack(fill=tk.X, padx=10, pady=5)
-        
+
         def apply_settings():
             # Apply theme change
-            if theme_var.get() != self.current_theme:
-                self.change_theme(theme_var.get())
-            
-            self.update_status("Settings applied")
-            settings_window.destroy()
-        
+            try:
+                # If preview was active, commit the selected theme
+                if preview_var.get():
+                    # If a preview changed the UI, commit selection now
+                    if theme_var.get() != self._settings_original_theme:
+                        self.change_theme(theme_var.get())
+                        # Clear preview marker
+                        self._preview_original_theme = None
+                else:
+                    if theme_var.get() != self.current_theme:
+                        self.change_theme(theme_var.get())
+
+                self.update_status("Settings applied")
+            finally:
+                settings_window.destroy()
+
         def cancel_settings():
-            settings_window.destroy()
-        
+            # If previewed, revert to original theme
+            try:
+                if preview_var.get() and getattr(self, "_preview_original_theme", None):
+                    self.revert_preview()
+            finally:
+                settings_window.destroy()
+
         # Buttons
-        tk.Button(button_frame, text="Apply", command=apply_settings).pack(side=tk.RIGHT, padx=5)
-        tk.Button(button_frame, text="Cancel", command=cancel_settings).pack(side=tk.RIGHT, padx=5)
-        tk.Button(button_frame, text="OK", command=apply_settings).pack(side=tk.RIGHT, padx=5)
+        tk.Button(button_frame, text="Apply", command=apply_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
+        tk.Button(button_frame, text="Cancel", command=cancel_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
+        tk.Button(button_frame, text="OK", command=apply_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
 
     def show_about(self):
         """Show about dialog"""
@@ -2762,125 +3177,175 @@ through an accessible educational environment.
 GitHub: https://github.com/James-HoneyBadger/Time_Warp
 License: MIT"""
 
-        
         messagebox.showinfo("About Time_Warp IDE 1.2", about_text)
-    
+
     def change_theme(self, theme_name):
         """Change to a different theme"""
         try:
             print(f"🎨 Changing theme to: {theme_name}")
             self.current_theme = theme_name
-            
+
             # Save theme preference
             config = load_config()
-            config['current_theme'] = theme_name
+            config["current_theme"] = theme_name
             save_config(config)
-            
+
             # Apply the new theme
             self.apply_theme()
-            
+
             print(f"✅ Theme changed to: {theme_name}")
         except Exception as e:
             print(f"⚠️ Theme change error: {e}")
+
+    def preview_theme(self, theme_name):
+        """Temporarily apply a theme for preview purposes without saving to config."""
+        try:
+            # Save original theme if not already saved
+            if getattr(self, "_preview_original_theme", None) is None:
+                self._preview_original_theme = self.current_theme
+
+            # Apply theme visually but do not save to config
+            colors = self.theme_manager.get_colors(theme_name)
+            self.current_theme = theme_name
+            # Apply to root and components
+            self.root.configure(bg=colors.get("bg_primary", "#000000"))
+            try:
+                self.theme_manager.apply_theme(self.root, theme_name)
+            except Exception:
+                pass
+
+            # Apply to editor and output if present
+            if hasattr(self, "multi_tab_editor"):
+                try:
+                    self.multi_tab_editor.apply_theme(colors)
+                except Exception:
+                    pass
+
+            if hasattr(self, "output_text"):
+                try:
+                    self.output_text.configure(
+                        bg=colors.get("bg_secondary", colors.get("bg_primary")),
+                        fg=colors.get("text_primary", "#000"),
+                        insertbackground=colors.get("text_primary", "#000"),
+                    )
+                except Exception:
+                    pass
+
+        except Exception as e:
+            print(f"⚠️ Preview theme error: {e}")
+
+    def revert_preview(self):
+        """Revert any temporary preview to the original theme saved at start of preview."""
+        try:
+            original = getattr(self, "_preview_original_theme", None)
+            if original:
+                self.change_theme(original)
+                self._preview_original_theme = None
+        except Exception as e:
+            print(f"⚠️ Revert preview error: {e}")
 
     def apply_theme(self):
         """Apply current theme consistently to all components"""
         try:
             print(f"🎨 Applying theme: {self.current_theme}")
-            
+
             # Get theme colors
             colors = self.theme_manager.get_colors()
-            
+
             # Apply theme to root window first
             self.root.configure(bg=colors["bg_primary"])
-            
+
             # Apply TTK styles
             self.theme_manager.apply_theme(self.root, self.current_theme)
-            
+
             # Apply theme consistently to all frames and panels
             frame_bg = colors.get("bg_secondary", colors["bg_primary"])
-            
+
             # Apply theme to main container and panels
-            if hasattr(self, 'main_container'):
+            if hasattr(self, "main_container"):
                 try:
                     self.main_container.configure(style="Themed.TPanedWindow")
                 except:
                     pass
-            
+
             # Ensure editor panel uses consistent colors
-            if hasattr(self, 'editor_panel'):
+            if hasattr(self, "editor_panel"):
                 try:
                     self.editor_panel.configure(style="Themed.TFrame")
                     # Note: ttk widgets use styles, not direct bg configuration
                 except Exception as e:
                     print(f"Warning: Could not theme editor panel: {e}")
-            
+
             # Ensure graphics panel uses consistent colors
-            if hasattr(self, 'graphics_output_panel'):
+            if hasattr(self, "graphics_output_panel"):
                 try:
                     self.graphics_output_panel.configure(style="Themed.TFrame")
                     # Note: ttk widgets use styles, not direct bg configuration
                 except Exception as e:
                     print(f"Warning: Could not theme graphics panel: {e}")
-            
+
             # Apply theme to multi-tab editor with proper error handling
-            if hasattr(self, 'multi_tab_editor'):
+            if hasattr(self, "multi_tab_editor"):
                 try:
                     self.multi_tab_editor.apply_theme(colors)
                     print("✅ Multi-tab editor theme applied successfully")
                 except Exception as e:
                     print(f"Warning: Could not apply theme to multi-tab editor: {e}")
-            
+
             # Apply theme to output text
-            if hasattr(self, 'output_text'):
+            if hasattr(self, "output_text"):
                 try:
                     self.output_text.configure(
                         bg=colors.get("bg_secondary", colors["bg_primary"]),
                         fg=colors.get("text_primary", "#000000"),
-                        insertbackground=colors.get("text_primary", "#000000")
+                        insertbackground=colors.get("text_primary", "#000000"),
                     )
                 except:
                     pass
-            
+
             # Apply theme to status bar
-            if hasattr(self, 'status_label'):
+            if hasattr(self, "status_label"):
                 self.status_label.configure(
                     background=colors["bg_secondary"],
                     foreground=colors["text_primary"],
-                    relief="flat"
+                    relief="flat",
                 )
-            
-            if hasattr(self, 'language_label'):
+
+            if hasattr(self, "language_label"):
                 # Use high contrast colors for language label readability
-                if self.current_theme in ['forest', 'spring']:
+                if self.current_theme in ["forest", "spring"]:
                     # Light themes: use dark background with light text
                     label_bg = colors["text_primary"]  # Dark green
-                    label_fg = colors["bg_primary"]    # Light background
-                elif self.current_theme in ['sunset', 'candy']:
+                    label_fg = colors["bg_primary"]  # Light background
+                elif self.current_theme in ["sunset", "candy"]:
                     # Light themes with colorful backgrounds: use dark text on light background
                     label_bg = colors["bg_secondary"]  # Light background
                     label_fg = colors["text_primary"]  # Dark text
                 else:
                     # Dark themes: use accent with light text
                     label_bg = colors["accent"]
-                    label_fg = colors["bg_primary"]    # Light background color for text
-                
+                    label_fg = colors["bg_primary"]  # Light background color for text
+
                 self.language_label.configure(
-                    background=label_bg,
-                    foreground=label_fg,
-                    relief="flat"
+                    background=label_bg, foreground=label_fg, relief="flat"
                 )
-            
+
             # Apply theme to enhanced graphics canvas
-            if hasattr(self, 'enhanced_graphics') and ENHANCED_GRAPHICS_AVAILABLE:
+            if hasattr(self, "enhanced_graphics") and ENHANCED_GRAPHICS_AVAILABLE:
                 self.enhanced_graphics.apply_theme(colors)
-            elif hasattr(self, 'basic_canvas'):
+            elif hasattr(self, "basic_canvas"):
                 self.theme_manager.apply_canvas_theme(self.basic_canvas)
-            
+
             # Apply theme to output text areas
-            if hasattr(self, 'output_text'):
+            if hasattr(self, "output_text"):
                 self.theme_manager.apply_text_widget_theme(self.output_text)
-            
+
+            # Recursively apply theme to all widgets (ensures canvases get themed)
+            try:
+                self.theme_manager.apply_widget_theme(self.root)
+            except Exception:
+                pass
+
         except Exception as e:
             print(f"⚠️ Theme application error: {e}")
 
@@ -2888,17 +3353,18 @@ License: MIT"""
         """Apply current theme to a specific window"""
         try:
             # Initialize theme manager if not already done
-            if not hasattr(self, 'theme_manager'):
+            if not hasattr(self, "theme_manager"):
                 from .utils.theme import ThemeManager
+
                 self.theme_manager = ThemeManager()
-            
+
             # Apply theme to the window
             self.theme_manager.apply_theme(window, self.current_theme)
             colors = self.theme_manager.get_colors()
-            
+
             # Apply basic styling to the window
             window.configure(bg=colors["bg_primary"])
-            
+
         except Exception as e:
             print(f"⚠️ Window theme application error: {e}")
 
@@ -2909,6 +3375,75 @@ License: MIT"""
             # TODO: Load plugins for 1.1
         except Exception as e:
             print(f"⚠️ Plugin loading error: {e}")
+
+    def open_theme_selector(self):
+        """Open a modern theme selector dialog with previews."""
+        try:
+            dlg = tk.Toplevel(self.root)
+            dlg.title("Theme Settings")
+            dlg.geometry("600x400")
+            dlg.transient(self.root)
+            dlg.grab_set()
+
+            info = ttk.Label(
+                dlg, text="Choose a theme:", font=("TkDefaultFont", 12, "bold")
+            )
+            info.pack(pady=8)
+
+            # Create a scrollable frame for theme swatches
+            canvas = tk.Canvas(dlg, height=300)
+            scrollbar = ttk.Scrollbar(dlg, orient=tk.VERTICAL, command=canvas.yview)
+            scroll_frame = ttk.Frame(canvas)
+
+            scroll_frame_id = canvas.create_window(
+                (0, 0), window=scroll_frame, anchor="nw"
+            )
+            canvas.configure(yscrollcommand=scrollbar.set)
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # Populate themes
+            row = 0
+            col = 0
+            for theme_name in available_themes():
+                sw_bg, sw_bg2, sw_accent = get_theme_preview(theme_name)
+
+                sw_frame = ttk.Frame(scroll_frame, relief=tk.RIDGE, borderwidth=1)
+                sw_frame.grid(row=row, column=col, padx=8, pady=8, sticky="n")
+
+                sw_canvas = tk.Canvas(
+                    sw_frame, width=120, height=60, bd=0, highlightthickness=0
+                )
+                sw_canvas.pack(padx=4, pady=4)
+                sw_canvas.create_rectangle(0, 0, 120, 60, fill=sw_bg, outline=sw_bg2)
+                sw_canvas.create_rectangle(
+                    4, 36, 116, 56, fill=sw_accent, outline=sw_accent
+                )
+
+                label = ttk.Label(sw_frame, text=theme_name.title(), width=14)
+                label.pack(pady=(2, 4))
+
+                def make_callback(name):
+                    return lambda: (self.change_theme(name), dlg.destroy())
+
+                btn = ttk.Button(
+                    sw_frame, text="Apply", command=make_callback(theme_name)
+                )
+                btn.pack(pady=(0, 6))
+
+                col += 1
+                if col >= 4:
+                    col = 0
+                    row += 1
+
+            # Update scroll region
+            def _on_frame_config(event):
+                canvas.configure(scrollregion=canvas.bbox("all"))
+
+            scroll_frame.bind("<Configure>", _on_frame_config)
+
+        except Exception as e:
+            print(f"⚠️ Theme selector error: {e}")
 
     # Gamification callbacks
     def show_achievement_notification(self, achievement):
@@ -2937,7 +3472,7 @@ License: MIT"""
         if unsaved_count > 0:
             result = messagebox.askyesnocancel(
                 "Unsaved Changes",
-                f"You have {unsaved_count} unsaved file(s). Save before closing?"
+                f"You have {unsaved_count} unsaved file(s). Save before closing?",
             )
             if result is None:  # Cancel
                 return
@@ -2952,11 +3487,11 @@ def main():
     print("🚀 Starting Time_Warp IDE 1.2...")
     print("⏰ Enhanced Educational Programming Environment")
     print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
-    
+
     try:
         print("🔧 Initializing Time_Warp IDE...")
         app = Time_WarpIDE()
-        
+
         print("🔧 Starting main event loop...")
         # Add a check to ensure the window is still valid before starting mainloop
         if app.root.winfo_exists():
@@ -2964,26 +3499,32 @@ def main():
             print("👋 Time_Warp IDE session ended. Happy coding!")
         else:
             print("❌ Window was destroyed during initialization")
-            
+
     except KeyboardInterrupt:
         print("\n⚠️ User interrupted - Time_Warp IDE shutting down gracefully...")
     except Exception as e:
         print(f"❌ Critical error during startup: {e}")
         import traceback
+
         traceback.print_exc()
-        
+
         # Try to keep a minimal window open for debugging
         try:
             import tkinter as tk
+
             root = tk.Tk()
             root.title("Time_Warp IDE - Error")
             root.geometry("500x300")
-            
-            error_label = tk.Label(root, 
-                                 text=f"Time_Warp IDE encountered an error:\n{str(e)}\n\nCheck console for details.",
-                                 wraplength=450, justify=tk.CENTER, fg="red")
+
+            error_label = tk.Label(
+                root,
+                text=f"Time_Warp IDE encountered an error:\n{str(e)}\n\nCheck console for details.",
+                wraplength=450,
+                justify=tk.CENTER,
+                fg="red",
+            )
             error_label.pack(pady=50)
-            
+
             tk.Button(root, text="Close", command=root.quit).pack(pady=20)
             root.mainloop()
         except:

@@ -4,7 +4,7 @@ Handles saving and loading of UI theme preferences across time
 """
 
 import json
-import os
+import tkinter as tk
 from pathlib import Path
 
 
@@ -68,10 +68,305 @@ def load_config():
                 merged_config = default_config.copy()
                 merged_config.update(config)
                 return merged_config
-    except Exception as e:
+    except (OSError, json.JSONDecodeError) as e:
         print(f"Warning: Failed to load config: {e}")
 
     return default_config
+
+
+# Builtin theme registry - centralized so other helpers can reference it
+BUILTIN_THEMES = {
+    # DARK THEMES
+    "dracula": {
+        "bg_primary": "#1E1E2E",
+        "bg_secondary": "#282A36",
+        "bg_tertiary": "#44475A",
+        "text_primary": "#F8F8F2",
+        "text_secondary": "#BD93F9",
+        "text_muted": "#6272A4",
+        "accent": "#FF79C6",
+        "accent_secondary": "#8BE9FD",
+        "success": "#50FA7B",
+        "warning": "#FFB86C",
+        "error": "#FF5555",
+        "info": "#8BE9FD",
+        "border": "#6272A4",
+        "selection": "#44475A",
+        "button_bg": "#6272A4",
+        "button_hover": "#FF79C6",
+        "toolbar_bg": "#21222C",
+        "menu_bg": "#282A36",
+        "syntax_keyword": "#FF79C6",
+        "syntax_string": "#F1FA8C",
+        "syntax_comment": "#6272A4",
+        "syntax_number": "#BD93F9",
+    },
+    "monokai": {
+        "bg_primary": "#272822",
+        "bg_secondary": "#383830",
+        "bg_tertiary": "#49483E",
+        "text_primary": "#F8F8F2",
+        "text_secondary": "#A6E22E",
+        "text_muted": "#75715E",
+        "accent": "#F92672",
+        "accent_secondary": "#66D9EF",
+        "success": "#A6E22E",
+        "warning": "#E6DB74",
+        "error": "#F92672",
+        "info": "#66D9EF",
+        "border": "#75715E",
+        "selection": "#49483E",
+        "button_bg": "#75715E",
+        "button_hover": "#F92672",
+        "toolbar_bg": "#1E1F1C",
+        "menu_bg": "#383830",
+        "syntax_keyword": "#F92672",
+        "syntax_string": "#E6DB74",
+        "syntax_comment": "#75715E",
+        "syntax_number": "#AE81FF",
+    },
+    "solarized": {
+        "bg_primary": "#002B36",
+        "bg_secondary": "#073642",
+        "bg_tertiary": "#586E75",
+        "text_primary": "#FDF6E3",
+        "text_secondary": "#EEE8D5",
+        "text_muted": "#93A1A1",
+        "accent": "#268BD2",
+        "accent_secondary": "#2AA198",
+        "success": "#859900",
+        "warning": "#B58900",
+        "error": "#DC322F",
+        "info": "#268BD2",
+        "border": "#586E75",
+        "selection": "#073642",
+        "button_bg": "#586E75",
+        "button_hover": "#268BD2",
+        "toolbar_bg": "#001E27",
+        "menu_bg": "#073642",
+        "syntax_keyword": "#859900",
+        "syntax_string": "#2AA198",
+        "syntax_comment": "#586E75",
+        "syntax_number": "#D33682",
+    },
+    "ocean": {
+        "bg_primary": "#0F1419",
+        "bg_secondary": "#1F2937",
+        "bg_tertiary": "#374151",
+        "text_primary": "#F9FAFB",
+        "text_secondary": "#D1D5DB",
+        "text_muted": "#9CA3AF",
+        "accent": "#3B82F6",
+        "accent_secondary": "#10B981",
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#06B6D4",
+        "border": "#4B5563",
+        "selection": "#374151",
+        "button_bg": "#4B5563",
+        "button_hover": "#3B82F6",
+        "toolbar_bg": "#111827",
+        "menu_bg": "#1F2937",
+        "syntax_keyword": "#3B82F6",
+        "syntax_string": "#10B981",
+        "syntax_comment": "#6B7280",
+        "syntax_number": "#8B5CF6",
+    },
+    "midnight": {
+        "bg_primary": "#0b0f1a",
+        "bg_secondary": "#111827",
+        "bg_tertiary": "#1f2937",
+        "text_primary": "#e6eef8",
+        "text_secondary": "#a6b8d6",
+        "text_muted": "#6b7280",
+        "accent": "#7c3aed",
+        "accent_secondary": "#60a5fa",
+        "success": "#10b981",
+        "warning": "#f59e0b",
+        "error": "#ef4444",
+        "info": "#60a5fa",
+        "border": "#374151",
+        "selection": "#111827",
+        "button_bg": "#374151",
+        "button_hover": "#7c3aed",
+        "toolbar_bg": "#071129",
+        "menu_bg": "#0b1220",
+        "syntax_keyword": "#7c3aed",
+        "syntax_string": "#f97316",
+        "syntax_comment": "#6b7280",
+        "syntax_number": "#60a5fa",
+    },
+    "sepia": {
+        "bg_primary": "#f4ecd8",
+        "bg_secondary": "#efe6cf",
+        "bg_tertiary": "#e7dcc1",
+        "text_primary": "#3b2f2f",
+        "text_secondary": "#5a4639",
+        "text_muted": "#7a6a5a",
+        "accent": "#d87f33",
+        "accent_secondary": "#b55a1e",
+        "success": "#6aa84f",
+        "warning": "#f1c232",
+        "error": "#cc0000",
+        "info": "#6fa8dc",
+        "border": "#d0c0a8",
+        "selection": "#efe6cf",
+        "button_bg": "#d87f33",
+        "button_hover": "#b55a1e",
+        "toolbar_bg": "#faf6ec",
+        "menu_bg": "#f4ecd8",
+        "syntax_keyword": "#b55a1e",
+        "syntax_string": "#d87f33",
+        "syntax_comment": "#7a6a5a",
+        "syntax_number": "#6aa84f",
+    },
+    "ice": {
+        "bg_primary": "#f3fbff",
+        "bg_secondary": "#e8f6ff",
+        "bg_tertiary": "#d6eef9",
+        "text_primary": "#05264a",
+        "text_secondary": "#0b4a6f",
+        "text_muted": "#558aa3",
+        "accent": "#0ea5e9",
+        "accent_secondary": "#06b6d4",
+        "success": "#16a34a",
+        "warning": "#f59e0b",
+        "error": "#ef4444",
+        "info": "#0ea5e9",
+        "border": "#bfe9ff",
+        "selection": "#e8f6ff",
+        "button_bg": "#0ea5e9",
+        "button_hover": "#0284c7",
+        "toolbar_bg": "#f0fbff",
+        "menu_bg": "#f3fbff",
+        "syntax_keyword": "#0369a1",
+        "syntax_string": "#06b6d4",
+        "syntax_comment": "#7dd3fc",
+        "syntax_number": "#1d4ed8",
+    },
+    "ember": {
+        "bg_primary": "#1b0b0b",
+        "bg_secondary": "#2b0f0f",
+        "bg_tertiary": "#421616",
+        "text_primary": "#ffece6",
+        "text_secondary": "#ffb4a2",
+        "text_muted": "#d78a7a",
+        "accent": "#ff6b35",
+        "accent_secondary": "#ff9b71",
+        "success": "#9ae66e",
+        "warning": "#ffb703",
+        "error": "#ff3b30",
+        "info": "#ff6b35",
+        "border": "#3a1a1a",
+        "selection": "#2b0f0f",
+        "button_bg": "#3a1a1a",
+        "button_hover": "#ff6b35",
+        "toolbar_bg": "#120606",
+        "menu_bg": "#1b0b0b",
+        "syntax_keyword": "#ff6b35",
+        "syntax_string": "#ff9b71",
+        "syntax_comment": "#6b4b46",
+        "syntax_number": "#ffb86c",
+    },
+    # LIGHT THEMES
+    "spring": {
+        "bg_primary": "#F0FFF0",
+        "bg_secondary": "#E6FFE6",
+        "bg_tertiary": "#D4F4DD",
+        "text_primary": "#1B5E20",
+        "text_secondary": "#2E7D32",
+        "text_muted": "#388E3C",
+        "accent": "#00BCD4",
+        "accent_secondary": "#8BC34A",
+        "success": "#4CAF50",
+        "warning": "#FF9800",
+        "error": "#F44336",
+        "info": "#03A9F4",
+        "border": "#C8E6C9",
+        "selection": "#E8F5E8",
+        "button_bg": "#4CAF50",
+        "button_hover": "#66BB6A",
+        "toolbar_bg": "#F1F8E9",
+        "menu_bg": "#F0FFF0",
+        "syntax_keyword": "#2E7D32",
+        "syntax_string": "#00BCD4",
+        "syntax_comment": "#81C784",
+        "syntax_number": "#FF9800",
+    },
+    "sunset": {
+        "bg_primary": "#FFF8E1",
+        "bg_secondary": "#FFECB3",
+        "bg_tertiary": "#FFE082",
+        "text_primary": "#BF360C",
+        "text_secondary": "#D84315",
+        "text_muted": "#E65100",
+        "accent": "#E91E63",
+        "accent_secondary": "#9C27B0",
+        "success": "#4CAF50",
+        "warning": "#FF9800",
+        "error": "#F44336",
+        "info": "#2196F3",
+        "border": "#FFCC02",
+        "selection": "#FFF3C4",
+        "button_bg": "#E91E63",
+        "button_hover": "#C2185B",
+        "toolbar_bg": "#FFFDE7",
+        "menu_bg": "#FFF8E1",
+        "syntax_keyword": "#9C27B0",
+        "syntax_string": "#E91E63",
+        "syntax_comment": "#FF8F00",
+        "syntax_number": "#E65100",
+    },
+    "candy": {
+        "bg_primary": "#FFF0F5",
+        "bg_secondary": "#FFE4E1",
+        "bg_tertiary": "#FFCCCB",
+        "text_primary": "#4A0E4E",
+        "text_secondary": "#6B1076",
+        "text_muted": "#B85C9E",
+        "accent": "#FF1493",
+        "accent_secondary": "#00CED1",
+        "success": "#32CD32",
+        "warning": "#FFD700",
+        "error": "#DC143C",
+        "info": "#4169E1",
+        "border": "#F0B7CD",
+        "selection": "#FFE4E6",
+        "button_bg": "#FF1493",
+        "button_hover": "#C71585",
+        "toolbar_bg": "#FDF2F8",
+        "menu_bg": "#FFF0F5",
+        "syntax_keyword": "#9932CC",
+        "syntax_string": "#FF1493",
+        "syntax_comment": "#DA70D6",
+        "syntax_number": "#8B008B",
+    },
+    "forest": {
+        "bg_primary": "#F5FFFA",
+        "bg_secondary": "#E0FFEF",
+        "bg_tertiary": "#C8E6C9",
+        "text_primary": "#1B5E20",
+        "text_secondary": "#2E7D32",
+        "text_muted": "#66BB6A",
+        "accent": "#00695C",
+        "accent_secondary": "#00838F",
+        "success": "#388E3C",
+        "warning": "#F57C00",
+        "error": "#D32F2F",
+        "info": "#0277BD",
+        "border": "#A5D6A7",
+        "selection": "#E8F5E8",
+        "button_bg": "#00695C",
+        "button_hover": "#004D40",
+        "toolbar_bg": "#F1F8E9",
+        "menu_bg": "#F5FFFA",
+        "syntax_keyword": "#00695C",
+        "syntax_string": "#00838F",
+        "syntax_comment": "#81C784",
+        "syntax_number": "#F57C00",
+    },
+}
 
 
 def save_config(config):
@@ -82,7 +377,7 @@ def save_config(config):
         with open(config_file, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         return True
-    except Exception as e:
+    except OSError as e:
         print(f"Warning: Failed to save config: {e}")
         return False
 
@@ -94,218 +389,62 @@ def reset_config():
         if config_file.exists():
             config_file.unlink()
         return True
-    except Exception as e:
+    except OSError as e:
         print(f"Warning: Failed to reset config: {e}")
         return False
 
 
 def get_theme_colors(theme_name="dracula"):
-    """Get theme colors based on theme name - each theme has a fixed brightness level"""
+    """Get theme colors based on theme name.
 
-    # Theme definitions - dark themes: dracula, monokai, solarized, ocean
-    # Light themes: spring, sunset, candy, forest
-    themes = {
-        # DARK THEMES
-        "dracula": {
-            "bg_primary": "#1E1E2E",  # Rich dark purple-blue
-            "bg_secondary": "#282A36",  # Slightly lighter dark
-            "bg_tertiary": "#44475A",  # Medium gray-purple
-            "text_primary": "#F8F8F2",  # Bright white
-            "text_secondary": "#BD93F9",  # Light purple
-            "text_muted": "#6272A4",  # Muted blue
-            "accent": "#FF79C6",  # Bright pink
-            "accent_secondary": "#8BE9FD",  # Cyan
-            "success": "#50FA7B",  # Bright green
-            "warning": "#FFB86C",  # Orange
-            "error": "#FF5555",  # Red
-            "info": "#8BE9FD",  # Cyan
-            "border": "#6272A4",  # Muted blue
-            "selection": "#44475A",  # Selection background
-            "button_bg": "#6272A4",  # Button background
-            "button_hover": "#FF79C6",  # Button hover
-            "toolbar_bg": "#21222C",  # Toolbar background
-            "menu_bg": "#282A36",  # Menu background
-            "syntax_keyword": "#FF79C6",  # Keywords
-            "syntax_string": "#F1FA8C",  # Strings
-            "syntax_comment": "#6272A4",  # Comments
-            "syntax_number": "#BD93F9",  # Numbers
-        },
-        "monokai": {
-            "bg_primary": "#272822",  # Dark olive green
-            "bg_secondary": "#383830",  # Lighter olive
-            "bg_tertiary": "#49483E",  # Medium olive
-            "text_primary": "#F8F8F2",  # Bright white
-            "text_secondary": "#A6E22E",  # Bright green
-            "text_muted": "#75715E",  # Muted brown
-            "accent": "#F92672",  # Bright magenta
-            "accent_secondary": "#66D9EF",  # Cyan
-            "success": "#A6E22E",  # Bright green
-            "warning": "#E6DB74",  # Yellow
-            "error": "#F92672",  # Magenta
-            "info": "#66D9EF",  # Cyan
-            "border": "#75715E",  # Muted brown
-            "selection": "#49483E",  # Selection background
-            "button_bg": "#75715E",  # Button background
-            "button_hover": "#F92672",  # Button hover
-            "toolbar_bg": "#1E1F1C",  # Toolbar background
-            "menu_bg": "#383830",  # Menu background
-            "syntax_keyword": "#F92672",  # Keywords
-            "syntax_string": "#E6DB74",  # Strings
-            "syntax_comment": "#75715E",  # Comments
-            "syntax_number": "#AE81FF",  # Numbers
-        },
-        "solarized": {
-            "bg_primary": "#002B36",  # Dark blue-green
-            "bg_secondary": "#073642",  # Slightly lighter
-            "bg_tertiary": "#586E75",  # Medium gray
-            "text_primary": "#FDF6E3",  # Light cream (much more readable)
-            "text_secondary": "#EEE8D5",  # Light beige (better contrast)
-            "text_muted": "#93A1A1",  # Muted gray
-            "accent": "#268BD2",  # Blue
-            "accent_secondary": "#2AA198",  # Cyan
-            "success": "#859900",  # Green
-            "warning": "#B58900",  # Yellow
-            "error": "#DC322F",  # Red
-            "info": "#268BD2",  # Blue
-            "border": "#586E75",  # Medium gray
-            "selection": "#073642",  # Selection background
-            "button_bg": "#586E75",  # Button background
-            "button_hover": "#268BD2",  # Button hover
-            "toolbar_bg": "#001E27",  # Toolbar background
-            "menu_bg": "#073642",  # Menu background
-            "syntax_keyword": "#859900",  # Keywords
-            "syntax_string": "#2AA198",  # Strings
-            "syntax_comment": "#586E75",  # Comments
-            "syntax_number": "#D33682",  # Numbers
-        },
-        "ocean": {
-            "bg_primary": "#0F1419",  # Very dark blue
-            "bg_secondary": "#1F2937",  # Dark blue-gray
-            "bg_tertiary": "#374151",  # Medium blue-gray
-            "text_primary": "#F9FAFB",  # Near white
-            "text_secondary": "#D1D5DB",  # Light gray
-            "text_muted": "#9CA3AF",  # Muted gray
-            "accent": "#3B82F6",  # Blue
-            "accent_secondary": "#10B981",  # Green
-            "success": "#10B981",  # Emerald
-            "warning": "#F59E0B",  # Amber
-            "error": "#EF4444",  # Red
-            "info": "#06B6D4",  # Cyan
-            "border": "#4B5563",  # Gray
-            "selection": "#374151",  # Selection background
-            "button_bg": "#4B5563",  # Button background
-            "button_hover": "#3B82F6",  # Button hover
-            "toolbar_bg": "#111827",  # Toolbar background
-            "menu_bg": "#1F2937",  # Menu background
-            "syntax_keyword": "#3B82F6",  # Keywords
-            "syntax_string": "#10B981",  # Strings
-            "syntax_comment": "#6B7280",  # Comments
-            "syntax_number": "#8B5CF6",  # Numbers
-        },
-        # LIGHT THEMES
-        "spring": {
-            "bg_primary": "#F0FFF0",  # Honeydew
-            "bg_secondary": "#E6FFE6",  # Light mint
-            "bg_tertiary": "#D4F4DD",  # Pale green
-            "text_primary": "#1B5E20",  # Darker green (better contrast)
-            "text_secondary": "#2E7D32",  # Forest green
-            "text_muted": "#388E3C",  # Darker medium green (more readable)
-            "accent": "#00BCD4",  # Cyan
-            "accent_secondary": "#8BC34A",  # Light green
-            "success": "#4CAF50",  # Green
-            "warning": "#FF9800",  # Orange
-            "error": "#F44336",  # Red
-            "info": "#03A9F4",  # Light blue
-            "border": "#C8E6C9",  # Light green border
-            "selection": "#E8F5E8",  # Very light green
-            "button_bg": "#4CAF50",  # Button background
-            "button_hover": "#66BB6A",  # Button hover
-            "toolbar_bg": "#F1F8E9",  # Toolbar background
-            "menu_bg": "#F0FFF0",  # Menu background
-            "syntax_keyword": "#2E7D32",  # Keywords
-            "syntax_string": "#00BCD4",  # Strings
-            "syntax_comment": "#81C784",  # Comments
-            "syntax_number": "#FF9800",  # Numbers
-        },
-        "sunset": {
-            "bg_primary": "#FFF8E1",  # Light yellow
-            "bg_secondary": "#FFECB3",  # Pale yellow
-            "bg_tertiary": "#FFE082",  # Light gold
-            "text_primary": "#BF360C",  # Darker red-orange (better contrast)
-            "text_secondary": "#D84315",  # Deep orange (more readable)
-            "text_muted": "#E65100",  # Darker orange (better visibility)
-            "accent": "#E91E63",  # Pink
-            "accent_secondary": "#9C27B0",  # Purple
-            "success": "#4CAF50",  # Green
-            "warning": "#FF9800",  # Orange
-            "error": "#F44336",  # Red
-            "info": "#2196F3",  # Blue
-            "border": "#FFCC02",  # Gold border
-            "selection": "#FFF3C4",  # Light cream
-            "button_bg": "#E91E63",  # Button background
-            "button_hover": "#C2185B",  # Button hover
-            "toolbar_bg": "#FFFDE7",  # Toolbar background
-            "menu_bg": "#FFF8E1",  # Menu background
-            "syntax_keyword": "#9C27B0",  # Keywords
-            "syntax_string": "#E91E63",  # Strings
-            "syntax_comment": "#FF8F00",  # Comments
-            "syntax_number": "#E65100",  # Numbers
-        },
-        "candy": {
-            "bg_primary": "#FFF0F5",  # Lavender blush
-            "bg_secondary": "#FFE4E1",  # Misty rose
-            "bg_tertiary": "#FFCCCB",  # Light coral
-            "text_primary": "#4A0E4E",  # Much darker magenta (better contrast)
-            "text_secondary": "#6B1076",  # Darker orchid (better readability)
-            "text_muted": "#B85C9E",  # More muted orchid (easier to read)
-            "accent": "#FF1493",  # Deep pink
-            "accent_secondary": "#00CED1",  # Dark turquoise
-            "success": "#32CD32",  # Lime green
-            "warning": "#FFD700",  # Gold
-            "error": "#DC143C",  # Crimson
-            "info": "#4169E1",  # Royal blue
-            "border": "#F0B7CD",  # Pink border
-            "selection": "#FFE4E6",  # Light pink
-            "button_bg": "#FF1493",  # Button background
-            "button_hover": "#C71585",  # Button hover
-            "toolbar_bg": "#FDF2F8",  # Toolbar background
-            "menu_bg": "#FFF0F5",  # Menu background
-            "syntax_keyword": "#9932CC",  # Keywords
-            "syntax_string": "#FF1493",  # Strings
-            "syntax_comment": "#DA70D6",  # Comments
-            "syntax_number": "#8B008B",  # Numbers
-        },
-        "forest": {
-            "bg_primary": "#F5FFFA",  # Mint cream
-            "bg_secondary": "#E0FFEF",  # Light mint
-            "bg_tertiary": "#C8E6C9",  # Light green
-            "text_primary": "#1B5E20",  # Dark green
-            "text_secondary": "#2E7D32",  # Green
-            "text_muted": "#66BB6A",  # Light green
-            "accent": "#00695C",  # Dark teal
-            "accent_secondary": "#00838F",  # Dark cyan
-            "success": "#388E3C",  # Green
-            "warning": "#F57C00",  # Orange
-            "error": "#D32F2F",  # Red
-            "info": "#0277BD",  # Light blue
-            "border": "#A5D6A7",  # Light green border
-            "selection": "#E8F5E8",  # Very light green
-            "button_bg": "#00695C",  # Button background
-            "button_hover": "#004D40",  # Button hover
-            "toolbar_bg": "#F1F8E9",  # Toolbar background
-            "menu_bg": "#F5FFFA",  # Menu background
-            "syntax_keyword": "#00695C",  # Keywords
-            "syntax_string": "#00838F",  # Strings
-            "syntax_comment": "#81C784",  # Comments
-            "syntax_number": "#F57C00",  # Numbers
-        },
-    }
+    Supports builtin and custom themes from config.
+    """
+    # Combine builtin themes with any user-provided custom themes from config
+    cfg = load_config()
+    custom = cfg.get("custom_themes", {}) if isinstance(cfg, dict) else {}
 
-    # Get the requested theme
-    if theme_name not in themes:
-        theme_name = "forest"  # Fallback to default
+    combined = {}
+    combined.update(BUILTIN_THEMES)
+    combined.update(custom)
 
-    return themes[theme_name]
+    # Determine selected theme with graceful fallbacks
+    if theme_name not in combined:
+        theme_name = cfg.get("current_theme", "forest")
+        if theme_name not in combined:
+            theme_name = next(iter(combined.keys()), "dracula")
+
+    return combined[theme_name]
+
+
+def available_themes():
+    """Return a list of available theme names.
+
+    Includes builtin themes and any user-defined custom themes.
+    """
+    # Build from BUILTIN_THEMES plus any custom themes in config
+    cfg = load_config()
+    custom = cfg.get("custom_themes", {}) if isinstance(cfg, dict) else {}
+
+    names = list(BUILTIN_THEMES.keys())
+    # Append custom themes in defined order
+    for k in custom.keys():
+        if k not in names:
+            names.append(k)
+
+    return names
+
+
+def get_theme_preview(theme_name):
+    """Return a small preview color tuple for UI swatches.
+
+    Returns (bg_primary, bg_secondary, accent).
+    """
+    colors = get_theme_colors(theme_name)
+    return (
+        colors.get("bg_primary", "#000000"),
+        colors.get("bg_secondary", "#222222"),
+        colors.get("accent", "#888888"),
+    )
 
 
 def backup_config():
@@ -320,7 +459,7 @@ def backup_config():
 
         shutil.copy2(config_file, backup_file)
         return True
-    except Exception as e:
+    except (OSError, shutil.Error) as e:
         print(f"Warning: Failed to backup config: {e}")
         return False
 
@@ -337,7 +476,7 @@ def restore_config_from_backup():
 
             shutil.copy2(backup_file, config_file)
             return True
-    except Exception as e:
+    except (OSError, shutil.Error) as e:
         print(f"Warning: Failed to restore config from backup: {e}")
 
     return False
@@ -352,14 +491,13 @@ class ThemeManager:
         self.current_theme = self.config.get("current_theme", "dracula")
         # Initialize with default dark theme colors
         self.current_colors = get_theme_colors(self.current_theme)
-        
+
     def set_theme(self, theme_name):
         """Set the current theme"""
-        if theme_name in ['dracula', 'monokai', 'solarized', 'ocean', 
-                          'spring', 'sunset', 'candy', 'forest']:
+        if theme_name in available_themes():
             self.current_theme = theme_name
             self.current_colors = get_theme_colors(theme_name)
-            
+
             # Save to config
             self.config["current_theme"] = theme_name
             save_config(self.config)
@@ -375,12 +513,13 @@ class ThemeManager:
             root.configure(bg=self.current_colors["bg_primary"])
 
             # Configure ttk styles for modern appearance
-            self._configure_ttk_styles(root)
+            self._configure_ttk_styles()
 
-        except Exception as e:
+        except (KeyError, RuntimeError) as e:
+            # KeyError if a color key is missing; RuntimeError for ttk issues
             print(f"Theme application error: {e}")
 
-    def _configure_ttk_styles(self, root):
+    def _configure_ttk_styles(self):
         """Configure ttk widget styles for modern appearance"""
         try:
             import tkinter.ttk as ttk
@@ -475,18 +614,13 @@ class ThemeManager:
                 borderwidth=0,
             )
 
-        except Exception as e:
+        except (ImportError, RuntimeError, KeyError) as e:
             print(f"TTK style configuration error: {e}")
 
     def get_colors(self, theme_name=None):
         """Get colors for specified theme or current theme"""
         if theme_name:
-            # Temporarily switch to requested theme to get colors
-            old_theme = self.current_theme
-            self.set_theme(theme_name)
-            colors = self.current_colors.copy()
-            self.set_theme(old_theme)  # Switch back
-            return colors
+            return get_theme_colors(theme_name)
         return self.current_colors
 
     def apply_text_widget_theme(self, text_widget):
@@ -515,11 +649,14 @@ class ThemeManager:
                 ("number", "syntax_number"),
             ]:
                 try:
-                    text_widget.tag_configure(tag_name, foreground=colors[color_key])
-                except:
+                    col = colors.get(color_key)
+                    if col:
+                        text_widget.tag_configure(tag_name, foreground=col)
+                except (tk.TclError, TypeError, NameError):
+                    # Skip tag configuration if invalid
                     pass
 
-        except Exception as e:
+        except (KeyError, TypeError) as e:
             print(f"Text widget theme error: {e}")
 
     def apply_canvas_theme(self, canvas):
@@ -534,10 +671,136 @@ class ThemeManager:
                 highlightbackground=colors["border"],
             )
 
-        except Exception as e:
+        except (KeyError, RuntimeError) as e:
             print(f"Canvas theme error: {e}")
+
+    def apply_widget_theme(self, widget):
+        """Recursively apply theme to a Tk widget and its children.
+
+        Ensures canvases, frames, labels and text widgets receive consistent
+        color treatment even if created outside the main theme application
+        flow.
+        """
+        try:
+            colors = self.current_colors
+
+            # Apply to common widget types
+            cls_name = widget.winfo_class().lower()
+
+            if cls_name in ["frame", "tframe", "labelframe", "canvas"]:
+                try:
+                    widget.configure(
+                        bg=colors.get("bg_secondary", colors["bg_primary"])
+                    )
+                except (tk.TclError, KeyError, AttributeError):
+                    pass
+
+            if cls_name in ["text", "scrolledtext", "entry"]:
+                try:
+                    widget.configure(
+                        bg=colors.get("bg_primary"),
+                        fg=colors.get("text_primary"),
+                        insertbackground=colors.get("text_primary"),
+                    )
+                except (tk.TclError, AttributeError):
+                    pass
+
+            # Canvas special: use canvas theme
+            if cls_name == "canvas":
+                try:
+                    widget.configure(bg=colors.get("bg_primary"))
+                except (tk.TclError, AttributeError):
+                    pass
+
+            # Recursively theme children
+            for child in widget.winfo_children():
+                try:
+                    self.apply_widget_theme(child)
+                except (AttributeError, RuntimeError):
+                    pass
+
+        except (KeyError, AttributeError, RuntimeError) as e:
+            print(f"Widget theming error: {e}")
 
     def save_config(self, config_updates):
         """Save configuration updates"""
         self.config.update(config_updates)
         save_config(self.config)
+
+    def add_custom_theme(self, name, theme_dict):
+        """Add a custom theme to the config and persist it."""
+        if not isinstance(theme_dict, dict):
+            raise TypeError("theme_dict must be a dict")
+        custom = self.config.get("custom_themes", {})
+
+        # Ensure unique name
+        base = name
+        i = 1
+        while name in BUILTIN_THEMES or name in custom:
+            name = f"{base}_{i}"
+            i += 1
+
+        custom[name] = theme_dict
+        self.config["custom_themes"] = custom
+        save_config(self.config)
+        return name
+
+    def export_theme(self, theme_name, file_path):
+        """Export a theme (builtin or custom) to a JSON file at file_path."""
+        theme = get_theme_colors(theme_name)
+        export_obj = {"name": theme_name, "theme": theme}
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(export_obj, f, indent=2, ensure_ascii=False)
+            return True
+        except OSError as e:
+            print(f"Warning: Failed to export theme: {e}")
+            return False
+
+    def import_theme_from_file(self, file_path):
+        """Import a theme from a JSON file.
+
+        Returns the new theme name or None on failure.
+        """
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"Warning: Failed to read theme file: {e}")
+            return None
+
+        # Support files that are either {"name":..., "theme": {...}}
+        # or a raw theme dict
+        if isinstance(data, dict) and "theme" in data and "name" in data:
+            name = data["name"]
+            theme_dict = data["theme"]
+        elif isinstance(data, dict):
+            # raw theme dict -> derive name from filename
+            theme_dict = data
+            name = None
+        else:
+            return None
+
+        # If name not provided, generate from file stem
+        if not name:
+            import pathlib
+
+            name = pathlib.Path(file_path).stem
+
+        return self.add_custom_theme(name, theme_dict)
+
+    def restore_defaults(self):
+        """Restore default configuration.
+
+        Removes custom themes and resets the current theme by deleting the
+        user's config file and reloading defaults.
+        """
+        try:
+            reset_config()
+            self.config = load_config()
+            self.current_theme = self.config.get("current_theme", "forest")
+            self.current_colors = get_theme_colors(self.current_theme)
+            return True
+        except OSError as e:
+            print(f"Warning: Failed to restore defaults: {e}")
+            return False
