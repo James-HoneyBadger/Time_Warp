@@ -1,202 +1,187 @@
-# 🎯 Time_Warp IDE
+# Time_Warp IDE
 
-> **Educational Programming Environment** - A comprehensive multi-language IDE designed for learning and teaching programming with integrated turtle graphics, professional themes, and intuitive tools.
+A simple educational programming environment built with Python and Tkinter, supporting multiple programming languages through a unified interpreter.
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/James-HoneyBadger/Time_Warp/releases)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+## Overview
 
-## ✨ Features
+Time_Warp IDE is a minimal but powerful educational tool that allows users to write and execute programs in 9 different programming languages using a single, simple interface. It's designed for learning programming concepts across different paradigms.
 
-### 🔤 **Multi-Language Support**
+## Features
 
-- **TW BASIC** - Classic line-numbered programming with variables and loops
-- **TW PILOT** - Educational programming with turtle graphics and text commands
-- **TW Logo** - Turtle graphics programming for visual learning
-- **Python** - Modern scripting with full library support
-- **JavaScript** - Web development and scripting (Node.js)
-- **Perl** - Text processing and system scripting
+- **Multi-Language Support**: Execute code in PILOT, BASIC, Logo, Pascal, Prolog, Forth, Perl, Python, and JavaScript
+- **Simple GUI**: Clean Tkinter interface with text editor and run button
+- **Turtle Graphics**: Visual programming support for Logo and PILOT languages
+- **Educational Focus**: Clear error messages and immediate execution feedback
+- **Keyboard Shortcuts**: F5 or Ctrl+R to run programs
 
-### 🎨 **Professional Environment**
+## Installation
 
-- **Multi-Tab Editor** - Syntax highlighting and code completion
-- **8 Beautiful Themes** - 4 dark themes, 4 light themes
-- **Turtle Graphics** - Visual programming canvas
-- **File Management** - Project organization and file handling
-- **Real-time Execution** - Immediate code execution and results
+1. Clone the repository:
 
-### 📚 **Educational Focus**
+   ```bash
+   git clone https://github.com/James-HoneyBadger/Time_Warp.git
+   cd Time_Warp
+   ```
 
-- **Learning-Centered Design** - Built specifically for programming education
-- **Visual Programming** - Turtle graphics for Logo and PILOT
-- **Clear Error Messages** - Educational feedback for learning
-- **Example Programs** - Comprehensive sample code library
+2. Install dependencies:
 
-## 🚀 Quick Start
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Installation
+3. Run the IDE:
 
-```bash
-# Clone repository
-git clone https://github.com/James-HoneyBadger/Time_Warp.git
-cd Time_Warp
+   ```bash
+   python Time_Warp.py
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+## Usage
 
-# Run Time_Warp IDE
-python timewarp.py
-```
+1. **Launch** the application with `python Time_Warp.py`
+2. **Write** your program in the text area
+3. **Click "▶ Run Program"** or press **F5** to execute
+4. **View results** in the console output
 
-### First Program
+## Supported Languages
 
-1. **Launch** Time_Warp IDE
-2. **Select Language** from the dropdown menu
-3. **Write Code** in the editor with syntax highlighting
-4. **Run Program** with F5 or the Run button
-5. **View Results** in the output panel and graphics canvas
-
-## 📋 Language Examples
-
-<details>
-<summary><strong>TW BASIC - Classic Programming</strong></summary>
-
-```basic
-10 PRINT "Welcome to BASIC!"
-20 FOR I = 1 TO 10
-30 PRINT "Number: "; I
-40 NEXT I
-50 END
-```
-
-</details>
-
-<details>
-<summary><strong>TW Logo - Turtle Graphics</strong></summary>
-
-```logo
-; Draw a colorful flower
-REPEAT 8 [
-  REPEAT 4 [FORWARD 50 RIGHT 90]
-  RIGHT 45
-]
-```
-
-</details>
-
-<details>
-<summary><strong>TW PILOT - Educational Programming</strong></summary>
+### TW PILOT (Educational Language)
 
 ```pilot
-T:Welcome to PILOT programming!
+T:Hello World!
 A:What is your name?
-T:Nice to meet you, #NAME!
-T:Let's draw a square:
-T:FORWARD 100
-T:RIGHT 90
-; Continue for all 4 sides...
+T:Nice to meet you, *NAME*!
+U:X=10
+T:X equals *X*
 ```
 
-</details>
+### TW BASIC (Classic Programming)
 
-## 🎨 Themes
+```basic
+10 PRINT "Hello BASIC!"
+20 LET X = 5
+30 PRINT "X = "; X
+40 END
+```
 
-Professional color schemes for comfortable coding:
+### TW Logo (Turtle Graphics)
 
-| Dark Themes | Light Themes |
-|-------------|--------------|
-| 🌙 Dracula | 🌸 Spring |
-| 🔥 Monokai | 🌅 Sunset |
-| 🌊 Solarized Dark | 🍭 Candy |
-| 🌌 Ocean | 🌲 Forest |
+```logo
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+```
 
-## 📁 Project Structure
+### Python
+
+```python
+print("Hello from Python!")
+x = 42
+print(f"x = {x}")
+```
+
+### JavaScript
+
+```javascript
+console.log("Hello from JavaScript!");
+let x = 42;
+console.log(`x = ${x}`);
+```
+
+### Perl
+
+```perl
+print "Hello from Perl!\n";
+my $x = 42;
+print "x = $x\n";
+```
+
+## Architecture
 
 ```
 Time_Warp/
-├── src/timewarp/          # Main application package
-│   ├── __init__.py        # Package initialization
-│   ├── main.py            # Main application entry point
-│   ├── core/              # Core interpreter and language engines
-│   ├── gui/               # User interface components
-│   ├── utils/             # Utilities and theme management
-│   └── games/             # Game engine framework
-├── tests/                 # Comprehensive test suite
-│   ├── unit/              # Unit tests
-│   ├── integration/       # Integration tests
-│   ├── fixtures/          # Test data and fixtures
-│   └── verification/      # Test verification tools
-├── docs/                  # Documentation and guides
-│   ├── user-guide/        # End-user documentation
-│   ├── developer-guide/   # Contributing and development docs
-│   ├── api/               # API reference documentation
-│   ├── languages/         # Language-specific guides
-│   └── reports/           # Development and testing reports
-├── examples/              # Sample programs and tutorials
-│   ├── BASIC/             # BASIC language examples
-│   ├── Logo/              # Logo turtle graphics examples
-│   ├── PILOT/             # PILOT educational examples
-│   ├── Python/            # Python scripting examples
-│   └── games/             # Game development examples
-├── scripts/               # Development and build scripts
-│   ├── build/             # Build automation scripts
-│   └── development/       # Development tools
-├── plugins/               # Plugin system and extensions
-│   └── sample_plugin/     # Example plugin implementation
-├── marketing/             # Marketing materials and outreach
-│   ├── graphics/          # Marketing graphics and assets
-│   └── social_media/      # Social media content
-├── release/               # Release management
-│   └── v1.1/              # Version 1.1 release files
-├── timewarp.py            # Main entry point script
-├── pyproject.toml         # Modern Python project configuration
-├── requirements.txt       # Project dependencies
-└── pytest.ini            # Test configuration
+├── Time_Warp.py          # Main GUI application
+├── core/
+│   ├── __init__.py       # Core module exports
+│   ├── interpreter.py    # Main interpreter engine
+│   ├── languages/        # Language-specific executors
+│   │   ├── __init__.py
+│   │   ├── pilot.py      # TW PILOT executor
+│   │   ├── basic.py      # TW BASIC executor
+│   │   ├── logo.py       # TW Logo executor
+│   │   └── ...           # Other language executors
+│   └── utilities/        # Helper utilities
+├── requirements.txt      # Python dependencies
+└── scripts/
+    └── start.sh          # Launch script
 ```
 
-## 🧪 Testing
+## Language Details
+
+### TW PILOT
+
+- **Purpose**: Educational programming with simple commands
+- **Commands**: T: (text), A: (input), J: (jump), Y: (yes branch), N: (no branch), U: (update variable)
+- **Features**: Variable interpolation with `*VAR*` syntax, turtle graphics integration
+
+### TW BASIC
+
+- **Purpose**: Classic line-numbered programming
+- **Commands**: PRINT, LET, GOTO, IF...THEN, FOR...NEXT, INPUT
+- **Features**: Traditional BASIC syntax with modern enhancements
+
+### TW Logo
+
+- **Purpose**: Educational turtle graphics programming
+- **Commands**: FORWARD, BACK, LEFT, RIGHT, PENUP, PENDOWN, REPEAT
+- **Features**: Visual programming with turtle graphics
+
+### Modern Languages (Perl, Python, JavaScript)
+
+- **Purpose**: Full scripting language support
+- **Execution**: Direct execution with proper error handling
+- **Features**: Access to standard libraries and modern language features
+
+## Development
+
+### Running Tests
 
 ```bash
-# Run comprehensive test suite
 python -m pytest tests/
-
-# Run specific test categories
-python -m pytest tests/unit/          # Unit tests
-python -m pytest tests/integration/   # Integration tests
 ```
 
-## 📖 Documentation
+### Adding a New Language
 
-- **[User Guide](docs/user-guide/)** - Complete usage documentation
-- **[Developer Guide](docs/developer-guide/)** - Contributing and development
-- **[API Reference](docs/api/)** - Technical API documentation
-- **[Examples](examples/)** - Sample programs and tutorials
+1. Create executor class in `core/languages/newlang.py`
+2. Implement `execute_command()` method
+3. Add import to `core/languages/__init__.py`
+4. Register in `interpreter.py` language mapping
 
-## 🤝 Contributing
+### Code Style
 
-We welcome contributions! Please read our [Contributing Guide](docs/developer-guide/CONTRIBUTING.md) for:
+- Use descriptive docstrings for all classes and methods
+- Follow PEP 8 style guidelines
+- Include type hints where helpful
+- Write clear, educational error messages
 
-- Code style guidelines
-- Development setup
-- Pull request process
-- Issue reporting
+## Requirements
 
-## 📜 License
+- Python 3.8+
+- Tkinter (usually included with Python)
+- PIL/Pillow (optional, for image features)
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+## License
 
-## 🌟 Support
+MIT License - see LICENSE file for details.
 
-- **🐛 Issues**: [GitHub Issues](https://github.com/James-HoneyBadger/Time_Warp/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/James-HoneyBadger/Time_Warp/discussions)
-- **📚 Documentation**: Complete guides in `docs/` directory
+## Contributing
 
----
+Contributions welcome! Please:
 
-<div align="center">
-
-**Time_Warp IDE v1.1** - *Making programming education accessible, visual, and enjoyable*
-
-[🌟 Star this project](https://github.com/James-HoneyBadger/Time_Warp) • [🔗 Share with educators](https://github.com/James-HoneyBadger/Time_Warp) • [🚀 Try it now](https://github.com/James-HoneyBadger/Time_Warp/releases)
-
-</div>
+1. Test your changes
+2. Update documentation
+3. Follow existing code style
+4. Add examples for new features
