@@ -1,5 +1,32 @@
 # Time_Warp IDE - Changelog
 
+## Version 1.3.0 (October 13, 2025) 🚀
+
+### 🛠️ Major Improvements
+
+- **File Structure Organization**: Complete reorganization of project files for better maintainability
+- **Repository Cleanup**: Removed redundant files and directories, reducing repository size by ~440MB
+- **Enhanced Project Structure**: Logical grouping of documentation, examples, tests, and build scripts
+
+### 🔧 Technical Enhancements
+
+- **Clean Root Directory**: Moved auxiliary files to appropriate subdirectories (docs/, examples/, tests/, scripts/)
+- **Improved Organization**: Better separation of concerns with dedicated directories for different file types
+- **Version Management**: Updated version numbering across all configuration files
+
+### 📚 Documentation Updates
+
+- **Organized Documentation**: Moved all documentation files to docs/ with proper subdirectories
+- **Release Notes**: Updated release documentation structure
+- **Guides**: Consolidated GitHub release and deployment guides
+
+### 🧪 Testing & Quality
+
+- **Consolidated Tests**: All test files now properly organized in tests/ directory
+- **Build Scripts**: Organized build and deployment scripts in scripts/build/
+
+---
+
 ## Version 1.2.0 (October 11, 2025) 🚀
 
 ### 🛠️ Critical Bug Fixes
