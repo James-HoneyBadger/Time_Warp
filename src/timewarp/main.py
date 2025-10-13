@@ -1452,7 +1452,7 @@ TIPS:
                     },
                     "BASIC": {
                         "hello": '10 PRINT "Hello, World!"\n20 END\n\nThis prints text and ends the program.',
-                        "input": '10 PRINT "Enter your name:"\n20 INPUT N$\n30 PRINT "Hello "; N$\n40 END',
+                        "input": '10 PRINT "Enter your name:"\n20 INPUT N$\n30 PRINT "Hello "; N$; "!"\n40 END',
                         "loop": '10 FOR I = 1 TO 10\n20 PRINT "Count: "; I\n30 NEXT I\n40 END',
                         "graphics": "10 FOR I = 1 TO 4\n20 FORWARD 100\n30 RIGHT 90\n40 NEXT I\n50 END",
                     },
@@ -1540,8 +1540,8 @@ Quiz Program:
 T:What's 5 + 3?
 A:
 M:8
-Y:T:Correct! Well done!
-N:T:Wrong! The answer is 8.
+Y:T:Correct!
+N:T:Try again!
 
 🔢 BASIC EXAMPLES:
 ------------------
