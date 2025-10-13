@@ -27,6 +27,7 @@ from .utils.theme import (
     ThemeManager,
     available_themes,
     get_theme_preview,
+    get_config_file,
 )
 
 # Import core components
@@ -116,6 +117,12 @@ class Time_WarpIDE:
         # Initialize other components
         self.load_theme_config()
 
+        # Apply any saved settings (editor fonts, line numbers, etc.)
+        try:
+            self.apply_saved_settings()
+        except Exception:
+            pass
+
         # Setup keyboard shortcuts
         self.setup_keyboard_shortcuts()
 
@@ -144,13 +151,89 @@ class Time_WarpIDE:
     def load_theme_config(self):
         """Load theme configuration"""
         try:
-            self.current_theme = self.theme_manager.config.get(
-                "current_theme", "forest"
-            )
+            cfg = getattr(self.theme_manager, "config", {}) or {}
+            self.current_theme = cfg.get("current_theme", "forest")
             print(f"🎨 Loaded theme: {self.current_theme}")
+            # Log config path and key values for debugging
+            try:
+                cfg_path = get_config_file()
+                snippet = {
+                    "current_theme": self.current_theme,
+                    "font_family": cfg.get("font_family"),
+                    "editor_line_numbers": cfg.get("editor_settings", {}).get(
+                        "line_numbers"
+                    ),
+                }
+                print(f"🔍 Config path: {cfg_path} | keys: {snippet}")
+                # Write a small startup log for debugging
+                try:
+                    log_file = cfg_path.parent / "startup.log"
+                    with open(log_file, "a", encoding="utf-8") as lf:
+                        lf.write(
+                            f"{datetime.now().isoformat()} - Loaded config: {snippet}\n"
+                        )
+                except Exception:
+                    pass
+            except Exception:
+                pass
         except Exception as e:
             print(f"⚠️ Theme loading error: {e}")
             self.current_theme = "forest"
+
+    def apply_saved_settings(self):
+        """Apply saved editor and general settings from ThemeManager.config.
+
+        This method is safe to call after UI initialization; it will attempt to
+        apply font settings and editor flags to any already-created editor tabs.
+        """
+        try:
+            cfg = getattr(self.theme_manager, "config", {}) or {}
+
+            # Editor settings
+            editor_cfg = (
+                cfg.get("editor_settings", {})
+                if isinstance(cfg.get("editor_settings", {}), dict)
+                else {}
+            )
+
+            font_family = cfg.get("font_family") or editor_cfg.get("font_family")
+            font_size = cfg.get("font_size") or editor_cfg.get("font_size")
+
+            if font_family is None:
+                font_family = "Consolas"
+            if font_size is None:
+                font_size = 11
+
+            # Apply to existing editor tabs if present
+            if hasattr(self, "multi_tab_editor") and self.multi_tab_editor:
+                wrap_mode = tk.WORD if editor_cfg.get("word_wrap", False) else tk.NONE
+                for tab in self.multi_tab_editor.tabs.values():
+                    try:
+                        if hasattr(tab, "text_editor"):
+                            tab.text_editor.configure(
+                                font=(font_family, int(font_size)), wrap=wrap_mode
+                            )
+                        # Line numbers handling if supported by tab
+                        if hasattr(tab, "line_numbers"):
+                            if editor_cfg.get("line_numbers", True):
+                                try:
+                                    tab.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
+                                except Exception:
+                                    pass
+                            else:
+                                try:
+                                    tab.line_numbers.pack_forget()
+                                except Exception:
+                                    pass
+                    except Exception:
+                        pass
+
+            # Store remember flags on instance for later use
+            self.remember_tabs = bool(cfg.get("remember_tabs", True))
+            self.auto_save = bool(cfg.get("auto_save", False))
+
+        except Exception as e:
+            print(f"⚠️ Failed to apply saved settings: {e}")
 
     def _setup_window(self):
         """Setup main window properties"""
@@ -162,7 +245,7 @@ class Time_WarpIDE:
         try:
             # Try to set an icon (optional)
             pass
-        except:
+        except Exception:
             pass
 
     def setup_keyboard_shortcuts(self):
@@ -191,14 +274,14 @@ class Time_WarpIDE:
         self.editor_panel = ttk.Frame(self.main_container)
         try:
             self.main_container.add(self.editor_panel, weight=3, minsize=600)
-        except:
+        except Exception:
             self.main_container.add(self.editor_panel, weight=3)
 
         # Right panel: Graphics and Output
         self.graphics_output_panel = ttk.Frame(self.main_container, width=400)
         try:
             self.main_container.add(self.graphics_output_panel, weight=1, minsize=350)
-        except:
+        except Exception:
             self.main_container.add(self.graphics_output_panel, weight=1)
 
         # Setup components
@@ -681,7 +764,7 @@ class Time_WarpIDE:
                         self.main_container.add(
                             self.graphics_output_panel, weight=1, minsize=350
                         )
-                    except:
+                    except Exception:
                         self.main_container.add(self.graphics_output_panel, weight=1)
                     self.update_status("Graphics panel shown")
             else:
@@ -2905,6 +2988,9 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         editor_frame = ttk.Frame(notebook)
         notebook.add(editor_frame, text="📝 Editor")
 
+        # Font settings - initialize from saved config when available
+        cfg = getattr(self.theme_manager, "config", {}) or {}
+
         # Font settings
         font_frame = ttk.LabelFrame(editor_frame, text="Font Settings")
         font_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -2912,7 +2998,10 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         tk.Label(font_frame, text="Font Family:").grid(
             row=0, column=0, sticky="w", padx=5, pady=2
         )
-        font_var = tk.StringVar(value="Consolas")
+        font_default = cfg.get(
+            "font_family", cfg.get("editor_settings", {}).get("font_family", "Consolas")
+        )
+        font_var = tk.StringVar(value=font_default)
         font_combo = ttk.Combobox(
             font_frame,
             textvariable=font_var,
@@ -2923,7 +3012,10 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         tk.Label(font_frame, text="Font Size:").grid(
             row=1, column=0, sticky="w", padx=5, pady=2
         )
-        size_var = tk.IntVar(value=10)
+        size_default = cfg.get(
+            "font_size", cfg.get("editor_settings", {}).get("font_size", 11)
+        )
+        size_var = tk.IntVar(value=size_default)
         size_spin = tk.Spinbox(
             font_frame, from_=8, to=24, textvariable=size_var, width=10
         )
@@ -2933,7 +3025,14 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         behavior_frame = ttk.LabelFrame(editor_frame, text="Editor Behavior")
         behavior_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        line_numbers_var = tk.BooleanVar(value=True)
+        # Editor behavior - initialize from config
+        editor_cfg = (
+            cfg.get("editor_settings", {})
+            if isinstance(cfg.get("editor_settings", {}), dict)
+            else {}
+        )
+
+        line_numbers_var = tk.BooleanVar(value=editor_cfg.get("line_numbers", True))
         tk.Checkbutton(
             behavior_frame, text="Show line numbers", variable=line_numbers_var
         ).pack(anchor="w", padx=5, pady=2)
@@ -2943,7 +3042,9 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             behavior_frame, text="Auto-indent", variable=auto_indent_var
         ).pack(anchor="w", padx=5, pady=2)
 
-        word_wrap_var = tk.BooleanVar(value=False)
+        auto_indent_var.set(editor_cfg.get("auto_indent", True))
+
+        word_wrap_var = tk.BooleanVar(value=editor_cfg.get("word_wrap", False))
         tk.Checkbutton(behavior_frame, text="Word wrap", variable=word_wrap_var).pack(
             anchor="w", padx=5, pady=2
         )
@@ -2958,6 +3059,17 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         tk.Label(
             current_theme_frame, text=f"Active Theme: {self.current_theme.title()}"
         ).pack(pady=10)
+        # Display config file location for debugging/persistence visibility
+        try:
+            cfg_path = get_config_file()
+            tk.Label(
+                current_theme_frame,
+                text=f"Config file: {cfg_path}",
+                font=("TkDefaultFont", 8),
+                fg="#666666",
+            ).pack(pady=(0, 6))
+        except Exception:
+            pass
 
         theme_list_frame = ttk.LabelFrame(theme_frame, text="Available Themes")
         theme_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
@@ -3002,6 +3114,8 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             sw = tk.Canvas(row, width=48, height=28, bd=0, highlightthickness=1)
             rect = sw.create_rectangle(0, 0, 48, 28, fill=sw_bg, outline=sw_bg2)
             sw.create_rectangle(0, 20, 48, 28, fill=sw_accent, outline=sw_accent)
+            # Make the swatch keyboard-focusable for accessibility
+            sw.configure(takefocus=1)
             sw.pack(side=tk.LEFT, padx=(0, 10))
 
             def on_enter(e, r=rect, o=sw_accent):
@@ -3016,11 +3130,20 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             sw.bind("<Enter>", on_enter)
             sw.bind("<Leave>", on_leave)
             sw.bind("<Button-1>", lambda e, t=theme_name: on_swatch_click(t))
+            # Keyboard activation (Enter/Space) for accessibility
+            sw.bind("<Return>", lambda e, t=theme_name: on_swatch_click(t))
+            sw.bind("<space>", lambda e, t=theme_name: on_swatch_click(t))
+            sw.bind("<FocusIn>", on_enter)
+            sw.bind("<FocusOut>", on_leave)
 
             rb = tk.Radiobutton(
                 row, text=theme_name.title(), variable=theme_var, value=theme_name
             )
             rb.pack(side=tk.LEFT, anchor="w")
+            try:
+                rb.configure(takefocus=1)
+            except Exception:
+                pass
 
             return row
 
@@ -3113,28 +3236,118 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         button_frame.pack(fill=tk.X, padx=10, pady=5)
 
         def apply_settings():
-            # Apply theme change
+            # Persist the selected theme and other settings, then apply them.
             try:
-                # If preview was active, commit the selected theme
-                if preview_var.get():
-                    # If a preview changed the UI, commit selection now
-                    if theme_var.get() != self._settings_original_theme:
-                        self.change_theme(theme_var.get())
-                        # Clear preview marker
-                        self._preview_original_theme = None
-                else:
-                    if theme_var.get() != self.current_theme:
-                        self.change_theme(theme_var.get())
+                # --- Theme handling ---
+                try:
+                    sel = theme_var.get()
+                    if sel:
+                        self.change_theme(sel)
+                except Exception as e:
+                    print(f"⚠️ Failed to apply selected theme: {e}")
+
+                # --- Editor and general settings ---
+                new_editor_cfg = {
+                    "line_numbers": bool(line_numbers_var.get()),
+                    "auto_indent": bool(auto_indent_var.get()),
+                    "word_wrap": bool(word_wrap_var.get()),
+                    "font_family": font_var.get(),
+                    "font_size": int(size_var.get()),
+                    "tab_size": cfg.get("editor_settings", {}).get("tab_size", 4),
+                    "syntax_highlighting": cfg.get("editor_settings", {}).get(
+                        "syntax_highlighting", True
+                    ),
+                }
+
+                updates = {
+                    "editor_settings": new_editor_cfg,
+                    "font_family": font_var.get(),
+                    "font_size": int(size_var.get()),
+                    "remember_tabs": bool(remember_tabs_var.get()),
+                    "auto_save": bool(auto_save_var.get()),
+                }
+
+                # Save to persistent config (atomic, returns bool)
+                try:
+                    ok = self.theme_manager.save_config(updates)
+                    if not ok:
+                        messagebox.showerror(
+                            "Save Error",
+                            "Failed to write settings to disk. Check permissions or disk space.",
+                        )
+                        return
+                except Exception as e:
+                    print(f"⚠️ Failed to save settings: {e}")
+                    messagebox.showerror(
+                        "Save Error",
+                        f"Failed to write settings to disk: {e}",
+                    )
+                    return
+
+                # Apply changes immediately to editor widgets
+                try:
+                    fam = font_var.get()
+                    sz = int(size_var.get())
+                    wrap_mode = tk.WORD if word_wrap_var.get() else tk.NONE
+
+                    if hasattr(self, "multi_tab_editor") and self.multi_tab_editor:
+                        for tab in self.multi_tab_editor.tabs.values():
+                            try:
+                                if hasattr(tab, "text_editor"):
+                                    tab.text_editor.configure(
+                                        font=(fam, sz), wrap=wrap_mode
+                                    )
+                                if hasattr(tab, "line_numbers"):
+                                    if line_numbers_var.get():
+                                        try:
+                                            tab.line_numbers.pack(
+                                                side=tk.LEFT, fill=tk.Y
+                                            )
+                                        except Exception:
+                                            pass
+                                    else:
+                                        try:
+                                            tab.line_numbers.pack_forget()
+                                        except Exception:
+                                            pass
+                            except Exception:
+                                pass
+
+                except Exception as e:
+                    print(f"⚠️ Failed to apply editor settings live: {e}")
 
                 self.update_status("Settings applied")
-            finally:
+                # Briefly notify the user that settings were saved
+                try:
+                    self.show_toast("Settings saved")
+                except Exception:
+                    pass
+                # Clear any preview marker since selection is now persisted
+                try:
+                    self._preview_original_theme = None
+                except Exception:
+                    pass
                 settings_window.destroy()
 
+            except Exception as e:
+                # Ensure unexpected errors don't close the settings dialog silently
+                print(f"⚠️ apply_settings outer error: {e}")
+                try:
+                    messagebox.showerror(
+                        "Settings Error", f"Error applying settings: {e}"
+                    )
+                except Exception:
+                    pass
+
         def cancel_settings():
-            # If previewed, revert to original theme
+            # If a preview was applied during this settings session, always revert
+            # to the original theme regardless of the current state of the preview checkbox.
             try:
-                if preview_var.get() and getattr(self, "_preview_original_theme", None):
-                    self.revert_preview()
+                if getattr(self, "_preview_original_theme", None):
+                    try:
+                        self.revert_preview()
+                    except Exception as e:
+                        print(f"⚠️ Failed to revert preview on cancel: {e}")
             finally:
                 settings_window.destroy()
 
@@ -3183,14 +3396,20 @@ License: MIT"""
         """Change to a different theme"""
         try:
             print(f"🎨 Changing theme to: {theme_name}")
-            self.current_theme = theme_name
+            # Delegate to ThemeManager which persists and updates colors
+            try:
+                self.theme_manager.set_theme(theme_name)
+            except Exception:
+                # Fallback to local assignment
+                self.current_theme = theme_name
+                try:
+                    cfg = load_config()
+                    cfg["current_theme"] = theme_name
+                    save_config(cfg)
+                except Exception:
+                    pass
 
-            # Save theme preference
-            config = load_config()
-            config["current_theme"] = theme_name
-            save_config(config)
-
-            # Apply the new theme
+            # Refresh visuals
             self.apply_theme()
 
             print(f"✅ Theme changed to: {theme_name}")
@@ -3368,6 +3587,46 @@ License: MIT"""
         except Exception as e:
             print(f"⚠️ Window theme application error: {e}")
 
+    def show_toast(self, message, duration=1800):
+        """Show a small transient toast-like notification near the bottom of the main window."""
+        try:
+            toast = tk.Toplevel(self.root)
+            toast.overrideredirect(True)
+            toast.attributes("-topmost", True)
+            toast.configure(bg="#333333")
+
+            label = tk.Label(
+                toast,
+                text=message,
+                bg="#333333",
+                fg="#ffffff",
+                padx=10,
+                pady=6,
+                font=("TkDefaultFont", 10),
+            )
+            label.pack()
+
+            # Position near bottom-right of main window
+            self.root.update_idletasks()
+            x = (
+                self.root.winfo_rootx()
+                + self.root.winfo_width()
+                - toast.winfo_reqwidth()
+                - 20
+            )
+            y = (
+                self.root.winfo_rooty()
+                + self.root.winfo_height()
+                - toast.winfo_reqheight()
+                - 40
+            )
+            toast.geometry(f"+{x}+{y}")
+
+            # Auto-destroy after duration milliseconds
+            toast.after(duration, toast.destroy)
+        except Exception:
+            pass
+
     def load_plugins(self):
         """Load essential plugins"""
         try:
@@ -3429,6 +3688,10 @@ License: MIT"""
                 btn = ttk.Button(
                     sw_frame, text="Apply", command=make_callback(theme_name)
                 )
+                # Make the swatch itself keyboard accessible
+                sw_canvas.configure(takefocus=1)
+                sw_canvas.bind("<Return>", lambda e, n=theme_name: make_callback(n)())
+                sw_canvas.bind("<space>", lambda e, n=theme_name: make_callback(n)())
                 btn.pack(pady=(0, 6))
 
                 col += 1

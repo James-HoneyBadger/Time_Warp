@@ -6,6 +6,8 @@ Handles saving and loading of UI theme preferences across time
 import json
 import tkinter as tk
 from pathlib import Path
+import os
+from datetime import datetime
 
 
 def get_config_dir():
@@ -60,13 +62,21 @@ def load_config():
         },
     }
 
+    def _deep_merge(a, b):
+        """Recursively merge dict b into dict a and return the result."""
+        for k, v in b.items():
+            if k in a and isinstance(a[k], dict) and isinstance(v, dict):
+                a[k] = _deep_merge(a[k], v)
+            else:
+                a[k] = v
+        return a
+
     try:
         if config_file.exists():
             with open(config_file, "r", encoding="utf-8") as f:
                 config = json.load(f)
-                # Merge with defaults to ensure all keys exist
-                merged_config = default_config.copy()
-                merged_config.update(config)
+                # Deep-merge with defaults to ensure nested keys are preserved
+                merged_config = _deep_merge(default_config.copy(), config)
                 return merged_config
     except (OSError, json.JSONDecodeError) as e:
         print(f"Warning: Failed to load config: {e}")
@@ -372,10 +382,22 @@ BUILTIN_THEMES = {
 def save_config(config):
     """Save configuration to file"""
     config_file = get_config_file()
-
     try:
-        with open(config_file, "w", encoding="utf-8") as f:
+        # Write atomically: write to a temp file and replace
+        # Add metadata for debugging
+        try:
+            meta = config.get("_meta", {}) if isinstance(config, dict) else {}
+            meta["last_saved"] = datetime.now().isoformat()
+            meta["last_saved_pid"] = os.getpid()
+            config["_meta"] = meta
+        except Exception:
+            pass
+
+        tmp = config_file.with_suffix(".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
+            f.flush()
+        tmp.replace(config_file)
         return True
     except OSError as e:
         print(f"Warning: Failed to save config: {e}")
@@ -724,8 +746,22 @@ class ThemeManager:
 
     def save_config(self, config_updates):
         """Save configuration updates"""
-        self.config.update(config_updates)
-        save_config(self.config)
+
+        # Deep-merge updates into the existing config to avoid clobbering nested dicts
+        def _deep_merge(a, b):
+            for k, v in b.items():
+                if k in a and isinstance(a[k], dict) and isinstance(v, dict):
+                    a[k] = _deep_merge(a[k], v)
+                else:
+                    a[k] = v
+            return a
+
+        try:
+            self.config = _deep_merge(self.config or {}, config_updates or {})
+            return save_config(self.config)
+        except Exception as e:
+            print(f"Warning: Failed to merge/save config: {e}")
+            return False
 
     def add_custom_theme(self, name, theme_dict):
         """Add a custom theme to the config and persist it."""
