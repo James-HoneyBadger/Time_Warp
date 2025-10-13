@@ -89,11 +89,11 @@ ls -la timewarp.py README.md requirements.txt CHANGELOG.md RELEASE_NOTES_v1.3.0.
 
 1. **Test the release**: Download and verify all assets work
 2. **Update social media**: Announce the stable release
-3. **Close old issues**: Mark resolved bugs as fixed in v1.2.0
-4. **Update documentation**: Ensure all links point to v1.2.0
+3. **Close old issues**: Mark resolved bugs as fixed in v1.3.0
+4. **Update documentation**: Ensure all links point to v1.3.0
 
 ---
 
 **Status**: ✅ Ready for GitHub Release
-**Tag**: v1.2.0 (pushed to origin)
+**Tag**: v1.3.0 (pushed to origin)
 **Branch**: release/v1.1-verified (up to date)
