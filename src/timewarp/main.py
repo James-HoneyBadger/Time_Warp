@@ -415,7 +415,6 @@ class Time_WarpIDE:
             label="🆘 Quick Help", command=self.show_quick_help, accelerator="F1"
         )
         help_menu.add_separator()
-        help_menu.add_command(label="ℹ️ About Time_Warp IDE", command=self.show_about)
 
     def setup_multi_tab_editor(self):
         """Setup multi-tab code editor"""
@@ -1080,9 +1079,9 @@ class Time_WarpIDE:
             notebook = ttk.Notebook(tutorial_window)
             notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-            # Basic Programming Tutorial
+            # TW Overview Tutorial
             basic_frame = ttk.Frame(notebook)
-            notebook.add(basic_frame, text="🎯 Basic Programming")
+            notebook.add(basic_frame, text="� TW Overview")
 
             basic_text = tk.Text(basic_frame, wrap=tk.WORD, font=("Consolas", 11))
             basic_scrollbar = ttk.Scrollbar(
@@ -1090,45 +1089,160 @@ class Time_WarpIDE:
             )
             basic_text.configure(yscrollcommand=basic_scrollbar.set)
 
-            basic_content = """🎯 BASIC PROGRAMMING TUTORIAL
+            basic_content = """� TIME_WARP IDE OVERVIEW
 
-Welcome to Time_Warp IDE! Let's learn the fundamentals:
+Welcome to Time_Warp IDE - Your Gateway to Programming History!
 
-1. CHOOSING A LANGUAGE:
-   • TW PILOT (1962) - Great for beginners, simple commands
-   • TW BASIC - Classic line-numbered programming
-   • TW Logo - Perfect for graphics and turtle programming
-   • Python - Modern, powerful scripting
+⏰ Time_Warp bridges the gap between vintage programming languages and modern development, offering an educational environment where you can explore the evolution of programming paradigms.
 
-2. YOUR FIRST PILOT PROGRAM:
-   Type this in the editor:
-   
-   T:Hello, World!
-   A:Enter your name
-   T:Welcome to Time_Warp IDE!
-   
-   Press F5 to run!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. YOUR FIRST BASIC PROGRAM:
-   10 PRINT "What's your name?"
-   20 INPUT N$
-   30 PRINT "Hello "; N$; "!"
-   40 END
+🎯 OUR MISSION
+To make programming history accessible, educational, and fun through interactive learning experiences that span from 1960s educational languages to modern scripting.
 
-4. YOUR FIRST LOGO PROGRAM:
-   FORWARD 100
-   RIGHT 90
-   FORWARD 100
-   RIGHT 90
-   FORWARD 100
-   RIGHT 90
-   FORWARD 100
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. TIPS FOR SUCCESS:
-   • Save your work frequently (Ctrl+S)
-   • Use the graphics panel to see turtle drawings
-   • Check the output panel for results
-   • Try different themes in View → Themes"""
+🚀 SUPPORTED LANGUAGES OVERVIEW
+
+1. 🚁 TW PILOT (1962) - Educational Programming
+   • Designed for teaching programming concepts
+   • English-like syntax for beginners
+   • Commands: T: (Type), A: (Accept), J: (Jump), Y: (Yes), N: (No)
+   • Perfect for: Learning basic programming logic
+
+2. 🔢 TW BASIC (1964) - Classic Line-Numbered Programming
+   • Traditional BASIC with line numbers
+   • Commands: PRINT, INPUT, LET, GOTO, IF...THEN, FOR...NEXT
+   • Perfect for: Understanding structured programming
+
+3. 🐢 TW Logo (1967) - Turtle Graphics Programming
+   • Visual programming with turtle graphics
+   • Commands: FORWARD, BACK, LEFT, RIGHT, PENUP, PENDOWN
+   • Perfect for: Learning geometry and visual programming
+
+4. 📚 TW Pascal (1970) - Structured Programming
+   • Strongly typed, procedural language
+   • Features: Records, pointers, procedures, functions
+   • Perfect for: Learning data structures and algorithms
+
+5. 🧠 TW Prolog (1972) - Logic Programming
+   • Declarative programming paradigm
+   • Based on formal logic and predicate calculus
+   • Perfect for: AI, expert systems, and logical reasoning
+
+6. ⚡ TW Forth (1970) - Stack-Based Programming
+   • Concatenative, stack-based language
+   • Extremely efficient and low-level
+   • Perfect for: Embedded systems and real-time programming
+
+7. 🐍 Python (1991) - Modern Scripting
+   • High-level, interpreted language
+   • Extensive standard library and ecosystem
+   • Perfect for: Web development, data science, automation
+
+8. 🌐 JavaScript (1995) - Web Programming
+   • Prototype-based scripting language
+   • Essential for web development
+   • Perfect for: Interactive web applications
+
+9. 💎 Perl (1987) - Text Processing
+   • Powerful text manipulation capabilities
+   • "Swiss Army knife" of scripting languages
+   • Perfect for: System administration and text processing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎮 UNIQUE FEATURES
+
+✨ Multi-Language Environment
+• Switch between languages seamlessly
+• Compare programming paradigms
+• Understand language evolution
+
+🎨 Integrated Graphics
+• Turtle graphics for visual programming
+• Real-time drawing and animation
+• Export capabilities
+
+🤖 AI-Powered Assistance
+• Context-aware code suggestions
+• Language-specific help
+• Debugging assistance
+
+📚 Interactive Tutorials
+• Step-by-step learning modules
+• Comprehensive language guides
+• Progress tracking
+
+🏆 Gamification System
+• Achievement badges
+• Skill progression
+• Programming challenges
+
+🔧 Code Analysis Tools
+• Syntax checking
+• Performance profiling
+• Code quality metrics
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 LEARNING PATH RECOMMENDED
+
+BEGINNER (Start Here):
+1. TW PILOT - Learn basic programming concepts
+2. TW Logo - Discover visual programming
+3. TW BASIC - Master structured programming
+
+INTERMEDIATE:
+4. TW Pascal - Explore data structures
+5. TW Python - Modern programming practices
+6. TW JavaScript - Web development basics
+
+ADVANCED:
+7. TW Prolog - Logic programming paradigm
+8. TW Forth - Low-level programming concepts
+9. TW Perl - Advanced text processing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 WHY TIME_WARP?
+
+• 🕰️ Historical Context: Understand how programming evolved
+• 🎓 Educational Focus: Designed for learning and teaching
+• 🔄 Paradigm Diversity: Experience different programming approaches
+• 🎮 Interactive Learning: Visual feedback and gamification
+• 🌍 Community Driven: Open source and collaborative
+• 🚀 Future Ready: Modern IDE features with historical languages
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 GETTING STARTED
+
+1. Choose Your First Language
+   • New to programming? Start with TW PILOT
+   • Visual learner? Try TW Logo
+   • Traditional approach? Begin with TW BASIC
+
+2. Explore the Interface
+   • Multi-tab editor for multiple files
+   • Integrated graphics canvas
+   • Output console for results
+
+3. Learn Through Examples
+   • Use the AI Assistant for help
+   • Browse code templates
+   • Complete tutorial challenges
+
+4. Track Your Progress
+   • View achievements in Gamification Dashboard
+   • Monitor learning progress
+   • Set personal goals
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Happy coding through time! ⏰✨
+
+Remember: Every programming language teaches you something unique about computation. Time_Warp IDE helps you discover the rich history and diverse paradigms that shaped modern programming."""
 
             basic_text.insert(tk.END, basic_content)
             basic_text.config(state=tk.DISABLED)
@@ -1354,6 +1468,655 @@ TIPS:
             logo_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             logo_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+            # TW Pascal Tutorial
+            pascal_frame = ttk.Frame(notebook)
+            notebook.add(pascal_frame, text="📚 TW Pascal")
+
+            pascal_text = tk.Text(pascal_frame, wrap=tk.WORD, font=("Consolas", 11))
+            pascal_scrollbar = ttk.Scrollbar(
+                pascal_frame, orient=tk.VERTICAL, command=pascal_text.yview
+            )
+            pascal_text.configure(yscrollcommand=pascal_scrollbar.set)
+
+            pascal_content = """📚 PASCAL LANGUAGE TUTORIAL
+
+Pascal is a strongly typed, procedural programming language designed for teaching structured programming and data structures.
+
+HISTORY & DESIGN PHILOSOPHY:
+• Created by Niklaus Wirth in 1970
+• Designed for education and system programming
+• Influenced languages like Ada, Modula-2, and Oberon
+• Emphasizes structured programming and data typing
+
+BASIC SYNTAX:
+• Case-sensitive language
+• Statements end with semicolons (;)
+• Programs have clear structure with BEGIN...END blocks
+• Strong type checking prevents many runtime errors
+
+PROGRAM STRUCTURE:
+program HelloWorld;
+begin
+    writeln('Hello, World!');
+end.
+
+DATA TYPES:
+• Integer: whole numbers (-32768 to 32767)
+• Real: floating-point numbers
+• Boolean: true/false values
+• Char: single characters
+• String: text strings
+
+EXAMPLES:
+
+1. HELLO WORLD:
+program HelloWorld;
+begin
+    writeln('Hello, World!');
+    writeln('Welcome to Pascal programming!');
+end.
+
+2. VARIABLES AND INPUT:
+program UserGreeting;
+var
+    name: string;
+    age: integer;
+begin
+    write('What is your name? ');
+    readln(name);
+    write('How old are you? ');
+    readln(age);
+    writeln('Hello, ', name, '! You are ', age, ' years old.');
+end.
+
+3. CONDITIONAL STATEMENTS:
+program NumberCheck;
+var
+    num: integer;
+begin
+    write('Enter a number: ');
+    readln(num);
+    if num > 0 then
+        writeln('Positive number')
+    else if num < 0 then
+        writeln('Negative number')
+    else
+        writeln('Zero');
+end.
+
+4. LOOPS:
+program Counting;
+var
+    i: integer;
+begin
+    writeln('Counting to 10:');
+    for i := 1 to 10 do
+        write(i, ' ');
+    writeln;
+
+    writeln('Even numbers:');
+    i := 2;
+    while i <= 10 do
+    begin
+        write(i, ' ');
+        i := i + 2;
+    end;
+    writeln;
+end.
+
+5. PROCEDURES AND FUNCTIONS:
+program MathOperations;
+var
+    a, b: integer;
+
+function Add(x, y: integer): integer;
+begin
+    Add := x + y;
+end;
+
+procedure DisplayResult(op: string; result: integer);
+begin
+    writeln(op, ' = ', result);
+end;
+
+begin
+    a := 10;
+    b := 5;
+    DisplayResult('Addition', Add(a, b));
+    DisplayResult('Subtraction', a - b);
+    DisplayResult('Multiplication', a * b);
+end.
+
+6. ARRAYS:
+program ArrayDemo;
+var
+    numbers: array[1..5] of integer;
+    i: integer;
+begin
+    // Initialize array
+    for i := 1 to 5 do
+        numbers[i] := i * 10;
+
+    // Display array
+    writeln('Array contents:');
+    for i := 1 to 5 do
+        write(numbers[i], ' ');
+    writeln;
+end.
+
+7. RECORDS (STRUCTS):
+program StudentRecord;
+type
+    Student = record
+        name: string;
+        age: integer;
+        grade: real;
+    end;
+
+var
+    student1: Student;
+
+begin
+    student1.name := 'Alice';
+    student1.age := 20;
+    student1.grade := 95.5;
+
+    writeln('Student Information:');
+    writeln('Name: ', student1.name);
+    writeln('Age: ', student1.age);
+    writeln('Grade: ', student1.grade:4:1);
+end.
+
+8. FILE OPERATIONS:
+program FileDemo;
+var
+    infile, outfile: text;
+    line: string;
+begin
+    // Write to file
+    assign(outfile, 'output.txt');
+    rewrite(outfile);
+    writeln(outfile, 'Hello from Pascal!');
+    writeln(outfile, 'This is a test file.');
+    close(outfile);
+
+    // Read from file
+    assign(infile, 'output.txt');
+    reset(infile);
+    while not eof(infile) do
+    begin
+        readln(infile, line);
+        writeln('Read: ', line);
+    end;
+    close(infile);
+end.
+
+KEY FEATURES:
+• Strong typing prevents type errors
+• Clear program structure with begin/end blocks
+• Procedures and functions for modular code
+• Records for complex data structures
+• File I/O capabilities
+• Pointers for dynamic memory management
+
+PROGRAMMING PARADIGMS:
+• Procedural programming
+• Structured programming
+• Modular design
+• Top-down design approach
+
+COMMON USES:
+• Educational programming
+• System programming
+• Compiler development
+• Database applications
+• Scientific computing
+
+TIPS FOR SUCCESS:
+• Always declare variables before use
+• Use meaningful variable names
+• Structure programs with proper indentation
+• Test programs with various inputs
+• Use procedures to organize code
+
+Pascal teaches disciplined programming practices that are valuable in any language!"""
+
+            pascal_text.insert(tk.END, pascal_content)
+            pascal_text.config(state=tk.DISABLED)
+
+            pascal_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            pascal_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # TW Prolog Tutorial
+            prolog_frame = ttk.Frame(notebook)
+            notebook.add(prolog_frame, text="🧠 TW Prolog")
+
+            prolog_text = tk.Text(prolog_frame, wrap=tk.WORD, font=("Consolas", 11))
+            prolog_scrollbar = ttk.Scrollbar(
+                prolog_frame, orient=tk.VERTICAL, command=prolog_text.yview
+            )
+            prolog_text.configure(yscrollcommand=prolog_scrollbar.set)
+
+            prolog_content = """🧠 PROLOG LANGUAGE TUTORIAL
+
+Prolog is a logic programming language based on formal logic and predicate calculus. It's particularly powerful for AI, expert systems, and symbolic computation.
+
+HISTORY & DESIGN PHILOSOPHY:
+• Created by Alain Colmerauer and Philippe Roussel in 1972
+• Based on Robinson's resolution principle
+• Designed for natural language processing and AI research
+• Uses declarative programming paradigm
+
+CORE CONCEPTS:
+• Facts: Statements that are unconditionally true
+• Rules: Conditional statements (if-then relationships)
+• Queries: Questions you ask the system
+• Unification: Pattern matching and variable binding
+• Backtracking: Automatic search through possibilities
+
+BASIC SYNTAX:
+• Facts end with a period (.)
+• Rules use :- (if) operator
+• Variables start with uppercase letters
+• Constants and predicates start with lowercase
+• Lists use square brackets: [1, 2, 3]
+
+EXAMPLES:
+
+1. BASIC FACTS:
+% Facts about people
+person(alice).
+person(bob).
+person(charlie).
+
+% Facts about relationships
+parent(alice, bob).
+parent(bob, charlie).
+
+% Facts about likes
+likes(alice, reading).
+likes(bob, swimming).
+likes(charlie, games).
+
+2. SIMPLE QUERIES:
+?- person(alice).        % Is alice a person? (yes)
+?- parent(alice, bob).   % Is alice parent of bob? (yes)
+?- likes(alice, X).      % What does alice like? (reading)
+
+3. RULES:
+% Define grandparent relationship
+grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+
+% Define sibling relationship
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \\= Y.
+
+% Define ancestor relationship (recursive)
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+
+4. LISTS AND RECURSION:
+% Length of a list
+list_length([], 0).
+list_length([_|Tail], Length) :-
+    list_length(Tail, TailLength),
+    Length is TailLength + 1.
+
+% Sum of list elements
+sum_list([], 0).
+sum_list([Head|Tail], Sum) :-
+    sum_list(Tail, TailSum),
+    Sum is Head + TailSum.
+
+% Check if element is in list
+member(X, [X|_]).
+member(X, [_|Tail]) :- member(X, Tail).
+
+5. MATHEMATICAL RELATIONS:
+% Factorial
+factorial(0, 1).
+factorial(N, Result) :-
+    N > 0,
+    N1 is N - 1,
+    factorial(N1, Result1),
+    Result is N * Result1.
+
+% Fibonacci
+fib(0, 0).
+fib(1, 1).
+fib(N, Result) :-
+    N > 1,
+    N1 is N - 1,
+    N2 is N - 2,
+    fib(N1, Result1),
+    fib(N2, Result2),
+    Result is Result1 + Result2.
+
+6. EXPERT SYSTEM EXAMPLE:
+% Animal classification expert system
+mammal(X) :- has_fur(X), gives_milk(X).
+bird(X) :- has_feathers(X), lays_eggs(X).
+reptile(X) :- has_scales(X), cold_blooded(X).
+
+% Facts about animals
+has_fur(cat).
+has_fur(dog).
+gives_milk(cat).
+gives_milk(dog).
+
+has_feathers(sparrow).
+lays_eggs(sparrow).
+
+has_scales(snake).
+cold_blooded(snake).
+
+% Classification queries:
+?- mammal(cat).      % yes
+?- bird(sparrow).    % yes
+?- reptile(snake).   % yes
+
+7. NATURAL LANGUAGE PROCESSING:
+% Simple English sentence parser
+sentence(S) :- noun_phrase(NP), verb_phrase(VP), append(NP, VP, S).
+
+noun_phrase([Det, N]) :- determiner(Det), noun(N).
+verb_phrase([V, NP]) :- verb(V), noun_phrase(NP).
+
+determiner([the]).
+determiner([a]).
+
+noun([cat]).
+noun([dog]).
+noun([mat]).
+
+verb([sat]).
+verb([chased]).
+
+% Parse: "the cat sat on the mat"
+?- sentence([the, cat, sat, on, the, mat]).
+
+8. SOLVING PUZZLES:
+% Eight queens problem (simplified 4x4 version)
+queens([]).
+queens([Q|Qs]) :- queens(Qs), member(Q, [1,2,3,4]), safe(Q, Qs, 1).
+
+safe(_, [], _).
+safe(Q, [Q1|Qs], D) :- Q \\=\\= Q1, abs(Q - Q1) \\=\\= D, safe(Q, Qs, D + 1).
+
+% Find solution: ?- queens([A,B,C,D]).
+
+9. DATABASE QUERIES:
+% Employee database
+employee(john, manager, 75000).
+employee(sarah, developer, 65000).
+employee(mike, designer, 55000).
+
+department(manager, engineering).
+department(developer, engineering).
+department(designer, design).
+
+% Queries
+?- employee(Name, Position, Salary), Salary > 60000.
+?- employee(Name, _, _), department(_, Dept).
+
+KEY FEATURES:
+• Declarative programming (what, not how)
+• Automatic backtracking and search
+• Pattern matching and unification
+• Recursive definitions
+• Built-in theorem prover
+
+PROGRAMMING PARADIGMS:
+• Logic programming
+• Declarative programming
+• Constraint programming
+• Symbolic computation
+
+COMMON USES:
+• Artificial Intelligence
+• Expert systems
+• Natural language processing
+• Automated theorem proving
+• Database query systems
+• Puzzle solving
+• Knowledge representation
+
+PROLOG THINKING:
+• Think in terms of relationships and rules
+• Let Prolog handle the "how" - you specify the "what"
+• Use recursion for repetitive structures
+• Facts are your knowledge base
+• Rules define relationships and inferences
+
+TIPS FOR SUCCESS:
+• Start with simple facts and queries
+• Understand unification and backtracking
+• Use meaningful predicate names
+• Test rules with various queries
+• Think declaratively, not procedurally
+
+Prolog will change how you think about programming - it's a paradigm shift worth experiencing!"""
+
+            prolog_text.insert(tk.END, prolog_content)
+            prolog_text.config(state=tk.DISABLED)
+
+            prolog_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            prolog_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # TW Forth Tutorial
+            forth_frame = ttk.Frame(notebook)
+            notebook.add(forth_frame, text="⚡ TW Forth")
+
+            forth_text = tk.Text(forth_frame, wrap=tk.WORD, font=("Consolas", 11))
+            forth_scrollbar = ttk.Scrollbar(
+                forth_frame, orient=tk.VERTICAL, command=forth_text.yview
+            )
+            forth_text.configure(yscrollcommand=forth_scrollbar.set)
+
+            forth_content = """⚡ FORTH LANGUAGE TUTORIAL
+
+Forth is a stack-based, concatenative programming language known for its efficiency, extensibility, and low-level control. It's widely used in embedded systems and real-time applications.
+
+HISTORY & DESIGN PHILOSOPHY:
+• Created by Charles H. Moore in 1970
+• Designed for efficiency and low resource usage
+• Influenced by earlier languages like Lisp and APL
+• "Forth" stands for "Fourth-generation language"
+
+STACK-BASED ARCHITECTURE:
+• All operations work on a data stack
+• Parameters passed via stack manipulation
+• Results returned on the stack
+• No variables in traditional sense (though available)
+
+BASIC CONCEPTS:
+• Words: Functions/subroutines in Forth
+• Stack: LIFO data structure for parameters/results
+• Dictionary: Collection of defined words
+• Colon definitions: User-defined words (: word-name ... ;)
+• Immediate execution vs. compilation
+
+STACK OPERATIONS:
+• DUP: Duplicate top stack item
+• DROP: Remove top stack item
+• SWAP: Exchange top two items
+• OVER: Copy second item to top
+• ROT: Rotate top three items
+
+EXAMPLES:
+
+1. BASIC ARITHMETIC:
+5 3 + .     \\ 8 (5 + 3 = 8)
+10 4 - .    \\ 6 (10 - 4 = 6)
+3 4 * .     \\ 12 (3 * 4 = 12)
+15 3 / .    \\ 5 (15 / 3 = 5)
+
+2. STACK MANIPULATION:
+5 DUP . .   \\ 5 5 (duplicate and print both)
+1 2 3 . . . \\ 3 2 1 (print in reverse order)
+4 5 SWAP . . \\ 4 5 (swap and print)
+
+3. FIRST WORDS:
+: SQUARE DUP * ;     \\ Define square function
+5 SQUARE .           \\ 25
+
+: CUBE DUP DUP * * ; \\ Define cube function
+3 CUBE .             \\ 27
+
+4. VARIABLES AND CONSTANTS:
+VARIABLE COUNTER    \\ Define variable
+10 COUNTER !        \\ Store 10 in COUNTER
+COUNTER @ .         \\ Retrieve and print: 10
+
+CONSTANT PI 314     \\ Define constant (314/100 = 3.14)
+PI .                \\ 314
+
+5. LOOPS:
+10 0 DO I . LOOP    \\ Print 0 1 2 ... 9
+
+: COUNT-DOWN
+    BEGIN
+        DUP .       \\ Print current value
+        1 -         \\ Decrement
+        DUP 0 <     \\ Check if negative
+    UNTIL           \\ Exit when true
+    DROP            \\ Remove final negative value
+;
+
+10 COUNT-DOWN       \\ 10 9 8 7 6 5 4 3 2 1 0
+
+6. CONDITIONALS:
+: IS-EVEN?
+    2 MOD 0 = IF
+        ." Even" CR
+    ELSE
+        ." Odd" CR
+    THEN
+;
+
+4 IS-EVEN?          \\ Even
+7 IS-EVEN?          \\ Odd
+
+: COMPARE
+    2DUP < IF       \\ Compare top two items
+        ." Less than" CR
+    ELSE 2DUP > IF
+        ." Greater than" CR
+    ELSE
+        ." Equal" CR
+    THEN THEN
+    2DROP           \\ Clean up stack
+;
+
+5 3 COMPARE         \\ Greater than
+
+7. STRINGS:
+: HELLO ." Hello, World!" CR ;
+
+HELLO               \\ Hello, World!
+
+S" Forth is fun!" TYPE CR    \\ Print string
+
+8. ARRAYS:
+CREATE ARRAY 10 CELLS ALLOT   \\ Create array of 10 cells
+
+: STORE-ARRAY ( value index -- )
+    CELLS ARRAY + !           \\ Store value at index
+;
+
+: FETCH-ARRAY ( index -- value )
+    CELLS ARRAY + @           \\ Fetch value from index
+;
+
+42 0 STORE-ARRAY              \\ Store 42 at index 0
+0 FETCH-ARRAY .              \\ 42
+
+9. RECURSION:
+: FACTORIAL
+    DUP 1 > IF
+        DUP 1 - RECURSE *    \\ Recursive call
+    ELSE
+        DROP 1               \\ Base case: 0! = 1! = 1
+    THEN
+;
+
+5 FACTORIAL .               \\ 120
+
+10. GRAPHICS EXAMPLE:
+: DRAW-SQUARE ( size -- )
+    DUP FORWARD 90 RIGHT    \\ Repeat 4 times
+    DUP FORWARD 90 RIGHT
+    DUP FORWARD 90 RIGHT
+         FORWARD 90 RIGHT
+    DROP
+;
+
+\\ Draw nested squares
+100 DRAW-SQUARE
+50 DRAW-SQUARE
+
+11. LOW-LEVEL CONTROL:
+HEX                    \\ Switch to hexadecimal
+: PORT-OUT ( value port -- )
+    OUT             \\ Output to port (system dependent)
+;
+
+DEC                    \\ Back to decimal
+
+12. EXTENSIBLE COMPILER:
+: CONSTANT ( "name" value -- )
+    CREATE ,       \\ Create word and store value
+    DOES> @        \\ Runtime: fetch value
+;
+
+13 PI CONSTANT MY-PI   \\ Define constant
+MY-PI .               \\ Print value
+
+KEY FEATURES:
+• Extremely efficient and fast
+• Minimal memory footprint
+• Extensible language (write your own compiler)
+• Direct hardware access
+• Interactive development
+• Threaded code for efficiency
+
+PROGRAMMING PARADIGMS:
+• Concatenative programming
+• Stack-based programming
+• Interactive programming
+• Metaprogramming
+
+COMMON USES:
+• Embedded systems
+• Real-time applications
+• Robotics control
+• Scientific instruments
+• Bootloaders and firmware
+• Industrial automation
+• Spacecraft control systems
+
+FORTH PHILOSOPHY:
+• Keep it simple and minimal
+• Build complex systems from simple primitives
+• Interactive development and testing
+• Direct control over hardware
+• "If you want it done right, do it yourself"
+
+TIPS FOR SUCCESS:
+• Always know what's on the stack
+• Use .S frequently to inspect stack
+• Build incrementally and test often
+• Learn stack manipulation thoroughly
+• Think in terms of data flow
+• Use meaningful word names
+
+Forth will teach you to think about programming at the lowest level while maintaining high-level abstractions. It's a unique paradigm that rewards deep understanding!"""
+
+            forth_text.insert(tk.END, forth_content)
+            forth_text.config(state=tk.DISABLED)
+
+            forth_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            forth_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
             # Close button
             close_btn = ttk.Button(
                 tutorial_window, text="Close Tutorial", command=tutorial_window.destroy
@@ -1462,6 +2225,24 @@ TIPS:
                         "spiral": "REPEAT 100 [FORWARD :I RIGHT 91]\n\nCreates a spiral pattern.",
                         "flower": "REPEAT 36 [\n  REPEAT 4 [FORWARD 50 RIGHT 90]\n  RIGHT 10\n]\n\nDraws a flower pattern with 36 squares.",
                     },
+                    "Pascal": {
+                        "hello": 'program HelloWorld;\nbegin\n  writeln(\'Hello, World!\');\nend.\n\nThis is a complete Pascal program.',
+                        "input": 'program GetName;\nvar\n  name: string;\nbegin\n  write(\'Enter your name: \');\n  readln(name);\n  writeln(\'Hello, \', name);\nend.',
+                        "loop": 'program CountToTen;\nvar\n  i: integer;\nbegin\n  for i := 1 to 10 do\n    writeln(i);\nend.',
+                        "function": 'program Factorial;\nfunction fact(n: integer): integer;\nbegin\n  if n <= 1 then\n    fact := 1\n  else\n    fact := n * fact(n-1);\nend;\nbegin\n  writeln(fact(5));\nend.',
+                    },
+                    "Prolog": {
+                        "hello": 'hello :- write(\'Hello, World!\'), nl.\n\nQuery: ?- hello.\n\nThis defines a predicate that writes "Hello, World!".',
+                        "facts": 'parent(john, mary).\nparent(mary, ann).\n\nQuery: ?- parent(john, mary).\n\nThis defines family relationships.',
+                        "rules": 'ancestor(X, Y) :- parent(X, Y).\nancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).\n\nThis defines recursive ancestor relationships.',
+                        "query": '?- ancestor(john, ann).\n\nThis queries if john is an ancestor of ann.',
+                    },
+                    "Forth": {
+                        "hello": ': HELLO ." Hello, World!" CR ;\nHELLO\n\nThis defines and calls a word that prints "Hello, World!".',
+                        "stack": '5 3 + .     \\ Result: 8\n10 4 - .    \\ Result: 6\n3 4 * .     \\ Result: 12',
+                        "word": ': SQUARE DUP * ;\n5 SQUARE .   \\ Result: 25\n\nThis defines a word that squares a number.',
+                        "loop": '10 0 DO I . LOOP    \\ Prints 0 1 2 ... 9\n\nThis counts from 0 to 9.',
+                    },
                     "Python": {
                         "hello": 'print("Hello, World!")\n\nSimple text output in Python.',
                         "input": 'name = input("What\'s your name? ")\nprint(f"Hello, {name}!")',
@@ -1505,6 +2286,12 @@ TIPS:
                         response += "• PRINT - Display text\n• INPUT - Get input\n• FOR...NEXT - Loops\n• IF...THEN - Conditions"
                     elif language == "Logo":
                         response += "• FORWARD/BACK - Move turtle\n• LEFT/RIGHT - Turn turtle\n• REPEAT - Loop commands\n• PENUP/PENDOWN - Control drawing"
+                    elif language == "Pascal":
+                        response += "• program...end. - Program structure\n• var - Variable declarations\n• begin...end - Code blocks\n• writeln/readln - I/O operations"
+                    elif language == "Prolog":
+                        response += "• Facts: Define relationships\n• Rules: Define inferences\n• Queries: Ask questions\n• :- (neck) - Rule definition"
+                    elif language == "Forth":
+                        response += "• : word ; - Define words\n• DUP DROP SWAP - Stack operations\n• . - Print top of stack\n• CR - Carriage return"
                     elif language == "Python":
                         response += "• print() - Display text\n• input() - Get input\n• for/while - Loops\n• if/elif/else - Conditions"
 
@@ -1578,7 +2365,58 @@ REPEAT 8 [
   FORWARD 50
 ]
 
-🐍 PYTHON EXAMPLES:
+� PASCAL EXAMPLES:
+-------------------
+Hello World:
+program HelloWorld;
+begin
+  writeln('Hello, World!');
+end.
+
+Factorial Function:
+program Factorial;
+function fact(n: integer): integer;
+begin
+  if n <= 1 then
+    fact := 1
+  else
+    fact := n * fact(n-1);
+end;
+begin
+  writeln(fact(5));
+end.
+
+🔍 PROLOG EXAMPLES:
+-------------------
+Family Tree:
+parent(john, mary).
+parent(mary, ann).
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+
+Query: ?- ancestor(john, ann).
+
+Eight Queens:
+queens([]).
+queens([Q|Qs]) :- queens(Qs), member(Q, [1,2,3,4]), safe(Q, Qs, 1).
+safe(_, [], _).
+safe(Q, [Q1|Qs], D) :- Q \\=\\= Q1, abs(Q - Q1) \\=\\= D, safe(Q, Qs, D + 1).
+
+⚡ FORTH EXAMPLES:
+-----------------
+Stack Operations:
+5 3 + .     \\ 8
+10 4 - .    \\ 6
+3 4 * .     \\ 12
+
+Word Definition:
+: SQUARE DUP * ;
+5 SQUARE .   \\ 25
+
+Loop:
+10 0 DO I . LOOP    \\ 0 1 2 ... 9
+
+�🐍 PYTHON EXAMPLES:
 -------------------
 File Reader:
 with open("test.txt", "r") as file:
@@ -1668,7 +2506,7 @@ Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achie
 🥇 BEGINNER ACHIEVEMENTS:
 ▣ First Steps - Run your first program in any language
 ▣ Hello World - Create a "Hello, World!" program
-▣ Code Explorer - Try all 4 programming languages (PILOT, BASIC, Logo, Python)
+▣ Code Explorer - Try all 7 programming languages (PILOT, BASIC, Logo, Python, Pascal, Prolog, Forth)
 ▣ File Master - Save and load 5 different programs
 ▣ Theme Collector - Try all 8 available themes
 
@@ -1680,7 +2518,7 @@ Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achie
 ▣ Multi-Tab Pro - Work with 5 tabs simultaneously
 
 🥉 ADVANCED ACHIEVEMENTS:
-▣ Language Polyglot - Write the same program in all 4 languages
+▣ Language Polyglot - Write the same program in all 7 languages
 ▣ Graphics Wizard - Create complex geometric patterns
 ▣ Code Optimizer - Improve program efficiency by 50%
 ▣ Teaching Assistant - Help others learn programming concepts
@@ -1691,11 +2529,14 @@ Welcome to Time_Warp IDE's Learning Journey! Complete challenges to unlock achie
 ▣ BASIC Pioneer - Create advanced BASIC programs with graphics
 ▣ Logo Legend - Draw intricate patterns and designs
 ▣ Python Expert - Use advanced Python features
+▣ Pascal Structured - Master structured programming with procedures
+▣ Prolog Logic Master - Create complex logic programs with rules
+▣ Forth Stack Wizard - Master stack-based programming techniques
 ▣ Time_Warp Master - Unlock all other achievements
 
 📊 CURRENT PROGRESS:
 • Programs Run: 0/100 ⭐
-• Languages Used: 0/4 🔤
+• Languages Used: 0/7 🔤
 • Files Saved: 0/50 💾
 • Themes Tried: 1/8 🎨
 • Errors Fixed: 0/25 🔧
@@ -1768,7 +2609,7 @@ Keep coding daily to build your streak!"""
                 anchor=tk.W, pady=2
             )
             ttk.Label(
-                left_stats, text="🔤 Languages Used: 0/4", font=("Arial", 11)
+                left_stats, text="🔤 Languages Used: 0/7", font=("Arial", 11)
             ).pack(anchor=tk.W, pady=2)
 
             # Right column
@@ -1799,6 +2640,9 @@ Keep coding daily to build your streak!"""
                 ("🔢 BASIC", 0),
                 ("🐢 Logo", 0),
                 ("🐍 Python", 0),
+                ("📘 Pascal", 0),
+                ("🧠 Prolog", 0),
+                ("📚 Forth", 0),
             ]
 
             for lang, level in languages:
@@ -1868,8 +2712,8 @@ Ready to test your skills? Complete these challenges to earn XP and achievements
    • "Too high", "Too low", "Correct!"
 
 10. Multi-Language
-    • Write the same program in 2 languages
-    • Compare how they work differently
+    • Write the same program in 3 different languages
+    • Try Pascal, Prolog, or Forth for a challenge!
 
 🔴 ADVANCED CHALLENGES (50 XP each):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1892,6 +2736,26 @@ Ready to test your skills? Complete these challenges to earn XP and achievements
 15. Innovation Challenge
     • Create something completely unique
     • Surprise us with your creativity!
+
+16. Pascal Procedures
+    • Write a Pascal program with custom procedures
+    • Use functions to organize your code
+
+17. Prolog Logic Puzzle
+    • Create a logic puzzle in Prolog
+    • Use facts and rules to solve problems
+
+18. Forth Stack Master
+    • Write a complex Forth program using the stack
+    • Manipulate data efficiently on the stack
+
+19. Structured Code
+    • Convert a simple program to structured Pascal
+    • Use proper procedures and functions
+
+20. Logic Programming
+    • Solve a real-world problem with Prolog rules
+    • Create a knowledge base and queries
 
 🏆 WEEKLY CHALLENGES:
 ━━━━━━━━━━━━━━━━━━━━
@@ -2483,6 +3347,642 @@ def factorial(n):
 num = int(input("Enter a number: "))
 print(f"{num}! = {factorial(num)}")""",
                 },
+            "TW Pascal": {
+                "Basic": """📝 TW PASCAL BASIC TEMPLATES
+
+1. Hello World Program:
+program HelloWorld;
+begin
+  writeln('Hello, World!');
+end.
+
+2. User Input Program:
+program UserInput;
+var
+  name: string;
+begin
+  write('What is your name? ');
+  readln(name);
+  writeln('Hello, ', name, '!');
+end.
+
+3. Variables and Constants:
+program VariablesDemo;
+const
+  PI = 3.14159;
+var
+  radius, area: real;
+begin
+  radius := 5.0;
+  area := PI * radius * radius;
+  writeln('Area of circle: ', area:0:2);
+end.
+
+4. Conditional Statements:
+program ConditionalDemo;
+var
+  number: integer;
+begin
+  write('Enter a number: ');
+  readln(number);
+  if number > 0 then
+    writeln('Positive number')
+  else if number < 0 then
+    writeln('Negative number')
+  else
+    writeln('Zero');
+end.""",
+                "Loops": """🔄 TW PASCAL LOOP TEMPLATES
+
+1. For Loop:
+program ForLoopDemo;
+var
+  i: integer;
+begin
+  for i := 1 to 10 do
+    writeln('Count: ', i);
+end.
+
+2. While Loop:
+program WhileLoopDemo;
+var
+  count: integer;
+begin
+  count := 1;
+  while count <= 5 do
+  begin
+    writeln('Count: ', count);
+    count := count + 1;
+  end;
+end.
+
+3. Repeat Until Loop:
+program RepeatLoopDemo;
+var
+  number: integer;
+begin
+  repeat
+    write('Enter a positive number: ');
+    readln(number);
+  until number > 0;
+  writeln('Thank you for entering: ', number);
+end.
+
+4. Nested Loops:
+program NestedLoopsDemo;
+var
+  i, j: integer;
+begin
+  for i := 1 to 3 do
+  begin
+    for j := 1 to 3 do
+      write(i, ' x ', j, ' = ', i*j, '  ');
+    writeln;
+  end;
+end.""",
+                "Graphics": """🎨 TW PASCAL GRAPHICS TEMPLATES
+
+1. Simple Drawing:
+program SimpleDrawing;
+begin
+  // Move turtle forward and turn
+  forward(100);
+  right(90);
+  forward(100);
+  right(90);
+  forward(100);
+  right(90);
+  forward(100);
+end.
+
+2. Square Pattern:
+program SquarePattern;
+var
+  i: integer;
+begin
+  for i := 1 to 4 do
+  begin
+    forward(100);
+    right(90);
+  end;
+end.
+
+3. Colorful Spiral:
+program ColorfulSpiral;
+var
+  i: integer;
+begin
+  for i := 1 to 100 do
+  begin
+    setcolor(i mod 8);
+    forward(i);
+    right(91);
+  end;
+end.
+
+4. Star Pattern:
+program StarPattern;
+var
+  i: integer;
+begin
+  for i := 1 to 5 do
+  begin
+    forward(100);
+    right(144);
+  end;
+end.""",
+                "Games": """🎮 TW PASCAL GAME TEMPLATES
+
+1. Number Guessing Game:
+program GuessingGame;
+var
+  number, guess, tries: integer;
+begin
+  randomize;
+  number := random(100) + 1;
+  tries := 0;
+  writeln('Guess my number (1-100)!');
+  repeat
+    write('Your guess: ');
+    readln(guess);
+    tries := tries + 1;
+    if guess < number then
+      writeln('Too low!')
+    else if guess > number then
+      writeln('Too high!')
+    else
+      writeln('Correct in ', tries, ' tries!');
+  until guess = number;
+end.
+
+2. Simple Calculator:
+program Calculator;
+var
+  a, b, result: real;
+  operation: char;
+begin
+  write('Enter first number: ');
+  readln(a);
+  write('Enter operation (+, -, *, /): ');
+  readln(operation);
+  write('Enter second number: ');
+  readln(b);
+  
+  case operation of
+    '+': result := a + b;
+    '-': result := a - b;
+    '*': result := a * b;
+    '/': if b <> 0 then result := a / b else result := 0;
+  end;
+  
+  writeln('Result: ', result:0:2);
+end.""",
+                "Math": """🔢 TW PASCAL MATH TEMPLATES
+
+1. Factorial Calculator:
+program FactorialCalc;
+function factorial(n: integer): longint;
+begin
+  if n <= 1 then
+    factorial := 1
+  else
+    factorial := n * factorial(n - 1);
+end;
+
+var
+  num: integer;
+begin
+  write('Enter a number: ');
+  readln(num);
+  writeln(num, '! = ', factorial(num));
+end.
+
+2. Prime Number Checker:
+program PrimeChecker;
+function isPrime(n: integer): boolean;
+var
+  i: integer;
+begin
+  isPrime := true;
+  if n < 2 then
+    isPrime := false
+  else
+    for i := 2 to trunc(sqrt(n)) do
+      if n mod i = 0 then
+        isPrime := false;
+end;
+
+var
+  number: integer;
+begin
+  write('Enter a number: ');
+  readln(number);
+  if isPrime(number) then
+    writeln(number, ' is prime')
+  else
+    writeln(number, ' is not prime');
+end.
+
+3. Fibonacci Sequence:
+program Fibonacci;
+function fibonacci(n: integer): longint;
+begin
+  if n <= 1 then
+    fibonacci := n
+  else
+    fibonacci := fibonacci(n-1) + fibonacci(n-2);
+end;
+
+var
+  i: integer;
+begin
+  for i := 0 to 10 do
+    write(fibonacci(i), ' ');
+  writeln;
+end.""",
+            },
+            "TW Prolog": {
+                "Basic": """📝 TW PROLOG BASIC TEMPLATES
+
+1. Hello World Program:
+hello_world :- write('Hello, World!'), nl.
+
+2. Simple Facts and Rules:
+% Facts
+parent(john, mary).
+parent(mary, susan).
+parent(peter, mary).
+
+% Rules
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \\= Y.
+
+% Queries:
+% ?- grandparent(john, susan).
+% ?- sibling(mary, peter).
+
+3. Family Relationships:
+% Facts
+male(john).
+male(peter).
+female(mary).
+female(susan).
+
+% Rules
+father(X, Y) :- male(X), parent(X, Y).
+mother(X, Y) :- female(X), parent(X, Y).
+
+4. List Operations:
+% Basic list operations
+first_element([H|_], H).
+last_element([X], X).
+last_element([_|T], X) :- last_element(T, X).
+
+% Query: ?- first_element([1,2,3], X).""",
+                "Loops": """🔄 TW PROLOG LOOP TEMPLATES
+
+1. Recursive Counting:
+count_to(N) :- 
+  N > 0, 
+  write(N), nl, 
+  N1 is N - 1, 
+  count_to(N1).
+count_to(0) :- write('Done!'), nl.
+
+% Query: ?- count_to(5).
+
+2. List Processing:
+print_list([]).
+print_list([H|T]) :- 
+  write(H), nl, 
+  print_list(T).
+
+% Query: ?- print_list([apple, banana, cherry]).
+
+3. Factorial with Recursion:
+factorial(0, 1).
+factorial(N, F) :- 
+  N > 0, 
+  N1 is N - 1, 
+  factorial(N1, F1), 
+  F is N * F1.
+
+% Query: ?- factorial(5, Result).
+
+4. Fibonacci Sequence:
+fib(0, 0).
+fib(1, 1).
+fib(N, F) :- 
+  N > 1, 
+  N1 is N - 1, 
+  N2 is N - 2, 
+  fib(N1, F1), 
+  fib(N2, F2), 
+  F is F1 + F2.
+
+% Query: ?- fib(8, Result).""",
+                "Graphics": """🎨 TW PROLOG GRAPHICS TEMPLATES
+
+1. Simple Turtle Graphics:
+% Draw a square
+draw_square :- 
+  forward(100), 
+  right(90), 
+  draw_square.
+draw_square :- !.  % Cut to prevent infinite recursion
+
+% Better version with counter
+draw_square(N) :- 
+  N > 0, 
+  forward(100), 
+  right(90), 
+  N1 is N - 1, 
+  draw_square(N1).
+draw_square(0).
+
+% Query: ?- draw_square(4).
+
+2. Spiral Pattern:
+draw_spiral(Size) :- 
+  Size < 200, 
+  forward(Size), 
+  right(91), 
+  NewSize is Size + 5, 
+  draw_spiral(NewSize).
+draw_spiral(200).
+
+% Query: ?- draw_spiral(10).
+
+3. Tree Fractal:
+draw_tree(0) :- !.
+draw_tree(Depth) :- 
+  forward(50), 
+  right(30), 
+  Depth1 is Depth - 1, 
+  draw_tree(Depth1), 
+  back(50), 
+  left(60), 
+  draw_tree(Depth1), 
+  back(50), 
+  right(30).
+
+% Query: ?- draw_tree(5).""",
+                "Games": """🎮 TW PROLOG GAME TEMPLATES
+
+1. Number Guessing Game:
+guess_number :- 
+  random(1, 101, Number), 
+  write('Guess my number (1-100): '), nl, 
+  play_game(Number, 0).
+
+play_game(Number, Tries) :- 
+  read(Guess), 
+  (Guess = Number -> 
+    NewTries is Tries + 1, 
+    write('Correct in '), write(NewTries), write(' tries!'), nl
+  ; Guess < Number -> 
+    write('Too low! Try again: '), nl, 
+    NewTries is Tries + 1, 
+    play_game(Number, NewTries)
+  ; Guess > Number -> 
+    write('Too high! Try again: '), nl, 
+    NewTries is Tries + 1, 
+    play_game(Number, NewTries)
+  ).
+
+2. Rock Paper Scissors:
+beat(rock, scissors).
+beat(scissors, paper).
+beat(paper, rock).
+
+play_rps :- 
+  write('Rock, paper, or scissors? '), 
+  read(Player), 
+  random_member([rock, paper, scissors], Computer), 
+  write('Computer chose: '), write(Computer), nl, 
+  (beat(Player, Computer) -> 
+    write('You win!')
+  ; beat(Computer, Player) -> 
+    write('Computer wins!')
+  ; write('Tie!')
+  ), nl.""",
+                "Math": """🔢 TW PROLOG MATH TEMPLATES
+
+1. Prime Number Checker:
+is_prime(2).
+is_prime(N) :- 
+  N > 2, 
+  N mod 2 \\= 0, 
+  \\+ has_factor(N, 3).
+
+has_factor(N, F) :- 
+  F * F =< N, 
+  (N mod F =:= 0 ; 
+   F2 is F + 2, 
+   has_factor(N, F2)).
+
+% Query: ?- is_prime(17).
+
+2. Greatest Common Divisor:
+gcd(X, 0, X) :- X > 0.
+gcd(X, Y, G) :- 
+  Y > 0, 
+  R is X mod Y, 
+  gcd(Y, R, G).
+
+% Query: ?- gcd(48, 18, Result).
+
+3. List Sum:
+sum_list([], 0).
+sum_list([H|T], Sum) :- 
+  sum_list(T, Rest), 
+  Sum is H + Rest.
+
+% Query: ?- sum_list([1,2,3,4,5], Sum).
+
+4. Power Function:
+power(_, 0, 1).
+power(Base, Exp, Result) :- 
+  Exp > 0, 
+  Exp1 is Exp - 1, 
+  power(Base, Exp1, Partial), 
+  Result is Base * Partial.
+
+% Query: ?- power(2, 8, Result).""",
+            },
+            "TW Forth": {
+                "Basic": """📝 TW FORTH BASIC TEMPLATES
+
+1. Hello World Program:
+: HELLO   ." Hello, World!" CR ;
+
+HELLO
+
+2. Simple Arithmetic:
+5 3 + . CR    \\ Prints 8
+10 4 - . CR   \\ Prints 6
+3 7 * . CR    \\ Prints 21
+15 3 / . CR   \\ Prints 5
+
+3. Variables and Constants:
+variable COUNTER
+10 COUNTER !
+COUNTER @ . CR    \\ Prints 10
+
+constant PI 314
+PI 100 / . CR     \\ Prints 3 (integer division)
+
+4. Stack Operations:
+1 2 3 .S CR    \\ Shows stack: 1 2 3
+DUP .S CR      \\ Duplicates top: 1 2 3 3
+DROP .S CR     \\ Removes top: 1 2 3
+SWAP .S CR     \\ Swaps top two: 1 3 2""",
+                "Loops": """🔄 TW FORTH LOOP TEMPLATES
+
+1. DO LOOP:
+: COUNT-TO   ( n -- )
+  1+ 1 DO I . LOOP CR ;
+  
+10 COUNT-TO    \\ Prints 1 2 3 4 5 6 7 8 9 10
+
+2. BEGIN UNTIL Loop:
+variable N
+: COUNT-DOWN   ( n -- )
+  BEGIN DUP . 1- DUP 0< UNTIL DROP CR ;
+  
+5 COUNT-DOWN   \\ Prints 5 4 3 2 1 0
+
+3. BEGIN WHILE REPEAT:
+: FACTORIAL   ( n -- n! )
+  DUP 1 > IF
+    DUP 1- RECURSE *
+  THEN ;
+  
+5 FACTORIAL . CR   \\ Prints 120
+
+4. Nested Loops:
+: MULT-TABLE   ( n -- )
+  1+ 1 DO
+    1+ 1 DO
+      I J * 3 .R SPACE
+    LOOP CR
+  LOOP ;
+  
+3 MULT-TABLE""",
+                "Graphics": """🎨 TW FORTH GRAPHICS TEMPLATES
+
+1. Simple Square:
+: SQUARE   ( size -- )
+  4 0 DO
+    DUP FORWARD 90 RIGHT
+  LOOP DROP ;
+
+100 SQUARE
+
+2. Spiral Pattern:
+: SPIRAL   ( size max -- )
+  BEGIN
+    2DUP > WHILE
+    DUP FORWARD 91 RIGHT 5 +
+  REPEAT 2DROP ;
+
+10 200 SPIRAL
+
+3. Star Pattern:
+: STAR   ( size -- )
+  5 0 DO
+    DUP FORWARD 144 RIGHT
+  LOOP DROP ;
+
+100 STAR
+
+4. Colorful Circles:
+: COLOR-CIRCLE   ( radius -- )
+  8 0 DO
+    I SETCOLOR
+    DUP CIRCLE
+  LOOP DROP ;
+
+50 COLOR-CIRCLE""",
+                "Games": """🎮 TW FORTH GAME TEMPLATES
+
+1. Number Guessing Game:
+variable SECRET
+variable TRIES
+
+: INIT-GAME
+  RANDOM 100 MOD 1+ SECRET !
+  0 TRIES ! ;
+
+: GUESS   ( n -- )
+  1 TRIES +!
+  SECRET @ 2DUP = IF
+    ." Correct in " TRIES @ . ." tries!" CR
+  ELSE
+    > IF ." Too high! " ELSE ." Too low! " THEN
+    ." Try again: "
+  THEN ;
+
+: PLAY-GAME
+  INIT-GAME
+  BEGIN
+    ." Guess (1-100): " QUERY INTERPRET
+    GUESS SECRET @ <>
+  WHILE REPEAT ;
+
+2. Simple Calculator:
+: CALC   ( -- )
+  BEGIN
+    ." Enter operation (+ - * /) or Q to quit: "
+    KEY DUP [CHAR] Q <> WHILE
+    CASE
+      [CHAR] + OF + ENDOF
+      [CHAR] - OF - ENDOF
+      [CHAR] * OF * ENDOF
+      [CHAR] / OF / ENDOF
+    ENDCASE .
+  REPEAT DROP ;""",
+                "Math": """🔢 TW FORTH MATH TEMPLATES
+
+1. Factorial Calculator:
+: FACTORIAL   ( n -- n! )
+  DUP 1 > IF
+    DUP 1- RECURSE *
+  ELSE
+    DROP 1
+  THEN ;
+
+: FACT-TEST
+  ." Enter number: " QUERY INTERPRET
+  DUP FACTORIAL
+  SWAP ." ! = " . CR ;
+
+2. Prime Number Checker:
+: IS-PRIME?   ( n -- flag )
+  DUP 2 < IF DROP FALSE EXIT THEN
+  DUP 2 MOD 0= IF DROP FALSE EXIT THEN
+  TRUE SWAP 3 DO
+    DUP I MOD 0= IF DROP FALSE LEAVE THEN
+  2 +LOOP ;
+
+: PRIME-TEST
+  ." Enter number: " QUERY INTERPRET
+  DUP IS-PRIME? IF
+    ." is prime" CR
+  ELSE
+    ." is not prime" CR
+  THEN ;
+
+3. Fibonacci Sequence:
+: FIB   ( n -- fib )
+  DUP 2 < IF EXIT THEN
+  DUP 1- RECURSE
+  SWAP 2- RECURSE + ;
+
+: FIB-TEST
+  10 0 DO I FIB . LOOP CR ;""",
+            }
+
             }
 
             def update_templates():
@@ -2924,24 +4424,646 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             print(f"❌ Progress error: {e}")
 
     def show_plugin_manager(self):
-        """Show plugin manager"""
-        messagebox.showinfo(
-            "Plugin Manager", "Plugin management - Coming in next update!"
-        )
+        """Show plugin manager with full functionality"""
+        try:
+            # Create plugin manager window
+            pm_window = tk.Toplevel(self.root)
+            pm_window.title("🔌 Plugin Manager")
+            pm_window.geometry("700x500")
+            pm_window.transient(self.root)
+            pm_window.grab_set()
+
+            # Apply current theme
+            self.apply_theme_to_window(pm_window)
+
+            # Create main frame
+            main_frame = ttk.Frame(pm_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+            # Title
+            title_label = ttk.Label(
+                main_frame, text="🔌 Plugin Manager", font=("Arial", 16, "bold")
+            )
+            title_label.pack(pady=(0, 20))
+
+            # Create notebook for different sections
+            notebook = ttk.Notebook(main_frame)
+            notebook.pack(fill=tk.BOTH, expand=True)
+
+            # Installed Plugins Tab
+            installed_frame = ttk.Frame(notebook)
+            notebook.add(installed_frame, text="📦 Installed")
+
+            # Plugin list with scrollbar
+            plugin_list_frame = ttk.Frame(installed_frame)
+            plugin_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+            # Create treeview for plugins
+            columns = ("Name", "Version", "Author", "Status", "Description")
+            plugin_tree = ttk.Treeview(
+                plugin_list_frame, columns=columns, show="headings", height=15
+            )
+
+            # Define headings
+            plugin_tree.heading("Name", text="Plugin Name")
+            plugin_tree.heading("Version", text="Version")
+            plugin_tree.heading("Author", text="Author")
+            plugin_tree.heading("Status", text="Status")
+            plugin_tree.heading("Description", text="Description")
+
+            # Define column widths
+            plugin_tree.column("Name", width=150)
+            plugin_tree.column("Version", width=80)
+            plugin_tree.column("Author", width=100)
+            plugin_tree.column("Status", width=80)
+            plugin_tree.column("Description", width=250)
+
+            # Add scrollbar
+            scrollbar = ttk.Scrollbar(
+                plugin_list_frame, orient=tk.VERTICAL, command=plugin_tree.yview
+            )
+            plugin_tree.configure(yscrollcommand=scrollbar.set)
+
+            plugin_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            # Load and display plugins
+            self.load_plugin_list(plugin_tree)
+
+            # Plugin control buttons
+            button_frame = ttk.Frame(installed_frame)
+            button_frame.pack(fill=tk.X, padx=10, pady=10)
+
+            def refresh_plugins():
+                """Refresh the plugin list"""
+                for item in plugin_tree.get_children():
+                    plugin_tree.delete(item)
+                self.load_plugin_list(plugin_tree)
+
+            def enable_plugin():
+                """Enable selected plugin"""
+                selection = plugin_tree.selection()
+                if not selection:
+                    messagebox.showwarning("No Selection", "Please select a plugin to enable.")
+                    return
+
+                plugin_name = plugin_tree.item(selection[0])["values"][0]
+                if self.enable_plugin(plugin_name):
+                    messagebox.showinfo("Success", f"Plugin '{plugin_name}' enabled successfully!")
+                    refresh_plugins()
+                else:
+                    messagebox.showerror("Error", f"Failed to enable plugin '{plugin_name}'.")
+
+            def disable_plugin():
+                """Disable selected plugin"""
+                selection = plugin_tree.selection()
+                if not selection:
+                    messagebox.showwarning("No Selection", "Please select a plugin to disable.")
+                    return
+
+                plugin_name = plugin_tree.item(selection[0])["values"][0]
+                if self.disable_plugin(plugin_name):
+                    messagebox.showinfo("Success", f"Plugin '{plugin_name}' disabled successfully!")
+                    refresh_plugins()
+                else:
+                    messagebox.showerror("Error", f"Failed to disable plugin '{plugin_name}'.")
+
+            def show_plugin_details():
+                """Show detailed information about selected plugin"""
+                selection = plugin_tree.selection()
+                if not selection:
+                    messagebox.showwarning("No Selection", "Please select a plugin to view details.")
+                    return
+
+                plugin_name = plugin_tree.item(selection[0])["values"][0]
+                self.show_plugin_details(plugin_name)
+
+            ttk.Button(button_frame, text="🔄 Refresh", command=refresh_plugins).pack(side=tk.LEFT, padx=(0, 10))
+            ttk.Button(button_frame, text="✅ Enable", command=enable_plugin).pack(side=tk.LEFT, padx=(0, 10))
+            ttk.Button(button_frame, text="❌ Disable", command=disable_plugin).pack(side=tk.LEFT, padx=(0, 10))
+            ttk.Button(button_frame, text="ℹ️ Details", command=show_plugin_details).pack(side=tk.LEFT, padx=(0, 10))
+
+            # Plugin Store Tab (placeholder for future)
+            store_frame = ttk.Frame(notebook)
+            notebook.add(store_frame, text="🛒 Store")
+
+            store_label = ttk.Label(
+                store_frame,
+                text="🛒 Plugin Store\n\nComing Soon!\n\nBrowse and download plugins from the Time_Warp Plugin Repository.\n\nFeatures:\n• Official plugin collection\n• User-submitted plugins\n• Automatic updates\n• Plugin ratings and reviews",
+                justify=tk.CENTER,
+                font=("Arial", 12)
+            )
+            store_label.pack(expand=True)
+
+            # Settings Tab
+            settings_frame = ttk.Frame(notebook)
+            notebook.add(settings_frame, text="⚙️ Settings")
+
+            settings_label = ttk.Label(
+                settings_frame,
+                text="🔧 Plugin Settings\n\n• Auto-load enabled plugins on startup\n• Plugin update notifications\n• Security settings for plugin permissions\n• Plugin development mode\n\nThese settings will be available in a future update.",
+                justify=tk.LEFT,
+                font=("Arial", 11)
+            )
+            settings_label.pack(anchor=tk.W, padx=20, pady=20)
+
+            # Close button
+            close_btn = ttk.Button(
+                main_frame, text="Close Plugin Manager", command=pm_window.destroy
+            )
+            close_btn.pack(pady=10)
+
+            print("🔌 Plugin manager opened")
+
+        except Exception as e:
+            messagebox.showerror(
+                "Plugin Manager Error",
+                f"Failed to open plugin manager:\n{str(e)}",
+            )
+            print(f"❌ Plugin manager error: {e}")
+
+    def load_plugin_list(self, treeview):
+        """Load and display available plugins in the treeview"""
+        try:
+            import os
+            import json
+
+            # Initialize plugin tracking if not exists
+            if not hasattr(self, "loaded_plugins"):
+                self.loaded_plugins = {}
+
+            # Scan plugins directory
+            plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
+            if not os.path.exists(plugins_dir):
+                plugins_dir = os.path.join(os.path.dirname(__file__), "..", "plugins")
+
+            if os.path.exists(plugins_dir):
+                for item in os.listdir(plugins_dir):
+                    plugin_path = os.path.join(plugins_dir, item)
+                    if os.path.isdir(plugin_path):
+                        manifest_path = os.path.join(plugin_path, "manifest.json")
+
+                        if os.path.exists(manifest_path):
+                            try:
+                                with open(manifest_path, "r") as f:
+                                    manifest = json.load(f)
+
+                                plugin_name = manifest.get("name", item)
+                                version = manifest.get("version", "1.0.0")
+                                author = manifest.get("author", "Unknown")
+                                description = manifest.get("description", "No description available")
+
+                                # Check if plugin is loaded
+                                status = "Disabled"
+                                if plugin_name in self.loaded_plugins:
+                                    status = "Enabled"
+
+                                treeview.insert("", tk.END, values=(
+                                    plugin_name, version, author, status, description
+                                ))
+
+                            except Exception as e:
+                                print(f"Error loading plugin {item}: {e}")
+                                treeview.insert("", tk.END, values=(
+                                    item, "Error", "Unknown", "Error", f"Failed to load: {str(e)}"
+                                ))
+
+        except Exception as e:
+            print(f"Error scanning plugins: {e}")
+
+    def enable_plugin(self, plugin_name):
+        """Enable a plugin by name"""
+        try:
+            import os
+            import json
+            import importlib.util
+
+            # Find plugin directory
+            plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
+            if not os.path.exists(plugins_dir):
+                plugins_dir = os.path.join(os.path.dirname(__file__), "..", "plugins")
+
+            plugin_dir = None
+            for item in os.listdir(plugins_dir):
+                plugin_path = os.path.join(plugins_dir, item)
+                if os.path.isdir(plugin_path):
+                    manifest_path = os.path.join(plugin_path, "manifest.json")
+                    if os.path.exists(manifest_path):
+                        with open(manifest_path, "r") as f:
+                            manifest = json.load(f)
+                        if manifest.get("name") == plugin_name:
+                            plugin_dir = plugin_path
+                            break
+
+            if not plugin_dir:
+                return False
+
+            # Load plugin
+            manifest_path = os.path.join(plugin_dir, "manifest.json")
+            plugin_file = os.path.join(plugin_dir, "plugin.py")
+
+            if not os.path.exists(plugin_file):
+                return False
+
+            # Load manifest
+            with open(manifest_path, "r") as f:
+                manifest = json.load(f)
+
+            # Import plugin module
+            spec = importlib.util.spec_from_file_location("plugin_module", plugin_file)
+            plugin_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(plugin_module)
+
+            # Instantiate plugin
+            plugin_class = getattr(plugin_module, "TimeWarpPlugin", None)
+            if not plugin_class:
+                return False
+
+            plugin_instance = plugin_class(self)
+            plugin_instance.activate()
+
+            # Track loaded plugin
+            self.loaded_plugins[plugin_name] = plugin_instance
+
+            return True
+
+        except Exception as e:
+            print(f"Error enabling plugin {plugin_name}: {e}")
+            return False
+
+    def disable_plugin(self, plugin_name):
+        """Disable a plugin by name"""
+        try:
+            if plugin_name in self.loaded_plugins:
+                plugin_instance = self.loaded_plugins[plugin_name]
+                plugin_instance.deactivate()
+                del self.loaded_plugins[plugin_name]
+                return True
+            return False
+
+        except Exception as e:
+            print(f"Error disabling plugin {plugin_name}: {e}")
+            return False
+
+    def show_plugin_details(self, plugin_name):
+        """Show detailed information about a plugin"""
+        try:
+            # Create details window
+            details_window = tk.Toplevel(self.root)
+            details_window.title(f"ℹ️ {plugin_name} - Details")
+            details_window.geometry("500x400")
+            details_window.transient(self.root)
+            details_window.grab_set()
+
+            # Apply theme
+            self.apply_theme_to_window(details_window)
+
+            main_frame = ttk.Frame(details_window)
+            main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+            # Title
+            title_label = ttk.Label(
+                main_frame, text=f"ℹ️ {plugin_name}", font=("Arial", 14, "bold")
+            )
+            title_label.pack(pady=(0, 20))
+
+            # Plugin info
+            if plugin_name in self.loaded_plugins:
+                plugin = self.loaded_plugins[plugin_name]
+                info = plugin.get_info()
+            else:
+                # Try to load info from manifest
+                info = self.get_plugin_info_from_manifest(plugin_name)
+
+            if info:
+                info_text = f"""📦 Plugin Information
+
+Name: {info.get('name', 'Unknown')}
+Version: {info.get('version', 'Unknown')}
+Author: {info.get('author', 'Unknown')}
+
+📝 Description:
+{info.get('description', 'No description available')}
+
+🔧 Features:
+{chr(10).join('• ' + feature for feature in info.get('features', ['No features listed']))}
+
+🔐 Permissions:
+{chr(10).join('• ' + perm for perm in info.get('permissions', ['No permissions specified']))}
+
+📊 Status: {'Enabled' if plugin_name in getattr(self, 'loaded_plugins', {}) else 'Disabled'}"""
+
+                text_widget = tk.Text(
+                    main_frame, wrap=tk.WORD, font=("Consolas", 10), height=20
+                )
+                scrollbar = ttk.Scrollbar(
+                    main_frame, orient=tk.VERTICAL, command=text_widget.yview
+                )
+                text_widget.configure(yscrollcommand=scrollbar.set)
+
+                text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+                scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+                text_widget.insert(tk.END, info_text)
+                text_widget.config(state=tk.DISABLED)
+            else:
+                ttk.Label(main_frame, text="❌ Plugin information not available.").pack()
+
+            # Close button
+            ttk.Button(
+                main_frame, text="Close", command=details_window.destroy
+            ).pack(pady=10)
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to show plugin details: {str(e)}")
+
+    def get_plugin_info_from_manifest(self, plugin_name):
+        """Get plugin info from manifest file"""
+        try:
+            import os
+            import json
+
+            plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
+            if not os.path.exists(plugins_dir):
+                plugins_dir = os.path.join(os.path.dirname(__file__), "..", "plugins")
+
+            for item in os.listdir(plugins_dir):
+                plugin_path = os.path.join(plugins_dir, item)
+                if os.path.isdir(plugin_path):
+                    manifest_path = os.path.join(plugin_path, "manifest.json")
+                    if os.path.exists(manifest_path):
+                        with open(manifest_path, "r") as f:
+                            manifest = json.load(f)
+                        if manifest.get("name") == plugin_name:
+                            return {
+                                "name": manifest.get("name"),
+                                "version": manifest.get("version"),
+                                "author": manifest.get("author"),
+                                "description": manifest.get("description"),
+                                "features": ["Plugin loaded from manifest"],
+                                "permissions": manifest.get("permissions", [])
+                            }
+            return None
+
+        except Exception as e:
+            print(f"Error reading plugin manifest: {e}")
+            return None
 
     def show_documentation(self):
-        """Show documentation"""
-        messagebox.showinfo("Documentation", "Built-in docs - Coming in next update!")
+        """Show comprehensive documentation"""
+        doc_text = """📖 Time_Warp IDE 1.3 - Complete Documentation
+
+⏰ Time_Warp IDE is an educational programming environment that bridges
+programming history with modern development through accessible, visual learning.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 SUPPORTED LANGUAGES
+
+1. TW PILOT (Educational Programming)
+   • Simple, English-like syntax for beginners
+   • Commands: T: (Type), A: (Accept input), Y: (store input), J: (Jump)
+   • Example: T: Hello World! A: What is your name? Y: *NAME* T: Nice to meet you, *NAME*
+
+2. TW BASIC (Classic Line-Numbered Programming)
+   • Traditional BASIC with line numbers (10, 20, 30...)
+   • Commands: PRINT, INPUT, LET, GOTO, IF...THEN, FOR...NEXT
+   • Example: 10 PRINT "Hello World!" 20 INPUT "Your name: "; NAME$
+
+3. TW Logo (Turtle Graphics)
+   • Visual programming with turtle graphics
+   • Commands: FORWARD, BACK, LEFT, RIGHT, PENUP, PENDOWN
+   • Example: FORWARD 100 RIGHT 90 FORWARD 100
+
+4. Python (Modern Scripting)
+   • Full Python 3 support with syntax highlighting
+   • Access to standard libraries and external packages
+   • Example: print("Hello from Python!")
+
+5. JavaScript (Web Scripting)
+   • Modern JavaScript with Node.js-style execution
+   • Example: console.log("Hello from JavaScript!");
+
+6. Perl (Text Processing)
+   • Powerful text manipulation and scripting
+   • Example: print "Hello from Perl!\\n";
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖥️ USER INTERFACE FEATURES
+
+📝 Multi-Tab Editor
+• Open multiple files simultaneously
+• Syntax highlighting for all supported languages
+• Line numbers and code folding
+• Font customization and themes
+
+🎨 Theme System (8 Beautiful Themes)
+• Dark Themes: Dracula, Monokai, Solarized Dark, Ocean
+• Light Themes: Spring, Sunset, Candy, Forest
+• Live theme switching and preview
+• Persistent theme preferences
+
+🖼️ Enhanced Graphics Canvas
+• Turtle graphics with modern enhancements
+• Zoom, pan, and export capabilities
+• Grid overlay and coordinate display
+• High-resolution output
+
+📁 File Explorer
+• Project navigation and file management
+• Drag-and-drop file opening
+• Recent files and workspace management
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⌨️ KEYBOARD SHORTCUTS
+
+File Operations:
+• Ctrl+N - New file
+• Ctrl+O - Open file
+• Ctrl+S - Save file
+• Ctrl+Shift+S - Save as
+• Ctrl+W - Close tab
+• Ctrl+Q - Quit
+
+Code Execution:
+• F5 - Run code
+• Ctrl+F5 - Run with debug output
+• F6 - Stop execution
+
+Editing:
+• Ctrl+Z - Undo
+• Ctrl+Y - Redo
+• Ctrl+A - Select all
+• Ctrl+F - Find
+• Ctrl+H - Replace
+
+View:
+• F1 - Quick help
+• F11 - Toggle fullscreen
+• Ctrl+Plus/Minus - Zoom
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎮 ADVANCED FEATURES
+
+🤖 AI Assistant
+• Context-aware code suggestions
+• Programming help and explanations
+• Code completion and error detection
+
+📚 Tutorial System
+• Interactive learning modules
+• Step-by-step programming lessons
+• Progress tracking and achievements
+
+🎯 Gamification Dashboard
+• Achievement system with badges
+• Skill progression and levels
+• Programming challenges and rewards
+
+🔌 Plugin Architecture
+• Extensible plugin system
+• Custom language support
+• Third-party integrations
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛠️ DEVELOPMENT FEATURES
+
+🐛 Integrated Debugging
+• Breakpoint support
+• Variable inspection
+• Step-through execution
+• Error highlighting and suggestions
+
+📊 Code Analysis
+• Syntax checking and validation
+• Code quality metrics
+• Performance profiling
+• Memory usage monitoring
+
+🔧 Settings & Customization
+• Editor preferences (fonts, themes, behavior)
+• Language-specific settings
+• Plugin management
+• Export/import configurations
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 INSTALLATION & SETUP
+
+System Requirements:
+• Python 3.8 or higher
+• tkinter (included with Python)
+• pygame (for graphics and multimedia)
+• 500MB free disk space
+
+Quick Start:
+1. Download from GitHub
+2. Run: python timewarp.py
+3. Select a language and start coding!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 LEARNING RESOURCES
+
+📚 Built-in Tutorials
+• Language introductions
+• Basic programming concepts
+• Graphics and animation
+• File I/O and data handling
+
+🎓 Educational Features
+• Progressive difficulty levels
+• Interactive examples
+• Visual feedback and results
+• Comprehensive error messages
+
+📖 Documentation
+• In-app help system
+• Online documentation
+• Community forums
+• Video tutorials
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 CONNECT & CONTRIBUTE
+
+GitHub: https://github.com/James-HoneyBadger/Time_Warp
+Issues: Report bugs and request features
+Wiki: Detailed guides and tutorials
+Discord: Community discussions
+
+License: MIT (Open Source)
+Version: 1.3.0
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Happy coding through time! ⏰✨"""
+
+        # Create a scrollable documentation window
+        doc_window = tk.Toplevel(self.root)
+        doc_window.title("📖 Time_Warp IDE Documentation")
+        doc_window.geometry("900x700")
+        doc_window.resizable(True, True)
+
+        # Create main frame
+        main_frame = ttk.Frame(doc_window)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Create text widget with scrollbar
+        text_frame = ttk.Frame(main_frame)
+        text_frame.pack(fill=tk.BOTH, expand=True)
+
+        scrollbar = ttk.Scrollbar(text_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        text_widget = tk.Text(
+            text_frame,
+            wrap=tk.WORD,
+            yscrollcommand=scrollbar.set,
+            font=("Consolas", 10),
+            padx=10,
+            pady=10,
+        )
+        text_widget.pack(fill=tk.BOTH, expand=True)
+        scrollbar.config(command=text_widget.yview)
+
+        # Insert documentation text
+        text_widget.insert(tk.END, doc_text)
+        text_widget.config(state=tk.DISABLED)  # Make read-only
+
+        # Apply current theme to the documentation window
+        try:
+            self.apply_theme_to_window(doc_window)
+            colors = self.theme_manager.get_colors()
+            text_widget.config(
+                bg=colors.get("bg_secondary", "#ffffff"),
+                fg=colors.get("text_primary", "#000000"),
+                insertbackground=colors.get("text_primary", "#000000"),
+            )
+        except Exception:
+            pass
+
+        # Close button
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+
+        ttk.Button(button_frame, text="Close", command=doc_window.destroy).pack(
+            side=tk.RIGHT
+        )
 
     def show_quick_help(self):
         """Show quick help"""
-        help_text = """⏰ Time_Warp IDE 1.2 - Quick Help
+        help_text = """⏰ Time_Warp IDE 1.3 - Quick Help
 
 🔥 NEW FEATURES:
-• Multi-tab editor with syntax highlighting
-• File explorer with project navigation  
-• Enhanced graphics canvas with zoom/export
-• Better error messages with suggestions
+• File structure reorganization and cleanup
+• Enhanced documentation system
+• Improved repository organization
+• Better maintainability and navigation
 
 ⌨️ KEYBOARD SHORTCUTS:
 • Ctrl+N - New file
@@ -2961,7 +5083,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
 🚀 Happy coding through time!"""
 
-        messagebox.showinfo("Time_Warp IDE 1.2 - Quick Help", help_text)
+        messagebox.showinfo("Time_Warp IDE 1.3 - Quick Help", help_text)
 
     # Theme and settings
 
@@ -3005,7 +5127,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         font_combo = ttk.Combobox(
             font_frame,
             textvariable=font_var,
-            values=["Consolas", "Monaco", "DejaVu Sans Mono", "Courier New"],
+            values=["Consolas", "Monaco", "DejaVu Sans Mono", "Courier New", "Fira Code", "JetBrains Mono", "Source Code Pro", "Roboto Mono", "Cascadia Code", "Hack", "Inconsolata", "Ubuntu Mono"],
         )
         font_combo.grid(row=0, column=1, padx=5, pady=2)
 
@@ -3592,36 +5714,6 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         tk.Button(button_frame, text="OK", command=apply_settings).pack(
             side=tk.RIGHT, padx=5
         )
-
-    def show_about(self):
-        """Show about dialog"""
-        about_text = """⏰ Time_Warp IDE 1.2
-Enhanced Educational Programming Environment
-
-🔥 NEW IN 1.2:
-✅ Fixed code editor theme inheritance
-✅ Resolved turtle graphics display issues
-✅ Enhanced package structure and imports
-✅ Improved VS Code debugging support
-✅ Comprehensive testing and bug fixes
-
-🎯 MISSION:
-Bridge programming history with modern development
-through an accessible educational environment.
-
-💝 FEATURES:
-• 6 Programming languages (PILOT, BASIC, Logo, Python, JS, Perl)
-• Turtle graphics with modern enhancements
-• Educational tutorials and AI assistance
-• Plugin architecture and themes
-• Open source and community-driven
-
-🌟 Developed with ❤️ for educators and learners worldwide
-
-GitHub: https://github.com/James-HoneyBadger/Time_Warp
-License: MIT"""
-
-        messagebox.showinfo("About Time_Warp IDE 1.2", about_text)
 
     def change_theme(self, theme_name):
         """Change to a different theme"""
