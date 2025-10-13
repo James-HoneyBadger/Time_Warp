@@ -94,6 +94,9 @@ class Time_WarpIDE:
         self.root = tk.Tk()
         self._setup_window()
 
+        # Hide window during initialization to prevent theme flash
+        self.root.withdraw()
+
         # Initialize core systems
         self.theme_manager = ThemeManager()
         self.current_theme = "forest"  # Default theme
@@ -131,6 +134,9 @@ class Time_WarpIDE:
 
         # Apply initial theme (after all UI components are created)
         self.apply_theme()
+
+        # Show window now that theme is applied
+        self.root.deiconify()
 
         # Ensure theme is applied to multi-tab editor specifically
         if hasattr(self, "multi_tab_editor"):
