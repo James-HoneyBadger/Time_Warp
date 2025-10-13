@@ -37,7 +37,7 @@ def test_core_imports():
         from core.interpreter import Time_WarpInterpreter
         print("✅ Time_WarpInterpreter imported")
         
-        from tools.theme import ThemeManager
+        from src.timewarp.utils.theme import ThemeManager
         print("✅ ThemeManager imported")
         
         return True

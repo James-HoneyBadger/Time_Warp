@@ -76,9 +76,9 @@ jobs:
       - name: Run repository tests
         run: |
           echo "Running repository test scripts..."
-          python3 test/test_theme_export_import.py
-          python3 test/test_settings_persistence.py
-          python3 test/test_theme_import_malformed.py
+          python3 tests/test_theme_export_import.py
+          python3 tests/test_settings_persistence.py
+          python3 tests/test_theme_import_malformed.py
 
   lint:
     runs-on: ubuntu-latest
@@ -111,11 +111,9 @@ jobs:
       - name: Run Black formatter check
         run: |
           echo "🎨 Checking code formatting with Black..."
-          echo "✅ Black formatting check disabled for CI stability"
-          # black --check --diff --line-length=88 . || true
+          black --check --diff --line-length=88 . || echo "⚠️ Black formatting issues found"
 
       - name: Run Flake8 linting
         run: |
           echo "🔍 Running Flake8 linting..."
-          echo "⚠️ Linting temporarily disabled for CI stability"
-          # flake8 --max-line-length=120 --extend-ignore=E203,W503,E501,W293,F401,F841,E302,E305,W292,E402,E712,F811,F541 --exclude=.git,__pycache__,.venv,.Time_Warp,venv,build,dist,testing/ || true
+          flake8 --max-line-length=120 --extend-ignore=E203,W503,E501,W293,F401,F841,E302,E305,W292,E402,E712,F811,F541 --exclude=.git,__pycache__,.venv,.Time_Warp,venv,build,dist,testing/ || echo "⚠️ Flake8 linting issues found"
