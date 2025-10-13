@@ -73,7 +73,7 @@ GitHub automatically provides:
    - README.md  
    - requirements.txt
    - CHANGELOG.md
-   - RELEASE_NOTES_v1.2.0.md
+   - RELEASE_NOTES_v1.3.0.md
 7. **Check "Set as the latest release"**
 8. **Publish release**
 
@@ -82,7 +82,7 @@ GitHub automatically provides:
 All assets are ready and verified:
 
 ```bash
-ls -la timewarp.py README.md requirements.txt CHANGELOG.md RELEASE_NOTES_v1.2.0.md
+ls -la timewarp.py README.md requirements.txt CHANGELOG.md RELEASE_NOTES_v1.3.0.md
 ```
 
 ## Post-Release Actions
