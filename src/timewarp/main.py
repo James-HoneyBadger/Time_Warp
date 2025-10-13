@@ -3049,6 +3049,96 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             anchor="w", padx=5, pady=2
         )
 
+        # Editor tab buttons
+        editor_button_frame = tk.Frame(editor_frame)
+        editor_button_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        def apply_editor_settings():
+            """Apply editor settings to current session without saving"""
+            try:
+                fam = font_var.get()
+                sz = int(size_var.get())
+                wrap_mode = tk.WORD if word_wrap_var.get() else tk.NONE
+
+                if hasattr(self, "multi_tab_editor") and self.multi_tab_editor:
+                    for tab in self.multi_tab_editor.tabs.values():
+                        try:
+                            if hasattr(tab, "text_editor"):
+                                tab.text_editor.configure(
+                                    font=(fam, sz), wrap=wrap_mode
+                                )
+                            if hasattr(tab, "line_numbers"):
+                                if line_numbers_var.get():
+                                    try:
+                                        tab.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
+                                    except Exception:
+                                        pass
+                                else:
+                                    try:
+                                        tab.line_numbers.pack_forget()
+                                    except Exception:
+                                        pass
+                        except Exception:
+                            pass
+
+                self.update_status("Editor settings applied")
+                try:
+                    self.show_toast("Editor settings applied")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"⚠️ Failed to apply editor settings: {e}")
+                messagebox.showerror(
+                    "Apply Error", f"Failed to apply editor settings: {e}"
+                )
+
+        def save_editor_settings():
+            """Save editor settings to persistent config"""
+            try:
+                new_editor_cfg = {
+                    "line_numbers": bool(line_numbers_var.get()),
+                    "auto_indent": bool(auto_indent_var.get()),
+                    "word_wrap": bool(word_wrap_var.get()),
+                    "font_family": font_var.get(),
+                    "font_size": int(size_var.get()),
+                    "tab_size": cfg.get("editor_settings", {}).get("tab_size", 4),
+                    "syntax_highlighting": cfg.get("editor_settings", {}).get(
+                        "syntax_highlighting", True
+                    ),
+                }
+
+                updates = {
+                    "editor_settings": new_editor_cfg,
+                    "font_family": font_var.get(),
+                    "font_size": int(size_var.get()),
+                }
+
+                ok = self.theme_manager.save_config(updates)
+                if not ok:
+                    messagebox.showerror(
+                        "Save Error",
+                        "Failed to write editor settings to disk. Check permissions or disk space.",
+                    )
+                    return
+
+                self.update_status("Editor settings saved")
+                try:
+                    self.show_toast("Editor settings saved")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"⚠️ Failed to save editor settings: {e}")
+                messagebox.showerror(
+                    "Save Error", f"Failed to save editor settings: {e}"
+                )
+
+        tk.Button(
+            editor_button_frame, text="Apply", command=apply_editor_settings
+        ).pack(side=tk.RIGHT, padx=5)
+        tk.Button(editor_button_frame, text="Save", command=save_editor_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
+
         # Theme Settings Tab
         theme_frame = ttk.Frame(notebook)
         notebook.add(theme_frame, text="🎨 Themes")
@@ -3073,7 +3163,27 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
 
         theme_list_frame = ttk.LabelFrame(theme_frame, text="Available Themes")
         theme_list_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        # Dynamically load all available themes and show a color swatch
+
+        # Create a scrollable frame for theme grid
+        theme_canvas = tk.Canvas(theme_list_frame, height=200)
+        theme_scrollbar = ttk.Scrollbar(
+            theme_list_frame, orient=tk.VERTICAL, command=theme_canvas.yview
+        )
+        theme_scrollable_frame = ttk.Frame(theme_canvas)
+
+        theme_scrollable_frame.bind(
+            "<Configure>",
+            lambda e: theme_canvas.configure(scrollregion=theme_canvas.bbox("all")),
+        )
+
+        theme_canvas.create_window((0, 0), window=theme_scrollable_frame, anchor="nw")
+        theme_canvas.configure(yscrollcommand=theme_scrollbar.set)
+
+        # Pack the canvas and scrollbar
+        theme_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        theme_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Dynamically load all available themes and show in a compact grid
         themes = available_themes()
         theme_var = tk.StringVar(value=self.current_theme)
 
@@ -3084,8 +3194,8 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         )
         preview_chk.pack(anchor="w", padx=12, pady=(0, 6))
 
-        def on_swatch_click(selected_theme):
-            # Update the radio selection immediately
+        def on_theme_select(selected_theme):
+            """Handle theme selection"""
             theme_var.set(selected_theme)
 
             if preview_var.get():
@@ -3101,54 +3211,64 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
                 except Exception as e:
                     print(f"⚠️ Theme apply failed: {e}")
 
-        def add_theme_row(theme_name):
-            """Helper to add one theme row with swatch + radio."""
-            row = ttk.Frame(theme_list_frame)
-            row.pack(fill=tk.X, padx=5, pady=4)
+        def create_theme_swatch(theme_name, row, col):
+            """Create a compact theme swatch with name underneath"""
+            # Frame for this theme
+            theme_frame = ttk.Frame(theme_scrollable_frame)
+            theme_frame.grid(row=row, column=col, padx=8, pady=8, sticky="n")
 
             try:
                 sw_bg, sw_bg2, sw_accent = get_theme_preview(theme_name)
             except Exception:
                 sw_bg, sw_bg2, sw_accent = ("#ffffff", "#cccccc", "#888888")
 
-            sw = tk.Canvas(row, width=48, height=28, bd=0, highlightthickness=1)
-            rect = sw.create_rectangle(0, 0, 48, 28, fill=sw_bg, outline=sw_bg2)
-            sw.create_rectangle(0, 20, 48, 28, fill=sw_accent, outline=sw_accent)
-            # Make the swatch keyboard-focusable for accessibility
-            sw.configure(takefocus=1)
-            sw.pack(side=tk.LEFT, padx=(0, 10))
+            # Compact swatch (smaller than before)
+            sw = tk.Canvas(theme_frame, width=60, height=40, bd=0, highlightthickness=2)
+            sw.create_rectangle(0, 0, 60, 40, fill=sw_bg, outline=sw_bg2)
+            sw.create_rectangle(0, 30, 60, 40, fill=sw_accent, outline=sw_accent)
 
-            def on_enter(e, r=rect, o=sw_accent):
-                try:
-                    sw.itemconfig(r, outline=o)
-                except Exception:
-                    sw.itemconfig(r, outline="#888888")
-
-            def on_leave(e, r=rect, o=sw_bg2):
-                sw.itemconfig(r, outline=o)
-
-            sw.bind("<Enter>", on_enter)
-            sw.bind("<Leave>", on_leave)
-            sw.bind("<Button-1>", lambda e, t=theme_name: on_swatch_click(t))
-            # Keyboard activation (Enter/Space) for accessibility
-            sw.bind("<Return>", lambda e, t=theme_name: on_swatch_click(t))
-            sw.bind("<space>", lambda e, t=theme_name: on_swatch_click(t))
-            sw.bind("<FocusIn>", on_enter)
-            sw.bind("<FocusOut>", on_leave)
-
-            rb = tk.Radiobutton(
-                row, text=theme_name.title(), variable=theme_var, value=theme_name
+            # Theme name label underneath
+            name_label = ttk.Label(
+                theme_frame,
+                text=theme_name.title(),
+                font=("TkDefaultFont", 9),
+                wraplength=70,
+                justify=tk.CENTER,
             )
-            rb.pack(side=tk.LEFT, anchor="w")
-            try:
-                rb.configure(takefocus=1)
-            except Exception:
-                pass
 
-            return row
+            # Radio button for selection
+            rb = tk.Radiobutton(theme_frame, variable=theme_var, value=theme_name)
 
-        for theme in themes:
-            add_theme_row(theme)
+            # Pack components
+            sw.pack(pady=(0, 4))
+            name_label.pack(pady=(0, 2))
+            rb.pack()
+
+            # Bind click events to the swatch
+            def on_click(e):
+                on_theme_select(theme_name)
+
+            sw.bind("<Button-1>", on_click)
+            name_label.bind("<Button-1>", on_click)
+            rb.bind("<Button-1>", on_click)
+
+            # Keyboard accessibility
+            sw.configure(takefocus=1)
+            sw.bind("<Return>", on_click)
+            sw.bind("<space>", on_click)
+            sw.bind("<FocusIn>", lambda e: sw.configure(highlightbackground=sw_accent))
+            sw.bind("<FocusOut>", lambda e: sw.configure(highlightbackground=sw_bg2))
+
+            # Highlight current theme
+            if theme_name == self.current_theme:
+                sw.configure(highlightbackground=sw_accent, highlightcolor=sw_accent)
+
+        # Arrange themes in a grid (6 columns)
+        cols = 6
+        for i, theme in enumerate(themes):
+            row = i // cols
+            col = i % cols
+            create_theme_swatch(theme, row, col)
 
         # I/O controls (export, import, restore defaults)
         io_frame = ttk.Frame(theme_frame)
@@ -3181,7 +3301,15 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
                 return
             new_name = self.theme_manager.import_theme_from_file(fp)
             if new_name:
-                add_theme_row(new_name)
+                # Refresh the theme grid to include the new theme
+                for child in theme_scrollable_frame.winfo_children():
+                    child.destroy()
+                themes = available_themes()
+                cols = 6
+                for i, theme in enumerate(themes):
+                    row = i // cols
+                    col = i % cols
+                    create_theme_swatch(theme, row, col)
                 messagebox.showinfo("Import Theme", f"Imported theme as '{new_name}'")
             else:
                 messagebox.showerror("Import Theme", "Failed to import theme file.")
@@ -3193,11 +3321,15 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             if not ok:
                 return
             if self.theme_manager.restore_defaults():
-                # Rebuild theme rows
-                for child in theme_list_frame.winfo_children():
+                # Refresh the theme grid
+                for child in theme_scrollable_frame.winfo_children():
                     child.destroy()
-                for th in available_themes():
-                    add_theme_row(th)
+                themes = available_themes()
+                cols = 6
+                for i, theme in enumerate(themes):
+                    row = i // cols
+                    col = i % cols
+                    create_theme_swatch(theme, row, col)
                 # Apply default theme
                 self.change_theme(self.theme_manager.current_theme)
                 messagebox.showinfo("Restore Defaults", "Defaults restored")
@@ -3214,6 +3346,47 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
             io_frame, text="Restore Defaults", command=restore_defaults_handler
         ).pack(side=tk.RIGHT)
 
+        # Theme tab buttons
+        theme_button_frame = tk.Frame(theme_frame)
+        theme_button_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        def apply_theme_settings():
+            """Apply selected theme to current session without saving"""
+            try:
+                sel = theme_var.get()
+                if sel:
+                    self.preview_theme(sel)
+                    self.update_status(f"Theme '{sel}' applied")
+                    try:
+                        self.show_toast(f"Theme '{sel}' applied")
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"⚠️ Failed to apply theme: {e}")
+                messagebox.showerror("Apply Error", f"Failed to apply theme: {e}")
+
+        def save_theme_settings():
+            """Save selected theme to persistent config"""
+            try:
+                sel = theme_var.get()
+                if sel:
+                    self.change_theme(sel)
+                    self.update_status(f"Theme '{sel}' saved")
+                    try:
+                        self.show_toast(f"Theme '{sel}' saved")
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"⚠️ Failed to save theme: {e}")
+                messagebox.showerror("Save Error", f"Failed to save theme: {e}")
+
+        tk.Button(theme_button_frame, text="Apply", command=apply_theme_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
+        tk.Button(theme_button_frame, text="Save", command=save_theme_settings).pack(
+            side=tk.RIGHT, padx=5
+        )
+
         # General Settings Tab
         general_frame = ttk.Frame(notebook)
         notebook.add(general_frame, text="⚙️ General")
@@ -3221,15 +3394,73 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         startup_frame = ttk.LabelFrame(general_frame, text="Startup Options")
         startup_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        remember_tabs_var = tk.BooleanVar(value=True)
+        remember_tabs_var = tk.BooleanVar(value=cfg.get("remember_tabs", True))
         tk.Checkbutton(
             startup_frame, text="Remember open tabs", variable=remember_tabs_var
         ).pack(anchor="w", padx=5, pady=2)
 
-        auto_save_var = tk.BooleanVar(value=False)
+        auto_save_var = tk.BooleanVar(value=cfg.get("auto_save", False))
         tk.Checkbutton(
             startup_frame, text="Auto-save files", variable=auto_save_var
         ).pack(anchor="w", padx=5, pady=2)
+
+        # General tab buttons
+        general_button_frame = tk.Frame(general_frame)
+        general_button_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        def apply_general_settings():
+            """Apply general settings to current session without saving"""
+            try:
+                self.remember_tabs = bool(remember_tabs_var.get())
+                self.auto_save = bool(auto_save_var.get())
+                self.update_status("General settings applied")
+                try:
+                    self.show_toast("General settings applied")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"⚠️ Failed to apply general settings: {e}")
+                messagebox.showerror(
+                    "Apply Error", f"Failed to apply general settings: {e}"
+                )
+
+        def save_general_settings():
+            """Save general settings to persistent config"""
+            try:
+                updates = {
+                    "remember_tabs": bool(remember_tabs_var.get()),
+                    "auto_save": bool(auto_save_var.get()),
+                }
+
+                ok = self.theme_manager.save_config(updates)
+                if not ok:
+                    messagebox.showerror(
+                        "Save Error",
+                        "Failed to write general settings to disk. Check permissions or disk space.",
+                    )
+                    return
+
+                # Apply to instance
+                self.remember_tabs = bool(remember_tabs_var.get())
+                self.auto_save = bool(auto_save_var.get())
+
+                self.update_status("General settings saved")
+                try:
+                    self.show_toast("General settings saved")
+                except Exception:
+                    pass
+            except Exception as e:
+                print(f"⚠️ Failed to save general settings: {e}")
+                messagebox.showerror(
+                    "Save Error", f"Failed to save general settings: {e}"
+                )
+
+        tk.Button(
+            general_button_frame, text="Apply", command=apply_general_settings
+        ).pack(side=tk.RIGHT, padx=5)
+        tk.Button(
+            general_button_frame, text="Save", command=save_general_settings
+        ).pack(side=tk.RIGHT, padx=5)
 
         # Button frame
         button_frame = tk.Frame(settings_window)
