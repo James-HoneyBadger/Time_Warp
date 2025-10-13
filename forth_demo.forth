@@ -1,0 +1,1 @@
+: SQUARE DUP * ; : DEMO 5 3 + . 10 SQUARE . 6 7 * . ; DEMO

@@ -54,6 +54,9 @@ from .languages import (
     TwPilotExecutor,
     TwBasicExecutor,
     TwLogoExecutor,
+    TwPascalExecutor,
+    TwPrologExecutor,
+    TwForthExecutor,
     PerlExecutor,
     PythonExecutor,
     JavaScriptExecutor,
@@ -541,6 +544,9 @@ class Time_WarpInterpreter:
         self.pilot_executor = TwPilotExecutor(self)
         self.basic_executor = TwBasicExecutor(self)
         self.logo_executor = TwLogoExecutor(self)
+        self.pascal_executor = TwPascalExecutor(self)
+        self.prolog_executor = TwPrologExecutor(self)
+        self.forth_executor = TwForthExecutor(self)
         self.perl_executor = PerlExecutor(self)
         self.python_executor = PythonExecutor(self)
         self.javascript_executor = JavaScriptExecutor(self)
@@ -1191,10 +1197,111 @@ class Time_WarpInterpreter:
                 return "javascript"
             elif language_mode == "perl":
                 return "perl"
+            elif language_mode == "pascal":
+                return "pascal"
+            elif language_mode == "prolog":
+                return "prolog"
+            elif language_mode == "forth":
+                return "forth"
 
         # PILOT commands start with a letter followed by colon
         if len(command) > 1 and command[1] == ":":
             return "pilot"
+
+        # Prolog commands
+        if (
+            command.startswith("?-")
+            or ":-" in command
+            or command.upper()
+            in ["LISTING", "LISTING.", "TRACE", "TRACE.", "NOTRACE", "NOTRACE."]
+        ):
+            return "prolog"
+
+        # Forth commands - stack operations, arithmetic, word definitions
+        forth_words = [
+            "DUP",
+            "DROP",
+            "SWAP",
+            "OVER",
+            "ROT",
+            "-ROT",
+            "+",
+            "-",
+            "*",
+            "/",
+            "MOD",
+            "NEGATE",
+            "=",
+            "<",
+            ">",
+            "<=",
+            ">=",
+            "<>",
+            "AND",
+            "OR",
+            "XOR",
+            "INVERT",
+            ".",
+            "EMIT",
+            "CR",
+            "SPACE",
+            "SPACES",
+            "@",
+            "!",
+            "C@",
+            "C!",
+            ":",
+            ";",
+            "CONSTANT",
+            "VARIABLE",
+            "IF",
+            "THEN",
+            "ELSE",
+            "BEGIN",
+            "UNTIL",
+            "WHILE",
+            "REPEAT",
+            "DO",
+            "LOOP",
+            "+LOOP",
+            "I",
+            "J",
+            "SEE",
+            "WORDS",
+            "FORGET",
+        ]
+        cmd_first_word = command.split()[0].upper() if command.split() else ""
+        if cmd_first_word in forth_words or command.startswith(":"):
+            return "forth"
+
+        # Pascal commands
+        pascal_keywords = [
+            "PROGRAM",
+            "BEGIN",
+            "END",
+            "VAR",
+            "CONST",
+            "PROCEDURE",
+            "FUNCTION",
+            "IF",
+            "THEN",
+            "ELSE",
+            "WHILE",
+            "DO",
+            "FOR",
+            "TO",
+            "DOWNTO",
+            "REPEAT",
+            "UNTIL",
+            "CASE",
+            "OF",
+            "READLN",
+            "WRITELN",
+            "WRITE",
+        ]
+        cmd_first_word = command.split()[0].upper() if command.split() else ""
+        if cmd_first_word in pascal_keywords or ":=" in command:
+            return "pascal"
 
         # Logo commands
         logo_commands = [
@@ -1267,6 +1374,12 @@ class Time_WarpInterpreter:
             return self.basic_executor.execute_command(command)
         elif cmd_type == "logo":
             return self.logo_executor.execute_command(command)
+        elif cmd_type == "pascal":
+            return self.pascal_executor.execute_command(command)
+        elif cmd_type == "prolog":
+            return self.prolog_executor.execute_command(command)
+        elif cmd_type == "forth":
+            return self.forth_executor.execute_command(command)
         elif cmd_type == "perl":
             return self.perl_executor.execute_command(command)
         elif cmd_type == "python":

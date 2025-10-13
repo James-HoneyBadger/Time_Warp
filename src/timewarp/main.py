@@ -491,12 +491,8 @@ class Time_WarpIDE:
                 # Set the ide_turtle_canvas that the interpreter expects
                 self.interpreter.ide_turtle_canvas = self.enhanced_graphics.get_canvas()
 
-                # Also maintain the turtle_graphics dict for compatibility
-                self.interpreter.turtle_graphics = {
-                    "canvas": self.enhanced_graphics.get_canvas(),
-                    "screen": self.enhanced_graphics.get_screen(),
-                    "turtle": self.enhanced_graphics.get_turtle(),
-                }
+                # Don't set turtle_graphics here - let interpreter initialize it properly
+                # The interpreter's init_turtle_graphics() method will handle the full initialization
             except AttributeError:
                 print("⚠️ Turtle graphics integration needs updating")
         else:
@@ -520,14 +516,8 @@ class Time_WarpIDE:
             turtle_obj.speed(5)
             turtle_obj.shape("turtle")
 
-            self.interpreter.turtle_graphics = {
-                "canvas": self.basic_canvas,
-                "screen": screen,
-                "turtle": turtle_obj,
-            }
-
-            # Add reference to the graphics canvas for updates
-            self.interpreter.graphics_canvas = self.basic_canvas
+            # Set the ide_turtle_canvas for interpreter compatibility
+            self.interpreter.ide_turtle_canvas = self.basic_canvas
 
     def setup_keybindings(self):
         """Setup keyboard shortcuts"""
