@@ -30,7 +30,7 @@ This release focuses on major project organization and repository cleanup improv
 
 ### 📁 Clean Directory Structure
 
-```
+```text
 Time_Warp/
 ├── 📄 Core files (README.md, requirements.txt, etc.)
 ├── 📁 core/ - Application core
