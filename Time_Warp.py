@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", message=".*avx2.*", category=RuntimeWarning)
 Time_Warp IDE - Simple Educational Programming Environment
 
 A minimal Tkinter-based IDE for running multi-language programs through the Time_Warp interpreter.
-Supports Time Warp, Pascal, Prolog, Forth, Perl, Python, and JavaScript execution.
+Supports Time Warp, Pascal, and Prolog execution.
 
 Features:
 - Simple text editor with Courier font
@@ -818,7 +818,7 @@ Python Version: {sys.version.split()[0]}
 Architecture: {platform.machine()}
 
 Time_Warp IDE v1.3.0
-Available Languages: Time Warp, Pascal, Prolog, Forth, Perl, Python, JavaScript"""
+Available Languages: Time Warp, Pascal, Prolog"""
         
         messagebox.showinfo("System Info", info)
 
@@ -1499,17 +1499,6 @@ Features:
         view_menu.add_command(label="📝 Switch to Code Editor", command=self.switch_to_editor)
         view_menu.add_command(label="📊 Switch to Output", command=self.toggle_output_panel)
         view_menu.add_command(label="🐢 Switch to Turtle Graphics", command=self.toggle_turtle_graphics)
-        view_menu.add_separator()
-        # Screen Mode submenu
-        screen_menu = tk.Menu(view_menu, tearoff=0)
-        screen_menu.add_command(label="📺 Mode 0: CGA 40-col Text", command=lambda: self._set_screen_mode(0))
-        screen_menu.add_command(label="📺 Mode 1: CGA 40-col Text (Alt)", command=lambda: self._set_screen_mode(1))
-        screen_menu.add_command(label="📺 Mode 2: CGA 80-col Text", command=lambda: self._set_screen_mode(2))
-        screen_menu.add_command(label="🎨 Mode 7: EGA 320x200 Graphics", command=lambda: self._set_screen_mode(7))
-        screen_menu.add_command(label="🎨 Mode 8: EGA 640x200 Graphics", command=lambda: self._set_screen_mode(8))
-        screen_menu.add_command(label="🎨 Mode 9: EGA 640x350 Graphics", command=lambda: self._set_screen_mode(9))
-        screen_menu.add_command(label="⚫ Mode 10: MDA Monochrome", command=lambda: self._set_screen_mode(10))
-        view_menu.add_cascade(label="📺 Screen Modes", menu=screen_menu)
         self.menubar.add_cascade(label="👁️ View", menu=view_menu)
 
         # === RUN MENU === ▶️
@@ -1526,12 +1515,8 @@ Features:
         # === LANGUAGE MENU === 💻
         lang_menu = tk.Menu(self.menubar, tearoff=0)
         lang_menu.add_command(label="⏰ Time Warp", command=lambda: self._set_language("time_warp"))
-        lang_menu.add_command(label="🐍 Python", command=lambda: self._set_language("python"))
-        lang_menu.add_command(label="📜 Pascal", command=lambda: self._set_language("pascal"))
+        lang_menu.add_command(label=" Pascal", command=lambda: self._set_language("pascal"))
         lang_menu.add_command(label="🧠 Prolog", command=lambda: self._set_language("prolog"))
-        lang_menu.add_command(label="🔢 Forth", command=lambda: self._set_language("forth"))
-        lang_menu.add_command(label="💎 Perl", command=lambda: self._set_language("perl"))
-        lang_menu.add_command(label="🌐 JavaScript", command=lambda: self._set_language("javascript"))
         lang_menu.add_separator()
         lang_menu.add_command(label="🔍 Auto-Detect", command=lambda: self._set_language("auto"))
         self.menubar.add_cascade(label="💻 Language", menu=lang_menu)
@@ -1652,6 +1637,9 @@ Features:
         # Apply initial theme (but don't override the black background for welcome screen)
         # self._apply_theme_stub(self.selected_theme)
 
+        # Track when to show OK prompt
+        self.show_ok_prompt = True  # Show OK on initial run
+
         # Schedule welcome screen to show after GUI is fully initialized
         self.root.after(100, self._show_welcome_screen)
 
@@ -1668,16 +1656,15 @@ Features:
 
         import platform
 
-        # Clear canvas and set to text mode
-        self.unified_canvas.set_screen_mode(0, text_cols=80)  # 80-column text mode for better readability
-        self.unified_canvas.clear_text()
+        # Clear canvas and set to unified mode
+        self.unified_canvas._clear_screen()
 
         # Display welcome text
         welcome_text = f"""
 Time_Warp IDE v1.3.0 - Educational Programming Environment
 {platform.system()} {platform.release()} - {platform.machine()}
 
-Supports: PILOT, BASIC, Logo, Python, JavaScript, Pascal, Prolog, Forth, Perl
+Supports: Time Warp, Pascal, Prolog
 
 {memory_info}
 
@@ -1706,26 +1693,8 @@ OK
                     # Reset cursor position after clearing
                     self.unified_canvas.cursor_x = 0
                     self.unified_canvas.cursor_y = 0
-                elif command_upper.startswith("MODE "):
-                    try:
-                        mode = int(command.split()[1])
-                        self.unified_canvas.set_screen_mode(mode)
-                        mode_info = self.unified_canvas.get_mode_info()
-                        self.unified_canvas.write_text(f"Screen mode set to {mode_info['name']}\n", color=15)
-                    except (ValueError, IndexError):
-                        self.unified_canvas.write_text("Invalid mode. Use MODE 0-11\n", color=15)
-                elif command_upper.startswith("SCREEN "):
-                    try:
-                        mode = int(command.split()[1])
-                        self.unified_canvas.set_screen_mode(mode)
-                        mode_info = self.unified_canvas.get_mode_info()
-                        # Update status label if it exists (for compatibility)
-                        if hasattr(self, 'status_label') and self.status_label:
-                            self.status_label.config(text=f"Ready - {mode_info['name']}")
-                        self._update_window_title()
-                        self.unified_canvas.write_text(f"Screen mode set to {mode_info['name']}\n", color=15)
-                    except (ValueError, IndexError):
-                        self.unified_canvas.write_text("Invalid mode. Use SCREEN 0-11\n", color=15)
+                    # Show OK prompt after CLS
+                    self.show_ok_prompt = True
                 elif command_upper in ["EXIT", "QUIT", "BYE"]:
                     self.on_closing()
                     return
@@ -1741,33 +1710,28 @@ OK
 
     def _show_next_prompt(self, callback):
         """Show the next OK prompt and restart input"""
-        self.unified_canvas.write_text("OK\n", color=15)
+        if self.show_ok_prompt:
+            self.unified_canvas.write_text("OK\n", color=15)
+            self.show_ok_prompt = False  # Reset flag
+        # Note: cursor positioning is now handled by prompt_input method
         self.unified_canvas.prompt_input("", callback)
 
     def _show_help(self):
         """Show help information"""
         help_text = """
 Available Commands:
-python   HELP     - Show this help
+  HELP     - Show this help
   CLS      - Clear screen
-  MODE n   - Set screen mode (0-11)
-  SCREEN n - Set screen mode (0-11)
   EXIT     - Quit the IDE
 
-Screen Modes:
-  0: Text mode (40/80 columns)
-  1: 320x200 Graphics (4 colors)
-  2: 640x200 Graphics (2 colors)
-  7-10: EGA Graphics modes
-  11: XGA Turtle Graphics (1024x768, 256 colors)
-
-Languages: Type code directly or use RUN command
+Languages: Time_Warp programming language
 
 Examples:
   PRINT "Hello, World!"
   10 PRINT "BASIC LINE"
   FORWARD 100
   T:Hello World!
+  ? "Hello"  (shortcut for PRINT)
 
 OK
 """
@@ -1778,6 +1742,7 @@ OK
         try:
             # Handle special commands first
             command_upper = command.strip().upper()
+            
             if command_upper == "RUN":
                 # Execute the stored program
                 if self.interpreter.program_lines:
@@ -1790,6 +1755,8 @@ OK
             elif command_upper == "LIST":
                 # List the stored program
                 if self.interpreter.program_lines:
+                    # Clear screen for listing
+                    self.unified_canvas._clear_screen()
                     self.unified_canvas.write_text("Program:\n", color=15)
                     for line_num, cmd in self.interpreter.program_lines:
                         self.unified_canvas.write_text(f"{line_num} {cmd}\n", color=15)
@@ -1842,57 +1809,10 @@ OK
                     self.unified_canvas.write_text("Invalid line number format.\n", color=12)
                     return
 
-            # Detect language and execute
-            language = self._detect_language_from_code(command)
-
-            # Time Warp (consolidated language) - handle differently
-            if language == 'time_warp':
-                # This is an immediate command - execute directly without "program executed" message
-                result = self.interpreter.time_warp_executor.execute_command(command)
-                return
-
-            # For other languages, don't execute immediately - require Run menu
-            language_names = {
-                'pilot': 'PILOT',
-                'basic': 'BASIC',
-                'logo': 'Logo',
-                'pascal': 'Pascal',
-                'prolog': 'Prolog',
-                'forth': 'Forth',
-                'perl': 'Perl',
-                'python': 'Python',
-                'javascript': 'JavaScript'
-            }
-
-            if language in language_names:
-                self.unified_canvas.write_text(f"{language_names[language]} programs must be executed using the Run menu.\n", color=14)  # Yellow text
-                return
-
-            # Fallback for unknown languages - try Python eval
-            try:
-                result = eval(command)
-                self.unified_canvas.write_text(f"{result}\n", color=15)
-            except:
-                self.unified_canvas.write_text("Syntax error or unknown command\n", color=12)  # Light red
+            # Execute as Time_Warp command
+            result = self.interpreter.time_warp_executor.execute_command(command)
         except Exception as e:
             self.unified_canvas.write_text(f"Error: {str(e)}\n", color=12)
-
-    def _set_screen_mode(self, mode):
-        """Set the unified canvas screen mode"""
-        try:
-            self.unified_canvas.set_screen_mode(mode)
-            mode_info = self.unified_canvas.get_mode_info()
-            # Update status label if it exists (for compatibility)
-            if hasattr(self, 'status_label') and self.status_label:
-                self.status_label.config(text=f"Ready - {mode_info['name']}")
-            self._update_window_title()
-        except ValueError as e:
-            messagebox.showerror("Screen Mode Error", str(e))
-
-    def _update_window_title(self):
-        """Update window title with current screen mode"""
-        mode_info = self.unified_canvas.get_mode_info()
-        self.root.title(f"Time_Warp IDE - {mode_info['name']}")
 
     def _check_syntax(self):
         """Check syntax of code - requires external code input in unified canvas mode"""
@@ -1917,15 +1837,12 @@ OK
             import os
             _, ext = os.path.splitext(self.current_file.lower())
             ext_map = {
-                '.py': 'python',
-                '.js': 'javascript',
-                '.pl': 'perl',
                 '.pas': 'pascal',
                 '.plg': 'prolog',
-                '.fs': 'forth',
                 '.logo': 'logo',
                 '.bas': 'basic',
-                '.pilot': 'pilot'
+                '.pilot': 'pilot',
+                '.tw': 'time_warp'
             }
             if ext in ext_map:
                 return ext_map[ext]
@@ -1973,22 +1890,6 @@ OK
                     and var_part and expr_part and not any(char in expr_part for char in ['(', ')', '{', '}', ';', ':'])):
                     return 'time_warp'
 
-        # Python detection - more comprehensive
-        python_indicators = [
-            'import ', 'from ', 'def ', 'class ', 'if __name__ == "__main__"',
-            'print(', 'len(', 'range(', 'enumerate(', 'zip('
-        ]
-        if any(indicator in first_lines for indicator in python_indicators):
-            return 'python'
-
-        # JavaScript detection - more specific
-        js_indicators = [
-            'function ', 'const ', 'let ', 'var ', '=>', 'console.log',
-            'document.', 'window.', 'addEventListener', 'querySelector'
-        ]
-        if any(indicator in first_lines for indicator in js_indicators):
-            return 'javascript'
-
         # Default to Time_Warp for immediate commands instead of PILOT
         return 'time_warp'
 
@@ -1997,13 +1898,7 @@ OK
         errors = []
         lines = code.split('\n')
 
-        if language == 'python':
-            errors = self._validate_python_syntax(code)
-        elif language == 'javascript':
-            errors = self._validate_javascript_syntax(code)
-        elif language == 'perl':
-            errors = self._validate_perl_syntax(code)
-        elif language == 'basic':
+        if language == 'basic':
             errors = self._validate_basic_syntax(lines)
         elif language == 'logo':
             errors = self._validate_logo_syntax(lines)
@@ -2013,106 +1908,9 @@ OK
             errors = self._validate_pascal_syntax(code)
         elif language == 'prolog':
             errors = self._validate_prolog_syntax(code)
-        elif language == 'forth':
-            errors = self._validate_forth_syntax(lines)
         else:
             # For unsupported languages, just check for basic structure
             errors = self._validate_generic_syntax(lines)
-
-        return errors
-
-    def _validate_python_syntax(self, code):
-        """Validate Python syntax using AST parsing"""
-        errors = []
-        try:
-            import ast
-            ast.parse(code)
-        except SyntaxError as e:
-            errors.append({
-                'line': e.lineno or 1,
-                'message': f"SyntaxError: {e.msg}"
-            })
-        except Exception as e:
-            errors.append({
-                'line': 1,
-                'message': f"Parse error: {str(e)}"
-            })
-        return errors
-
-    def _validate_javascript_syntax(self, code):
-        """Validate JavaScript syntax (basic checks)"""
-        errors = []
-        lines = code.split('\n')
-
-        for i, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line or line.startswith('//'):
-                continue
-
-            # Check for unmatched braces
-            open_braces = line.count('{')
-            close_braces = line.count('}')
-            if open_braces != close_braces:
-                errors.append({
-                    'line': i,
-                    'message': f"Unmatched braces: {open_braces} opening, {close_braces} closing"
-                })
-
-            # Check for unmatched parentheses
-            open_parens = line.count('(')
-            close_parens = line.count(')')
-            if open_parens != close_parens:
-                errors.append({
-                    'line': i,
-                    'message': f"Unmatched parentheses: {open_parens} opening, {close_parens} closing"
-                })
-
-            # Check for missing semicolons (basic check) - be less strict
-            if (line and not line.endswith('{') and not line.endswith('}') 
-                and not line.endswith(';') and not line.startswith('//')
-                and not any(keyword in line for keyword in ['if', 'for', 'while', 'function', 'var ', 'let ', 'const ', 'return'])
-                and not any(line.endswith(x) for x in [',', ':', '++', '--', '&&', '||', '==', '!=', '<=', '>='])):
-                errors.append({
-                    'line': i,
-                    'message': "Missing semicolon (optional in modern JS)"
-                })
-
-        return errors
-
-    def _validate_perl_syntax(self, code):
-        """Validate Perl syntax (basic checks)"""
-        errors = []
-        lines = code.split('\n')
-
-        for i, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-
-            # Check for unmatched braces
-            open_braces = line.count('{')
-            close_braces = line.count('}')
-            if open_braces != close_braces:
-                errors.append({
-                    'line': i,
-                    'message': f"Unmatched braces: {open_braces} opening, {close_braces} closing"
-                })
-
-            # Check for unmatched parentheses
-            open_parens = line.count('(')
-            close_parens = line.count(')')
-            if open_parens != close_parens:
-                errors.append({
-                    'line': i,
-                    'message': f"Unmatched parentheses: {open_parens} opening, {close_parens} closing"
-                })
-
-            # Check for missing semicolons
-            if line and not line.endswith('{') and not line.endswith('}') and not line.endswith(';') and not line.startswith('#'):
-                errors.append({
-                    'line': i,
-                    'message': "Missing semicolon"
-                })
 
         return errors
 
@@ -2244,39 +2042,6 @@ OK
                     'line': i,
                     'message': "Missing period at end of clause"
                 })
-
-        return errors
-
-    def _validate_forth_syntax(self, lines):
-        """Validate Forth syntax (basic checks)"""
-        errors = []
-
-        for i, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line or line.startswith('\\'):
-                continue
-
-            # Check for unmatched parentheses in comments
-            if '(' in line and ')' not in line:
-                # This might be a comment, but let's check if it's properly closed
-                if not any(')' in later_line for later_line in lines[i:]):
-                    errors.append({
-                        'line': i,
-                        'message': "Unmatched opening parenthesis (possibly unclosed comment)"
-                    })
-
-            # Basic check for common Forth syntax issues
-            # Forth words are separated by spaces, no complex parsing needed for basic validation
-            # Just check for obviously malformed constructs
-
-            # Check for incomplete definitions
-            if line.startswith(':') and not line.endswith(';'):
-                # This is a definition start, should end with ;
-                if not any(';' in later_line for later_line in lines[i:]):
-                    errors.append({
-                        'line': i,
-                        'message': "Incomplete word definition (missing ;) "
-                    })
 
         return errors
 

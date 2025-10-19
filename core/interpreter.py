@@ -11,10 +11,7 @@ Supported Languages:
 - TW Logo: Turtle graphics programming (FORWARD, RIGHT, REPEAT)
 - TW Pascal: Structured programming (BEGIN, END, VAR, PROCEDURE)
 - TW Prolog: Logic programming (?- queries, :- rules)
-- TW Forth: Stack-based programming (DUP, DROP, SWAP, arithmetic)
-- Perl: Modern scripting language
-- Python: Full Python execution
-- JavaScript: JavaScript execution
+- TW Time_Warp: Unified language combining the best of all above
 
 Key Features:
 - Unified variable management across all languages
@@ -80,10 +77,6 @@ from .languages import (
     TwLogoExecutor,
     TwPascalExecutor,
     TwPrologExecutor,
-    TwForthExecutor,
-    PerlExecutor,
-    PythonExecutor,
-    JavaScriptExecutor,
     TwTimeWarpExecutor,
 )
 
@@ -505,10 +498,7 @@ class Time_WarpInterpreter:
         - Logo: Turtle graphics with FORWARD, RIGHT, REPEAT
         - Pascal: Structured programming with BEGIN/END blocks
         - Prolog: Logic programming with ?- queries and :- rules
-        - Forth: Stack-based programming with DUP, DROP, SWAP
-        - Perl: Modern scripting with full Perl syntax
-        - Python: Python execution with standard library access
-        - JavaScript: JavaScript execution with Node.js-style environment
+        - Time_Warp: Unified language combining features from all above
     """
 
     def __init__(self, output_widget=None):
@@ -622,10 +612,6 @@ class Time_WarpInterpreter:
         self.logo_executor = TwLogoExecutor(self)
         self.pascal_executor = TwPascalExecutor(self)
         self.prolog_executor = TwPrologExecutor(self)
-        self.forth_executor = TwForthExecutor(self)
-        self.perl_executor = PerlExecutor(self)
-        self.python_executor = PythonExecutor(self)
-        self.javascript_executor = JavaScriptExecutor(self)
         self.time_warp_executor = TwTimeWarpExecutor(self)
 
         # Language mode (optional explicit setting)
@@ -633,7 +619,7 @@ class Time_WarpInterpreter:
 
     def set_language_mode(self, mode):
         """Set the current language mode for script execution"""
-        valid_modes = ["pilot", "basic", "logo", "pascal", "prolog", "forth", "python", "javascript", "perl", "time_warp"]
+        valid_modes = ["pilot", "basic", "logo", "pascal", "prolog", "time_warp"]
         if mode in valid_modes:
             self.current_language_mode = mode
             self.log_output(f"Language mode set to: {mode}")
@@ -1391,18 +1377,10 @@ class Time_WarpInterpreter:
 
         # If explicit language mode is set, use that for modern languages
         if language_mode:
-            if language_mode == "python":
-                return "python"
-            elif language_mode == "javascript":
-                return "javascript"
-            elif language_mode == "perl":
-                return "perl"
-            elif language_mode == "pascal":
+            if language_mode == "pascal":
                 return "pascal"
             elif language_mode == "prolog":
                 return "prolog"
-            elif language_mode == "forth":
-                return "forth"
             elif language_mode == "basic":
                 return "basic"
             elif language_mode == "logo":
@@ -1424,63 +1402,6 @@ class Time_WarpInterpreter:
             in ["LISTING", "LISTING.", "TRACE", "TRACE.", "NOTRACE", "NOTRACE."]
         ):
             return "prolog"
-
-        # Forth commands - stack operations, arithmetic, word definitions
-        forth_words = [
-            "DUP",
-            "DROP",
-            "SWAP",
-            "OVER",
-            "ROT",
-            "-ROT",
-            "+",
-            "-",
-            "*",
-            "/",
-            "MOD",
-            "NEGATE",
-            "=",
-            "<",
-            ">",
-            "<=",
-            ">=",
-            "<>",
-            "AND",
-            "OR",
-            "XOR",
-            "INVERT",
-            ".",
-            "EMIT",
-            "CR",
-            "SPACE",
-            "SPACES",
-            "@",
-            "!",
-            "C@",
-            "C!",
-            ":",
-            ";",
-            "CONSTANT",
-            "VARIABLE",
-            "IF",
-            "THEN",
-            "ELSE",
-            "BEGIN",
-            "UNTIL",
-            "WHILE",
-            "REPEAT",
-            "DO",
-            "LOOP",
-            "+LOOP",
-            "I",
-            "J",
-            "SEE",
-            "WORDS",
-            "FORGET",
-        ]
-        cmd_first_word = command.split()[0].upper() if command.split() else ""
-        if cmd_first_word in forth_words or command.startswith(":"):
-            return "forth"
 
         # Pascal commands
         pascal_keywords = [
@@ -1510,19 +1431,6 @@ class Time_WarpInterpreter:
         cmd_first_word = command.split()[0].upper() if command.split() else ""
         if cmd_first_word in pascal_keywords or ":=" in command:
             return "pascal"
-
-        # Perl commands - check for Perl syntax patterns (before Time_Warp to avoid conflicts)
-        if (
-            (command.strip().startswith("print ") and command.strip()[0].islower()) or
-            ("my $" in command) or
-            ("our $" in command) or
-            ("sub " in command) or
-            ("use " in command and ";" in command) or
-            ("$" in command and " = " in command) or
-            ("@_" in command) or
-            ("$_" in command)
-        ):
-            return "perl"
 
         # Time_Warp unified language - check for modern syntax patterns first
         # This includes variable assignments, modern turtle commands, and unified syntax
@@ -1609,32 +1517,6 @@ class Time_WarpInterpreter:
         if cmd_first_word in basic_commands or cmd_first_word.startswith("GAME"):
             return "basic"
 
-        # Python commands - check for Python syntax patterns
-        if (
-            ("def " in command and "(" in command) or
-            ("import " in command) or
-            ("print(" in command and ")" in command) or
-            ("if __name__" in command) or
-            ("class " in command) or
-            (command.strip().startswith("print(") and command.strip().endswith(")")) or
-            ("for " in command and " in " in command) or
-            ("while " in command and ":" in command)
-        ):
-            return "python"
-
-        # JavaScript commands - check for JS syntax patterns
-        if (
-            ("console.log" in command) or
-            ("function " in command and "(" in command) or
-            ("var " in command and "=" in command) or
-            ("let " in command and "=" in command) or
-            ("const " in command and "=" in command) or
-            ("=>" in command) or
-            ("document." in command) or
-            ("window." in command)
-        ):
-            return "javascript"
-
         # BASIC commands - check for line numbers first
         if command.strip() and command.strip()[0].isdigit():
             # Line-numbered BASIC program
@@ -1664,14 +1546,6 @@ class Time_WarpInterpreter:
             return self.pascal_executor.execute_command(command)
         elif cmd_type == "prolog":
             return self.prolog_executor.execute_command(command)
-        elif cmd_type == "forth":
-            return self.forth_executor.execute_command(command)
-        elif cmd_type == "perl":
-            return self.perl_executor.execute_command(command)
-        elif cmd_type == "python":
-            return self.python_executor.execute_command(command)
-        elif cmd_type == "javascript":
-            return self.javascript_executor.execute_command(command)
         elif cmd_type == "time_warp":
             return self.time_warp_executor.execute_command(command)
 

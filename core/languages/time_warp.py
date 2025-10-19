@@ -86,6 +86,10 @@ class TwTimeWarpExecutor:
             if not command:
                 return "continue"
 
+            # Convert ? to PRINT for BASIC compatibility
+            if command.startswith('?'):
+                command = 'PRINT ' + command[1:].strip()
+
             # Strip inline comments (REM, ; comments)
             if "REM" in command:
                 command = command.split("REM", 1)[0].strip()
@@ -138,6 +142,20 @@ class TwTimeWarpExecutor:
                 return "continue"
 
             cmd = parts[0].upper()
+
+            # Handle MEM command for memory display
+            if cmd == "MEM":
+                try:
+                    import psutil
+                    memory = psutil.virtual_memory()
+                    total_mb = memory.total / (1024 * 1024)
+                    available_mb = memory.available / (1024 * 1024)
+                    used_mb = memory.used / (1024 * 1024)
+                    percent = memory.percent
+                    self.interpreter.log_output(f"Memory: {used_mb:.1f}MB used, {available_mb:.1f}MB free, {total_mb:.1f}MB total ({percent:.1f}%)")
+                except ImportError:
+                    self.interpreter.log_output("Memory information not available (psutil not installed)")
+                return "continue"
 
             # Handle function calls like SIN(30), LEN('test'), etc.
             # Extract function name from expressions like FUNC(args)

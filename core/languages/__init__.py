@@ -12,10 +12,7 @@ Language Executors:
 - TwLogoExecutor: Handles TW Logo commands (FORWARD, RIGHT, REPEAT, etc.)
 - TwPascalExecutor: Handles TW Pascal structured programming
 - TwPrologExecutor: Handles TW Prolog logic programming
-- TwForthExecutor: Handles TW Forth stack-based operations
-- PerlExecutor: Handles Perl script execution
-- PythonExecutor: Handles Python script execution
-- JavaScriptExecutor: Handles JavaScript execution
+- TwTimeWarpExecutor: Handles unified Time_Warp language
 
 Each executor follows a consistent interface:
 - __init__(interpreter): Initialize with reference to main interpreter
@@ -30,10 +27,6 @@ from .basic import TwBasicExecutor
 from .logo import TwLogoExecutor
 from .pascal import TwPascalExecutor
 from .prolog import TwPrologExecutor
-from .forth import TwForthExecutor
-from .perl import PerlExecutor
-from .python_executor import PythonExecutor
-from .javascript_executor import JavaScriptExecutor
 from .time_warp import TwTimeWarpExecutor
 
 __all__ = [
@@ -42,9 +35,5 @@ __all__ = [
     "TwLogoExecutor",
     "TwPascalExecutor",
     "TwPrologExecutor",
-    "TwForthExecutor",
-    "PerlExecutor",
-    "PythonExecutor",
-    "JavaScriptExecutor",
     "TwTimeWarpExecutor",
 ]

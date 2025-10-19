@@ -55,89 +55,10 @@ class UnifiedCanvas(tk.Canvas):
 
     # Screen mode configurations - Authentic GW-BASIC specifications
     SCREEN_MODES = {
-        0: {
-            "name": "Text Mode (40/80 columns)",
-            "width": 640, "height": 200,  # Default to 80-column size
-            "text_cols": 80, "text_rows": 25,
-            "char_width": 8, "char_height": 8,  # 8x8 character box (8x14 with EGA)
-            "colors": 16, "palette": CGA_PALETTE_0,
-            "type": "text",
-            "attribute_range": "0-15",  # 16 colors for 2 attributes (foreground/background)
-            "memory_pages": 1,
-            "page_size": "2K-4K"  # 2K for 40-col, 4K for 80-col
-        },
-        1: {
-            "name": "320x200 Graphics (4 colors)",
-            "width": 320, "height": 200,
-            "colors": 4, "palette": CGA_PALETTE_0[:4],  # Only first 4 colors
-            "type": "graphics",
-            "attribute_range": "0-3",
-            "bits_per_pixel": 2,
-            "memory_pages": 1,
-            "page_size": "16K"
-        },
-        2: {
-            "name": "640x200 Graphics (2 colors)",
-            "width": 640, "height": 200,
-            "colors": 2, "palette": CGA_PALETTE_0[:2],  # Black and white
-            "type": "graphics",
-            "attribute_range": "0-1",
-            "bits_per_pixel": 1,
-            "memory_pages": 1,
-            "page_size": "16K"
-        },
-        7: {
-            "name": "EGA 320x200 Graphics (16 colors)",
-            "width": 320, "height": 200,
-            "colors": 16, "palette": EGA_PALETTE[:16],
-            "type": "graphics",
-            "attribute_range": "0-15",
-            "bits_per_pixel": 4,
-            "memory_pages": "2-4",  # Depends on EGA memory (64K=2, 128K=3, 256K=4)
-            "page_size": "32K",
-            "ega_required": True
-        },
-        8: {
-            "name": "EGA 640x200 Graphics (16 colors)",
-            "width": 640, "height": 200,
-            "colors": 16, "palette": EGA_PALETTE[:16],
-            "type": "graphics",
-            "attribute_range": "0-15",
-            "bits_per_pixel": 4,
-            "memory_pages": "1-4",  # Depends on EGA memory (64K=1, 128K=2, 256K=4)
-            "page_size": "64K",
-            "ega_required": True
-        },
-        9: {
-            "name": "EGA 640x350 Graphics (16/64 colors)",
-            "width": 640, "height": 350,
-            "colors": 64, "palette": EGA_PALETTE,  # Full 64-color palette
-            "type": "graphics",
-            "attribute_range": "0-15 (64K) / 0-63 (128K+)",
-            "bits_per_pixel": "2-4",  # 2 bits (64K) or 4 bits (128K+)
-            "memory_pages": "1-2",  # 2 pages with 256K
-            "page_size": "128K",
-            "ega_required": True
-        },
-        10: {
-            "name": "EGA Monochrome 640x350 Graphics (9 pseudo-colors)",
-            "width": 720, "height": 350,  # Note: 720 width for MDA
-            "colors": 9, "palette": [
-                "#000000", "#FFFFFF", "#000000", "#FFFFFF",  # Off, On, Blink off-to-on
-                "#000000", "#FFFFFF", "#000000", "#FFFFFF",  # Blink off-to-high, On
-                "#FFFFFF"  # High intensity
-            ],
-            "type": "graphics",
-            "attribute_range": "0-3",
-            "bits_per_pixel": 2,
-            "memory_pages": "1-2",  # 2 pages with 256K
-            "page_size": "128K",
-            "ega_required": True,
-            "monochrome": True
-        },
         11: {
-            "name": "XGA Turtle Graphics (1024x768, 256 colors)",
+            "name": "Unified Canvas (1024x768, 256 colors)",
             "width": 1024, "height": 768,
+            "text_cols": 80, "text_rows": 25,  # Text grid for input/output
             "colors": 256, "palette": [
                 # Standard 16 EGA colors (0-15)
                 "#000000", "#0000AA", "#00AA00", "#00AAAA", "#AA0000", "#AA00AA", "#AA5500", "#AAAAAA",
@@ -146,17 +67,16 @@ class UnifiedCanvas(tk.Canvas):
                 *[f"#{r:02X}{g:02X}{b:02X}" for r in range(0, 256, 16)
                   for g in range(0, 256, 16) for b in range(0, 256, 16)][16:256]
             ],
-            "type": "turtle",
+            "type": "unified",
             "attribute_range": "0-255",
             "bits_per_pixel": 8,
             "memory_pages": 1,
             "page_size": "768K",  # 1024x768x1 bytes
-            "turtle_optimized": True,
             "high_resolution": True
         }
     }
 
-    def __init__(self, parent, mode=2, text_cols=None, **kwargs):
+    def __init__(self, parent, mode=11, text_cols=None, **kwargs):
         # Extract font parameters before passing to Canvas
         self.font_family = kwargs.pop('font_family', 'Courier')
         self.font_size = kwargs.pop('font_size', 12)
@@ -237,27 +157,18 @@ class UnifiedCanvas(tk.Canvas):
 
         self.config(width=canvas_width, height=canvas_height)
 
-    def set_screen_mode(self, mode, text_cols=None):
+    def set_screen_mode(self, mode=11, text_cols=None):
         """Set the screen mode
 
         Args:
-            mode: Screen mode number (0-11)
-            text_cols: For mode 0, specify 40 or 80 columns (default: 80)
+            mode: Screen mode number (only 11 supported)
+            text_cols: Not used in unified mode
         """
-        if mode not in self.SCREEN_MODES:
-            raise ValueError(f"Invalid screen mode: {mode}")
+        if mode != 11:
+            raise ValueError(f"Only screen mode 11 is supported")
 
         self.current_mode = mode
         self.mode_config = self.SCREEN_MODES[mode].copy()
-
-        # Handle mode 0 text column selection (40 or 80 columns)
-        if mode == 0:
-            if text_cols in [40, 80]:
-                self.mode_config["text_cols"] = text_cols
-                # Adjust width based on columns
-                self.mode_config["width"] = text_cols * 8  # 8 pixels per character
-            elif text_cols is not None:
-                raise ValueError("Mode 0 supports only 40 or 80 columns")
 
         # Update grid dimensions
         self.rows = self.mode_config.get("text_rows", 25)
@@ -278,14 +189,9 @@ class UnifiedCanvas(tk.Canvas):
         self.cursor_x = 0
         self.cursor_y = 0
 
-        # Set default colors based on mode type
-        if self.mode_config["type"] == "text":
-            self.text_color = 7  # Light gray for text modes
-            self.bg_color = 0   # Black background
-        else:
-            self.text_color = 15  # White for graphics modes
-            self.bg_color = 0    # Black background
-
+        # Set default colors for unified mode
+        self.text_color = 15  # White
+        self.bg_color = 0    # Black
         self.pen_color = 15   # White pen
         self.fill_color = 0   # Black fill
 
@@ -299,6 +205,10 @@ class UnifiedCanvas(tk.Canvas):
         default_color = min(15, len(self.mode_config["palette"]) - 1)
         self.screen_buffer = [[' ' for _ in range(self.cols)] for _ in range(self.rows)]
         self.screen_colors = [[default_color for _ in range(self.cols)] for _ in range(self.rows)]
+
+        # Reset cursor position
+        self.cursor_x = 0
+        self.cursor_y = 0
 
         # Fill background
         canvas_width = self.winfo_width() or (self.cols * self.font.measure("W"))
