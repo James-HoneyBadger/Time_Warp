@@ -91,6 +91,10 @@ run_*_direct.py
 "test_file.txt"
 test file with spaces.txt
 unicode_test.txt
+
+# Unrelated repositories
+seahorse/
+
 # Build directory
 build/
 
