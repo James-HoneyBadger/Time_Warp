@@ -1,0 +1,105 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+timewarp_venv/
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+
+# Archive directory
+archive/
+
+# Output files
+*.ppm
+*.out
+
+# Test outputs
+*_compiled
+*_logo
+*_pilot
+
+# Config files (user-specific)
+.timewarp/
+config.json
+
+# Cache directories
+.cache/
+
+# Test and temporary files
+test_*.py
+*_test.py
+debug_*.py
+benchmark_*.py
+stress_test_*.py
+*_backup.py
+*_corrupted*.py
+temp_*.py
+edge_case_*.py
+diagnose_*.py
+
+# Documentation files (will be generated)
+*_SUMMARY.md
+*_REPORT.md
+*_GUIDE.md
+*_COMPLETE.md
+
+# Game and demo files (examples only)
+demo_*.py
+run_*_direct.py
+
+# File system test files
+"test
+"test_file.txt"
+test file with spaces.txt
+unicode_test.txt
+# Build directory
+build/
+
+# Release archives (too large for GitHub)
+release/**/*.tar.gz
+release/**/*.zip
+*.tar.gz
+*.zip
+
+# Scripts (development only - don't ignore)
+# scripts/
+

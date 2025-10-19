@@ -1,0 +1,32 @@
+# Testing requirements for Time_Warp IDE
+# Install with: pip install -r test_requirements.txt
+
+# Core testing framework
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.0.0  # Parallel test execution
+pytest-mock>=3.10.0
+
+# Coverage reporting
+coverage>=7.0.0
+
+# Test utilities
+unittest-xml-reporting>=3.2.0  # XML test reports
+pytest-html>=3.1.0  # HTML test reports
+pytest-benchmark>=4.0.0  # Performance benchmarking
+
+# Mocking and test data
+factory-boy>=3.2.0  # Test data generation
+faker>=18.0.0  # Fake data generation
+
+# GUI testing (if needed)
+pytest-qt>=4.2.0  # Qt application testing
+
+# Code quality during testing
+flake8>=6.0.0
+black>=23.0.0
+mypy>=1.0.0
+
+# Optional: for advanced testing
+hypothesis>=6.75.0  # Property-based testing
+parameterized>=0.9.0  # Parameterized tests

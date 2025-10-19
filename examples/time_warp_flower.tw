@@ -1,0 +1,46 @@
+# Time Warp Flower Pattern Generator
+# Demonstrates Logo-style turtle graphics with Time Warp unified syntax
+
+T:🌸 Time Warp Flower Generator 🌸
+T:Watch as we create beautiful geometric patterns!
+
+# Set up variables
+LET PETALS = 8
+LET SIZE = 50
+LET ANGLE = 360 / PETALS
+
+# Main drawing loop
+LET I = 1
+WHILE I <= PETALS DO
+    T:Drawing petal *I* of *PETALS*...
+
+    # Draw one petal
+    FORWARD SIZE
+    RIGHT 60
+    FORWARD SIZE
+    RIGHT 120
+    FORWARD SIZE
+    RIGHT 60
+    FORWARD SIZE
+
+    # Rotate to next petal position
+    RIGHT ANGLE
+
+    LET I = I + 1
+END WHILE
+
+# Add center dot
+T:Adding the flower center...
+DOT 20
+
+# Draw stem
+T:Adding a stem...
+PENUP
+RIGHT 90
+FORWARD 100
+PENDOWN
+FORWARD 150
+
+T:🌼 Beautiful flower complete! 🌼
+T:Time Warp combines the best of PILOT, BASIC, and Logo!</content>
+<parameter name="filePath">/home/james/Downloads/Time_Warp-main/examples/time_warp_flower.tw

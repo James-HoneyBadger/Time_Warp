@@ -1,0 +1,1063 @@
+# Ensure the main function is called when running the script directly
+
+#!/usr/bin/env python3
+"""
+Time_Warp IDE - Simple Educational Programming Environment
+
+A minimal Tkinter-based IDE for running multi-language programs through the Time_Warp interpreter.
+Supports PILOT, BASIC, Logo, Pascal, Prolog, Forth, Perl, Python, and JavaScript execution.
+
+Features:
+- Simple text editor with Courier font
+- One-click program execution
+- Integrated interpreter with 9+ language support
+- Turtle graphics for visual languages
+- Educational error messages
+
+Usage:
+    python Time_Warp.py
+
+The IDE provides a basic text editing interface where users can write and execute
+programs in multiple programming languages with immediate visual feedback.
+"""
+
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from core.interpreter import Time_WarpInterpreter
+import os
+import json
+
+# Import advanced editor features
+try:
+    from src.timewarp.gui.editor.features import (
+        AdvancedSyntaxHighlighter,
+        AutoCompletionEngine,
+        RealTimeSyntaxChecker,
+        CodeFoldingSystem,
+    )
+    ADVANCED_EDITOR_AVAILABLE = True
+except ImportError:
+    ADVANCED_EDITOR_AVAILABLE = False
+
+
+class EnhancedCodeEditor(tk.Frame):
+    """Enhanced code editor with syntax highlighting, auto-completion, and advanced features"""
+
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+
+        # Create main frame
+        self.main_frame = tk.Frame(self)
+        self.main_frame.pack(fill="both", expand=True)
+
+        # Create line numbers
+        self.line_numbers = tk.Text(
+            self.main_frame,
+            width=4,
+            padx=3,
+            pady=3,
+            takefocus=0,
+            border=0,
+            background="#f0f0f0",
+            foreground="#666666",
+            font=("Consolas", 10),
+            state="disabled"
+        )
+        self.line_numbers.pack(side="left", fill="y")
+
+        # Create main text widget
+        self.text_widget = tk.Text(
+            self.main_frame,
+            wrap="none",
+            font=("Consolas", 11),
+            undo=True,
+            padx=8,
+            pady=8,
+            bg="#ffffff",
+            relief="flat",
+            insertbackground="black"
+        )
+        self.text_widget.pack(side="left", fill="both", expand=True)
+
+        # Create horizontal scrollbar
+        self.h_scrollbar = tk.Scrollbar(self, orient="horizontal", command=self.text_widget.xview)
+        self.h_scrollbar.pack(side="bottom", fill="x")
+        self.text_widget.config(xscrollcommand=self.h_scrollbar.set)
+
+        # Create vertical scrollbar
+        self.v_scrollbar = tk.Scrollbar(self.main_frame, orient="vertical", command=self._on_scroll)
+        self.v_scrollbar.pack(side="right", fill="y")
+
+        # Initialize advanced features if available
+        self.syntax_highlighter = None
+        self.auto_completion = None
+        self.syntax_checker = None
+        self.code_folding = None
+
+        if ADVANCED_EDITOR_AVAILABLE:
+            self._init_advanced_features()
+
+        # Bind events
+        self.text_widget.bind("<KeyRelease>", self._on_key_release)
+        self.text_widget.bind("<Tab>", self._handle_tab)
+        self.text_widget.bind("<Shift-Tab>", self._handle_shift_tab)
+        self.text_widget.bind("<Control-slash>", self._toggle_comment)
+        self.text_widget.bind("<Control-f>", self._find_replace)
+        self.text_widget.bind("<F3>", self._find_next)
+
+        # Update line numbers on scroll and text changes
+        self.text_widget.bind("<MouseWheel>", self._update_line_numbers)
+        self.text_widget.bind("<Button-4>", self._update_line_numbers)  # Linux scroll up
+        self.text_widget.bind("<Button-5>", self._update_line_numbers)  # Linux scroll down
+
+        # Initialize line numbers
+        self._update_line_numbers()
+
+
+    def _init_advanced_features(self):
+        """Initialize advanced editor features"""
+        try:
+            # Syntax highlighting
+            self.syntax_highlighter = AdvancedSyntaxHighlighter(self.text_widget)
+            self.text_widget.bind("<KeyRelease>", self.syntax_highlighter.highlight_syntax, add=True)
+
+            # Auto-completion
+            self.auto_completion = AutoCompletionEngine(self.text_widget)
+            self.text_widget.bind("<Control-space>", self.auto_completion.show_completions)
+
+            # Syntax checking
+            self.syntax_checker = RealTimeSyntaxChecker(self.text_widget)
+            self.text_widget.bind("<KeyRelease>", self.syntax_checker.check_syntax, add=True)
+
+            # Code folding
+            self.code_folding = CodeFoldingSystem(self.text_widget)
+
+        except Exception as e:
+            print(f"Warning: Could not initialize advanced editor features: {e}")
+
+    def _on_scroll(self, *args):
+        """Handle scroll events"""
+        self.text_widget.yview(*args)
+        self.line_numbers.yview(*args)
+        self._update_line_numbers()
+
+    def _on_key_release(self, event):
+        """Handle key release events"""
+        # Update line numbers
+        self._update_line_numbers()
+
+        # Auto-indent on Enter
+        if event.keysym == "Return":
+            self._auto_indent()
+
+    def _update_line_numbers(self, event=None):
+        """Update line numbers display"""
+        self.line_numbers.config(state="normal")
+        self.line_numbers.delete("1.0", tk.END)
+
+        # Get the number of lines in the text widget
+        text_content = self.text_widget.get("1.0", tk.END)
+        lines = text_content.split("\n")
+
+        # Add line numbers
+        for i in range(1, len(lines)):
+            self.line_numbers.insert(tk.END, f"{i}\n")
+
+        self.line_numbers.config(state="disabled")
+
+        # Sync scrolling
+        self.line_numbers.yview_moveto(self.text_widget.yview()[0])
+
+    def _auto_indent(self):
+        """Auto-indent new lines"""
+        # Get current line
+        cursor_pos = self.text_widget.index(tk.INSERT)
+        line_num = int(cursor_pos.split(".")[0])
+
+        if line_num > 1:
+            # Get previous line's indentation
+            prev_line = self.text_widget.get(f"{line_num-1}.0", f"{line_num-1}.end")
+            indent = ""
+            for char in prev_line:
+                if char in " \t":
+                    indent += char
+                else:
+                    break
+
+            # Check if previous line ends with colon (Python/BASIC block start)
+            if prev_line.rstrip().endswith(":"):
+                if "\t" in indent:
+                    indent += "\t"
+                else:
+                    indent += "    "
+
+            # Insert indentation
+            if indent:
+                self.text_widget.insert(cursor_pos, indent)
+
+    def _handle_tab(self, event):
+        """Handle Tab key for indentation"""
+        self.text_widget.insert(tk.INSERT, "    ")
+        return "break"
+
+    def _handle_shift_tab(self, event=None):
+        """Handle Shift+Tab for unindentation"""
+        cursor_pos = self.text_widget.index(tk.INSERT)
+        line_start = f"{cursor_pos.split('.')[0]}.0"
+        line_text = self.text_widget.get(line_start, cursor_pos)
+
+        # Remove up to 4 spaces from start of line
+        spaces_to_remove = 0
+        for char in line_text:
+            if char == " " and spaces_to_remove < 4:
+                spaces_to_remove += 1
+            else:
+                break
+
+        if spaces_to_remove > 0:
+            remove_start = f"{cursor_pos.split('.')[0]}.{int(cursor_pos.split('.')[1]) - spaces_to_remove}"
+            self.text_widget.delete(remove_start, cursor_pos)
+
+        return "break"
+
+    def _toggle_comment(self, event=None):
+        """Toggle comments on selected lines or current line"""
+        try:
+            # Get selection or current line
+            try:
+                start_pos = self.text_widget.index(tk.SEL_FIRST)
+                end_pos = self.text_widget.index(tk.SEL_LAST)
+                start_line = int(start_pos.split(".")[0])
+                end_line = int(end_pos.split(".")[0])
+            except tk.TclError:
+                # No selection, use current line
+                cursor_pos = self.text_widget.index(tk.INSERT)
+                start_line = end_line = int(cursor_pos.split(".")[0])
+
+            # Process each line
+            for line_num in range(start_line, end_line + 1):
+                line_start = f"{line_num}.0"
+                line_end = f"{line_num}.end"
+                line_text = self.text_widget.get(line_start, line_end)
+
+                # Detect language and comment style
+                if line_text.strip().startswith("def ") or line_text.strip().startswith("class ") or "import " in line_text:
+                    comment_char = "#"  # Python
+                elif "::" in line_text or line_text.strip().startswith("REM"):
+                    comment_char = "//"  # PILOT/BASIC style
+                elif any(cmd in line_text.upper() for cmd in ["FORWARD", "PRINT", "REM"]):
+                    comment_char = ";"  # Logo/BASIC
+                else:
+                    comment_char = "#"  # Default
+
+                # Toggle comment
+                if line_text.strip().startswith(comment_char):
+                    # Uncomment
+                    comment_start = line_text.find(comment_char)
+                    self.text_widget.delete(f"{line_num}.{comment_start}", f"{line_num}.{comment_start + len(comment_char)}")
+                else:
+                    # Comment
+                    self.text_widget.insert(line_start, comment_char)
+
+        except Exception as e:
+            print(f"Comment toggle error: {e}")
+
+        return "break"
+
+    def _find_replace(self, event):
+        """Open find/replace dialog"""
+        self._show_find_dialog()
+        return "break"
+
+    def _find_next(self, event):
+        """Find next occurrence"""
+        if hasattr(self, '_last_find_text') and self._last_find_text:
+            self._find_text(self._last_find_text)
+        return "break"
+
+    def _show_find_dialog(self):
+        """Show find/replace dialog"""
+        dialog = tk.Toplevel(self)
+        dialog.title("Find & Replace")
+        dialog.geometry("400x150")
+        dialog.transient(self.winfo_toplevel())
+
+        # Find text
+        tk.Label(dialog, text="Find:").grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        find_entry = tk.Entry(dialog, width=30)
+        find_entry.grid(row=0, column=1, columnspan=2, padx=5, pady=5)
+
+        # Replace text
+        tk.Label(dialog, text="Replace:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        replace_entry = tk.Entry(dialog, width=30)
+        replace_entry.grid(row=1, column=1, columnspan=2, padx=5, pady=5)
+
+        # Buttons
+        find_btn = tk.Button(dialog, text="Find", command=lambda: self._find_text(find_entry.get()))
+        find_btn.grid(row=2, column=0, padx=5, pady=5)
+
+        replace_btn = tk.Button(dialog, text="Replace", command=lambda: self._replace_text(find_entry.get(), replace_entry.get()))
+        replace_btn.grid(row=2, column=1, padx=5, pady=5)
+
+        replace_all_btn = tk.Button(dialog, text="Replace All", command=lambda: self._replace_all_text(find_entry.get(), replace_entry.get()))
+        replace_all_btn.grid(row=2, column=2, padx=5, pady=5)
+
+        find_entry.focus()
+
+    def _find_text(self, text):
+        """Find text in editor"""
+        if not text:
+            return
+
+        self._last_find_text = text
+
+        # Get current position
+        start_pos = self.text_widget.index(tk.INSERT)
+
+        # Search from current position
+        pos = self.text_widget.search(text, start_pos, tk.END)
+        if not pos:
+            # Wrap around to beginning
+            pos = self.text_widget.search(text, "1.0", tk.END)
+
+        if pos:
+            # Select the found text
+            end_pos = f"{pos}+{len(text)}c"
+            self.text_widget.tag_remove("sel", "1.0", tk.END)
+            self.text_widget.tag_add("sel", pos, end_pos)
+            self.text_widget.mark_set(tk.INSERT, end_pos)
+            self.text_widget.see(pos)
+
+    def _replace_text(self, find_text, replace_text):
+        """Replace selected text"""
+        try:
+            self.text_widget.delete(tk.SEL_FIRST, tk.SEL_LAST)
+            self.text_widget.insert(tk.INSERT, replace_text)
+            self._find_text(find_text)  # Find next occurrence
+        except tk.TclError:
+            pass  # No selection
+
+    def _replace_all_text(self, find_text, replace_text):
+        """Replace all occurrences"""
+        if not find_text:
+            return
+
+        count = 0
+        start_pos = "1.0"
+
+        while True:
+            pos = self.text_widget.search(find_text, start_pos, tk.END)
+            if not pos:
+                break
+
+            end_pos = f"{pos}+{len(find_text)}c"
+            self.text_widget.delete(pos, end_pos)
+            self.text_widget.insert(pos, replace_text)
+            start_pos = pos
+            count += 1
+
+        messagebox.showinfo("Replace All", f"Replaced {count} occurrences")
+
+    # Delegate methods to text widget
+    def get(self, *args, **kwargs):
+        return self.text_widget.get(*args, **kwargs)
+
+    def insert(self, *args, **kwargs):
+        return self.text_widget.insert(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self.text_widget.delete(*args, **kwargs)
+
+    def index(self, *args, **kwargs):
+        return self.text_widget.index(*args, **kwargs)
+
+    def tag_add(self, *args, **kwargs):
+        return self.text_widget.tag_add(*args, **kwargs)
+
+    def tag_remove(self, *args, **kwargs):
+        return self.text_widget.tag_remove(*args, **kwargs)
+
+    def tag_configure(self, *args, **kwargs):
+        return self.text_widget.tag_configure(*args, **kwargs)
+
+    def bind(self, *args, **kwargs):
+        return self.text_widget.bind(*args, **kwargs)
+
+    def focus_set(self):
+        return self.text_widget.focus_set()
+
+    def request_input(self, prompt, input_type=str):
+        """Show input prompt in output panel and enable entry field."""
+        self._expected_input_type = input_type
+        self.output_panel.config(state="normal")
+        self.output_panel.insert("end", f"{prompt}")
+        self.output_panel.see("end")
+        self.output_panel.config(state="disabled")
+        self.output_entry_var.set("")
+        self.output_entry.config(state="normal")
+        self.output_entry.focus_set()
+
+    def _on_output_entry_submit(self, event=None):
+        value = self.output_entry_var.get()
+        input_type = self._expected_input_type or str
+        try:
+            typed_value = input_type(value)
+        except Exception:
+            self.output_panel.config(state="normal")
+            self.output_panel.insert("end", f"\n❌ Invalid input type. Expected {input_type.__name__}.\n")
+            self.output_panel.config(state="disabled")
+            self.output_entry_var.set("")
+            return
+        self.output_entry.config(state="disabled")
+        self.output_panel.config(state="normal")
+        self.output_panel.insert("end", f"{typed_value}\n")
+        self.output_panel.config(state="disabled")
+        # Send input to interpreter
+        if hasattr(self, "_input_callback") and self._input_callback:
+            self._input_callback(typed_value)
+        self._input_callback = None
+        self._expected_input_type = None
+
+
+class TimeWarpApp:
+    """
+    Main application class for the Time_Warp IDE.
+
+    Creates a simple GUI with:
+    - Text area for code editing
+    - Run button for program execution
+    - Integrated Time_Warp interpreter for multi-language support
+    """
+
+    def __init__(self, root):
+        print("[DEBUG] Entered TimeWarpApp.__init__")
+        self.root = root
+        self.root.title("Time_Warp IDE v1.3.0")
+        self.root.geometry("800x600")  # Set reasonable default size
+        self.current_file = None
+        self.selected_theme = "Spring"  # Start with light theme for contrast
+        self.config_path = os.path.expanduser("~/.Time_Warp/config.json")
+        self.interpreter = Time_WarpInterpreter()
+        self.interpreter.ide_turtle_canvas = None  # Will be set later
+        try:
+            from plugins import PluginManager, PluginManagerDialog
+            self.plugin_manager = PluginManager(self)
+            self.plugin_manager_dialog = None
+        except Exception as e:
+            self.plugin_manager = None
+            self.plugin_manager_dialog = None
+        self.theme_manager = None
+        try:
+            from src.timewarp.utils.theme import ThemeManager, available_themes
+            self.theme_manager = ThemeManager()
+        except Exception:
+            pass
+        self.root.bind("<F5>", lambda e: self.run_program())
+        self.root.bind("<Control-r>", lambda e: self.run_program())
+        self.root.bind("<Control-c>", lambda e: self._copy_text())
+        self.root.bind("<Control-v>", lambda e: self._paste_text())
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        print("[DEBUG] Calling _create_ui()")
+        self._create_ui()
+        print("[DEBUG] Calling _load_theme_config()")
+        self._load_theme_config()
+        print("[DEBUG] Finished TimeWarpApp.__init__")
+
+    def new_file(self):
+        self.editor.delete("1.0", tk.END)
+        self.status_label.config(text="🆕 New file.")
+
+    def open_file(self):
+        from tkinter import filedialog
+        file_path = filedialog.askopenfilename(filetypes=[("All Files", "*.*"), ("Python", "*.py"), ("Text", "*.txt"), ("BASIC", "*.bas"), ("PILOT", "*.pilot"), ("Logo", "*.logo")])
+        if file_path:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            self.editor.delete("1.0", tk.END)
+            self.editor.insert("1.0", content)
+            self.status_label.config(text=f"📂 Opened: {file_path}")
+            self.current_file = file_path
+
+    def save_file(self):
+        import os
+        if hasattr(self, "current_file") and self.current_file:
+            file_path = self.current_file
+        else:
+            file_path = self.save_file_as()
+            if not file_path:
+                return
+            self.current_file = file_path
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(self.editor.get("1.0", tk.END))
+        self.status_label.config(text=f"💾 Saved: {file_path}")
+
+    def save_file_as(self):
+        from tkinter import filedialog
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"), ("Python", "*.py"), ("Text", "*.txt"), ("BASIC", "*.bas"), ("PILOT", "*.pilot"), ("Logo", "*.logo")])
+        if file_path:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(self.editor.get("1.0", tk.END))
+            self.status_label.config(text=f"💾 Saved As: {file_path}")
+            self.current_file = file_path
+
+    def clear_editor(self):
+        self.editor.delete("1.0", tk.END)
+        self.status_label.config(text="🧹 Code editor cleared.")
+
+    def clear_output(self):
+        self.output_panel.config(state="normal")
+        self.output_panel.delete("1.0", tk.END)
+        self.output_panel.config(state="disabled")
+        self.status_label.config(text="🧹 Output panel cleared.")
+
+    def clear_turtle(self):
+        self.turtle_canvas.delete("all")
+        if hasattr(self.interpreter, "turtle_graphics"):
+            self.interpreter.turtle_graphics = None
+        self.status_label.config(text="🧹 Turtle graphics cleared.")
+
+    def _open_find_replace(self):
+        """Open find/replace dialog"""
+        if hasattr(self.editor, '_show_find_dialog'):
+            self.editor._show_find_dialog()
+        else:
+            messagebox.showinfo("Find/Replace", "Find/Replace is not available in basic editor mode.")
+
+    def _find_next(self):
+        """Find next occurrence"""
+        if hasattr(self.editor, '_find_next'):
+            self.editor._find_next()
+        else:
+            messagebox.showinfo("Find Next", "Find Next is not available in basic editor mode.")
+
+    def _toggle_comment(self):
+        """Toggle comment on current line/selection"""
+        if hasattr(self.editor, '_toggle_comment'):
+            self.editor._toggle_comment(event=None)
+        else:
+            messagebox.showinfo("Toggle Comment", "Comment toggle is not available in basic editor mode.")
+
+    def _copy_text(self):
+        """Copy selected text to clipboard"""
+        try:
+            if hasattr(self.editor, 'text_widget'):
+                # Enhanced editor
+                selected_text = self.editor.text_widget.get(tk.SEL_FIRST, tk.SEL_LAST)
+                if selected_text:
+                    self.root.clipboard_clear()
+                    self.root.clipboard_append(selected_text)
+            else:
+                # Basic editor
+                selected_text = self.editor.get(tk.SEL_FIRST, tk.SEL_LAST)
+                if selected_text:
+                    self.root.clipboard_clear()
+                    self.root.clipboard_append(selected_text)
+        except tk.TclError:
+            # No text selected
+            pass
+
+    def _paste_text(self):
+        """Paste text from clipboard"""
+        try:
+            clipboard_text = self.root.clipboard_get()
+            if hasattr(self.editor, 'text_widget'):
+                # Enhanced editor
+                self.editor.text_widget.insert(tk.INSERT, clipboard_text)
+            else:
+                # Basic editor
+                self.editor.insert(tk.INSERT, clipboard_text)
+        except tk.TclError:
+            # Clipboard empty or unavailable
+            pass
+
+    def _increase_indent(self):
+        """Increase indentation"""
+        if hasattr(self.editor, 'text_widget'):
+            # Enhanced editor
+            self.editor.text_widget.insert(tk.INSERT, "    ")
+        else:
+            # Basic editor
+            self.editor.insert(tk.INSERT, "    ")
+
+    def _decrease_indent(self):
+        """Decrease indentation"""
+        if hasattr(self.editor, '_handle_shift_tab'):
+            self.editor._handle_shift_tab(event=None)
+        else:
+            messagebox.showinfo("Decrease Indent", "Indentation tools are not available in basic editor mode.")
+
+    def run_program(self):
+        """
+        Execute the program currently in the text area.
+        """
+        program_code = self.editor.get("1.0", "end").strip()
+
+        if not program_code:
+            self.status_label.config(text="❌ No code to run.")
+            messagebox.showwarning(
+                "No Code",
+                "❌ Please enter a program to run.\n\nTry copying one of the examples from the README.md file.",
+            )
+            return
+
+        # Check if program contains turtle graphics commands
+        turtle_commands = ["FORWARD", "FD", "BACK", "BK", "LEFT", "LT", "RIGHT", "RT", "PENUP", "PU", "PENDOWN", "PD", "CLEARSCREEN", "CS", "HOME", "SETXY", "CIRCLE", "DOT", "RECT", "TEXT"]
+        has_turtle_commands = any(cmd in program_code.upper() for cmd in turtle_commands)
+
+        try:
+            self.status_label.config(text="🚀 Running program...")
+            # Always switch to output tab for I/O
+            self.notebook.select(self.output_tab)
+            # Clear output panel
+            self.output_panel.config(state="normal")
+            self.output_panel.delete("1.0", "end")
+            self.output_panel.config(state="disabled")
+
+            # Clear turtle canvas
+            self.turtle_canvas.delete("all")
+            self.interpreter.turtle_graphics = None
+
+            # Run the program through the interpreter
+            self.interpreter.run_program(program_code)
+
+            self.status_label.config(text="✅ Program complete.")
+            
+            # Automatically switch to turtle graphics tab if program used turtle commands
+            if has_turtle_commands:
+                self.notebook.select(self.turtle_tab)
+                messagebox.showinfo(
+                    "Program Complete",
+                    "✅ Program executed successfully!\n\nTurtle graphics results are displayed in the Turtle Graphics tab.",
+                )
+            else:
+                messagebox.showinfo(
+                    "Program Complete",
+                    "✅ Program executed successfully!\n\nCheck the output panel for results.",
+                )
+        except Exception as e:
+            error_msg = f"❌ Error: {str(e)}"
+            self.status_label.config(text=error_msg)
+            self.output_panel.config(state="normal")
+            self.output_panel.delete("1.0", "end")
+            self.output_panel.insert("1.0", error_msg)
+            self.output_panel.config(state="disabled")
+            messagebox.showerror("Execution Error", error_msg)
+
+    def show_about(self):
+        """Show about dialog"""
+        about_text = """Time_Warp IDE v1.3.0
+
+An educational programming environment supporting multiple languages:
+• PILOT, BASIC, Logo, Pascal, Prolog, Forth, Perl, Python, JavaScript
+
+Features:
+• Multi-language code execution
+• Turtle graphics support
+• Plugin system
+• Theme customization
+• Educational error messages
+
+© 2025 Time_Warp Development Team"""
+        messagebox.showinfo("About Time_Warp IDE", about_text)
+
+    def show_documentation(self):
+        """Show documentation"""
+        import webbrowser
+        try:
+            # Try to open local documentation
+            doc_path = "docs/README.md"
+            if os.path.exists(doc_path):
+                webbrowser.open(f"file://{os.path.abspath(doc_path)}")
+            else:
+                # Fallback to online documentation or show message
+                messagebox.showinfo("Documentation", "📚 Documentation is available in the 'docs/' folder.\n\nCheck README.md for usage instructions.")
+        except Exception as e:
+            messagebox.showerror("Documentation Error", f"Could not open documentation:\n\n{str(e)}")
+
+    def toggle_output_panel(self):
+        """Switch to output tab"""
+        self.notebook.select(self.output_tab)
+        self.status_label.config(text="📊 Switched to Output tab")
+
+    def toggle_turtle_graphics(self):
+        """Switch to turtle graphics tab"""
+        self.notebook.select(self.turtle_tab)
+        self.status_label.config(text="🐢 Switched to Turtle Graphics tab")
+
+    def switch_to_editor(self):
+        """Switch to code editor tab"""
+        self.notebook.select(self.editor_tab)
+        self.status_label.config(text="📝 Switched to Code Editor tab")
+
+    def open_plugin_manager(self):
+        """Open the plugin manager dialog"""
+        if self.plugin_manager and hasattr(self.plugin_manager, "list_available_plugins"):
+            if not self.plugin_manager_dialog:
+                from plugins import PluginManagerDialog
+                self.plugin_manager_dialog = PluginManagerDialog(self, self.plugin_manager)
+            self.plugin_manager_dialog.show()
+        else:
+            messagebox.showerror("Plugin Manager", "❌ Plugin system not available.")
+
+    def open_theme_selector(self):
+        """Open theme selector dialog"""
+        themes = ["Dracula", "Monokai", "Solarized Dark", "Ocean", "Spring", "Sunset", "Candy", "Forest"]
+
+        dialog = tk.Toplevel(self.root)
+        dialog.title("🎨 Select Theme")
+        dialog.geometry("400x350")
+        dialog.transient(self.root)
+
+        tk.Label(dialog, text="Choose a theme:", font=("Arial", 12, "bold")).pack(pady=10)
+
+        # Create buttons for each theme
+        button_frame = tk.Frame(dialog)
+        button_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+        for i, theme in enumerate(themes):
+            row = i // 2
+            col = i % 2
+            btn = tk.Button(
+                button_frame,
+                text=theme,
+                command=lambda t=theme: self._apply_theme_from_selector(t, dialog),
+                font=("Arial", 10),
+                width=15
+            )
+            btn.grid(row=row, column=col, padx=5, pady=5)
+
+        # Current theme indicator
+        tk.Label(dialog, text=f"Current: {self.selected_theme}", font=("Arial", 10, "italic")).pack(pady=5)
+
+        tk.Button(dialog, text="Close", command=dialog.destroy, font=("Arial", 11)).pack(pady=10)
+
+    def _apply_theme_from_selector(self, theme_name, dialog):
+        """Apply theme from selector and close dialog"""
+        self.selected_theme = theme_name
+        self._save_theme_config(theme_name)
+        self._apply_theme_stub(theme_name)
+        self.status_label.config(text=f"🎨 Theme '{theme_name}' applied.")
+        dialog.destroy()
+
+    def _apply_theme_stub(self, theme_name):
+        """Stub theme application for demonstration purposes"""
+        # Example: change background and foreground colors for a few themes
+        theme_colors = {
+            "Dracula": {"bg": "#282a36", "fg": "#f8f8f2", "panel_bg": "#44475a", "panel_fg": "#f8f8f2"},
+            "Monokai": {"bg": "#272822", "fg": "#f8f8f2", "panel_bg": "#49483e", "panel_fg": "#f8f8f2"},
+            "Solarized Dark": {"bg": "#002b36", "fg": "#839496", "panel_bg": "#073642", "panel_fg": "#93a1a1"},
+            "Ocean": {"bg": "#223447", "fg": "#c3eaff", "panel_bg": "#2a415d", "panel_fg": "#c3eaff"},
+            "Spring": {"bg": "#f0fff0", "fg": "#228b22", "panel_bg": "#e0ffe0", "panel_fg": "#228b22"},
+            "Sunset": {"bg": "#fff5e6", "fg": "#ff4500", "panel_bg": "#ffe4b5", "panel_fg": "#ff4500"},
+            "Candy": {"bg": "#fff0fa", "fg": "#d72660", "panel_bg": "#ffe0f7", "panel_fg": "#d72660"},
+            "Forest": {"bg": "#e6ffe6", "fg": "#006400", "panel_bg": "#cceccc", "panel_fg": "#006400"},
+        }
+        colors = theme_colors.get(theme_name, theme_colors["Dracula"])
+
+        # Apply ttk styles for notebook tabs
+        style = ttk.Style()
+        style.configure("TNotebook", background=colors["bg"])
+        style.configure("TNotebook.Tab", background=colors["bg"], foreground=colors["fg"])
+        style.map("TNotebook.Tab", background=[("selected", colors["panel_bg"])])
+
+        # Apply theme to main window and frames
+        self.root.config(bg=colors["bg"])
+        self.main_frame.config(bg=colors["bg"])
+
+        # Apply theme to tab frames
+        self.editor_tab.config(bg=colors["bg"])
+        self.editor_frame.config(bg=colors["bg"])
+        
+        # Handle enhanced code editor
+        if hasattr(self.editor, 'text_widget'):
+            # Enhanced editor
+            self.editor.text_widget.config(bg=colors["bg"], fg=colors["fg"])
+            self.editor.line_numbers.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
+        else:
+            # Basic editor
+            self.editor.config(bg=colors["bg"], fg=colors["fg"])
+
+        self.output_tab.config(bg=colors["bg"])
+        self.output_frame.config(bg=colors["bg"])
+        self.output_panel.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
+
+        self.turtle_tab.config(bg=colors["bg"])
+        self.turtle_frame.config(bg=colors["bg"])
+        self.turtle_canvas.config(bg="white" if theme_name in ["Spring", "Sunset", "Candy", "Forest"] else colors["panel_bg"])
+
+        # Apply theme to controls
+        self.controls_frame.config(bg=colors["bg"])
+        # self.run_button no longer exists
+        self.status_label.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
+
+        # Force UI update
+        self.root.update_idletasks()
+
+    def _save_theme_config(self, theme_name):
+        """Save theme configuration to file"""
+        try:
+            config_dir = os.path.expanduser("~/.Time_Warp")
+            os.makedirs(config_dir, exist_ok=True)
+            config_file = os.path.join(config_dir, "config.json")
+            config = {}
+            if os.path.exists(config_file):
+                with open(config_file, 'r') as f:
+                    config = json.load(f)
+            config['theme'] = theme_name
+            with open(config_file, 'w') as f:
+                json.dump(config, f, indent=2)
+        except Exception as e:
+            # Silently fail if we can't save config
+            pass
+
+    def _load_theme_config(self):
+        """Load theme configuration from file"""
+        try:
+            config_file = os.path.expanduser("~/.Time_Warp/config.json")
+            if os.path.exists(config_file):
+                with open(config_file, 'r') as f:
+                    content = f.read().strip()
+                    if content:  # Only parse if file is not empty
+                        config = json.loads(content)
+                        saved_theme = config.get('theme', 'Dracula')
+                        if saved_theme in ["Dracula", "Monokai", "Solarized Dark", "Ocean", "Spring", "Sunset", "Candy", "Forest"]:
+                            self.selected_theme = saved_theme
+        except Exception as e:
+            # Silently fail if we can't load config, use default
+            pass
+
+    def run_tests(self):
+        """Run test suite and display results in output panel"""
+        import subprocess
+        import sys
+        try:
+            result = subprocess.run([sys.executable, "scripts/run_tests.py"], capture_output=True, text=True)
+            output = result.stdout + "\n" + result.stderr
+            # Show in output panel
+            self.output_panel.config(state="normal")
+            self.output_panel.delete("1.0", "end")
+            self.output_panel.insert("1.0", f"🧪 Test Results:\n\n{output}")
+            self.output_panel.config(state="disabled")
+            # Also show summary in messagebox
+            messagebox.showinfo("Test Results", f"🧪 Test run complete:\n\n{output[:1000]}")
+        except Exception as e:
+            self.output_panel.config(state="normal")
+            self.output_panel.insert("1.0", f"❌ Could not run tests:\n\n{str(e)}")
+            self.output_panel.config(state="disabled")
+            messagebox.showerror("Test Error", f"❌ Could not run tests:\n\n{str(e)}")
+
+    def on_closing(self):
+        """Handle window close event."""
+        if messagebox.askokcancel("Quit", "Do you want to quit Time_Warp IDE?"):
+            self.root.destroy()
+
+    def _create_ui(self):
+        print("[DEBUG] Entered TimeWarpApp._create_ui")
+        # Create menu bar
+        self.menubar = tk.Menu(self.root)
+        self.root.config(menu=self.menubar)
+
+
+
+        # File menu (without Run)
+        file_menu = tk.Menu(self.menubar, tearoff=0)
+        file_menu.add_command(label="New", command=self.new_file)
+        file_menu.add_command(label="Open...", command=self.open_file)
+        file_menu.add_command(label="Save", command=self.save_file)
+        file_menu.add_command(label="Save As...", command=self.save_file_as)
+        file_menu.add_separator()
+        file_menu.add_command(label="Clear Code Editor", command=self.clear_editor)
+        file_menu.add_command(label="Clear Output Panel", command=self.clear_output)
+        file_menu.add_command(label="Clear Turtle Graphics", command=self.clear_turtle)
+        file_menu.add_separator()
+        file_menu.add_command(label="Quit", command=self.on_closing)
+
+        self.menubar.add_cascade(label="File", menu=file_menu)
+
+        # Run menu (top-level)
+        run_menu = tk.Menu(self.menubar, tearoff=0)
+        run_menu.add_command(label="Run Program (F5)", command=self.run_program)
+        self.menubar.add_cascade(label="Run", menu=run_menu)
+
+        # Edit menu (enhanced editor features)
+        edit_menu = tk.Menu(self.menubar, tearoff=0)
+        edit_menu.add_command(label="Find/Replace (Ctrl+F)", command=self._open_find_replace)
+        edit_menu.add_command(label="Find Next (F3)", command=self._find_next)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Copy (Ctrl+C)", command=self._copy_text)
+        edit_menu.add_command(label="Paste (Ctrl+V)", command=self._paste_text)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Toggle Comment (Ctrl+/)", command=self._toggle_comment)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Increase Indent (Tab)", command=self._increase_indent)
+        edit_menu.add_command(label="Decrease Indent (Shift+Tab)", command=self._decrease_indent)
+        edit_menu.add_separator()
+        edit_menu.add_command(label="Check Syntax", command=self._check_syntax)
+        self.menubar.add_cascade(label="Edit", menu=edit_menu)
+
+        # Tools menu
+        tools_menu = tk.Menu(self.menubar, tearoff=0)
+        tools_menu.add_command(label="Plugin Manager", command=self.open_plugin_manager)
+        tools_menu.add_command(label="Theme Selector", command=self.open_theme_selector)
+        tools_menu.add_command(label="Run Tests", command=self.run_tests)
+        self.menubar.add_cascade(label="Tools", menu=tools_menu)
+
+        # View menu
+        view_menu = tk.Menu(self.menubar, tearoff=0)
+        view_menu.add_command(label="Switch to Code Editor Tab", command=self.switch_to_editor)
+        view_menu.add_command(label="Switch to Output Tab", command=self.toggle_output_panel)
+        view_menu.add_command(label="Switch to Turtle Graphics Tab", command=self.toggle_turtle_graphics)
+        self.menubar.add_cascade(label="View", menu=view_menu)
+
+        # Help menu
+        help_menu = tk.Menu(self.menubar, tearoff=0)
+        help_menu.add_command(label="About", command=self.show_about)
+        help_menu.add_command(label="Documentation", command=self.show_documentation)
+        self.menubar.add_cascade(label="Help", menu=help_menu)
+
+
+        # --- Enhanced UI Layout ---
+        # Main frame for padding and layout
+        self.main_frame = tk.Frame(self.root, bg="#f5f5f5")
+        self.main_frame.pack(expand=True, fill="both")
+
+        # Create tabbed notebook
+        self.notebook = ttk.Notebook(self.main_frame)
+        self.notebook.pack(expand=True, fill="both", padx=12, pady=(12, 6))
+
+        # Code Editor Tab
+        self.editor_tab = tk.Frame(self.notebook, bg="#f5f5f5")
+        self.notebook.add(self.editor_tab, text="📝 Code Editor")
+
+        self.editor_frame = tk.Frame(self.editor_tab, bg="#f5f5f5")
+        self.editor_frame.pack(expand=True, fill="both", padx=8, pady=8)
+        
+        # Use enhanced code editor if available
+        if ADVANCED_EDITOR_AVAILABLE:
+            self.editor = EnhancedCodeEditor(self.editor_frame)
+            self.editor.pack(expand=True, fill="both")
+        else:
+            # Fallback to basic text editor
+            self.editor = tk.Text(
+                self.editor_frame,
+                wrap="word",
+                font=("Courier", 12),
+                undo=True,
+                padx=8,
+                pady=8,
+                bg="#fff",
+                relief="flat"
+            )
+            self.editor.pack(expand=True, fill="both")
+
+        # Output Tab
+        self.output_tab = tk.Frame(self.notebook, bg="#f5f5f5")
+        self.notebook.add(self.output_tab, text="📊 Output")
+
+        self.output_frame = tk.Frame(self.output_tab, bg="#f5f5f5")
+        self.output_frame.pack(expand=True, fill="both", padx=8, pady=8)
+        self.output_panel = tk.Text(
+            self.output_frame,
+            wrap="word",
+            font=("Consolas", 10),
+            bg="#222",
+            fg="#eee",
+            state="disabled",
+            relief="flat",
+            padx=8,
+            pady=8
+        )
+        self.output_panel.pack(expand=True, fill="both")
+
+        # Turtle Graphics Tab
+        self.turtle_tab = tk.Frame(self.notebook, bg="#f5f5f5")
+        self.notebook.add(self.turtle_tab, text="🐢 Turtle Graphics")
+
+        self.turtle_frame = tk.Frame(self.turtle_tab, bg="#f5f5f5")
+        self.turtle_frame.pack(expand=True, fill="both", padx=8, pady=8)
+        self.turtle_canvas = tk.Canvas(self.turtle_frame, bg="white", relief="ridge", bd=2)
+        self.turtle_canvas.pack(expand=True, fill="both")
+
+        # Set turtle canvas reference
+        self.interpreter.ide_turtle_canvas = self.turtle_canvas
+
+        # Set output widget reference for interpreter logging
+        class OutputHandler:
+            def __init__(self, output_widget):
+                self.output_widget = output_widget
+            
+            def insert(self, position, text):
+                self.output_widget.config(state=tk.NORMAL)
+                self.output_widget.insert(position, text)
+                self.output_widget.see(tk.END)
+                self.output_widget.config(state=tk.DISABLED)
+                self.output_widget.update()
+            
+            def see(self, position):
+                self.output_widget.see(position)
+
+        self.interpreter.output_widget = OutputHandler(self.output_panel)
+
+
+        # Controls frame (removed run button)
+        self.controls_frame = tk.Frame(self.main_frame, bg="#f5f5f5")
+        self.controls_frame.pack(fill="x", padx=12, pady=(0, 6))
+
+        # Status bar for real-time feedback
+        self.status_label = tk.Label(
+            self.main_frame,
+            text="Ready",
+            anchor="w",
+            font=("Arial", 10),
+            bg="#e0e0e0",
+            fg="#333"
+        )
+        self.status_label.pack(fill="x", side="bottom", padx=0, pady=(0, 0))
+
+        # Apply initial theme
+        self._apply_theme_stub(self.selected_theme)
+
+    def _check_syntax(self):
+        """Stub for syntax checking. Replace with actual implementation."""
+        from tkinter import messagebox
+        messagebox.showinfo("Check Syntax", "Syntax checking is not yet implemented.")
+
+
+def main():
+    print("[DEBUG] Entered main()")
+    import sys
+    # Check for command line arguments
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--test" and len(sys.argv) >= 4:
+            # Run in test mode: python Time_Warp.py --test test_file language
+            test_file = sys.argv[2]
+            language = sys.argv[3]
+            interpreter = Time_WarpInterpreter()
+            try:
+                with open(test_file, 'r', encoding='utf-8') as f:
+                    code = f.read()
+                print(f"Testing {language} code from {test_file}")
+                interpreter.run_program(code, language=language.lower())
+                print("Test completed successfully")
+                return
+            except Exception as e:
+                print(f"Test failed: {e}")
+                sys.exit(1)
+        elif sys.argv[1] == "--help":
+            print("Time_Warp IDE v1.3.0")
+            print("Usage:")
+            print("  python Time_Warp.py                    # Start GUI")
+            print("  python Time_Warp.py --test file lang    # Run test file")
+            print("  python Time_Warp.py --help              # Show this help")
+            return
+    print("[DEBUG] Instantiating TimeWarpApp and starting mainloop")
+    root = tk.Tk()
+    app = TimeWarpApp(root)
+    root.mainloop()
+    print("[DEBUG] Exited mainloop")
+
+if __name__ == "__main__":
+    main()
+
+

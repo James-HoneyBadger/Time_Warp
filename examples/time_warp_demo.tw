@@ -1,0 +1,90 @@
+REM Time_Warp Language Demo Program
+REM ================================
+REM This program demonstrates the unified Time_Warp language
+REM combining features from BASIC, PILOT, and Logo
+
+T:Welcome to Time_Warp - The Unified Programming Language!
+
+REM Variable assignment (modern syntax)
+NAME = "Time_Warp User"
+AGE = 25
+
+T:Hello *NAME*! You are *AGE* years old.
+
+REM Mathematical operations
+X = 10
+Y = 20
+SUM = X + Y
+PRODUCT = X * Y
+
+T:Math demo: *X* + *Y* = *SUM*
+T:*X* × *Y* = *PRODUCT*
+
+REM Turtle graphics (Logo-style commands)
+CLEARSCREEN
+PENUP
+SETXY 0 0
+PENDOWN
+SETCOLOR red
+FORWARD 100
+RIGHT 90
+SETCOLOR blue
+FORWARD 100
+RIGHT 90
+SETCOLOR green
+FORWARD 100
+RIGHT 90
+SETCOLOR purple
+FORWARD 100
+
+REM Repeat loop (Logo-style)
+PENUP
+SETXY 50 50
+PENDOWN
+SETCOLOR orange
+REPEAT 8 [
+    FORWARD 30
+    RIGHT 45
+]
+
+REM Circle drawing
+PENUP
+SETXY -50 -50
+PENDOWN
+SETCOLOR teal
+CIRCLE 40
+
+REM Text output
+PENUP
+SETXY -100 -150
+SETCOLOR black
+TEXT "Time_Warp Demo Complete!"
+
+REM Array operations
+SCORES = [85, 92, 78, 96, 88]
+TOTAL = SUM(SCORES)
+AVERAGE = AVG(SCORES)
+
+T:Test scores: *SCORES*
+T:Total: *TOTAL*, Average: *AVERAGE*
+
+REM String functions
+MESSAGE = "HELLO WORLD"
+LOWERCASE = LOWER(MESSAGE)
+LENGTH = LEN(MESSAGE)
+
+T:Original: *MESSAGE*
+T:Lowercase: *LOWERCASE*
+T:Length: *LENGTH*
+
+REM Conditional logic
+SCORE = 85
+IF SCORE >= 90 THEN T:Excellent work!
+IF SCORE >= 80 AND SCORE < 90 THEN T:Good job!
+IF SCORE < 80 THEN T:Keep practicing!
+
+REM Sound (if available)
+BEEP 800 0.5
+
+T:Program completed successfully!
+T:Time_Warp combines the best of BASIC, PILOT, and Logo!

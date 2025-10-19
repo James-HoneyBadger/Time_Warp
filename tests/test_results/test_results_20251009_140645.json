@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-10-09 14:06:44",
+  "total_tests": 65,
+  "passed": 58,
+  "failed": 4,
+  "errors": 3,
+  "skipped": 0,
+  "success_rate": 89.23076923076924,
+  "execution_time": 0.8945550918579102,
+  "test_suites": [
+    {
+      "module": "test_core_interpreter",
+      "tests": 18,
+      "passed": 15,
+      "failed": 0,
+      "errors": 3,
+      "skipped": 0,
+      "failures": [],
+      "errors_list": [
+        {
+          "test": "test_basic_program_execution (tests.test_core_interpreter.TestTime_WarpInterpreter.test_basic_program_execution)",
+          "traceback": "Traceback (most recent call last):\n  File \"/home/james/Time_Warp/tests/test_core_interpreter.py\", line 84, in test_basic_program_execution\n    result = self.interpreter.run_program(program, language=\"basic\")\nTypeError: Time_WarpInterpreter.run_program() got an unexpected keyword argument 'language'\n"
+        },
+        {
+          "test": "test_logo_program_execution (tests.test_core_interpreter.TestTime_WarpInterpreter.test_logo_program_execution)",
+          "traceback": "Traceback (most recent call last):\n  File \"/home/james/Time_Warp/tests/test_core_interpreter.py\", line 97, in test_logo_program_execution\n    result = self.interpreter.run_program(program, language=\"logo\")\nTypeError: Time_WarpInterpreter.run_program() got an unexpected keyword argument 'language'\n"
+        },
+        {
+          "test": "test_python_program_execution (tests.test_core_interpreter.TestTime_WarpInterpreter.test_python_program_execution)",
+          "traceback": "Traceback (most recent call last):\n  File \"/home/james/Time_Warp/tests/test_core_interpreter.py\", line 109, in test_python_program_execution\n    result = self.interpreter.run_program(program, language=\"python\")\nTypeError: Time_WarpInterpreter.run_program() got an unexpected keyword argument 'language'\n"
+        }
+      ],
+      "execution_time": 0.2594788074493408
+    },
+    {
+      "module": "test_performance",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures": [],
+      "errors_list": [],
+      "execution_time": 0.43715357780456543
+    },
+    {
+      "module": "test_feature_systems",
+      "tests": 26,
+      "passed": 26,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures": [],
+      "errors_list": [],
+      "execution_time": 0.01652240753173828
+    },
+    {
+      "module": "integration_tests",
+      "tests": 6,
+      "passed": 2,
+      "failed": 4,
+      "errors": 0,
+      "skipped": 0,
+      "failures": [],
+      "errors_list": [],
+      "execution_time": 0.18094158172607422
+    }
+  ],
+  "coverage": null
+}

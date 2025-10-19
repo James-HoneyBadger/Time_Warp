@@ -1,0 +1,32 @@
+; Multi-shape pattern
+; Draw a triangle
+REPEAT 3 [
+  FORWARD 80
+  RIGHT 120
+]
+
+; Move to new position
+PENUP
+SETXY 200 200
+PENDOWN
+
+; Draw a pentagon
+SETCOLOR 3
+REPEAT 5 [
+  FORWARD 60
+  RIGHT 72
+]
+
+; Move again
+PENUP
+SETXY 400 100
+PENDOWN
+
+; Draw a hexagon
+SETCOLOR 5
+REPEAT 6 [
+  FORWARD 50
+  RIGHT 60
+]
+
+HOME

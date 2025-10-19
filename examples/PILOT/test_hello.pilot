@@ -1,0 +1,8 @@
+T: Hello from PILOT!
+T: What is your name?
+A: NAME
+T: Nice to meet you, *NAME*!
+Y: *NAME* == "Alice"
+T: You have a lovely name!
+T: This program was compiled to native code!
+END

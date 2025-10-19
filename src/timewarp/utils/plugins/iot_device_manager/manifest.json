@@ -1,0 +1,12 @@
+{
+  "name": "IoT Device Manager",
+  "version": "1.0.0",
+  "author": "Time_Warp IDE Team",
+  "description": "Comprehensive IoT device management with discovery, control, network monitoring, protocol support, and data analytics",
+  "category": "iot",
+  "entry_point": "plugin.py",
+  "api_version": "1.0",
+  "permissions": ["network", "iot", "devices", "protocols", "ui"],
+  "dependencies": [],
+  "keywords": ["iot", "devices", "network", "protocols", "smart-home", "analytics"]
+}

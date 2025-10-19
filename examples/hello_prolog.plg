@@ -1,0 +1,7 @@
+% Prolog Hello World
+parent(john, mary).
+parent(mary, susan).
+
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+
+% Query: grandparent(john, susan).

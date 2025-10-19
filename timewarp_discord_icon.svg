@@ -1,0 +1,8 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="256" r="240" fill="#282c34" stroke="#61dafb" stroke-width="24"/>
+  <path d="M256 96v160l112 64" stroke="#61dafb" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="256" r="32" fill="#61dafb"/>
+  <path d="M180 380c40-60 112-60 152 0" stroke="#61dafb" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <ellipse cx="256" cy="420" rx="40" ry="16" fill="#61dafb" opacity="0.5"/>
+  <text x="256" y="140" text-anchor="middle" font-size="64" fill="#fff" font-family="Arial" font-weight="bold">TW</text>
+</svg>

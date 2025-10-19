@@ -1,0 +1,26 @@
+; Time_Warp IDE Logo Demo
+; This draws a square using turtle graphics
+
+forward 100
+right 90
+forward 100
+right 90  
+forward 100
+right 90
+forward 100
+
+; Draw a triangle next to the square
+penup
+forward 150
+pendown
+
+forward 80
+right 120
+forward 80
+right 120
+forward 80
+
+; Return to center
+penup
+home
+pendown

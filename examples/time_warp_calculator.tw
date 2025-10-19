@@ -1,0 +1,49 @@
+# Time Warp Interactive Calculator
+# Demonstrates PILOT-style interaction, BASIC math, and Logo graphics
+
+T:Welcome to the Time Warp Calculator!
+T:Let's do some math and draw shapes!
+
+# Get user input (PILOT style)
+A:FIRST_NUM
+A:SECOND_NUM
+A:OPERATION
+
+# Perform calculations (BASIC style)
+LET RESULT = 0
+
+IF OPERATION = "add" THEN
+    LET RESULT = FIRST_NUM + SECOND_NUM
+    T:*FIRST_NUM* + *SECOND_NUM* = *RESULT*
+END IF
+
+IF OPERATION = "subtract" THEN
+    LET RESULT = FIRST_NUM - SECOND_NUM
+    T:*FIRST_NUM* - *SECOND_NUM* = *RESULT*
+END IF
+
+IF OPERATION = "multiply" THEN
+    LET RESULT = FIRST_NUM * SECOND_NUM
+    T:*FIRST_NUM* × *SECOND_NUM* = *RESULT*
+END IF
+
+IF OPERATION = "divide" THEN
+    LET RESULT = FIRST_NUM / SECOND_NUM
+    T:*FIRST_NUM* ÷ *SECOND_NUM* = *RESULT*
+END IF
+
+# Draw a visual representation (Logo style)
+T:
+T:Drawing a square with side length *RESULT*...
+
+FORWARD RESULT
+RIGHT 90
+FORWARD RESULT
+RIGHT 90
+FORWARD RESULT
+RIGHT 90
+FORWARD RESULT
+RIGHT 90
+
+T:Thanks for using Time Warp Calculator!</content>
+<parameter name="filePath">/home/james/Downloads/Time_Warp-main/examples/time_warp_calculator.tw
