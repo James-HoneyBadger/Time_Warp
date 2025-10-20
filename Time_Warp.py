@@ -12,12 +12,12 @@ warnings.filterwarnings("ignore", message=".*avx2.*", category=RuntimeWarning)
 Time_Warp IDE - Simple Educational Programming Environment
 
 A minimal Tkinter-based IDE for running multi-language programs through the Time_Warp interpreter.
-Supports Time Warp, Pascal, and Prolog execution.
+Supports Time Warp, PILOT, BASIC, Logo, Pascal, and Prolog execution.
 
 Features:
 - Simple text editor with Courier font
 - One-click program execution
-- Integrated interpreter with 7 language support
+- Integrated interpreter with 6 language support
 - Turtle graphics for visual languages
 - Educational error messages
 

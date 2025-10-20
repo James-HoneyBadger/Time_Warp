@@ -24,6 +24,9 @@ class UnifiedCanvas(tk.Canvas):
         self.font_family = font_family
         self.font_size = font_size
 
+        # Store background color from kwargs or default to black
+        self.bg_color = kwargs.get('bg', 'black')
+
         # Initialize font and character dimensions
         self.font = tkfont.Font(family=self.font_family, size=self.font_size)
         self.char_width = self.font.measure("W")
@@ -124,10 +127,10 @@ class UnifiedCanvas(tk.Canvas):
         """Redraw the entire canvas based on the screen buffer with the specified color."""
         self.delete("all")
 
-        # Fill the background to ensure visibility
+        # Fill the background with the configured background color
         self.create_rectangle(
             0, 0, self.cols * self.char_width, self.rows * self.char_height,
-            fill="white", outline="white", tags="background"
+            fill=self.bg_color, outline=self.bg_color, tags="background"
         )
 
         # Render each character in the buffer

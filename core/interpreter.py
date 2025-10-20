@@ -3,15 +3,15 @@
 Time_Warp Interpreter - Core Multi-Language Execution Engine
 
 The Time_WarpInterpreter is the central execution engine for the Time_Warp IDE,
-providing unified support for 9 programming languages through a single interface.
+providing unified support for 6 programming languages through a single interface.
 
 Supported Languages:
-- TW PILOT: Educational language with simple commands (T:, A:, J:, Y:, N:)
-- TW BASIC: Classic line-numbered programming (PRINT, LET, GOTO, FOR)
-- TW Logo: Turtle graphics programming (FORWARD, RIGHT, REPEAT)
-- TW Pascal: Structured programming (BEGIN, END, VAR, PROCEDURE)
-- TW Prolog: Logic programming (?- queries, :- rules)
-- TW Time_Warp: Unified language combining the best of all above
+- Time Warp: Unified educational language combining PILOT, BASIC, and Logo
+- PILOT: Educational language with simple commands (T:, A:, J:, Y:, N:)
+- BASIC: Classic line-numbered programming (PRINT, LET, GOTO, FOR)
+- Logo: Turtle graphics programming (FORWARD, RIGHT, REPEAT)
+- Pascal: Structured programming (BEGIN, END, VAR, PROCEDURE)
+- Prolog: Logic programming (?- queries, :- rules)
 
 Key Features:
 - Unified variable management across all languages
@@ -625,6 +625,10 @@ class Time_WarpInterpreter:
             self.log_output(f"Language mode set to: {mode}")
         else:
             self.log_output(f"Invalid language mode: {mode}")
+
+    def get_language_mode(self):
+        """Get the current language mode for script execution"""
+        return self.current_language_mode
 
     def init_turtle_graphics(self):
         """Initialize turtle graphics system"""

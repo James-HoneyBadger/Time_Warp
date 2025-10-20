@@ -8,9 +8,9 @@ Time_Warp IDE is a powerful educational tool that allows users to write and exec
 
 ## Features
 
-- **Multi-Language Support**: Execute code in Time Warp, Pascal, Prolog, Forth, Perl, Python, and JavaScript
-- **Unified Canvas Interface**: Single display surface for text and graphics with GW BASIC screen modes
-- **GW BASIC Screen Modes**: Authentic emulation of classic screen modes (0,1,2,7,8,9,10) with proper resolutions and color palettes
+- **Multi-Language Support**: Execute code in Time Warp, Pascal, Prolog, PILOT, BASIC, and Logo
+- **Unified Canvas Interface**: Single display surface for text and graphics with GW BASIC screen mode emulation
+- **GW BASIC Screen Modes**: Authentic emulation of classic screen modes with proper resolutions and color palettes
 - **Retro Computing Aesthetics**: Faithful recreation of classic BASIC computing environments
 - **Turtle Graphics**: Visual programming support integrated into unified canvas
 - **Keyboard Input Prompts**: Interactive input system built into the canvas
@@ -113,7 +113,7 @@ The unified canvas eliminates the complexity of multiple screen modes while main
 ```time_warp
 T:Hello World!
 A:What is your name?
-T:Nice to meet you, *NAME*!
+T:Hello *NAME*! Let's do some math.
 
 LET X = 10
 PRINT "X equals *X*"
@@ -123,28 +123,74 @@ RIGHT 90
 REPEAT 4 [FORWARD 100 RIGHT 90]
 ```
 
-### Python
+### PILOT (Programmed Inquiry Learning Or Teaching)
 
-```python
-print("Hello from Python!")
-x = 42
-print(f"x = {x}")
+```pilot
+T:Welcome to PILOT!
+A:NAME
+T:Hello *NAME*! Let's learn together.
+J:QUESTION
+L:QUESTION
+T:What is 2 + 2?
+A:ANSWER
+Y:*ANSWER*=4
+T:Correct! Well done.
+J:END
+N:TRY_AGAIN
+T:Not quite. Try again.
+J:QUESTION
+L:TRY_AGAIN
+L:END
+T:Thanks for learning with PILOT!
 ```
 
-### JavaScript
+### BASIC (Beginner's All-purpose Symbolic Instruction Code)
 
-```javascript
-console.log("Hello from JavaScript!");
-let x = 42;
-console.log(`x = ${x}`);
+```basic
+10 PRINT "Hello from BASIC!"
+20 LET X = 10
+30 LET Y = 20
+40 PRINT "X + Y = "; X + Y
+50 FOR I = 1 TO 5
+60 PRINT "Count: "; I
+70 NEXT I
+80 END
 ```
 
-### Perl
+### Logo (Turtle Graphics Language)
 
-```perl
-print "Hello from Perl!\n";
-my $x = 42;
-print "x = $x\n";
+```logo
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+
+REPEAT 4 [FORWARD 100 RIGHT 90]
+```
+
+### Pascal
+
+```pascal
+PROGRAM HelloWorld;
+BEGIN
+  writeln('Hello, World!');
+  readln;
+END.
+```
+
+### Prolog
+
+```prolog
+parent(alice, bob).
+parent(bob, charlie).
+
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+
+?- grandparent(alice, charlie).
 ```
 
 ## Architecture
@@ -152,13 +198,18 @@ print "x = $x\n";
 ```
 Time_Warp/
 ├── Time_Warp.py          # Main GUI application
+├── unified_canvas.py     # Unified canvas for text/graphics rendering
 ├── core/
 │   ├── __init__.py       # Core module exports
 │   ├── interpreter.py    # Main interpreter engine
 │   ├── languages/        # Language-specific executors
 │   │   ├── __init__.py
 │   │   ├── time_warp.py  # Time Warp unified executor
-│   │   └── ...           # Other language executors
+│   │   ├── pilot.py      # PILOT language executor
+│   │   ├── basic.py      # BASIC language executor
+│   │   ├── logo.py       # Logo language executor
+│   │   ├── pascal.py     # Pascal language executor
+│   │   └── prolog.py     # Prolog language executor
 │   └── utilities/        # Helper utilities
 ├── requirements.txt      # Python dependencies
 └── scripts/
@@ -173,11 +224,35 @@ Time_Warp/
 - **Commands**: T: (text), A: (input), J: (jump), Y: (yes branch), N: (no branch), U: (update variable), PRINT, LET, IF...THEN, FORWARD, RIGHT, LEFT, REPEAT
 - **Features**: Variable interpolation with `*VAR*` syntax, turtle graphics integration, modern variable assignment, structured programming
 
-### Modern Languages (Pascal, Prolog, Forth, Perl, Python, JavaScript)
+### PILOT
 
-- **Purpose**: Full programming language support for advanced concepts
-- **Execution**: Direct execution with proper error handling
-- **Features**: Access to standard libraries and modern language features
+- **Purpose**: Educational programming language designed for computer-assisted instruction
+- **Commands**: T: (type/text), A: (accept/input), M: (match), J: (jump), Y: (yes branch), N: (no branch), U: (use/update), E: (end)
+- **Features**: Pattern matching, conditional branching, educational focus on interactive learning
+
+### BASIC
+
+- **Purpose**: Classic line-numbered programming language
+- **Commands**: PRINT, INPUT, LET, GOTO, IF...THEN, FOR...NEXT, GOSUB...RETURN, END, REM
+- **Features**: Line-numbered programs, procedural programming, mathematical operations
+
+### Logo
+
+- **Purpose**: Educational programming language focused on turtle graphics
+- **Commands**: FORWARD, BACK, LEFT, RIGHT, PENUP, PENDOWN, CLEARSCREEN, HOME, REPEAT, SETCOLOR
+- **Features**: Turtle graphics, procedural programming, list processing
+
+### Pascal
+
+- **Purpose**: Structured programming language for teaching programming concepts
+- **Commands**: PROGRAM, BEGIN, END, VAR, CONST, PROCEDURE, FUNCTION, IF, THEN, ELSE, WHILE, FOR, READLN, WRITELN
+- **Features**: Strong typing, structured programming, modular design
+
+### Prolog
+
+- **Purpose**: Logic programming language for artificial intelligence and symbolic computation
+- **Commands**: Facts, rules, queries (?-), predicates, unification
+- **Features**: Declarative programming, backtracking, pattern matching, logical inference
 
 ## Development
 
