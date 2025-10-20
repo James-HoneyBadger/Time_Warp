@@ -26,29 +26,77 @@ Time_Warp IDE is a powerful educational tool that allows users to write and exec
    cd Time_Warp
    ```
 
-2. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Run the IDE:
+2. Set up the environment (automatic):
 
    ```bash
    python Time_Warp.py
    ```
 
+   The IDE will automatically check for required dependencies and set up a virtual environment if needed.
+
+3. Or set up manually:
+
+   ```bash
+   python setup_environment.py
+   ```
+
+4. Run the IDE:
+
+   ```bash
+   python Time_Warp.py
+   ```
+
+### Requirements
+
+- Python 3.8+
+- Pillow (PIL) - Image processing
+- Pygame - Graphics and multimedia
+- Tkinter (usually included with Python)
+
+The environment setup script will automatically install all required dependencies in a virtual environment.
+
 ## Usage
 
 1. **Launch** the application with `python Time_Warp.py`
-2. **Select Screen Mode** from View → Screen Modes menu for different resolutions and color palettes
-3. **Write** your program in an external editor (code editing is handled externally in unified canvas mode)
-4. **Execute** programs through the interpreter (program execution methods to be implemented)
-5. **View results** directly on the unified canvas with proper text/graphics rendering
+2. **Write programs** using the command-line interface in the unified canvas
+3. **Execute** programs by typing commands or entering line-numbered BASIC programs
+4. **Load/Save Files** using File menu - line-numbered programs are loaded into memory for execution
+5. **View results** directly on the unified canvas with integrated text/graphics rendering
 
-## Screen Modes
+### File Operations
 
-Time_Warp IDE supports all major GW BASIC screen modes:
+- **Load Files**: File → Open File loads content into the unified canvas
+  - Line-numbered BASIC programs are parsed and stored for execution with `RUN`
+  - Other files are displayed as text content in the canvas
+- **Save Files**: File → Save/Save As saves the current line-numbered program
+  - Only line-numbered programs can be saved (created via command-line input)
+- **New File**: Clears the current program from memory
+
+### Example Commands
+
+```
+PRINT "Hello, World!"
+10 PRINT "BASIC LINE"
+FORWARD 100
+T:Hello World!
+? "Hello"  (shortcut for PRINT)
+RUN         (execute stored program)
+LIST        (show stored program)
+NEW         (clear stored program)
+```
+
+The unified canvas provides an integrated environment where text input, program execution, and graphics output all work together seamlessly.
+
+## Unified Canvas Architecture
+
+Time_Warp IDE uses a single unified canvas that supports all functionality:
+
+- **Screen Mode**: Only mode 11 (1024×768, 256 colors) - unified for text & graphics
+- **Text Rendering**: Grid-based text input/output with 25 rows × 80 columns
+- **Graphics Rendering**: Pixel and vector graphics integrated with text display
+- **Turtle Graphics**: Compatible with existing turtle graphics commands
+
+The unified canvas eliminates the complexity of multiple screen modes while maintaining full compatibility with all text and graphics operations.
 
 - **Mode 0**: CGA 40-column Text (320x200, 16 colors)
 - **Mode 1**: CGA 40-column Text Alt (320x200, 16 colors)

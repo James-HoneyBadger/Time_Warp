@@ -672,10 +672,8 @@ class Time_WarpInterpreter:
                 self.turtle_graphics["center_y"] = 384
                 self.debug_output(f"📐 Using XGA fallback canvas center: (512, 384) - {e}")
 
-            # Switch to XGA turtle graphics mode for turtle graphics
-            if hasattr(self.ide_turtle_canvas, 'set_screen_mode'):
-                self.ide_turtle_canvas.set_screen_mode(11)  # XGA 1024x768 Turtle Graphics mode
-                self.debug_output("🐢 Switched to XGA Turtle Graphics mode for turtle graphics")
+            # Switch to unified canvas mode for turtle graphics
+            # (always mode 11 now)
 
             self.update_turtle_display()
             # Force canvas update to ensure it's ready for drawing

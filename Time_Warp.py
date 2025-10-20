@@ -45,7 +45,7 @@ def check_environment():
     try:
         print("🔍 Checking environment requirements...")
         result = subprocess.run([sys.executable, str(requirements_script), "--check"],
-                              capture_output=True, text=True, timeout=30)
+                              capture_output=True, text=True, timeout=60)
 
         if result.returncode == 0:
             print("✅ Environment is properly configured")
@@ -56,7 +56,7 @@ def check_environment():
             print("🔧 Environment needs setup...")
             # Run full setup
             result = subprocess.run([sys.executable, str(requirements_script)],
-                                  timeout=300)  # 5 minute timeout
+                                  timeout=600)  # 10 minute timeout for setup
             if result.returncode == 0:
                 # Activate virtual environment in current process after setup
                 activate_venv_in_process()
@@ -578,19 +578,72 @@ class TimeWarpApp:
         print("[DEBUG] Finished TimeWarpApp.__init__")
 
     def new_file(self):
-        self.editor.delete("1.0", tk.END)
-        self.status_label.config(text="🆕 New file.")
+        # Clear any loaded program
+        if hasattr(self.interpreter, 'program_lines'):
+            self.interpreter.program_lines = []
+        self.current_file = None
+        self.unified_canvas.write_text("New program started. Previous program cleared.\n", color=10)
+        self.status_label.config(text="🆕 New program started")
 
     def open_file(self):
         from tkinter import filedialog
         file_path = filedialog.askopenfilename(filetypes=[("All Files", "*.*"), ("Time Warp", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
         if file_path:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            self.editor.delete("1.0", tk.END)
-            self.editor.insert("1.0", content)
-            self.status_label.config(text=f"📂 Opened: {file_path}")
-            self.current_file = file_path
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+
+                # Store the current file path
+                self.current_file = file_path
+
+                # Check if this looks like a line-numbered BASIC program
+                lines = content.strip().split('\n')
+                is_line_numbered_program = False
+
+                for line in lines:
+                    line = line.strip()
+                    if line and line[0].isdigit():
+                        # Check if it has a space after the line number
+                        parts = line.split(None, 1)
+                        if len(parts) == 2 and parts[0].isdigit():
+                            is_line_numbered_program = True
+                            break
+
+                if is_line_numbered_program:
+                    # Load as line-numbered program
+                    self.interpreter.program_lines = []
+                    for line in lines:
+                        line = line.strip()
+                        if line and line[0].isdigit():
+                            try:
+                                parts = line.split(None, 1)
+                                if len(parts) == 2:
+                                    line_num = int(parts[0])
+                                    cmd = parts[1]
+                                    # Insert in line number order
+                                    insert_pos = 0
+                                    for i, (existing_num, _) in enumerate(self.interpreter.program_lines):
+                                        if existing_num > line_num:
+                                            break
+                                        insert_pos = i + 1
+                                    self.interpreter.program_lines.insert(insert_pos, (line_num, cmd))
+                            except (ValueError, IndexError):
+                                continue
+
+                    self.unified_canvas.write_text(f"Loaded program from {file_path}\n", color=10)
+                    self.unified_canvas.write_text(f"{len(self.interpreter.program_lines)} lines loaded.\n", color=10)
+                    self.status_label.config(text=f"📂 Loaded program: {file_path}")
+                else:
+                    # Display file content in canvas
+                    self.unified_canvas.write_text(f"File: {file_path}\n", color=11)
+                    self.unified_canvas.write_text("=" * 50 + "\n", color=11)
+                    self.unified_canvas.write_text(content, color=15)
+                    self.unified_canvas.write_text("\n" + "=" * 50 + "\n", color=11)
+                    self.status_label.config(text=f"📂 Displayed file: {file_path}")
+
+            except Exception as e:
+                self.unified_canvas.write_text(f"Error loading file: {str(e)}\n", color=12)
+                self.status_label.config(text=f"❌ Error loading file: {str(e)}")
 
     def save_file(self):
         import os
@@ -600,19 +653,48 @@ class TimeWarpApp:
             file_path = self.save_file_as()
             if not file_path:
                 return
-            self.current_file = file_path
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(self.editor.get("1.0", tk.END))
-        self.status_label.config(text=f"💾 Saved: {file_path}")
+
+        try:
+            # Check if we have a line-numbered program to save
+            if hasattr(self.interpreter, 'program_lines') and self.interpreter.program_lines:
+                # Save as line-numbered program
+                with open(file_path, "w", encoding="utf-8") as f:
+                    for line_num, cmd in self.interpreter.program_lines:
+                        f.write(f"{line_num} {cmd}\n")
+                self.unified_canvas.write_text(f"Program saved to {file_path}\n", color=10)
+                self.status_label.config(text=f"💾 Saved program: {file_path}")
+            else:
+                # No program to save
+                self.unified_canvas.write_text("No program loaded to save.\n", color=14)
+                self.unified_canvas.write_text("Create a line-numbered program first.\n", color=14)
+                self.status_label.config(text="❌ No program to save")
+        except Exception as e:
+            self.unified_canvas.write_text(f"Error saving file: {str(e)}\n", color=12)
+            self.status_label.config(text=f"❌ Error saving file: {str(e)}")
 
     def save_file_as(self):
         from tkinter import filedialog
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"), ("Time Warp", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
         if file_path:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(self.editor.get("1.0", tk.END))
-            self.status_label.config(text=f"💾 Saved As: {file_path}")
-            self.current_file = file_path
+            try:
+                # Check if we have a line-numbered program to save
+                if hasattr(self.interpreter, 'program_lines') and self.interpreter.program_lines:
+                    # Save as line-numbered program
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        for line_num, cmd in self.interpreter.program_lines:
+                            f.write(f"{line_num} {cmd}\n")
+                    self.unified_canvas.write_text(f"Program saved as {file_path}\n", color=10)
+                    self.status_label.config(text=f"💾 Saved program as: {file_path}")
+                    self.current_file = file_path
+                else:
+                    # No program to save
+                    self.unified_canvas.write_text("No program loaded to save.\n", color=14)
+                    self.unified_canvas.write_text("Create a line-numbered program first.\n", color=14)
+                    self.status_label.config(text="❌ No program to save")
+            except Exception as e:
+                self.unified_canvas.write_text(f"Error saving file: {str(e)}\n", color=12)
+                self.status_label.config(text=f"❌ Error saving file: {str(e)}")
+        return file_path if 'file_path' in locals() and file_path else None
 
     def clear_editor(self):
         # Editor is no longer part of the unified canvas - this method may be deprecated
@@ -1723,6 +1805,13 @@ Available Commands:
   HELP     - Show this help
   CLS      - Clear screen
   EXIT     - Quit the IDE
+
+File Operations:
+  Use File menu to Load/Save programs
+  Line-numbered programs are stored in memory
+  RUN executes stored program
+  LIST shows stored program
+  NEW clears stored program
 
 Languages: Time_Warp programming language
 

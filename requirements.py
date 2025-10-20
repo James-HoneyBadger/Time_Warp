@@ -190,6 +190,7 @@ class RequirementsManager:
         # Map package names to their import names
         import_map = {
             'Pillow': 'PIL',
+            'PIL': 'PIL',
             'beautifulsoup4': 'bs4',
             'scikit-learn': 'sklearn',
             'python-dateutil': 'dateutil',
@@ -202,12 +203,12 @@ class RequirementsManager:
 
         try:
             result = subprocess.run(
-                [str(python_exe), "-c", f"import {import_name}"],
+                [str(python_exe), "-c", f"import {import_name}; print('OK')"],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=15  # Increased timeout for slower systems
             )
-            return result.returncode == 0
+            return result.returncode == 0 and 'OK' in result.stdout
         except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
             return False
 

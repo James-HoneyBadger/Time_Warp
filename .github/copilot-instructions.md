@@ -13,11 +13,11 @@ Time_Warp IDE is an educational programming IDE supporting multiple languages wi
 - **Plugin System**: `plugins/` - Extensible architecture for custom functionality
 
 ### Unified Canvas Architecture
-The IDE now uses a single `UnifiedCanvas` class that replaces the previous tabbed interface:
-- **GW BASIC Screen Modes**: Full emulation of modes 0,1,2,7,8,9,10 with authentic resolutions and color palettes
-- **Text Rendering**: Character-based text display with proper font sizing for different modes
+The IDE now uses a single unified canvas that supports all functionality:
+- **Unified Canvas**: `unified_canvas.py` - Single canvas supporting text/graphics rendering
+- **Screen Mode**: Only mode 11 (1024x768, 256 colors) - unified for text & graphics
+- **Text Rendering**: Grid-based text input/output with 25 rows × 80 columns
 - **Graphics Rendering**: Pixel and vector graphics integrated with text display
-- **Input Handling**: Keyboard input prompts with callback system
 - **Turtle Graphics**: Compatible with existing turtle graphics commands
 
 ### Multi-Language Support
@@ -29,7 +29,7 @@ Each language has dedicated executor classes in `core/languages/`:
 
 ### Key Components
 - **Time_WarpInterpreter**: Central execution engine that dispatches to language-specific executors
-- **UnifiedCanvas**: Single display surface handling text, graphics, and input with screen mode switching
+- **UnifiedCanvas**: Single display surface handling text, graphics, and input with unified mode 11
 - **ThemeManager**: JSON-based configuration with 8 themes (4 dark: Dracula, Monokai, Solarized Dark, Ocean; 4 light: Spring, Sunset, Candy, Forest)
 - **Plugin System**: `PluginManager` with sample plugin architecture in `plugins/sample_plugin/`
 - **Game Engine**: Complete 2D game framework in `games/engine/` with physics, rendering, and object management
@@ -114,11 +114,10 @@ See `plugins/sample_plugin/` for complete plugin template including:
 - Compatible with existing turtle graphics commands
 
 ### Screen Mode Management
-- Screen modes switched via `UnifiedCanvas.set_screen_mode(mode)` 
-- Modes 0,1,2: Text modes with 40/80 columns and 16 colors
-- Modes 7,8,9: Graphics modes with 320x200, 640x200, 640x350 resolutions
-- Mode 10: Monochrome graphics with 720x350 resolution
-- Color palettes automatically applied based on selected mode
+- **Single Mode**: Mode 11 only - Unified Canvas (1024×768, 256 colors)
+- **Text Grid**: 25 rows × 80 columns for input/output
+- **Graphics**: Full 1024×768 pixel canvas with 256 colors
+- **Turtle Graphics**: Integrated with unified canvas
 
 ### Hardware/IoT Extensions
 Advanced features in `core/hardware/` and `core/iot/` for:
