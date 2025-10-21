@@ -864,19 +864,27 @@ class Time_WarpInterpreter:
             right_x = x + size * 0.6 * math.cos(heading - 2.5)
             right_y = y - size * 0.6 * math.sin(heading - 2.5)
 
-            # Create turtle triangle
-            canvas.create_polygon(
-                tip_x,
-                tip_y,
-                left_x,
-                left_y,
-                right_x,
-                right_y,
-                fill="green",
-                outline="darkgreen",
-                width=2,
-                tags="turtle",
-            )
+            # Use unified canvas to persist the turtle
+            if hasattr(self, "ide_unified_canvas"):
+                self.ide_unified_canvas.draw_polygon(
+                    [tip_x, tip_y, left_x, left_y, right_x, right_y],
+                    filled=True,
+                    color="green",
+                    width=2
+                )
+            else:
+                canvas.create_polygon(
+                    tip_x,
+                    tip_y,
+                    left_x,
+                    left_y,
+                    right_x,
+                    right_y,
+                    fill="green",
+                    outline="darkgreen",
+                    width=2,
+                    tags="turtle",
+                )
 
     def clear_turtle_screen(self):
         """Clear the turtle screen"""

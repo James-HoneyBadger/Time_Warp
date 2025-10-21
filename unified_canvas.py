@@ -87,9 +87,9 @@ class UnifiedCanvas(tk.Canvas):
         # Theme system
         self.current_theme = theme or self._create_default_theme()
 
-        # Text buffer system (modern approach)
-        self.lines: List[str] = []
-        self.line_attributes: List[Dict] = []
+        # Text buffer system (modern approach) - ensure at least one empty line
+        self.lines: List[str] = [""]
+        self.line_attributes: List[Dict] = [{}]
         self.cursor_line = 0
         self.cursor_col = 0
 
@@ -350,9 +350,6 @@ class UnifiedCanvas(tk.Canvas):
         # Recreate graphics on top
         self._redraw_graphics()
 
-        # Ensure display is updated
-        self.update_idletasks()
-
     def _redraw_graphics(self):
         """Recreate all graphics objects"""
         self.graphics_objects.clear()
@@ -371,6 +368,9 @@ class UnifiedCanvas(tk.Canvas):
             elif cmd['type'] == 'text':
                 obj_id = self.create_text(cmd['x'], cmd['y'], text=cmd['text'],
                                         fill=cmd['color'], font=self.font, **cmd.get('kwargs', {}))
+            elif cmd['type'] == 'polygon':
+                obj_id = self.create_polygon(cmd['points'], outline=cmd['color'], fill=cmd['fill_color'],
+                                           width=cmd['width'], **cmd.get('kwargs', {}))
             self.graphics_objects.append(obj_id)
 
     def _draw_line_text(self, text: str, x_offset: int, y: int,
@@ -588,13 +588,32 @@ class UnifiedCanvas(tk.Canvas):
     def _on_mouse_click(self, event):
         """Handle mouse click events"""
         x_offset = self.line_number_width if self.show_line_numbers else 0
-        col = max(0, (event.x - x_offset) // self.char_width)
-        line = max(0, event.y // self.char_height)
 
-        if line < len(self.lines):
-            self.cursor_line = line
-            self.cursor_col = min(col, len(self.lines[line]))
-            self.redraw()
+        # safe char width/height
+        cw = getattr(self, 'char_width', 1) or 1
+        ch = getattr(self, 'char_height', 1) or 1
+
+        # compute column and line indices
+        raw_x = event.x - x_offset
+        col = max(0, raw_x // cw)
+        line_index = max(0, event.y // ch)
+
+        # ensure at least one line exists
+        if not self.lines:
+            self.lines = [""]
+            self.line_attributes = [{}]
+
+        # if click below existing lines, extend lines so cursor can move there
+        if line_index >= len(self.lines):
+            add_count = line_index - len(self.lines) + 1
+            self.lines.extend([""] * add_count)
+            self.line_attributes.extend([{}] * add_count)
+
+        # set cursor (allow column beyond end of line)
+        self.cursor_line = min(line_index, len(self.lines) - 1)
+        self.cursor_col = max(0, col)
+
+        self.redraw()
 
         # Ensure canvas gets focus when clicked
         self.focus_set()
@@ -633,25 +652,49 @@ class UnifiedCanvas(tk.Canvas):
         })
         return line_id
 
-    def draw_rectangle(self, x1: float, y1: float, x2: float, y2: float,
-                      filled: bool = False, color: Optional[str] = None,
-                      width: int = 1, **kwargs):
+    def draw_rectangle(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        filled: bool = False,
+        color: Optional[str] = None,
+        width: int = 1,
+        **kwargs,
+    ):
         """Draw a rectangle"""
         color = color or self.current_theme.accent
         fill_color = color if filled else ""
-        rect_id = self.create_rectangle(x1, y1, x2, y2, outline=color,
-                                      fill=fill_color, width=width, **kwargs)
+        rect_id = self.create_rectangle(
+            x1, y1, x2, y2, outline=color, fill=fill_color, width=width, **kwargs
+        )
         self.graphics_objects.append(rect_id)
-        self.graphics_commands.append({
-            'type': 'rectangle',
-            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
-            'color': color, 'fill_color': fill_color, 'width': width, 'kwargs': kwargs
-        })
+        self.graphics_commands.append(
+            {
+                "type": "rectangle",
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
+                "color": color,
+                "fill_color": fill_color,
+                "width": width,
+                "kwargs": kwargs,
+            }
+        )
         return rect_id
 
-    def draw_circle(self, center_x: float, center_y: float, radius: float,
-                   filled: bool = False, color: Optional[str] = None,
-                   width: int = 1, **kwargs):
+    def draw_circle(
+        self,
+        center_x: float,
+        center_y: float,
+        radius: float,
+        filled: bool = False,
+        color: Optional[str] = None,
+        width: int = 1,
+        **kwargs,
+    ):
         """Draw a circle"""
         color = color or self.current_theme.accent
         x1 = center_x - radius
@@ -659,27 +702,68 @@ class UnifiedCanvas(tk.Canvas):
         x2 = center_x + radius
         y2 = center_y + radius
         fill_color = color if filled else ""
-        circle_id = self.create_oval(x1, y1, x2, y2, outline=color,
-                                   fill=fill_color, width=width, **kwargs)
+        circle_id = self.create_oval(
+            x1, y1, x2, y2,
+            outline=color, fill=fill_color, width=width, **kwargs
+        )
         self.graphics_objects.append(circle_id)
-        self.graphics_commands.append({
-            'type': 'circle',
-            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
-            'color': color, 'fill_color': fill_color, 'width': width, 'kwargs': kwargs
-        })
+        self.graphics_commands.append(
+            {
+                "type": "circle",
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
+                "color": color,
+                "fill_color": fill_color,
+                "width": width,
+                "kwargs": kwargs,
+            }
+        )
         return circle_id
 
-    def draw_text(self, x: float, y: float, text: str,
-                  color: Optional[str] = None, **kwargs):
+    def draw_polygon(
+        self, points, filled=False, color=None, width=1, **kwargs
+    ):
+        """Draw a polygon"""
+        color = color or self.current_theme.accent
+        fill_color = color if filled else ""
+        polygon_id = self.create_polygon(
+            points,
+            outline=color, fill=fill_color, width=width, **kwargs
+        )
+        self.graphics_objects.append(polygon_id)
+        self.graphics_commands.append(
+            {
+                "type": "polygon",
+                "points": points,
+                "color": color,
+                "fill_color": fill_color,
+                "width": width,
+                "kwargs": kwargs,
+            }
+        )
+        return polygon_id
+
+    def draw_text(
+        self, x: float, y: float, text: str, color: Optional[str] = None, **kwargs
+    ):
         """Draw text at graphics coordinates"""
         color = color or self.current_theme.foreground
-        text_id = self.create_text(x, y, text=text, fill=color,
-                                 font=self.font, **kwargs)
+        text_id = self.create_text(
+            x, y, text=text, fill=color, font=self.font, **kwargs
+        )
         self.graphics_objects.append(text_id)
-        self.graphics_commands.append({
-            'type': 'text',
-            'x': x, 'y': y, 'text': text, 'color': color, 'kwargs': kwargs
-        })
+        self.graphics_commands.append(
+            {
+                "type": "text",
+                "x": x,
+                "y": y,
+                "text": text,
+                "color": color,
+                "kwargs": kwargs,
+            }
+        )
         return text_id
 
     # Legacy compatibility methods
