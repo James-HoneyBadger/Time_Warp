@@ -196,7 +196,7 @@ class TwBasicInterpreter:
                                                     array_dict[i] = elem[1:-1]
                                                 else:
                                                     array_dict[i] = elem
-                                        except:
+                                        except Exception:
                                             array_dict[i] = elem
                                 else:
                                     array_dict = {}

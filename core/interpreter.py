@@ -1085,7 +1085,7 @@ class Time_WarpInterpreter:
                 # Not an array access for known arrays — return original text so
                 # function calls like SIN(...), LEN(...), VAL(...) are preserved
                 return match.group(0)
-            except:
+            except Exception:
                 return match.group(0)
 
         expr = re.sub(array_pattern, replace_array_access, expr)
@@ -1212,7 +1212,7 @@ class Time_WarpInterpreter:
             try:
                 val = self.evaluate_expression(arg)
                 return f'"{str(val)}"'
-            except:
+            except Exception:
                 return f'"{arg}"'
 
         expr = re.sub(r"STR\$\(([^)]+)\)", replace_str_func, expr)
@@ -1223,7 +1223,7 @@ class Time_WarpInterpreter:
             try:
                 val = int(self.evaluate_expression(arg))
                 return f'"{chr(val)}"'
-            except:
+            except Exception:
                 return '""'
 
         expr = re.sub(r"CHR\$\(([^)]+)\)", replace_chr_func, expr)
@@ -1236,7 +1236,7 @@ class Time_WarpInterpreter:
                     s = str(self.evaluate_expression(args[0].strip()))
                     n = int(self.evaluate_expression(args[1].strip()))
                     return f'"{s[:n]}"'
-                except:
+                except Exception:
                     pass
             return '""'
 
@@ -1249,7 +1249,7 @@ class Time_WarpInterpreter:
                     s = str(self.evaluate_expression(args[0].strip()))
                     n = int(self.evaluate_expression(args[1].strip()))
                     return f'"{s[-n:] if n > 0 else ""}"'
-                except:
+                except Exception:
                     pass
             return '""'
 

@@ -365,7 +365,7 @@ class TwLogoExecutor:
         self.interpreter.turtle_graphics["pen_down"] = False
         self.interpreter.debug_output("Pen up - turtle will move without drawing")
         if self.interpreter.turtle_trace:
-            self.interpreter.log_output(f"TRACE: PEN=UP")
+            self.interpreter.log_output("TRACE: PEN=UP")
         return "continue"
 
     def _handle_pendown(self):
@@ -385,7 +385,7 @@ class TwLogoExecutor:
         self.interpreter.debug_output("Pen down - turtle will draw when moving")
         if self.interpreter.turtle_trace:
             self.interpreter.log_output(
-                f"TRACE: PEN=DOWN COLOR={self.interpreter.turtle_graphics['pen_color']}"
+                "TRACE: PEN=DOWN COLOR=" + str(self.interpreter.turtle_graphics["pen_color"])
             )
         return "continue"
 
@@ -514,7 +514,7 @@ class TwLogoExecutor:
     def _handle_heading(self):
         """Handle HEADING command"""
         heading = self.interpreter.turtle_graphics["heading"]
-        self.interpreter.log_output(f"Turtle heading")
+        self.interpreter.log_output("Turtle heading")
         return "continue"
 
     def _handle_position(self):

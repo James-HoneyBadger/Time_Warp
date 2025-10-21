@@ -105,8 +105,8 @@ class VariableManager:
                     severity=ErrorSeverity.ERROR,
                     message=f"Undefined variable '{name}'",
                     suggestions=[
-                        f"Define the variable before using it",
-                        f"Check for typos in the variable name",
+                        "Define the variable before using it",
+                        "Check for typos in the variable name",
                     ],
                 )
             )

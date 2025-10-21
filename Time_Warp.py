@@ -225,7 +225,6 @@ if not GUI_AVAILABLE:
 
 import json
 import os
-import platform
 import queue
 import re
 import threading
@@ -1262,18 +1261,10 @@ Full reporting functionality to be implemented."""
                             pass
                     except Exception as e:
                         try:
-                            self.root.after(
-                                0,
-                                lambda: self.unified_canvas.write_text(
-                                    f"❌ Error: {e}\n"
-                                ),
-                            )
-                            self.root.after(
-                                0,
-                                lambda: self.status_label.config(
-                                    text=f"❌ Execution error: {e}"
-                                ),
-                            )
+                            err_text = f"❌ Error: {e}\n"
+                            err_status = f"❌ Execution error: {e}"
+                            self.root.after(0, lambda err_text=err_text: self.unified_canvas.write_text(err_text))
+                            self.root.after(0, lambda err_status=err_status: self.status_label.config(text=err_status))
                         except Exception:
                             pass
 
@@ -2787,14 +2778,14 @@ Features:
         # Check for single immediate commands first (PRINT, INPUT, LET, variable assignments)
         immediate_commands = ["PRINT", "INPUT", "LET"]
         for cmd in immediate_commands:
-            if re.search(r"\b" + re.escape(cmd) + r"\b", all_code.upper()):
+            if re.search(r"\b" + re.escape(cmd) + r"\b", code.upper()):
                 return "time_warp"
 
         # Check for exact word matches to avoid substring conflicts
         time_warp_score = 0
         for cmd in time_warp_commands:
             # Use word boundaries to match whole words only
-            if re.search(r"\b" + re.escape(cmd) + r"\b", all_code.upper()):
+            if re.search(r"\b" + re.escape(cmd) + r"\b", code.upper()):
                 time_warp_score += 1
 
         # If any Time_Warp commands are found, treat as Time_Warp
@@ -2991,7 +2982,9 @@ def main():
                 with open(test_file, "r", encoding="utf-8") as f:
                     code = f.read()
                 print(f"Testing {language} code from {test_file}")
-                interpreter.run_program(code, language=language.lower())
+                # Use a fresh interpreter instance for test runs to avoid relying on GUI state
+                from core.interpreter import Time_WarpInterpreter as _TWI
+                _TWI().run_program(code, language=language.lower())
                 print("Test completed successfully")
                 return
             except Exception as e:

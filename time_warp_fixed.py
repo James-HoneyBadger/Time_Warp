@@ -2,6 +2,7 @@
 
 # Set pygame environment variable to suppress AVX2 warning
 import os
+import sys
 
 os.environ['PYGAME_DETECT_AVX2'] = '1'
 
@@ -727,4 +728,4 @@ class TimeWarpApp:
         self.status_label.config(text="↪️ Redo not available in unified canvas mode.")
 
     def _cut_text(self):
-        """
+        """Cut not available in unified canvas mode"""
