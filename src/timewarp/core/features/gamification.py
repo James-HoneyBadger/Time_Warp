@@ -4,11 +4,11 @@ Adds achievements, badges, challenges, and progress tracking to make learning fu
 """
 
 import json
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Callable
-from pathlib import Path
-from dataclasses import dataclass, asdict
 from enum import Enum
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class AchievementType(Enum):

@@ -3,9 +3,9 @@ IoT Device Management System
 Smart home and IoT device integration for Time_Warp.
 """
 
-import time
-import random
 import json
+import random
+import time
 from datetime import datetime
 
 

@@ -14,12 +14,12 @@ This test suite will thoroughly examine EVERY aspect of the Time_Warp IDE:
 Will identify and fix ANY remaining glitches to make this system PERFECT!
 """
 
-import sys
 import os
-import time
+import sys
 import tempfile
-import traceback
 import threading
+import time
+import traceback
 from pathlib import Path
 
 # Add Time_Warp to path
@@ -218,6 +218,7 @@ class CoreSystemTests:
         """Test memory usage is reasonable"""
         try:
             import gc
+
             import psutil
             
             process = psutil.Process()
@@ -562,7 +563,7 @@ class GUITests:
         try:
             # Test that main GUI can be imported
             import Time_Warp
-            
+
             # Check main class exists
             if not hasattr(Time_Warp, 'Time_WarpIDE'):
                 self.results.test_fail("GUI Integration", "Time_WarpIDE class not found", 

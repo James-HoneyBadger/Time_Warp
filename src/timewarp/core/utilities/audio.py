@@ -3,9 +3,9 @@ Audio utilities for Time_Warp
 Handles sound mixing and playback functionality.
 """
 
-import sys
-import subprocess
 import os
+import subprocess
+import sys
 
 
 def _has_exe(name):

@@ -4,8 +4,8 @@ Time_Warp IDE CI Test Runner
 Simplified test runner for CI environments
 """
 
-import sys
 import os
+import sys
 import warnings
 from pathlib import Path
 

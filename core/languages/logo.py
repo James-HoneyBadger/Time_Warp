@@ -22,8 +22,8 @@ visual output, providing an intuitive programming environment for learning
 geometry, mathematics, and programming concepts through turtle graphics.
 """
 
-import re
 import math
+import re
 import time
 
 

@@ -40,12 +40,13 @@ class AIMLIntegration:
             self.pandas_available = False
 
         try:
-            from sklearn.linear_model import LinearRegression, LogisticRegression
-            from sklearn.tree import DecisionTreeClassifier
             from sklearn.cluster import KMeans
-            from sklearn.preprocessing import StandardScaler
-            from sklearn.model_selection import train_test_split
+            from sklearn.linear_model import (LinearRegression,
+                                              LogisticRegression)
             from sklearn.metrics import accuracy_score, mean_squared_error
+            from sklearn.model_selection import train_test_split
+            from sklearn.preprocessing import StandardScaler
+            from sklearn.tree import DecisionTreeClassifier
 
             self.LinearRegression = LinearRegression
             self.LogisticRegression = LogisticRegression

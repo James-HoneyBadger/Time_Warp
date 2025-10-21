@@ -3,17 +3,17 @@ Error Analysis and Stack Trace Visualization for Time_Warp IDE
 Intelligent error detection, pattern matching, and stack trace visualization
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import traceback
-import sys
-import re
-import threading
-from typing import Dict, List, Any, Optional, Callable, Tuple
-from datetime import datetime
-from collections import defaultdict, Counter
 import ast
 import inspect
+import re
+import sys
+import threading
+import tkinter as tk
+import traceback
+from collections import Counter, defaultdict
+from datetime import datetime
+from tkinter import messagebox, scrolledtext, ttk
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
 class ErrorPatternMatcher:

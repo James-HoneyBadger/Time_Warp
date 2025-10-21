@@ -16,8 +16,8 @@ This module handles TW Forth command execution including:
 - Variables and constants
 """
 
-import re
 import math
+import re
 
 
 class TwForthExecutor:

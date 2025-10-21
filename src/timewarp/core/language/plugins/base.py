@@ -3,11 +3,11 @@ Time_Warp IDE Plugin Base Classes
 Foundation for the plugin system
 """
 
+import inspect
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass
 from enum import Enum
-import inspect
+from typing import Any, Callable, Dict, List, Optional
 
 
 class PluginType(Enum):

@@ -3,8 +3,9 @@
 Apply comprehensive fixes for Time_Warp IDE issues
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 def fix_theme_consistency():
@@ -206,6 +207,7 @@ def test_fixes():
     print("\\n2. Testing theme consistency...")
     try:
         import tkinter as tk
+
         from tools.theme import ThemeManager
         
         root = tk.Tk()

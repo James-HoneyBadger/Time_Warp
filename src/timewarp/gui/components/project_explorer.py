@@ -5,7 +5,7 @@ File tree view for managing Time_Warp projects and files.
 
 import os
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import filedialog, messagebox, simpledialog, ttk
 
 
 class ProjectExplorer:

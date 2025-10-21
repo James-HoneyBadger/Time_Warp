@@ -4,14 +4,14 @@ Time_Warp IDE Integration Test Suite
 Tests the complete system including enhanced editor, plugins, and sample programs
 """
 
-import sys
+import json
 import os
-import tkinter as tk
-from tkinter import ttk
+import sys
 import tempfile
 import threading
 import time
-import json
+import tkinter as tk
+from tkinter import ttk
 from typing import Dict, List, Optional
 
 # Add the project root to path
@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 # Test all the enhanced editor components
 try:
+    from core.editor.code_completion_engine import CodeCompletionEngine
+    from core.editor.compiler_manager import CompilerManager
     from core.editor.enhanced_editor import EnhancedCodeEditor
     from core.editor.language_engine import LanguageEngine
-    from core.editor.compiler_manager import CompilerManager
     from core.editor.syntax_analyzer import SyntaxAnalyzer
-    from core.editor.code_completion_engine import CodeCompletionEngine
 
     ENHANCED_EDITOR_AVAILABLE = True
 except ImportError as e:
@@ -33,10 +33,7 @@ except ImportError as e:
 # Test learning assistant
 try:
     from tools.plugins.learning_assistant.plugin import (
-        LearningAssistantPlugin,
-        CodeAnalyzer,
-        TutorialManager,
-    )
+        CodeAnalyzer, LearningAssistantPlugin, TutorialManager)
 
     LEARNING_ASSISTANT_AVAILABLE = True
 except ImportError as e:

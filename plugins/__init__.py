@@ -3,13 +3,13 @@ Time_Warp Plugin System
 Provides extensible plugin architecture for Time_Warp IDE
 """
 
-import os
-import json
 import importlib.util
+import json
+import os
 import sys
-from typing import Dict, List, Optional, Any
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
+from typing import Any, Dict, List, Optional
 
 
 class TimeWarpPlugin:

@@ -4,13 +4,14 @@ Enhanced Graphics Canvas for Time_Warp IDE
 Improved turtle graphics with zoom, export, and grid features
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import turtle
 import io
-from PIL import Image, ImageDraw
-from typing import Optional, Tuple
 import math
+import tkinter as tk
+import turtle
+from tkinter import filedialog, messagebox, ttk
+from typing import Optional, Tuple
+
+from PIL import Image, ImageDraw
 
 
 class EnhancedGraphicsCanvas:

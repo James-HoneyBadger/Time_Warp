@@ -5,13 +5,13 @@ Comprehensive IoT device management with discovery, control, network monitoring,
 protocol support, and data analytics
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, simpledialog
+import os
 import random
 import sys
-import os
+import tkinter as tk
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from tkinter import messagebox, scrolledtext, simpledialog, ttk
+from typing import Any, Dict, List, Optional
 
 # Import the base framework
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

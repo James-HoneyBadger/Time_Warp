@@ -5,8 +5,9 @@ Alternative launcher that can be run directly with Python
 """
 
 import os
-import sys
 import subprocess
+import sys
+
 
 def main():
     """Launch Time_Warp IDE"""

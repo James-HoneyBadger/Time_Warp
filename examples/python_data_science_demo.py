@@ -5,9 +5,9 @@ Educational program showing data analysis and visualization concepts
 Perfect for learning scientific computing with Python
 """
 
-import random
-import math
 import json
+import math
+import random
 from datetime import datetime, timedelta
 
 

@@ -3,15 +3,15 @@ Learning Assistant Plugin for Time_Warp IDE
 Provides educational features including tutorials, code analysis, and progress tracking
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+import datetime
 import json
 import os
-import datetime
-from typing import Dict, List, Optional, Any, Tuple
+import re
 import threading
 import time
-import re
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     from ...tool_manager import ToolPlugin

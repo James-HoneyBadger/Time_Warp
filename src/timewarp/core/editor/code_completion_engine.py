@@ -4,10 +4,10 @@ Enhanced Code Completion Engine for Time_Warp IDE
 Provides intelligent code completion for all supported languages
 """
 
-import re
 import ast
-from typing import List, Dict, Optional, Tuple, Any
+import re
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass

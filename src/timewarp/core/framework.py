@@ -4,16 +4,16 @@ Time_Warp Core Framework - Base architecture for modular tool system
 Provides event management, plugin interfaces, and standardized component registration
 """
 
-import sys
+import json
 import os
-import threading
 import queue
-from typing import Dict, List, Optional, Any, Callable
+import sys
+import threading
+import tkinter as tk
 from abc import ABC, abstractmethod
 from datetime import datetime
-import json
-import tkinter as tk
 from tkinter import ttk
+from typing import Any, Callable, Dict, List, Optional
 
 
 class EventManager:

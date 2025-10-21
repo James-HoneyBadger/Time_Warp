@@ -6,8 +6,8 @@ Provides guided learning experiences with built-in challenges and progress track
 import json
 import os
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Callable
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 
 class TutorialStep:

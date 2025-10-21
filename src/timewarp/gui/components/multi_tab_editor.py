@@ -4,12 +4,12 @@ Multi-Tab Code Editor for Time_Warp IDE
 Enhanced editor with tabbed interface and file management
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
 import os
-from pathlib import Path
-from typing import Dict, List, Optional, Callable
 import re
+import tkinter as tk
+from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
+from typing import Callable, Dict, List, Optional
 
 
 class TabEditor:

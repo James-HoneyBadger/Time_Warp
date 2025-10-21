@@ -4,7 +4,8 @@ Implements Logo-style turtle graphics and geometric programming
 """
 
 import math
-from typing import List, Tuple, Optional, Callable, Any
+from typing import Any, Callable, List, Optional, Tuple
+
 from ..parser import LogoCommandNode
 
 

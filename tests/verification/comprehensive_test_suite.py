@@ -20,11 +20,11 @@ Test Categories:
 10. Performance Tests
 """
 
+import os
+import sys
+import time
 import tkinter as tk
 from tkinter import scrolledtext
-import sys
-import os
-import time
 
 # Add the project directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -46,7 +46,7 @@ class ComprehensiveTestSuite:
         
         # Setup interpreter
         from core.interpreter import Time_WarpInterpreter
-        
+
         # Custom output handler
         class OutputHandler:
             def __init__(self, output_widget):

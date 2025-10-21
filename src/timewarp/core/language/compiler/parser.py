@@ -3,20 +3,15 @@ Time_Warp IDE Enhanced Parser
 Improved AST generation with better error handling
 """
 
-from typing import List, Optional, Dict, Any, Union
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
-from .lexer import Token, TokenType, EnhancedLexer
-from ..errors.error_manager import (
-    ErrorManager,
-    TimeWarpError,
-    TimeWarpSyntaxError,
-    ErrorCode,
-    ErrorSeverity,
-    SourceLocation,
-)
+from ..errors.error_manager import (ErrorCode, ErrorManager, ErrorSeverity,
+                                    SourceLocation, TimeWarpError,
+                                    TimeWarpSyntaxError)
+from .lexer import EnhancedLexer, Token, TokenType
 
 
 # AST Node Types

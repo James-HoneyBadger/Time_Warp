@@ -20,8 +20,8 @@ This module handles TW Logo command execution including:
 - Macros (DEFINE, CALL)
 """
 
-import re
 import math
+import re
 import time
 
 

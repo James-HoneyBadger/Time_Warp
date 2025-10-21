@@ -5,12 +5,12 @@ Professional hardware interface tool with GPIO control, sensor management,
 device automation, and Raspberry Pi integration
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+import os
 import random
 import sys
-import os
-from typing import Dict, Any, List, Optional
+import tkinter as tk
+from tkinter import messagebox, simpledialog, ttk
+from typing import Any, Dict, List, Optional
 
 # Import the base framework
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

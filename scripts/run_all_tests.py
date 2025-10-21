@@ -4,10 +4,9 @@ Time_Warp IDE 1.1 - Master Test Runner
 Runs all tests for the Time_Warp IDE project
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
-
 
 # Get project root
 project_root = Path(__file__).parent.parent

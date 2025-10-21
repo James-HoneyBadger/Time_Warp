@@ -4,16 +4,17 @@ Time_Warp Tool Manager - Enhanced plugin system specifically for tools
 Extends the base plugin system with tool-specific functionality
 """
 
-import os
-import json
 import importlib.util
+import json
+import os
 import sys
-from typing import Dict, List, Optional, Any
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
+from typing import Any, Dict, List, Optional
 
 # Import base plugin system
 from plugins import PluginManager, TimeWarpPlugin
+
 from ..core.framework import Time_WarpFramework, ToolPlugin
 
 

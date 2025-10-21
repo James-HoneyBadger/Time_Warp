@@ -3,9 +3,10 @@
 Verify Time_Warp IDE is working correctly
 """
 
+import os
 import subprocess
 import time
-import os
+
 
 def check_time_warp_status():
     """Check if Time_Warp IDE is running and working"""

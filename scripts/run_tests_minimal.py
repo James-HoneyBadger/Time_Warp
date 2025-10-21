@@ -6,10 +6,11 @@ Ultra-minimal test for GitHub Actions
 
 # Set pygame environment variable to suppress AVX2 warning
 import os
+
 os.environ['PYGAME_DETECT_AVX2'] = '1'
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to Python path

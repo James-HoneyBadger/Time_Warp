@@ -4,8 +4,8 @@ Time_Warp IDE Test Runner
 Tests the enhanced Time_Warp IDE system
 """
 
-import sys
 import os
+import sys
 
 # Add the project root to Python path
 project_root = os.path.dirname(
@@ -27,9 +27,9 @@ def discover_and_run_tests():
         print("✅ Core interpreter import successful")
 
         print("Testing feature imports...")
-        from core.features.tutorial_system import TutorialSystem
         from core.features.ai_assistant import AICodeAssistant
         from core.features.gamification import GamificationSystem
+        from core.features.tutorial_system import TutorialSystem
 
         print("✅ Feature system imports successful")
 

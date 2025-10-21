@@ -3,11 +3,11 @@ Advanced GUI Components for Time_Warp IDE
 Contains dialogs, managers, and specialized interface components.
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog, filedialog
 import os
 import subprocess
-from typing import Dict, List, Optional, Callable
+import tkinter as tk
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from typing import Callable, Dict, List, Optional
 
 
 class ProjectExplorer:
@@ -1044,8 +1044,8 @@ Available Commands:
     def save_scene(self):
         """Save current scene"""
         try:
-            from tkinter import filedialog
             import json
+            from tkinter import filedialog
 
             game_manager = getattr(self.ide.interpreter, "game_manager", None)
             if not game_manager or not hasattr(game_manager, "game_objects"):
@@ -1092,8 +1092,8 @@ Available Commands:
     def load_scene(self):
         """Load scene from file"""
         try:
-            from tkinter import filedialog
             import json
+            from tkinter import filedialog
 
             filename = filedialog.askopenfilename(
                 title="Load Scene",

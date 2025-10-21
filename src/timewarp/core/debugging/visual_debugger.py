@@ -3,18 +3,18 @@ Visual Debugger for Time_Warp IDE
 Comprehensive debugging interface with breakpoints, variable inspection, and call stack visualization
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext
-import sys
-import pdb
-import traceback
-import threading
-import queue
-from typing import Dict, List, Any, Optional, Callable
 import ast
 import inspect
 import json
+import pdb
+import queue
+import sys
+import threading
+import tkinter as tk
+import traceback
 from datetime import datetime
+from tkinter import scrolledtext, ttk
+from typing import Any, Callable, Dict, List, Optional
 
 
 class BreakpointManager:

@@ -3,9 +3,9 @@ Time_Warp IDE Error Handling System
 Centralized error management for better debugging and user experience
 """
 
-from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class ErrorSeverity(Enum):

@@ -25,21 +25,21 @@ The interpreter maintains state across program execution including variables,
 program lines, execution position, and turtle graphics state.
 """
 
-import sys
-import os
-import tkinter as tk
-from tkinter import simpledialog
-import turtle
-import math
-import re
 import json
-from datetime import datetime
-import threading
-import queue
+import math
+import os
 import pathlib
-import subprocess
+import queue
 import random
+import re
+import subprocess
+import sys
+import threading
 import time
+import tkinter as tk
+import turtle
+from datetime import datetime
+from tkinter import simpledialog
 
 # Optional PIL import - gracefully handle missing dependency
 PIL_AVAILABLE = False
@@ -75,10 +75,8 @@ except ImportError:
 # Import performance optimizations
 try:
     from .optimizations.performance_optimizer import (
-        OptimizedInterpreterMixin,
-        performance_optimizer,
-        optimize_for_production,
-    )
+        OptimizedInterpreterMixin, optimize_for_production,
+        performance_optimizer)
 
     PERFORMANCE_OPTIMIZATIONS_AVAILABLE = True
 except ImportError:
@@ -103,16 +101,13 @@ except ImportError:
 try:
     # Try to import from actual modules first
     from games.engine import GameManager
+
     from .audio import AudioEngine
-    from .hardware import (
-        RPiController,
-        RobotInterface,
-        GameController,
-        SensorVisualizer,
-    )
-    from .iot import IoTDeviceManager, SmartHomeHub, SensorNetwork
-    from .utilities import Mixer, Tween, Timer, Particle
+    from .hardware import (GameController, RobotInterface, RPiController,
+                           SensorVisualizer)
+    from .iot import IoTDeviceManager, SensorNetwork, SmartHomeHub
     from .networking import CollaborationManager
+    from .utilities import Mixer, Particle, Timer, Tween
 
     ArduinoController = None  # Not implemented yet
     AdvancedRobotInterface = None  # Not implemented yet
@@ -641,6 +636,12 @@ class Time_WarpInterpreter:
             self.basic_executor = self.tw_basic_executor
         except Exception:
             self.basic_executor = None
+
+        # Backwards compatibility: older code/tests refer to time_warp_executor
+        try:
+            self.time_warp_executor = self.tw_basic_executor
+        except Exception:
+            self.time_warp_executor = None
 
         # Language mode (optional explicit setting)
         self.current_language_mode = None
@@ -1178,7 +1179,7 @@ class Time_WarpInterpreter:
         # Find any remaining word-like tokens that look like variable names
         # But don't replace inside quoted strings
         import re
-        
+
         # Split expression by both single and double quotes to avoid replacing inside strings
         parts = re.split(r'(".*?"|\'.*?\')', expr)
         for i, part in enumerate(parts):

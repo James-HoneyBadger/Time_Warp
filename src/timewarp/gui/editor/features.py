@@ -5,7 +5,7 @@ Syntax highlighting, auto-completion, and intelligent code editing for Time_Warp
 
 import re
 import tkinter as tk
-from typing import List, Dict, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 
 class AdvancedSyntaxHighlighter:

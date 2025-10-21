@@ -3,13 +3,14 @@ Time_Warp IDE Plugin Manager
 Central management for the plugin system
 """
 
-from typing import Dict, List, Any, Optional, Callable
 import os
-from .base import PluginInterface, PluginType
-from .registry import PluginRegistry
-from .loader import PluginLoader
-from ..runtime.engine import RuntimeEngine, ExecutionContext
+from typing import Any, Callable, Dict, List, Optional
+
+from ..runtime.engine import ExecutionContext, RuntimeEngine
 from ..stdlib.core import StandardLibrary
+from .base import PluginInterface, PluginType
+from .loader import PluginLoader
+from .registry import PluginRegistry
 
 
 class PluginManager:
@@ -42,7 +43,7 @@ class PluginManager:
 
     def _load_builtin_plugins(self):
         """Load built-in plugins"""
-        from .base import MathLibraryPlugin, LoggingPlugin
+        from .base import LoggingPlugin, MathLibraryPlugin
 
         # Register built-in plugins
         math_plugin = MathLibraryPlugin()

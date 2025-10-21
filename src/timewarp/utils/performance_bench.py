@@ -4,14 +4,15 @@ Time_Warp Performance Benchmark - Safe Version
 Comprehensive performance testing without threading issues
 """
 
-import time
-import sys
-import os
 import gc
-import psutil
-from typing import Dict, List, Any, Optional
+import os
 import statistics
+import sys
 import tempfile
+import time
+from typing import Any, Dict, List, Optional
+
+import psutil
 
 # Add project root to path
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -95,8 +96,9 @@ class TimeWarpPerformanceBench:
         """Test interpreter creation and basic operations"""
 
         def interpreter_test():
-            from core.interpreter import Time_WarpInterpreter
             import tkinter as tk
+
+            from core.interpreter import Time_WarpInterpreter
 
             # Single threaded test
             root = tk.Tk()
@@ -119,8 +121,10 @@ class TimeWarpPerformanceBench:
         """Test language command execution performance"""
 
         def language_test():
-            from core.languages import PilotExecutor, BasicExecutor, LogoExecutor
             import tkinter as tk
+
+            from core.languages import (BasicExecutor, LogoExecutor,
+                                        PilotExecutor)
 
             root = tk.Tk()
             root.withdraw()

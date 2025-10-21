@@ -5,15 +5,16 @@ Professional-grade debugging tool with breakpoints, variable inspection,
 call stack analysis, execution control, and memory monitoring
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog, filedialog
-import json
 import gc
-import psutil
+import json
 import os
 import sys
+import tkinter as tk
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from typing import Any, Dict, List, Optional
+
+import psutil
 
 # Import the base framework
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

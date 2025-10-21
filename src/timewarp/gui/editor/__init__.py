@@ -4,14 +4,11 @@ Main editor class that integrates syntax highlighting, auto-completion, and othe
 """
 
 import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-from .features import (
-    AdvancedSyntaxHighlighter,
-    AutoCompletionEngine,
-    IntelligentCodeCompletion,
-    RealTimeSyntaxChecker,
-    CodeFoldingSystem,
-)
+from tkinter import messagebox, scrolledtext, ttk
+
+from .features import (AdvancedSyntaxHighlighter, AutoCompletionEngine,
+                       CodeFoldingSystem, IntelligentCodeCompletion,
+                       RealTimeSyntaxChecker)
 
 
 class AdvancedCodeEditor:

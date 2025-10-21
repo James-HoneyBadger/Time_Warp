@@ -2,10 +2,12 @@
 
 # Set pygame environment variable to suppress AVX2 warning
 import os
+
 os.environ['PYGAME_DETECT_AVX2'] = '1'
 
 # Suppress pygame AVX2 warning
 import warnings
+
 warnings.filterwarnings("ignore", message=".*avx2.*", category=RuntimeWarning)
 
 """
@@ -31,8 +33,8 @@ programs in multiple programming languages with immediate visual feedback.
 # Check and setup environment before importing other modules
 def check_environment():
     """Check if environment is properly set up, set it up if needed"""
-    import sys
     import subprocess
+    import sys
     from pathlib import Path
 
     # Check if requirements.py exists
@@ -73,8 +75,8 @@ def check_environment():
 
 def activate_venv_in_process():
     """Activate virtual environment in the current process"""
-    import sys
     import os
+    import sys
     from pathlib import Path
 
     project_root = Path(__file__).parent
@@ -109,15 +111,15 @@ if not check_environment():
     print("❌ Environment setup failed. Please check the errors above.")
     sys.exit(1)
 
+import json
+import os
+import re
 # Now import other modules after environment is verified
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
+
 from core.interpreter import Time_WarpInterpreter
-import os
-import json
-import re
-from unified_canvas import UnifiedCanvas, Theme
+from unified_canvas import Theme, UnifiedCanvas
 
 # Import compiler system
 try:
@@ -129,12 +131,10 @@ except ImportError:
 
 # Import advanced editor features
 try:
-    from src.timewarp.gui.editor.features import (
-        AdvancedSyntaxHighlighter,
-        AutoCompletionEngine,
-        RealTimeSyntaxChecker,
-        CodeFoldingSystem,
-    )
+    from src.timewarp.gui.editor.features import (AdvancedSyntaxHighlighter,
+                                                  AutoCompletionEngine,
+                                                  CodeFoldingSystem,
+                                                  RealTimeSyntaxChecker)
     ADVANCED_EDITOR_AVAILABLE = True
 except ImportError:
     ADVANCED_EDITOR_AVAILABLE = False

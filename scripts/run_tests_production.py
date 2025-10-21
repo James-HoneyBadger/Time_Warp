@@ -4,8 +4,8 @@ Time_Warp IDE Test Runner
 Production-ready test runner with comprehensive testing capabilities
 """
 
-import sys
 import os
+import sys
 
 # Add the project root to Python path
 project_root = os.path.dirname(__file__)
@@ -71,9 +71,9 @@ def run_basic_tests():
     # Test 2: Feature system imports
     def test_feature_imports():
         try:
-            from features.tutorial_system import TutorialSystem
             from features.ai_assistant import AICodeAssistant
             from features.gamification import GamificationSystem
+            from features.tutorial_system import TutorialSystem
 
             return True
         except ImportError:
@@ -84,10 +84,11 @@ def run_basic_tests():
     # Test 3: Basic initialization
     def test_initialization():
         try:
-            from core.interpreter import Time_WarpInterpreter
-            from features.tutorial_system import TutorialSystem
             from features.ai_assistant import AICodeAssistant
             from features.gamification import GamificationSystem
+            from features.tutorial_system import TutorialSystem
+
+            from core.interpreter import Time_WarpInterpreter
 
             interpreter = Time_WarpInterpreter()
             tutorial = TutorialSystem()

@@ -4,21 +4,21 @@ Time Warp Interpreter - Core interpreter for IDE Time Warp
 Journey through code across time and space
 """
 
-import sys
-import os
-import tkinter as tk
-from tkinter import simpledialog
-import turtle
-import math
-import re
 import json
-from datetime import datetime
-import threading
-import queue
+import math
+import os
 import pathlib
-import subprocess
+import queue
 import random
+import re
+import subprocess
+import sys
+import threading
 import time
+import tkinter as tk
+import turtle
+from datetime import datetime
+from tkinter import simpledialog
 
 # Optional PIL import - gracefully handle missing dependency
 PIL_AVAILABLE = False
@@ -50,25 +50,15 @@ except ImportError:
     print("ℹ️  PIL/Pillow not available - image features disabled")
 
 # Import language executors
-from .languages import (
-    TwPilotExecutor,
-    TwBasicExecutor,
-    TwLogoExecutor,
-    TwPascalExecutor,
-    TwPrologExecutor,
-    TwForthExecutor,
-    PerlExecutor,
-    PythonExecutor,
-    JavaScriptExecutor,
-)
+from .languages import (JavaScriptExecutor, PerlExecutor, PythonExecutor,
+                        TwBasicExecutor, TwForthExecutor, TwLogoExecutor,
+                        TwPascalExecutor, TwPilotExecutor, TwPrologExecutor)
 
 # Import performance optimizations
 try:
     from .optimizations.performance_optimizer import (
-        OptimizedInterpreterMixin,
-        performance_optimizer,
-        optimize_for_production,
-    )
+        OptimizedInterpreterMixin, optimize_for_production,
+        performance_optimizer)
 
     PERFORMANCE_OPTIMIZATIONS_AVAILABLE = True
 except ImportError:
@@ -93,16 +83,13 @@ except ImportError:
 try:
     # Try to import from actual modules first
     from games.engine import GameManager
+
     from .audio import AudioEngine
-    from .hardware import (
-        RPiController,
-        RobotInterface,
-        GameController,
-        SensorVisualizer,
-    )
-    from .iot import IoTDeviceManager, SmartHomeHub, SensorNetwork
-    from .utilities import Mixer, Tween, Timer, Particle
+    from .hardware import (GameController, RobotInterface, RPiController,
+                           SensorVisualizer)
+    from .iot import IoTDeviceManager, SensorNetwork, SmartHomeHub
     from .networking import CollaborationManager
+    from .utilities import Mixer, Particle, Timer, Tween
 
     ArduinoController = None  # Not implemented yet
     AdvancedRobotInterface = None  # Not implemented yet

@@ -7,9 +7,9 @@ JavaScript is a high-level, dynamic programming language.
 This module handles JavaScript script execution for the Time_Warp IDE using Node.js.
 """
 
+import os
 import subprocess
 import sys
-import os
 import tempfile
 
 

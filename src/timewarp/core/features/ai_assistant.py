@@ -3,11 +3,11 @@ AI Code Assistant for Time_Warp IDE
 Provides intelligent code suggestions, bug detection, explanations, and refactoring
 """
 
-import re
 import json
-from typing import Dict, List, Optional, Tuple, Any
-from datetime import datetime
+import re
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass

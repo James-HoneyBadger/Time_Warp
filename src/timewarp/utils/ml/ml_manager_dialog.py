@@ -4,7 +4,7 @@ GUI interface for managing machine learning models and datasets.
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
 
 
 class MLManagerDialog:

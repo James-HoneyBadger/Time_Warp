@@ -3,14 +3,15 @@ Time_Warp IDE Runtime Engine
 Executes Time_Warp IDE programs by interpreting the Abstract Syntax Tree
 """
 
-import sys
 import math
-import random
-import time
 import os
-from typing import Any, Dict, List, Optional, Callable, Union
-from .parser import *
+import random
+import sys
+import time
+from typing import Any, Callable, Dict, List, Optional, Union
+
 from .lexer import TimeWarpLexer, Token
+from .parser import *
 
 
 class TimeWarpError(Exception):

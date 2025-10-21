@@ -6,19 +6,21 @@ This will test EVERY component and find ALL remaining issues.
 No more "it's working" claims without proper verification!
 """
 
-import sys
 import os
+import sys
+
 sys.path.append('/home/james/Time_Warp')
 
-import unittest
-import tempfile
 import shutil
-from pathlib import Path
-import tkinter as tk
-from tkinter import ttk
 import subprocess
-import time
+import tempfile
 import threading
+import time
+import tkinter as tk
+import unittest
+from pathlib import Path
+from tkinter import ttk
+
 
 class TestResults:
     """Track all test results comprehensively"""

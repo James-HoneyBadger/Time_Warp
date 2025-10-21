@@ -3,8 +3,8 @@
 Pytest configuration and fixtures for Time_Warp IDE tests
 """
 
-import sys
 import os
+import sys
 
 # Add src to path for all tests (same as main entry point)
 project_root = os.path.dirname(os.path.dirname(__file__))

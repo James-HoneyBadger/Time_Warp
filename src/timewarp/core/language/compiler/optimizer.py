@@ -3,8 +3,10 @@ Time_Warp IDE Code Optimizer
 AST optimization for better performance
 """
 
-from typing import List, Dict, Any, Optional
-from .parser import ASTNode, ASTNodeType, LiteralNode, BinaryOpNode, UnaryOpNode
+from typing import Any, Dict, List, Optional
+
+from .parser import (ASTNode, ASTNodeType, BinaryOpNode, LiteralNode,
+                     UnaryOpNode)
 
 
 class CodeOptimizer:

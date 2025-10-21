@@ -8,27 +8,21 @@ Updated main application with new features:
 - Better error handling
 """
 
-import sys
-import os
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, filedialog, simpledialog
-import turtle
 import json
-from datetime import datetime
-import threading
+import os
 import pathlib
-import subprocess
 import platform
+import subprocess
+import sys
+import threading
+import tkinter as tk
+import turtle
+from datetime import datetime
+from tkinter import filedialog, messagebox, scrolledtext, simpledialog, ttk
 
 # Import theme configuration functions
-from .utils.theme import (
-    load_config,
-    save_config,
-    ThemeManager,
-    available_themes,
-    get_theme_preview,
-    get_config_file,
-)
+from .utils.theme import (ThemeManager, available_themes, get_config_file,
+                          get_theme_preview, load_config, save_config)
 
 # Import core components
 try:
@@ -41,8 +35,8 @@ except ImportError as e:
 
 # Import plugins (from root level)
 try:
-    import sys
     import os
+    import sys
 
     # Add root directory to path for plugins
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -57,8 +51,8 @@ except ImportError as e:
 
 # Import GUI components
 try:
-    from .gui.components.multi_tab_editor import MultiTabEditor
     from .gui.components.enhanced_graphics_canvas import EnhancedGraphicsCanvas
+    from .gui.components.multi_tab_editor import MultiTabEditor
 
     ENHANCED_GRAPHICS_AVAILABLE = True
 except ImportError as e:
@@ -67,10 +61,11 @@ except ImportError as e:
 
 # Error handling and feature modules
 try:
-    from .core.enhanced_error_handler import EnhancedErrorHandler, ErrorHighlighter
-    from .core.features.tutorial_system import TutorialSystem
+    from .core.enhanced_error_handler import (EnhancedErrorHandler,
+                                              ErrorHighlighter)
     from .core.features.ai_assistant import AICodeAssistant
     from .core.features.gamification import GamificationSystem
+    from .core.features.tutorial_system import TutorialSystem
 
     FEATURES_AVAILABLE = True
 except ImportError as e:
@@ -4585,8 +4580,8 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
     def load_plugin_list(self, treeview):
         """Load and display available plugins in the treeview"""
         try:
-            import os
             import json
+            import os
 
             # Initialize plugin tracking if not exists
             if not hasattr(self, "loaded_plugins"):
@@ -4634,9 +4629,9 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
     def enable_plugin(self, plugin_name):
         """Enable a plugin by name"""
         try:
-            import os
-            import json
             import importlib.util
+            import json
+            import os
 
             # Find plugin directory
             plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
@@ -4780,8 +4775,8 @@ Author: {info.get('author', 'Unknown')}
     def get_plugin_info_from_manifest(self, plugin_name):
         """Get plugin info from manifest file"""
         try:
-            import os
             import json
+            import os
 
             plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
             if not os.path.exists(plugins_dir):

@@ -4,10 +4,10 @@ Enhanced Error Handler for Time_Warp IDE
 Educational error messages with suggestions and location highlighting
 """
 
-import tkinter as tk
 import re
-from typing import Dict, Optional, Callable
+import tkinter as tk
 from dataclasses import dataclass
+from typing import Callable, Dict, Optional
 
 
 @dataclass

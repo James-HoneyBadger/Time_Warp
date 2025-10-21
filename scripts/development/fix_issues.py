@@ -3,8 +3,9 @@
 Fix Logo REPEAT parsing and theme issues
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 def fix_logo_repeat_parsing():
@@ -109,7 +110,7 @@ def check_theme_consistency():
     
     # Check the theme manager
     from tools.theme import ThemeManager, load_config
-    
+
     # Load current config
     config = load_config()
     print(f"Config current theme: {config.get('current_theme', 'not set')}")

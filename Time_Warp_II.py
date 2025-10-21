@@ -4,10 +4,12 @@
 
 # Set pygame environment variable to suppress AVX2 warning
 import os
+
 os.environ['PYGAME_DETECT_AVX2'] = '1'
 
 # Suppress pygame AVX2 warning
 import warnings
+
 warnings.filterwarnings("ignore", message=".*avx2.*", category=RuntimeWarning)
 
 """
@@ -30,21 +32,19 @@ The IDE provides a basic text editing interface where users can write and execut
 programs in multiple programming languages with immediate visual feedback.
 """
 
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from core.interpreter import Time_WarpInterpreter
-import os
 import json
+import os
+import tkinter as tk
+from tkinter import messagebox, ttk
+
+from core.interpreter import Time_WarpInterpreter
 
 # Import advanced editor features
 try:
-    from src.timewarp.gui.editor.features import (
-        AdvancedSyntaxHighlighter,
-        AutoCompletionEngine,
-        RealTimeSyntaxChecker,
-        CodeFoldingSystem,
-    )
+    from src.timewarp.gui.editor.features import (AdvancedSyntaxHighlighter,
+                                                  AutoCompletionEngine,
+                                                  CodeFoldingSystem,
+                                                  RealTimeSyntaxChecker)
     ADVANCED_EDITOR_AVAILABLE = True
 except ImportError:
     ADVANCED_EDITOR_AVAILABLE = False
@@ -1901,6 +1901,7 @@ Features:
 def main():
     print("[DEBUG] Entered main()")
     import sys
+
     # Check for command line arguments
     if len(sys.argv) > 1:
         if sys.argv[1] == "--test" and len(sys.argv) >= 4:

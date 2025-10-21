@@ -6,8 +6,9 @@ Provides real-time syntax checking and error reporting
 import re
 import threading
 import time
-from typing import List, Dict, Optional, Callable, Any, Tuple
-from .language_engine import LanguageEngine, BaseLanguageEngine
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+from .language_engine import BaseLanguageEngine, LanguageEngine
 
 
 class SyntaxError:

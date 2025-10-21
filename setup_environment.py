@@ -5,9 +5,10 @@ A simple script to help users set up the development environment manually
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
+
 
 def main():
     """Main setup function"""

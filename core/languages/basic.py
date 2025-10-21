@@ -20,11 +20,10 @@ This executor maintains backward compatibility with existing BASIC, PILOT, and L
 while providing a modern, consistent syntax for new programs.
 """
 
-import re
-import time
 import math
 import random
-
+import re
+import time
 
 
 class TwBasicInterpreter:
@@ -51,31 +50,31 @@ class TwBasicInterpreter:
         # Set the output callback used by the IDE. Keep a debug trace when set.
         self.output_callback = callback
         try:
-            # Lightweight debug to help trace UI wiring during development
-            print(f"[TwBasicInterpreter] output_callback set: {bool(callback)}")
+            # Output callback registered
+            pass
         except Exception:
             pass
 
     def log_output(self, text):
-        # Always emit a small debug trace to stdout so we can confirm calls
-        try:
-            print(f"[TwBasicInterpreter.log_output] -> {text}")
-        except Exception:
-            pass
-
+        # Route output to the registered callback or fallback to stdout
         if self.output_callback:
             try:
                 self.output_callback(text)
             except Exception as e:
-                # If callback fails, fall back to printing and emit debug
-                print(f"[TwBasicInterpreter] output_callback error: {e}")
-                print(text)
+                # If callback fails, fall back to printing the text
+                try:
+                    print(text)
+                except Exception:
+                    pass
         else:
-            print(text)
+            try:
+                print(text)
+            except Exception:
+                pass
 
     def debug_output(self, text):
-        # For debugging - can be enhanced later
-        print(f"[DEBUG] {text}")
+        # For debugging - no-op in production
+        pass
 
     def evaluate_expression(self, expr):
         """Simple expression evaluator for BASIC"""
@@ -124,8 +123,9 @@ class TwBasicInterpreter:
             bool: True if pygame initialized successfully, False otherwise
         """
         try:
-            import pygame
             import os
+
+            import pygame
 
             # Check if display is available
             display = os.environ.get("DISPLAY")

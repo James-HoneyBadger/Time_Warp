@@ -3,10 +3,11 @@ Time_Warp IDE Language Parser
 Parses tokenized Time_Warp IDE source code into an Abstract Syntax Tree (AST)
 """
 
-from typing import List, Optional, Union, Any
 from dataclasses import dataclass
 from enum import Enum
-from .lexer import Token, TokenType, TimeWarpLexer
+from typing import Any, List, Optional, Union
+
+from .lexer import TimeWarpLexer, Token, TokenType
 
 
 # AST Node Types

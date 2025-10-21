@@ -3,9 +3,9 @@ Time_Warp IDE Language Module
 Unified programming language combining PILOT, BASIC, Logo, and Python
 """
 
-from .lexer import TimeWarpLexer, Token, TokenType
-from .parser import TimeWarpParser, ProgramNode
 from .interpreter import Time_WarpInterpreter
+from .lexer import TimeWarpLexer, Token, TokenType
+from .parser import ProgramNode, TimeWarpParser
 
 __all__ = [
     "TimeWarpLexer",

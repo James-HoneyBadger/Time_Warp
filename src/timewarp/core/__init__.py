@@ -11,8 +11,7 @@ Core functionality for the Time_Warp IDE including:
 __version__ = "2.0.0"
 __author__ = "Time_Warp Development Team"
 
+from . import languages, utilities
 from .interpreter import Time_WarpInterpreter
-from . import languages
-from . import utilities
 
 __all__ = ["Time_WarpInterpreter", "languages", "utilities"]

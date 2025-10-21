@@ -3,10 +3,10 @@ Enhanced Syntax Highlighter Plugin for Time_Warp IDE
 Provides advanced syntax highlighting with customizable colors
 """
 
-import tkinter as tk
-from tkinter import messagebox, colorchooser
-import sys
 import os
+import sys
+import tkinter as tk
+from tkinter import colorchooser, messagebox
 
 # Add the parent directory to path to import the base plugin class
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

@@ -4,8 +4,9 @@ Provides language-specific code formatting capabilities
 """
 
 import re
-from typing import List, Dict, Optional
-from .language_engine import LanguageEngine, BaseLanguageEngine
+from typing import Dict, List, Optional
+
+from .language_engine import BaseLanguageEngine, LanguageEngine
 
 
 class CodeFormatter:

@@ -3,9 +3,10 @@
 Setup script for Time_Warp IDE - A multi-language educational programming environment
 """
 
-from setuptools import setup, find_packages
 import os
 import re
+
+from setuptools import find_packages, setup
 
 
 # Read the README file

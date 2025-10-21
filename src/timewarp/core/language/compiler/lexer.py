@@ -3,20 +3,15 @@ Time_Warp IDE Enhanced Lexer
 Improved tokenization with better error handling and performance
 """
 
-from typing import List, Optional, Dict, Iterator, NamedTuple
-from enum import Enum, auto
-from dataclasses import dataclass
 import re
 import string
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Dict, Iterator, List, NamedTuple, Optional
 
-from ..errors.error_manager import (
-    ErrorManager,
-    TimeWarpError,
-    TimeWarpLexicalError,
-    ErrorCode,
-    ErrorSeverity,
-    SourceLocation,
-)
+from ..errors.error_manager import (ErrorCode, ErrorManager, ErrorSeverity,
+                                    SourceLocation, TimeWarpError,
+                                    TimeWarpLexicalError)
 
 
 class TokenType(Enum):

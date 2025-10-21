@@ -7,9 +7,9 @@ Python is a high-level, general-purpose programming language.
 This module handles Python script execution for the Time_Warp IDE.
 """
 
+import os
 import subprocess
 import sys
-import os
 import tempfile
 
 

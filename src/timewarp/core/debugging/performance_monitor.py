@@ -3,25 +3,25 @@ Performance Monitoring and Memory Analysis for Time_Warp IDE
 Real-time performance tracking, memory usage analysis, and profiling tools
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext
+import cProfile
+import gc
+import io
+import pstats
+import sys
 import threading
 import time
-import sys
-import gc
-import cProfile
-import pstats
-import io
+import tkinter as tk
 import tracemalloc
-from typing import Dict, List, Any, Optional, Callable
-from collections import deque, defaultdict
+from collections import defaultdict, deque
 from datetime import datetime, timedelta
+from tkinter import scrolledtext, ttk
+from typing import Any, Callable, Dict, List, Optional
 
 try:
     import matplotlib.pyplot as plt
+    import numpy as np
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
     from matplotlib.figure import Figure
-    import numpy as np
 
     MATPLOTLIB_AVAILABLE = True
 except ImportError:

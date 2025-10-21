@@ -31,8 +31,8 @@ The executor parses PILOT commands (identified by the colon syntax) and executes
 them using the main interpreter's facilities for output, input, variables, and graphics.
 """
 
-import re
 import random
+import re
 from tkinter import simpledialog
 
 
@@ -486,8 +486,8 @@ class TwPilotExecutor:
 
     def _handle_database_command(self, command):
         """Handle D: database commands"""
-        import sqlite3
         import os
+        import sqlite3
 
         cmd = command[2:].strip()
         parts = cmd.split(" ", 1)
@@ -663,8 +663,8 @@ class TwPilotExecutor:
 
     def _handle_datetime_command(self, command):
         """Handle DT: date/time commands"""
-        from datetime import datetime
         import time
+        from datetime import datetime
 
         cmd = command[3:].strip()  # Skip "DT:"
         parts = cmd.split(" ", 2)

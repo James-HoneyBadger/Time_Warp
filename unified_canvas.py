@@ -20,51 +20,59 @@ class Theme:
 
     @property
     def background(self) -> str:
-        return self.colors.get('background', '#000000')
+        return self.colors.get("background", "#000000")
 
     @property
     def foreground(self) -> str:
-        return self.colors.get('foreground', '#ffffff')
+        return self.colors.get("foreground", "#ffffff")
 
     @property
     def accent(self) -> str:
-        return self.colors.get('accent', '#00ff00')
+        return self.colors.get("accent", "#00ff00")
 
     @property
     def panel_bg(self) -> str:
-        return self.colors.get('panel_bg', '#333333')
+        return self.colors.get("panel_bg", "#333333")
 
     @property
     def panel_fg(self) -> str:
-        return self.colors.get('panel_fg', '#ffffff')
+        return self.colors.get("panel_fg", "#ffffff")
 
     @property
     def cursor_color(self) -> str:
-        return self.colors.get('cursor', '#ffffff')
+        return self.colors.get("cursor", "#ffffff")
 
     @property
     def selection_bg(self) -> str:
-        return self.colors.get('selection_bg', '#444444')
+        return self.colors.get("selection_bg", "#444444")
 
     @property
     def syntax_colors(self) -> Dict[str, str]:
-        return self.colors.get('syntax', {
-            'keyword': '#ff6b6b',
-            'string': '#4ecdc4',
-            'number': '#45b7d1',
-            'comment': '#7d8796',
-            'function': '#f9ca24',
-            'variable': '#6c5ce7'
-        })
+        return self.colors.get(
+            "syntax",
+            {
+                "keyword": "#ff6b6b",
+                "string": "#4ecdc4",
+                "number": "#45b7d1",
+                "comment": "#7d8796",
+                "function": "#f9ca24",
+                "variable": "#6c5ce7",
+            },
+        )
 
 
 class UnifiedCanvas(tk.Canvas):
-    def _append_text(self, text: str, color: Optional[Union[str, int]] = None, style: str = "normal"):
+    def _append_text(
+        self,
+        text: str,
+        color: Optional[Union[str, int]] = None,
+        style: str = "normal",
+    ):
         """Append text at the end of the canvas output buffer"""
         if isinstance(color, int):
             color = self._get_color_from_index(color)
 
-        lines = text.split('\n')
+        lines = text.split("\n")
         for i, line_text in enumerate(lines):
             if i > 0:
                 self.lines.append("")
@@ -80,19 +88,28 @@ class UnifiedCanvas(tk.Canvas):
 
             if color or style != "normal":
                 line_attrs = self.line_attributes[self.cursor_line]
-                if 'segments' not in line_attrs:
-                    line_attrs['segments'] = []
+                if "segments" not in line_attrs:
+                    line_attrs["segments"] = []
                 start_col = self.cursor_col
                 end_col = start_col + len(line_text)
-                line_attrs['segments'].append({
-                    'start': start_col,
-                    'end': end_col,
-                    'color': color or self.current_theme.foreground,
-                    'style': style
-                })
+                seg_color = color or self.current_theme.foreground
+                line_attrs["segments"].append(
+                    {
+                        "start": start_col,
+                        "end": end_col,
+                        "color": seg_color,
+                        "style": style,
+                    }
+                )
             self.cursor_col += len(line_text)
-    def write_text(self, text: str, color: Optional[Union[str, int]] = None,
-                   style: str = "normal", line: Optional[int] = None):
+
+    def write_text(
+        self,
+        text: str,
+        color: Optional[Union[str, int]] = None,
+        style: str = "normal",
+        line: Optional[int] = None,
+    ):
         """Write text to the canvas with advanced formatting (always append for output console)"""
         self._append_text(text, color, style)
         # Use a debounced redraw to avoid blocking the UI when many writes occur
@@ -101,6 +118,7 @@ class UnifiedCanvas(tk.Canvas):
         except Exception:
             # If scheduling fails, fallback to an immediate redraw
             self.redraw()
+
     """
     Modern unified canvas for Time Warp IDE with advanced features:
     - Dynamic theming support
@@ -111,15 +129,22 @@ class UnifiedCanvas(tk.Canvas):
     - Modern IDE features
     """
 
-    def __init__(self, parent, width: int = 1024, height: int = 768,
-                 font_family: str = "Consolas", font_size: int = 12,
-                 theme: Optional[Theme] = None, **kwargs):
+    def __init__(
+        self,
+        parent,
+        width: int = 1024,
+        height: int = 768,
+        font_family: str = "Consolas",
+        font_size: int = 12,
+        theme: Optional[Theme] = None,
+        **kwargs,
+    ):
         # Extract our custom parameters
-        self.rows = kwargs.pop('rows', 25)
-        self.cols = kwargs.pop('cols', 80)
-        
+        self.rows = kwargs.pop("rows", 25)
+        self.cols = kwargs.pop("cols", 80)
+
         super().__init__(parent, **kwargs)
-        print(f"[DEBUG] UnifiedCanvas initialized with size {width}x{height}")
+        # UnifiedCanvas initialized
 
         # Canvas dimensions
         self.canvas_width = width
@@ -195,7 +220,9 @@ class UnifiedCanvas(tk.Canvas):
                 return
             self._redraw_scheduled = True
             # Store after id so we can cancel if an immediate redraw is requested
-            self._redraw_after_id = self.after(delay, self._do_scheduled_redraw)
+            self._redraw_after_id = self.after(
+                delay, self._do_scheduled_redraw
+            )
         except Exception:
             # If scheduling fails for any reason, fallback to immediate redraw
             self.redraw()
@@ -226,32 +253,34 @@ class UnifiedCanvas(tk.Canvas):
         """Update font metrics when font changes"""
         self.char_width = self.font.measure("W")
         self.char_height = self.font.metrics("linespace")
-        visible_width = (
-            self.canvas_width -
-            (self.line_number_width if self.show_line_numbers else 0)
+        visible_width = self.canvas_width - (
+            self.line_number_width if self.show_line_numbers else 0
         )
         self.cols = max(1, visible_width // self.char_width)
         self.rows = max(1, self.canvas_height // self.char_height)
 
     def _create_default_theme(self) -> Theme:
         """Create the default dark theme"""
-        return Theme("Time Warp Dark", {
-            'background': '#1a1a1a',
-            'foreground': '#ffffff',
-            'accent': '#00ff88',
-            'panel_bg': '#2d2d2d',
-            'panel_fg': '#ffffff',
-            'cursor': '#ffffff',
-            'selection_bg': '#404040',
-            'syntax': {
-                'keyword': '#ff6b6b',
-                'string': '#4ecdc4',
-                'number': '#45b7d1',
-                'comment': '#7d8796',
-                'function': '#f9ca24',
-                'variable': '#6c5ce7'
-            }
-        })
+        return Theme(
+            "Time Warp Dark",
+            {
+                "background": "#1a1a1a",
+                "foreground": "#ffffff",
+                "accent": "#00ff88",
+                "panel_bg": "#2d2d2d",
+                "panel_fg": "#ffffff",
+                "cursor": "#ffffff",
+                "selection_bg": "#404040",
+                "syntax": {
+                    "keyword": "#ff6b6b",
+                    "string": "#4ecdc4",
+                    "number": "#45b7d1",
+                    "comment": "#7d8796",
+                    "function": "#f9ca24",
+                    "variable": "#6c5ce7",
+                },
+            },
+        )
 
     def apply_theme(self, theme: Theme):
         """Apply a theme to the canvas"""
@@ -304,9 +333,14 @@ class UnifiedCanvas(tk.Canvas):
         # Don't clear graphics_objects here - we'll recreate them
 
         # Draw background
-        self.create_rectangle(0, 0, self.canvas_width, self.canvas_height,
-                              fill=self.current_theme.background,
-                              outline="")
+        self.create_rectangle(
+            0,
+            0,
+            self.canvas_width,
+            self.canvas_height,
+            fill=self.current_theme.background,
+            outline="",
+        )
 
         x_offset = self.line_number_width if self.show_line_numbers else 0
 
@@ -315,8 +349,14 @@ class UnifiedCanvas(tk.Canvas):
             y = line_num * self.char_height
             if self.show_line_numbers:
                 line_num_text = f"{line_num + 1:4d} "
-                self.create_text(5, y, text=line_num_text, font=self.font,
-                               fill=self.current_theme.panel_fg, anchor="nw")
+                self.create_text(
+                    5,
+                    y,
+                    text=line_num_text,
+                    font=self.font,
+                    fill=self.current_theme.panel_fg,
+                    anchor="nw",
+                )
             self._draw_line_text(line_text, x_offset, y, line_num)
 
         # Do NOT draw cursor or input prompt
@@ -325,13 +365,11 @@ class UnifiedCanvas(tk.Canvas):
         self._redraw_graphics()
 
     def _insert_text_at_line(
-
-        self, text: str, line_num: int,
-
+        self,
+        text: str,
+        line_num: int,
         color: Optional[Union[str, int]] = None,
-
-        style: str = "normal"
-
+        style: str = "normal",
     ):
         """Insert text at specific line"""
         while len(self.lines) <= line_num:
@@ -344,21 +382,35 @@ class UnifiedCanvas(tk.Canvas):
         self.lines[line_num] = text
         if color or style != "normal":
             self.line_attributes[line_num] = {
-                'segments': [{
-                    'start': 0,
-                    'end': len(text),
-                    'color': color or self.current_theme.foreground,
-                    'style': style
-                }]
+                "segments": [
+                    {
+                        "start": 0,
+                        "end": len(text),
+                        "color": color or self.current_theme.foreground,
+                        "style": style,
+                    }
+                ]
             }
 
     def _get_color_from_index(self, index: int) -> str:
         """Convert color index to actual color"""
         palette = [
-            "#000000", "#000080", "#008000", "#008080", "#800000",
-            "#800080", "#808000", "#c0c0c0", "#808080", "#0000ff",
-            "#00ff00", "#00ffff", "#ff0000", "#ff00ff", "#ffff00",
-            "#ffffff"
+            "#000000",
+            "#000080",
+            "#008000",
+            "#008080",
+            "#800000",
+            "#800080",
+            "#808000",
+            "#c0c0c0",
+            "#808080",
+            "#0000ff",
+            "#00ff00",
+            "#00ffff",
+            "#ff0000",
+            "#ff00ff",
+            "#ffff00",
+            "#ffffff",
         ]
         if 0 <= index < len(palette):
             return palette[index]
@@ -368,46 +420,86 @@ class UnifiedCanvas(tk.Canvas):
         """Recreate all graphics objects"""
         self.graphics_objects.clear()
         for cmd in self.graphics_commands:
-            if cmd['type'] == 'line':
-                obj_id = self.create_line(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
-                                        fill=cmd['color'], width=cmd['width'], **cmd.get('kwargs', {}))
-            elif cmd['type'] == 'rectangle':
-                obj_id = self.create_rectangle(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
-                                             outline=cmd['color'], fill=cmd['fill_color'],
-                                             width=cmd['width'], **cmd.get('kwargs', {}))
-            elif cmd['type'] == 'circle':
-                obj_id = self.create_oval(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
-                                        outline=cmd['color'], fill=cmd['fill_color'],
-                                        width=cmd['width'], **cmd.get('kwargs', {}))
-            elif cmd['type'] == 'text':
-                obj_id = self.create_text(cmd['x'], cmd['y'], text=cmd['text'],
-                                        fill=cmd['color'], font=self.font, **cmd.get('kwargs', {}))
-            elif cmd['type'] == 'polygon':
-                obj_id = self.create_polygon(cmd['points'], outline=cmd['color'], fill=cmd['fill_color'],
-                                           width=cmd['width'], **cmd.get('kwargs', {}))
+            if cmd["type"] == "line":
+                obj_id = self.create_line(
+                    cmd["x1"],
+                    cmd["y1"],
+                    cmd["x2"],
+                    cmd["y2"],
+                    fill=cmd["color"],
+                    width=cmd["width"],
+                    **cmd.get("kwargs", {}),
+                )
+            elif cmd["type"] == "rectangle":
+                obj_id = self.create_rectangle(
+                    cmd["x1"],
+                    cmd["y1"],
+                    cmd["x2"],
+                    cmd["y2"],
+                    outline=cmd["color"],
+                    fill=cmd["fill_color"],
+                    width=cmd["width"],
+                    **cmd.get("kwargs", {}),
+                )
+            elif cmd["type"] == "circle":
+                obj_id = self.create_oval(
+                    cmd["x1"],
+                    cmd["y1"],
+                    cmd["x2"],
+                    cmd["y2"],
+                    outline=cmd["color"],
+                    fill=cmd["fill_color"],
+                    width=cmd["width"],
+                    **cmd.get("kwargs", {}),
+                )
+            elif cmd["type"] == "text":
+                obj_id = self.create_text(
+                    cmd["x"],
+                    cmd["y"],
+                    text=cmd["text"],
+                    fill=cmd["color"],
+                    font=self.font,
+                    **cmd.get("kwargs", {}),
+                )
+            elif cmd["type"] == "polygon":
+                obj_id = self.create_polygon(
+                    cmd["points"],
+                    outline=cmd["color"],
+                    fill=cmd["fill_color"],
+                    width=cmd["width"],
+                    **cmd.get("kwargs", {}),
+                )
             self.graphics_objects.append(obj_id)
 
-    def _draw_line_text(self, text: str, x_offset: int, y: int,
-                       line_num: int):
+    def _draw_line_text(self, text: str, x_offset: int, y: int, line_num: int):
         """Draw a single line of text with formatting"""
-        attrs = (self.line_attributes[line_num]
-                if line_num < len(self.line_attributes) else {})
+        attrs = (
+            self.line_attributes[line_num]
+            if line_num < len(self.line_attributes)
+            else {}
+        )
 
-        if 'segments' in attrs and attrs['segments']:
-            for segment in attrs['segments']:
-                start = segment['start']
-                end = min(segment['end'], len(text))
+        if "segments" in attrs and attrs["segments"]:
+            for segment in attrs["segments"]:
+                start = segment["start"]
+                end = min(segment["end"], len(text))
                 if start < end:
                     segment_text = text[start:end]
                     x = x_offset + start * self.char_width
-                    color = segment.get('color',
-                                       self.current_theme.foreground)
-                    self.create_text(x, y, text=segment_text, font=self.font,
-                                   fill=color, anchor="nw")
+                    color = segment.get("color", self.current_theme.foreground)
+                    self.create_text(
+                        x,
+                        y,
+                        text=segment_text,
+                        font=self.font,
+                        fill=color,
+                        anchor="nw",
+                    )
         else:
-            color = attrs.get('color', self.current_theme.foreground)
-            self.create_text(x_offset, y, text=text, font=self.font,
-                           fill=color, anchor="nw")
+            color = attrs.get("color", self.current_theme.foreground)
+            self.create_text(
+                x_offset, y, text=text, font=self.font, fill=color, anchor="nw"
+            )
 
     def prompt_input(self, prompt: str = "", callback=None):
         """Set up input prompt in the output console"""
@@ -507,7 +599,9 @@ class UnifiedCanvas(tk.Canvas):
         """Insert text at cursor position in text editor mode"""
         if self.cursor_line >= len(self.lines):
             self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
-            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+            self.line_attributes.extend(
+                [{}] * (self.cursor_line - len(self.line_attributes) + 1)
+            )
 
         current_line = self.lines[self.cursor_line]
         before = current_line[:self.cursor_col]
@@ -520,7 +614,9 @@ class UnifiedCanvas(tk.Canvas):
         """Insert a newline at cursor position"""
         if self.cursor_line >= len(self.lines):
             self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
-            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+            self.line_attributes.extend(
+                [{}] * (self.cursor_line - len(self.line_attributes) + 1)
+            )
 
         current_line = self.lines[self.cursor_line]
         before = current_line[:self.cursor_col]
@@ -543,7 +639,10 @@ class UnifiedCanvas(tk.Canvas):
         if forward:
             # Delete character after cursor
             if self.cursor_col < len(current_line):
-                self.lines[self.cursor_line] = current_line[:self.cursor_col] + current_line[self.cursor_col + 1:]
+                self.lines[self.cursor_line] = (
+                    current_line[: self.cursor_col]
+                    + current_line[self.cursor_col + 1:]
+                )
             elif self.cursor_line < len(self.lines) - 1:
                 # Join with next line
                 next_line = self.lines[self.cursor_line + 1]
@@ -553,7 +652,10 @@ class UnifiedCanvas(tk.Canvas):
         else:
             # Delete character before cursor
             if self.cursor_col > 0:
-                self.lines[self.cursor_line] = current_line[:self.cursor_col - 1] + current_line[self.cursor_col:]
+                self.lines[self.cursor_line] = (
+                    current_line[: self.cursor_col - 1]
+                    + current_line[self.cursor_col:]
+                )
                 self.cursor_col -= 1
             elif self.cursor_line > 0:
                 # Join with previous line
@@ -580,14 +682,18 @@ class UnifiedCanvas(tk.Canvas):
         """Move cursor up"""
         if self.cursor_line > 0:
             self.cursor_line -= 1
-            self.cursor_col = min(self.cursor_col, len(self.lines[self.cursor_line]))
+            self.cursor_col = min(
+                self.cursor_col, len(self.lines[self.cursor_line])
+            )
         self.redraw()
 
     def _move_cursor_down(self):
         """Move cursor down"""
         if self.cursor_line < len(self.lines) - 1:
             self.cursor_line += 1
-            self.cursor_col = min(self.cursor_col, len(self.lines[self.cursor_line]))
+            self.cursor_col = min(
+                self.cursor_col, len(self.lines[self.cursor_line])
+            )
         self.redraw()
 
     def _on_mouse_click(self, event):
@@ -595,8 +701,8 @@ class UnifiedCanvas(tk.Canvas):
         x_offset = self.line_number_width if self.show_line_numbers else 0
 
         # safe char width/height
-        cw = getattr(self, 'char_width', 1) or 1
-        ch = getattr(self, 'char_height', 1) or 1
+        cw = getattr(self, "char_width", 1) or 1
+        ch = getattr(self, "char_height", 1) or 1
 
         # compute column and line indices
         raw_x = event.x - x_offset
@@ -653,18 +759,34 @@ class UnifiedCanvas(tk.Canvas):
         self.redraw()
 
     # Graphics methods (enhanced)
-    def draw_line(self, x1: float, y1: float, x2: float, y2: float,
-                  color: Optional[str] = None, width: int = 1, **kwargs):
+    def draw_line(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        color: Optional[str] = None,
+        width: int = 1,
+        **kwargs,
+    ):
         """Draw a line"""
         color = color or self.current_theme.accent
-        line_id = self.create_line(x1, y1, x2, y2, fill=color,
-                                 width=width, **kwargs)
+        line_id = self.create_line(
+            x1, y1, x2, y2, fill=color, width=width, **kwargs
+        )
         self.graphics_objects.append(line_id)
-        self.graphics_commands.append({
-            'type': 'line',
-            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
-            'color': color, 'width': width, 'kwargs': kwargs
-        })
+        self.graphics_commands.append(
+            {
+                "type": "line",
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
+                "color": color,
+                "width": width,
+                "kwargs": kwargs,
+            }
+        )
         return line_id
 
     def draw_rectangle(
@@ -682,7 +804,14 @@ class UnifiedCanvas(tk.Canvas):
         color = color or self.current_theme.accent
         fill_color = color if filled else ""
         rect_id = self.create_rectangle(
-            x1, y1, x2, y2, outline=color, fill=fill_color, width=width, **kwargs
+            x1,
+            y1,
+            x2,
+            y2,
+            outline=color,
+            fill=fill_color,
+            width=width,
+            **kwargs,
         )
         self.graphics_objects.append(rect_id)
         self.graphics_commands.append(
@@ -718,8 +847,14 @@ class UnifiedCanvas(tk.Canvas):
         y2 = center_y + radius
         fill_color = color if filled else ""
         circle_id = self.create_oval(
-            x1, y1, x2, y2,
-            outline=color, fill=fill_color, width=width, **kwargs
+            x1,
+            y1,
+            x2,
+            y2,
+            outline=color,
+            fill=fill_color,
+            width=width,
+            **kwargs,
         )
         self.graphics_objects.append(circle_id)
         self.graphics_commands.append(
@@ -744,8 +879,7 @@ class UnifiedCanvas(tk.Canvas):
         color = color or self.current_theme.accent
         fill_color = color if filled else ""
         polygon_id = self.create_polygon(
-            points,
-            outline=color, fill=fill_color, width=width, **kwargs
+            points, outline=color, fill=fill_color, width=width, **kwargs
         )
         self.graphics_objects.append(polygon_id)
         self.graphics_commands.append(
@@ -761,7 +895,12 @@ class UnifiedCanvas(tk.Canvas):
         return polygon_id
 
     def draw_text(
-        self, x: float, y: float, text: str, color: Optional[str] = None, **kwargs
+        self,
+        x: float,
+        y: float,
+        text: str,
+        color: Optional[str] = None,
+        **kwargs,
     ):
         """Draw text at graphics coordinates"""
         color = color or self.current_theme.foreground
@@ -806,15 +945,29 @@ class UnifiedCanvas(tk.Canvas):
             "theme": self.current_theme.name,
             "font_family": self.font_family,
             "font_size": self.font_size,
-            "type": "modern_unified"
+            "type": "modern_unified",
         }
 
     def get_palette(self):
         """Get color palette (legacy compatibility)"""
-        return ["#000000", "#000080", "#008000", "#008080", "#800000",
-                "#800080", "#808000", "#c0c0c0", "#808080", "#0000ff",
-                "#00ff00", "#00ffff", "#ff0000", "#ff00ff", "#ffff00",
-                "#ffffff"]
+        return [
+            "#000000",
+            "#000080",
+            "#008000",
+            "#008080",
+            "#800000",
+            "#800080",
+            "#808000",
+            "#c0c0c0",
+            "#808080",
+            "#0000ff",
+            "#00ff00",
+            "#00ffff",
+            "#ff0000",
+            "#ff00ff",
+            "#ffff00",
+            "#ffffff",
+        ]
 
     def set_screen_mode(self, mode):
         """Legacy screen mode setting (no-op)"""

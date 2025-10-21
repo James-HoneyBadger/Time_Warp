@@ -7,9 +7,9 @@ Perl is a high-level, general-purpose, interpreted, dynamic programming language
 This module handles Perl script execution for the Time_Warp IDE.
 """
 
+import os
 import subprocess
 import sys
-import os
 import tempfile
 
 

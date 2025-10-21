@@ -4,11 +4,11 @@ File Explorer Panel for Time_Warp IDE
 Tree-view file navigation with project support
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
+import tkinter as tk
 from pathlib import Path
-from typing import Dict, List, Optional, Callable, Union
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from typing import Callable, Dict, List, Optional, Union
 
 
 class FileExplorer:

@@ -27,11 +27,11 @@ Usage:
 """
 
 import os
+import platform
+import shutil
 import subprocess
 import tempfile
-import shutil
 from pathlib import Path
-import platform
 
 
 class Time_WarpCompiler:

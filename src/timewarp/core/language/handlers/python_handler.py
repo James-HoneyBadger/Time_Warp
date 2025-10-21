@@ -5,7 +5,8 @@ Handles execution of Python code blocks within Time_Warp programs
 
 import sys
 import traceback
-from typing import Dict, Any, Optional, Callable, List
+from typing import Any, Callable, Dict, List, Optional
+
 from ..parser import PythonBlockNode
 
 

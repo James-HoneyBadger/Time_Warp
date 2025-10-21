@@ -4,13 +4,13 @@ Sensor Visualizer Plugin for Time_Warp IDE
 Comprehensive sensor data visualization with real-time charts, data logging, and analysis capabilities
 """
 
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, filedialog
+import os
 import random
 import sys
-import os
+import tkinter as tk
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional
+from tkinter import filedialog, messagebox, scrolledtext, ttk
+from typing import Any, Dict, List, Optional
 
 # Import the base framework
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

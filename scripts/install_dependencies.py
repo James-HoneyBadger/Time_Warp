@@ -4,9 +4,9 @@ Time_Warp IDE Dependency Installer
 Installs all required and optional dependencies for Time_Warp IDE
 """
 
+import os
 import subprocess
 import sys
-import os
 
 
 def install_package(package):

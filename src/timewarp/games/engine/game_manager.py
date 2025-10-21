@@ -3,9 +3,9 @@ Game Manager for Time_Warp Game Engine
 Main game management system with game loop and object management.
 """
 
-from .physics import PhysicsEngine
-from .game_renderer import GameRenderer
 from .game_objects import GameObject, Vector2D
+from .game_renderer import GameRenderer
+from .physics import PhysicsEngine
 
 
 class GameManager:

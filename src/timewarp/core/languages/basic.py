@@ -19,10 +19,10 @@ This module handles TW BASIC command execution including:
 - Comments (REM)
 """
 
-import re
-import time
 import math
 import random
+import re
+import time
 
 
 class TwBasicExecutor:
@@ -38,8 +38,9 @@ class TwBasicExecutor:
     def _init_pygame_graphics(self, width, height, title):
         """Initialize pygame graphics for standalone mode"""
         try:
-            import pygame
             import os
+
+            import pygame
 
             # Check if display is available
             display = os.environ.get("DISPLAY")

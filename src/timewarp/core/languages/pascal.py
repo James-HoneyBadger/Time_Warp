@@ -16,9 +16,9 @@ This module handles TW Pascal command execution including:
 - File I/O operations
 """
 
-import re
 import math
 import random
+import re
 import time
 
 

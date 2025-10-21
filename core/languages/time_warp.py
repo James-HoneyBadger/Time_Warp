@@ -52,9 +52,9 @@ The unified language maintains backward compatibility with existing BASIC, PILOT
 and Logo programs while providing a modern, consistent syntax for new programs.
 """
 
-import re
 import math
 import random
+import re
 import time
 from datetime import datetime
 
@@ -615,8 +615,8 @@ class TwTimeWarpExecutor:
 
     def _handle_database_command(self, command):
         """Handle D: database commands"""
-        import sqlite3
         import os
+        import sqlite3
 
         cmd = command[2:].strip()
         parts = cmd.split(" ", 1)
@@ -706,8 +706,8 @@ class TwTimeWarpExecutor:
 
     def _handle_datetime_command(self, command):
         """Handle DT: date/time commands"""
-        from datetime import datetime
         import time
+        from datetime import datetime
 
         cmd = command[3:].strip()
         parts = cmd.split(" ", 2)

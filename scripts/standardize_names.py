@@ -4,10 +4,11 @@ Time_Warp IDE Standardization Script
 Replaces all occurrences of 'Time_Warp' and 'time_warp' with 'Time_Warp'
 """
 
+import glob
 import os
 import re
-import glob
 from pathlib import Path
+
 
 def update_file_content(filepath, replacements):
     """Update file content with the given replacements"""

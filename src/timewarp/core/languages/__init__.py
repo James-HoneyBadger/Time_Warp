@@ -14,15 +14,15 @@ Contains implementations for supported programming languages:
 - JavaScript script executor
 """
 
-from .pilot import TwPilotExecutor
 from .basic import TwBasicExecutor
+from .forth import TwForthExecutor
+from .javascript_executor import JavaScriptExecutor
 from .logo import TwLogoExecutor
 from .pascal import TwPascalExecutor
-from .prolog import TwPrologExecutor
-from .forth import TwForthExecutor
 from .perl import PerlExecutor
+from .pilot import TwPilotExecutor
+from .prolog import TwPrologExecutor
 from .python_executor import PythonExecutor
-from .javascript_executor import JavaScriptExecutor
 
 __all__ = [
     "TwPilotExecutor",

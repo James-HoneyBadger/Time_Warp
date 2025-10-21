@@ -4,7 +4,8 @@ Implements PILOT-style text processing and pattern matching
 """
 
 import re
-from typing import Dict, List, Any, Optional, Callable
+from typing import Any, Callable, Dict, List, Optional
+
 from ..parser import PilotCommandNode
 
 

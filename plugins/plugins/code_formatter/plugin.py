@@ -3,10 +3,10 @@ Code Formatter Plugin for Time_Warp IDE
 Provides automatic code formatting and beautification
 """
 
+import os
+import sys
 import tkinter as tk
 from tkinter import messagebox
-import sys
-import os
 
 # Add the parent directory to path to import the base plugin class
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))

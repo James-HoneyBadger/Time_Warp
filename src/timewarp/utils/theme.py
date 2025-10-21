@@ -4,10 +4,10 @@ Handles saving and loading of UI theme preferences across time
 """
 
 import json
-import tkinter as tk
-from pathlib import Path
 import os
+import tkinter as tk
 from datetime import datetime
+from pathlib import Path
 
 
 def get_config_dir():

@@ -5,12 +5,12 @@ Handles virtual environment setup, dependency installation, and environment vali
 Runs automatically at startup to ensure all requirements are met
 """
 
-import os
-import sys
-import subprocess
 import importlib.util
-import platform
 import json
+import os
+import platform
+import subprocess
+import sys
 from pathlib import Path
 
 

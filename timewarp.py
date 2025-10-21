@@ -6,8 +6,8 @@ Educational programming environment supporting multiple languages
 with integrated turtle graphics and comprehensive learning tools.
 """
 
-import sys
 import os
+import sys
 
 # Add src to path for development
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))

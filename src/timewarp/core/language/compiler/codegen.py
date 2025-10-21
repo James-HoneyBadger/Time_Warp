@@ -3,25 +3,14 @@ Time_Warp IDE Code Generator
 Generates executable code from AST
 """
 
-from typing import List, Dict, Any, Optional, Callable
-from .parser import (
-    ASTNode,
-    ASTNodeType,
-    LiteralNode,
-    IdentifierNode,
-    BinaryOpNode,
-    UnaryOpNode,
-    FunctionCallNode,
-    AssignmentNode,
-    ProgramNode,
-)
-from ..runtime.engine import RuntimeEngine, ExecutionContext
-from ..errors.error_manager import (
-    TimeWarpError,
-    TimeWarpRuntimeError,
-    ErrorCode,
-    ErrorSeverity,
-)
+from typing import Any, Callable, Dict, List, Optional
+
+from ..errors.error_manager import (ErrorCode, ErrorSeverity, TimeWarpError,
+                                    TimeWarpRuntimeError)
+from ..runtime.engine import ExecutionContext, RuntimeEngine
+from .parser import (AssignmentNode, ASTNode, ASTNodeType, BinaryOpNode,
+                     FunctionCallNode, IdentifierNode, LiteralNode,
+                     ProgramNode, UnaryOpNode)
 
 
 class CodeGenerator:

@@ -6,8 +6,8 @@ Provides language-specific editing features for Time_Warp IDE
 import re
 import tkinter as tk
 from abc import ABC, abstractmethod
-from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass

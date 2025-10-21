@@ -4,8 +4,8 @@ Tokenizes Time_Warp IDE source code for parsing
 """
 
 import re
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Optional, Union
 
 

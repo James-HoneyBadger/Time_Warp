@@ -3,9 +3,10 @@ Time_Warp IDE Plugin Registry
 Central registry for managing loaded plugins
 """
 
-from typing import Dict, List, Optional, Set, Any
-from .base import PluginInterface, PluginType, PluginMetadata
-from ..errors.error_manager import TimeWarpError, ErrorCode, ErrorSeverity
+from typing import Any, Dict, List, Optional, Set
+
+from ..errors.error_manager import ErrorCode, ErrorSeverity, TimeWarpError
+from .base import PluginInterface, PluginMetadata, PluginType
 
 
 class PluginRegistry:

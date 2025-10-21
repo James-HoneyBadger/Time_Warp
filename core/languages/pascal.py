@@ -22,9 +22,9 @@ The executor provides a simplified Pascal-like syntax suitable for educational
 purposes, with structured programming constructs and basic I/O capabilities.
 """
 
-import re
 import math
 import random
+import re
 import time
 
 

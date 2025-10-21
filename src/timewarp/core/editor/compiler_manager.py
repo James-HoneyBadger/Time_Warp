@@ -4,14 +4,14 @@ Handles compilation of different languages and execution of compiled programs
 """
 
 import os
+import shutil
 import subprocess
+import tempfile
 import threading
 import tkinter as tk
-from tkinter import messagebox, filedialog
-from typing import Dict, List, Optional, Callable, Any
 from pathlib import Path
-import tempfile
-import shutil
+from tkinter import filedialog, messagebox
+from typing import Any, Callable, Dict, List, Optional
 
 
 class CompilerResult:

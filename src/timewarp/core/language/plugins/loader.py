@@ -3,17 +3,17 @@ Time_Warp IDE Plugin Loader
 Dynamic plugin loading from files and directories
 """
 
-import os
-import sys
 import importlib
 import importlib.util
-from types import ModuleType
-from typing import List, Dict, Any, Optional, Type
+import os
+import sys
 import traceback
+from types import ModuleType
+from typing import Any, Dict, List, Optional, Type
 
+from ..errors.error_manager import ErrorCode, ErrorSeverity, TimeWarpError
 from .base import PluginInterface, PluginMetadata, PluginType
 from .registry import PluginRegistry
-from ..errors.error_manager import TimeWarpError, ErrorCode, ErrorSeverity
 
 
 class PluginLoader:

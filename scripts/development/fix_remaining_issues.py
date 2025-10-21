@@ -6,8 +6,9 @@ Comprehensive fixes for Time_Warp IDE issues:
 3. File type indicator not updating correctly
 """
 
-import sys
 import os
+import sys
+
 sys.path.append('/home/james/Time_Warp')
 
 def fix_theme_application():

@@ -4,14 +4,14 @@ Performance Optimizer Module for Time_Warp IDE
 Provides optimizations for memory usage, output handling, and system performance.
 """
 
-import sys
 import gc
 import re
-import time
+import sys
 import threading
-from collections import deque
-from typing import Dict, List, Any
+import time
 import weakref
+from collections import deque
+from typing import Any, Dict, List
 
 
 class OutputBuffer:

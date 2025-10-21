@@ -6,10 +6,11 @@ Fallback test with minimal dependencies for GitHub Actions
 
 # Set pygame environment variable to suppress AVX2 warning
 import os
+
 os.environ['PYGAME_DETECT_AVX2'] = '1'
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to Python path
@@ -29,8 +30,8 @@ def test_core_imports():
 
         # Test basic Python modules
         import json
-        import threading
         import subprocess
+        import threading
 
         print("✅ Basic Python modules imported")
 

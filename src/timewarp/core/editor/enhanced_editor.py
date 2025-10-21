@@ -3,17 +3,18 @@ Enhanced Code Editor for Time_Warp IDE
 Integrates language-specific features with the existing editor
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox
-from typing import Dict, List, Optional, Callable, Any
 import os
 import tempfile
+import tkinter as tk
+from tkinter import messagebox, ttk
+from typing import Any, Callable, Dict, List, Optional
 
-from .language_engine import LanguageEngine
-from .code_formatter import CodeFormatter
-from .syntax_analyzer import SyntaxAnalyzer, SyntaxError as EditorSyntaxError
 from .code_completion import CodeCompletionEngine
+from .code_formatter import CodeFormatter
 from .compiler_manager import CompilerManager
+from .language_engine import LanguageEngine
+from .syntax_analyzer import SyntaxAnalyzer
+from .syntax_analyzer import SyntaxError as EditorSyntaxError
 
 
 class EnhancedCodeEditor:

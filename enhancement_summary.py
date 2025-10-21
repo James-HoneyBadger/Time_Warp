@@ -23,8 +23,9 @@ TW Languages Maintained:
 - PILOT, BASIC, Logo, Prolog: Comprehensive educational implementations preserved
 """
 
-import sys
 import os
+import sys
+
 
 def print_summary():
     """Print comprehensive enhancement summary"""
