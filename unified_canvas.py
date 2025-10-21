@@ -95,7 +95,12 @@ class UnifiedCanvas(tk.Canvas):
                    style: str = "normal", line: Optional[int] = None):
         """Write text to the canvas with advanced formatting (always append for output console)"""
         self._append_text(text, color, style)
-        self.redraw()
+        # Use a debounced redraw to avoid blocking the UI when many writes occur
+        try:
+            self.schedule_redraw()
+        except Exception:
+            # If scheduling fails, fallback to an immediate redraw
+            self.redraw()
     """
     Modern unified canvas for Time Warp IDE with advanced features:
     - Dynamic theming support
@@ -157,6 +162,9 @@ class UnifiedCanvas(tk.Canvas):
         self.cursor_visible = True
         self.cursor_blink_timer = None
         self.start_cursor_blink()
+        # Redraw scheduling (debounce to avoid UI freezes on many small writes)
+        self._redraw_scheduled = False
+        self._redraw_after_id = None
 
     def start_cursor_blink(self):
         """Start the cursor blinking timer"""
@@ -173,8 +181,46 @@ class UnifiedCanvas(tk.Canvas):
     def _blink_cursor(self):
         """Toggle cursor visibility and schedule next blink"""
         self.cursor_visible = not self.cursor_visible
-        self.redraw()
+        # Cursor blink can be handled by a scheduled redraw to avoid immediate heavy redraws
+        self.schedule_redraw()
         self.cursor_blink_timer = self.after(500, self._blink_cursor)
+
+    def schedule_redraw(self, delay: int = 50):
+        """Schedule a debounced redraw on the Tk mainloop.
+
+        Multiple calls within `delay` ms will coalesce into a single redraw.
+        """
+        try:
+            if self._redraw_scheduled:
+                return
+            self._redraw_scheduled = True
+            # Store after id so we can cancel if an immediate redraw is requested
+            self._redraw_after_id = self.after(delay, self._do_scheduled_redraw)
+        except Exception:
+            # If scheduling fails for any reason, fallback to immediate redraw
+            self.redraw()
+
+    def _do_scheduled_redraw(self):
+        """Internal handler invoked by Tk after the debounce period."""
+        self._redraw_scheduled = False
+        self._redraw_after_id = None
+        # Perform the visual update
+        self.redraw()
+
+    def cancel_scheduled_redraw(self):
+        """Cancel a pending scheduled redraw, if any."""
+        if self._redraw_after_id:
+            try:
+                self.after_cancel(self._redraw_after_id)
+            except Exception:
+                pass
+        self._redraw_scheduled = False
+        self._redraw_after_id = None
+
+    def redraw_immediate(self):
+        """Cancel any scheduled redraw and perform an immediate redraw."""
+        self.cancel_scheduled_redraw()
+        self.redraw()
 
     def update_font_metrics(self):
         """Update font metrics when font changes"""

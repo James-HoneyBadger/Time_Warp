@@ -1,25 +1,39 @@
 # --- UnifiedCanvasOutputHandler: Compatibility layer for interpreter output ---
 class UnifiedCanvasOutputHandler:
+    """Thread-safe wrapper that schedules writes to the UnifiedCanvas on the Tk mainloop."""
     def __init__(self, unified_canvas):
         self.unified_canvas = unified_canvas
 
     def insert(self, position, text):
-        # Convert text output to unified canvas text rendering
-        # Command output should always start on a new line by default
+        # Schedule writes on the canvas via its event loop to remain thread-safe
+        try:
+            self.unified_canvas.after(0, lambda: self._do_insert(position, text))
+        except Exception:
+            # Fallback: direct write (best-effort)
+            try:
+                self.unified_canvas.write_text(text)
+            except Exception:
+                print(text)
+
+    def _do_insert(self, position, text):
         import tkinter as tk
         if position == "end" or position == tk.END:
             # Always start command output on a new line
             self.unified_canvas.write_text("\n")
             self.unified_canvas.write_text(text)
-            # Force canvas update
-            self.unified_canvas.update_idletasks()
+            try:
+                self.unified_canvas.update_idletasks()
+            except Exception:
+                pass
         else:
-            # For other positions, just append for now
             self.unified_canvas.write_text(text)
-            self.unified_canvas.update_idletasks()
+            try:
+                self.unified_canvas.update_idletasks()
+            except Exception:
+                pass
 
     def see(self, position):
-        # Unified canvas doesn't need scrolling, but we can implement if needed
+        # Unified canvas doesn't need scrolling, but could be implemented
         pass
 
     def request_input(self, prompt, input_type=str):
@@ -182,6 +196,7 @@ import platform
 from unified_canvas import UnifiedCanvas, Theme
 from core.languages import TwBasicInterpreter, TwPascalInterpreter, TwPrologInterpreter
 import threading
+import queue
 
 
 # Import advanced editor features
@@ -1050,21 +1065,31 @@ Full reporting functionality to be implemented."""
                 t = threading.Thread(target=_target, daemon=True)
                 t.start()
 
+            # Cancel welcome screen if still pending to avoid races with program output
+            try:
+                if hasattr(self, '_welcome_after_id') and self._welcome_after_id:
+                    try:
+                        self.root.after_cancel(self._welcome_after_id)
+                    except Exception:
+                        pass
+                    self._welcome_after_id = None
+            except Exception:
+                pass
+
             if self.current_language == "tw_basic":
                 # Set up graphics integration
                 self.tw_basic.ide_unified_canvas = self.unified_canvas
                 self.tw_basic.ide_turtle_canvas = self.unified_canvas
-                # Wrap output callback to ensure it is safe and visible in the UI
+                # Enqueue outputs so the UI poller flushes them on the main thread
                 def _tw_basic_callback(text):
                     try:
-                        print(f"[UI] Received basic output callback: {text}")
+                        # Put (text, color) to queue
+                        self._ui_output_queue.put((str(text) + "\n", 10))
                     except Exception:
-                        pass
-                    try:
-                        # Ensure writes happen on the Tk main thread
-                        self.root.after(0, lambda: self.unified_canvas.write_text(str(text) + "\n", color=10))
-                    except Exception as e:
-                        print(f"[UI] Error scheduling unified_canvas write: {e}")
+                        try:
+                            self._ui_output_queue.put(str(text) + "\n")
+                        except Exception:
+                            pass
 
                 self.tw_basic.set_output_callback(_tw_basic_callback)
                 # Run interpreter execution off the Tk main thread
@@ -1073,13 +1098,13 @@ Full reporting functionality to be implemented."""
                 # Set up graphics integration
                 self.pascal.ide_unified_canvas = self.unified_canvas
                 self.pascal.ide_turtle_canvas = self.unified_canvas
-                self.pascal.set_output_callback(lambda text: self.root.after(0, lambda: self.unified_canvas.write_text(str(text)+"\n", color=10)))
+                self.pascal.set_output_callback(lambda text: self._ui_output_queue.put((str(text)+"\n", 10)))
                 _run_in_thread(self.pascal.execute_command, code)
             elif self.current_language == "prolog":
                 # Set up graphics integration
                 self.prolog.ide_unified_canvas = self.unified_canvas
                 self.prolog.ide_turtle_canvas = self.unified_canvas
-                self.prolog.set_output_callback(lambda text: self.root.after(0, lambda: self.unified_canvas.write_text(str(text)+"\n", color=10)))
+                self.prolog.set_output_callback(lambda text: self._ui_output_queue.put((str(text)+"\n", 10)))
                 _run_in_thread(self.prolog.execute_command, code)
             self.unified_canvas.redraw()
             self.status_label.config(text="🚀 Program executed.")
@@ -1693,9 +1718,39 @@ Features:
         self.prolog.ide_unified_canvas = self.unified_canvas
 
         # Set output widget reference for interpreter logging
+        # Use thread-safe UnifiedCanvasOutputHandler which schedules writes via after()
         self.tw_basic.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
         self.pascal.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
         self.prolog.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
+
+        # Create a UI output queue and a poller to flush outputs from background threads
+        self._ui_output_queue = queue.Queue()
+
+        def _flush_ui_queue():
+            try:
+                while True:
+                    item = self._ui_output_queue.get_nowait()
+                    try:
+                        # item is (text, color)
+                        if isinstance(item, tuple) and len(item) >= 1:
+                            text = item[0]
+                            color = item[1] if len(item) > 1 else None
+                            self.unified_canvas.write_text(str(text), color=color)
+                        else:
+                            self.unified_canvas.write_text(str(item))
+                    except Exception:
+                        print(item)
+            except Exception:
+                # queue.Empty or other issues — ignore for now
+                pass
+            # Schedule next poll
+            try:
+                self.root.after(50, _flush_ui_queue)
+            except Exception:
+                pass
+
+        # Start the UI queue poller
+        self.root.after(50, _flush_ui_queue)
 
         # Set turtle canvas reference (unified canvas acts as turtle canvas too)
         self.tw_basic.ide_turtle_canvas = self.unified_canvas
@@ -1706,7 +1761,7 @@ Features:
         self.show_ok_prompt = True  # Show OK on initial run
 
         # Schedule welcome screen to show after GUI is fully initialized
-        self.root.after(100, self._show_welcome_screen)
+        self._welcome_after_id = self.root.after(100, self._show_welcome_screen)
 
     def _show_welcome_screen(self):
         """Display the welcome screen with introduction text, memory info, and OK prompt"""
@@ -1818,14 +1873,16 @@ Features:
                     self.unified_canvas.write_text("No program loaded. Enter line-numbered commands first.\n", color=14)
                     return
             elif command_upper == "LIST":
-                # List the stored program
+                # List the stored program (batch output to avoid UI freeze)
                 current_interpreter = self.get_current_interpreter()
                 if current_interpreter.program_lines:
                     # Clear screen for listing
                     self.unified_canvas.clear_screen()
-                    self.unified_canvas.write_text("Program:\n", color=15)
-                    for line_num, cmd in current_interpreter.program_lines:
-                        self.unified_canvas.write_text(f"{line_num} {cmd}\n", color=15)
+                    # Build full listing string and write once to minimize redraws
+                    output_lines = ["Program:\n"]
+                    output_lines.extend(f"{line_num} {cmd}\n" for line_num, cmd in current_interpreter.program_lines)
+                    full_output = "".join(output_lines)
+                    self.unified_canvas.write_text(full_output, color=15)
                 else:
                     self.unified_canvas.write_text("No program loaded.\n", color=14)
                 return
