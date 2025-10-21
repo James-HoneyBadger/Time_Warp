@@ -1726,20 +1726,62 @@ Features:
         # Create a UI output queue and a poller to flush outputs from background threads
         self._ui_output_queue = queue.Queue()
 
+        # Ensure interpreters always have an output callback that enqueues into the UI queue.
+        # This guarantees program output appears in the unified canvas regardless of the entry path.
+        def _enqueue_output(text):
+            try:
+                # Debug: indicate we're enqueueing text for the UI
+                try:
+                    print(f"[UI ENQUEUE] -> {str(text)}")
+                except Exception:
+                    pass
+                self._ui_output_queue.put((str(text) + "\n", 10))
+            except Exception:
+                try:
+                    self._ui_output_queue.put(str(text) + "\n")
+                except Exception:
+                    pass
+
+        try:
+            self.tw_basic.set_output_callback(_enqueue_output)
+        except Exception:
+            pass
+        try:
+            self.pascal.set_output_callback(_enqueue_output)
+        except Exception:
+            pass
+        try:
+            self.prolog.set_output_callback(_enqueue_output)
+        except Exception:
+            pass
+
         def _flush_ui_queue():
             try:
                 while True:
                     item = self._ui_output_queue.get_nowait()
                     try:
+                        print(f"[FLUSH_UI] dequeued: {repr(item)}")
                         # item is (text, color)
                         if isinstance(item, tuple) and len(item) >= 1:
                             text = item[0]
                             color = item[1] if len(item) > 1 else None
+                            # Ensure output starts on a new line to avoid being concatenated with existing content
+                            try:
+                                if not str(text).startswith("\n"):
+                                    self.unified_canvas.write_text("\n")
+                            except Exception:
+                                pass
                             self.unified_canvas.write_text(str(text), color=color)
                         else:
+                            try:
+                                if not str(item).startswith("\n"):
+                                    self.unified_canvas.write_text("\n")
+                            except Exception:
+                                pass
                             self.unified_canvas.write_text(str(item))
-                    except Exception:
-                        print(item)
+                        print(f"[FLUSH_UI] wrote to unified_canvas: {repr(item)}")
+                    except Exception as ex:
+                        print("[FLUSH_UI] write error:", ex, "item:", item)
             except Exception:
                 # queue.Empty or other issues — ignore for now
                 pass
@@ -1865,9 +1907,38 @@ Features:
             if command_upper == "RUN":
                 # Execute the stored program
                 current_interpreter = self.get_current_interpreter()
+                # Cancel welcome screen if still pending to avoid it overwriting program output
+                try:
+                    if hasattr(self, '_welcome_after_id') and self._welcome_after_id:
+                        try:
+                            self.root.after_cancel(self._welcome_after_id)
+                        except Exception:
+                            pass
+                        self._welcome_after_id = None
+                except Exception:
+                    pass
                 if current_interpreter.program_lines:
-                    program_text = "\n".join([f"{line_num} {cmd}" for line_num, cmd in current_interpreter.program_lines])
-                    result = current_interpreter.run_program(program_text, language=self.current_language, show_completion=True)
+                    # Execute stored program lines in a background thread by calling execute_command
+                    def _run_program_lines():
+                        try:
+                            for line_num, cmd in list(current_interpreter.program_lines):
+                                try:
+                                    # Execute each command; interpreter's execute_command should call log_output which
+                                    # is wired to enqueue into the UI queue via set_output_callback
+                                    current_interpreter.execute_command(cmd)
+                                except Exception:
+                                    # Continue even if one line errors
+                                    pass
+                            # Ensure UI reflects completion
+                            try:
+                                self.root.after(0, lambda: self.status_label.config(text="🚀 Program executed."))
+                            except Exception:
+                                pass
+                        finally:
+                            return
+
+                    t = threading.Thread(target=_run_program_lines, daemon=True)
+                    t.start()
                     return
                 else:
                     self.unified_canvas.write_text("No program loaded. Enter line-numbered commands first.\n", color=14)

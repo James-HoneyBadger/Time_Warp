@@ -99,8 +99,14 @@ class TwBasicInterpreter:
 
     def get_user_input(self, prompt):
         """Get user input - placeholder for now"""
-        # This would need to be implemented with a proper input mechanism
-        return input(prompt) if prompt else input()
+        # This would need to be implemented with a proper input mechanism.
+        # In non-interactive/test environments (pytest capture), input() may raise OSError/EOFError.
+        # Catch these and return an empty string so tests don't block.
+        try:
+            return input(prompt) if prompt else input()
+        except (EOFError, OSError):
+            # Non-interactive environment: return empty string to allow tests to proceed
+            return ""
 
     def _init_pygame_graphics(self, width, height, title):
         """

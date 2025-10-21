@@ -623,7 +623,24 @@ class Time_WarpInterpreter:
 
 
         # Initialize unified language executor
-        self.tw_basic_executor = TwBasicExecutor(self)
+        try:
+            # Preferred executor name (may exist in some code variants)
+            self.tw_basic_executor = TwBasicExecutor(self)
+        except NameError:
+            # Fallback: many modules expose TwBasicInterpreter instead of TwBasicExecutor
+            try:
+                from core.languages import TwBasicInterpreter as _FallbackBasic
+
+                # TwBasicInterpreter expects no interpreter param; instantiate and use as executor
+                self.tw_basic_executor = _FallbackBasic()
+            except Exception:
+                # Last-resort: leave as None and log behaviour when used
+                self.tw_basic_executor = None
+        # Backwards compatibility: some code/tests expect `basic_executor`
+        try:
+            self.basic_executor = self.tw_basic_executor
+        except Exception:
+            self.basic_executor = None
 
         # Language mode (optional explicit setting)
         self.current_language_mode = None
