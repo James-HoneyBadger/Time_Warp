@@ -596,53 +596,11 @@ class TimeWarpApp:
                 # Store the current file path
                 self.current_file = file_path
 
-                # Check if this looks like a line-numbered BASIC program
-                lines = content.strip().split('\n')
-                is_line_numbered_program = False
-
-                for line in lines:
-                    line = line.strip()
-                    if line and line[0].isdigit():
-                        # Check if it has a space after the line number
-                        parts = line.split(None, 1)
-                        if len(parts) == 2 and parts[0].isdigit():
-                            is_line_numbered_program = True
-                            break
-
-                if is_line_numbered_program:
-                    # Load as line-numbered program
-                    self.interpreter.program_lines = []
-                    for line in lines:
-                        line = line.strip()
-                        if line and line[0].isdigit():
-                            try:
-                                parts = line.split(None, 1)
-                                if len(parts) == 2:
-                                    line_num = int(parts[0])
-                                    cmd = parts[1]
-                                    # Insert in line number order
-                                    insert_pos = 0
-                                    for i, (existing_num, _) in enumerate(self.interpreter.program_lines):
-                                        if existing_num > line_num:
-                                            break
-                                        insert_pos = i + 1
-                                    self.interpreter.program_lines.insert(insert_pos, (line_num, cmd))
-                            except (ValueError, IndexError):
-                                continue
-
-                    self.unified_canvas.write_text(f"Loaded program from {file_path}\n", color=10)
-                    self.unified_canvas.write_text(f"{len(self.interpreter.program_lines)} lines loaded.\n", color=10)
-                    self.status_label.config(text=f"📂 Loaded program: {file_path}")
-                else:
-                    # Display file content in canvas
-                    self.unified_canvas.write_text(f"File: {file_path}\n", color=11)
-                    self.unified_canvas.write_text("=" * 50 + "\n", color=11)
-                    self.unified_canvas.write_text(content, color=15)
-                    self.unified_canvas.write_text("\n" + "=" * 50 + "\n", color=11)
-                    self.status_label.config(text=f"📂 Displayed file: {file_path}")
-
+                # Load file content into Code Editor
+                self.code_editor.text_widget.delete("1.0", tk.END)
+                self.code_editor.text_widget.insert("1.0", content)
+                self.status_label.config(text=f"📂 Loaded file: {file_path}")
             except Exception as e:
-                self.unified_canvas.write_text(f"Error loading file: {str(e)}\n", color=12)
                 self.status_label.config(text=f"❌ Error loading file: {str(e)}")
 
     def save_file(self):
@@ -885,7 +843,29 @@ class TimeWarpApp:
 
     def _open_settings(self):
         """Open settings dialog"""
-        messagebox.showinfo("Settings", "⚙️ Settings dialog not implemented yet.\n\nUse Theme Selector and Font Settings instead.")
+        dialog = tk.Toplevel(self.root)
+        dialog.title("⚙️ Settings")
+        dialog.geometry("400x300")
+        dialog.transient(self.root)
+
+        tk.Label(dialog, text="Font Family:").pack(pady=5)
+        font_var = tk.StringVar(value=self.selected_font_family)
+        font_entry = tk.Entry(dialog, textvariable=font_var)
+        font_entry.pack(pady=5)
+
+        tk.Label(dialog, text="Font Size:").pack(pady=5)
+        size_var = tk.IntVar(value=self.selected_font_size)
+        size_entry = tk.Entry(dialog, textvariable=size_var)
+        size_entry.pack(pady=5)
+
+        def save_settings():
+            self.selected_font_family = font_var.get()
+            self.selected_font_size = size_var.get()
+            self.unified_canvas.set_font(self.selected_font_family, self.selected_font_size)
+            dialog.destroy()
+            self.status_label.config(text="⚙️ Settings updated.")
+
+        tk.Button(dialog, text="Save", command=save_settings).pack(pady=20)
 
     def _show_system_info(self):
         """Show system information"""
@@ -955,15 +935,26 @@ Full reporting functionality to be implemented."""
 
     def run_program(self):
         """
-        Execute the program currently in the text area.
-        Note: In unified canvas mode, code editing is handled externally.
-        This method assumes code is available through some means.
+        Execute the program currently in the code editor.
         """
-        # For now, show a message that code execution needs to be handled differently
-        # In a full implementation, we'd need a way to get code from an external editor
-        self.unified_canvas.write_text("Program execution requires code input.\n")
-        self.unified_canvas.write_text("Please implement code input mechanism.\n")
-        self.status_label.config(text="❌ Code input not implemented in unified canvas mode.")
+        code = self.code_editor.text_widget.get("1.0", tk.END).strip()
+        self.notebook.select(self.output_frame)
+        self.unified_canvas.clear_all()
+        if not code:
+            self.unified_canvas.write_text("❌ No code entered.\n")
+            self.unified_canvas.redraw()
+            self.status_label.config(text="❌ No code to execute.")
+            return
+        try:
+            result = self.interpreter.run_program(code, language='auto')
+            output_text = f"Program Output:\n{result}\n" if result is not None else "Program Output:\n<No output>\n"
+            self.unified_canvas.write_text(output_text)
+            self.unified_canvas.redraw()
+            self.status_label.config(text="🚀 Program executed.")
+        except Exception as e:
+            self.unified_canvas.write_text(f"❌ Error: {str(e)}\n")
+            self.unified_canvas.redraw()
+            self.status_label.config(text=f"❌ Execution error: {str(e)}")
 
     def show_about(self):
         """Show about dialog"""
@@ -1676,16 +1667,29 @@ Features:
         self.menubar.add_cascade(label="❓ Help", menu=help_menu)
 
 
-        # --- Unified Canvas Layout ---
+        # --- Tabbed Canvas Layout ---
         # Main frame for padding and layout
         self.main_frame = tk.Frame(self.root, bg="black")
         self.main_frame.pack(expand=True, fill="both")
 
-        # Create unified canvas instead of tabbed interface - fill entire window
-        self.unified_canvas = UnifiedCanvas(self.main_frame, bg="black", relief="flat", bd=0,
+        # Create tabbed notebook for dual canvases
+        from tkinter import ttk
+        self.notebook = ttk.Notebook(self.main_frame)
+        self.notebook.pack(expand=True, fill="both")
+
+        # Code Editor tab
+        self.editor_frame = tk.Frame(self.notebook, bg="#f8f8f8")
+        self.code_editor = EnhancedCodeEditor(self.editor_frame)
+        self.code_editor.pack(expand=True, fill="both")
+        self.notebook.add(self.editor_frame, text="Code Editor")
+
+        # Output (UnifiedCanvas) tab
+        self.output_frame = tk.Frame(self.notebook, bg="black")
+        self.unified_canvas = UnifiedCanvas(self.output_frame, bg="black", relief="flat", bd=0,
                                           font_family=self.selected_font_family,
                                           font_size=self.selected_font_size)
         self.unified_canvas.pack(expand=True, fill="both", padx=0, pady=0)
+        self.notebook.add(self.output_frame, text="Output Console")
 
         # Make sure the main frame and root allow resizing
         self.root.resizable(True, True)
@@ -1805,28 +1809,22 @@ OK
             """Handle user commands"""
             command = command.strip()
             if command:
-                # Execute command without echoing it
                 command_upper = command.upper()
                 if command_upper == "HELP":
                     self._show_help()
                 elif command_upper in ["CLS", "CLEAR"]:
                     self.unified_canvas.clear_screen()
-                    # Reset cursor position after clearing
-                    self.unified_canvas.cursor_x = 0
-                    self.unified_canvas.cursor_y = 0
-                    # Show OK prompt after CLS
-                    self.show_ok_prompt = True
+                    # Show welcome screen after clear
+                    self._show_welcome_screen()
+                    return
                 elif command_upper in ["EXIT", "QUIT", "BYE"]:
                     self.on_closing()
                     return
                 else:
-                    # Try to execute as code
                     self._execute_command(command)
 
-            # Schedule next prompt after canvas updates
             self.root.after(100, lambda: self._show_next_prompt(command_callback))
 
-        # Start the input loop (cursor should already be positioned after welcome OK)
         self.unified_canvas.prompt_input("", command_callback)
 
     def _show_next_prompt(self, callback):
