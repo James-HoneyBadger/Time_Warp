@@ -28,12 +28,10 @@ import random
 import time
 
 
-class TwPascalExecutor:
-    """Handles TW Pascal language command execution"""
+class TwPascalInterpreter:
+    """Standalone interpreter for TW Pascal language"""
 
-    def __init__(self, interpreter):
-        """Initialize with reference to main interpreter"""
-        self.interpreter = interpreter
+    def __init__(self):
         self.program_name = ""
         self.variables = {}  # Local variable scope
         self.constants = {}  # Constants
@@ -44,6 +42,25 @@ class TwPascalExecutor:
         self.records = {}  # Record definitions
         self.current_procedure = None
         self.call_stack = []  # For procedure/function calls
+        self.output_callback = None
+        self.program_lines = []
+
+    def set_output_callback(self, callback):
+        self.output_callback = callback
+
+    def log_output(self, text):
+        if self.output_callback:
+            self.output_callback(text)
+        else:
+            print(text)
+
+    def debug_output(self, text):
+        # For debugging - can be enhanced later
+        print(f"[DEBUG] {text}")
+
+    def execute_line(self, line):
+        """Execute a single line of Pascal code"""
+        return self.execute_command(line)
 
     def execute_command(self, command):
         """Execute a Pascal command and return the result"""
@@ -133,7 +150,7 @@ class TwPascalExecutor:
                     return self._handle_call(command)
 
         except Exception as e:
-            self.interpreter.debug_output(f"Pascal command error: {e}")
+            self.debug_output(f"Pascal command error: {e}")
             return "continue"
 
         return "continue"
@@ -144,13 +161,13 @@ class TwPascalExecutor:
         match = re.match(r"PROGRAM\s+(\w+)", command, re.IGNORECASE)
         if match:
             self.program_name = match.group(1)
-            self.interpreter.log_output(f"🚀 Starting program: {self.program_name}")
+            self.log_output(f"🚀 Starting program: {self.program_name}")
         return "continue"
 
     def _handle_begin(self, command):
         """Handle BEGIN block"""
         # BEGIN - start of code block
-        self.interpreter.log_output("📦 Entering code block")
+        self.log_output("📦 Entering code block")
         return "continue"
 
     def _handle_end(self, command):
@@ -158,10 +175,10 @@ class TwPascalExecutor:
         # END. - program end
         # END; - block end
         if command.strip().upper() == "END.":
-            self.interpreter.log_output("🏁 Program completed")
+            self.log_output("🏁 Program completed")
             return "end"
         else:
-            self.interpreter.log_output("📦 Exiting code block")
+            self.log_output("📦 Exiting code block")
             return "continue"
 
     def _handle_var(self, command):
@@ -190,11 +207,11 @@ class TwPascalExecutor:
                             dimensions = array_match.group(2)
                             self._declare_array(array_name, dimensions, var_type)
 
-                self.interpreter.log_output(
+                self.log_output(
                     f"📝 Declared variables: {', '.join(variables)} as {var_type}"
                 )
         except Exception as e:
-            self.interpreter.debug_output(f"VAR declaration error: {e}")
+            self.debug_output(f"VAR declaration error: {e}")
         return "continue"
 
     def _handle_const(self, command):
@@ -207,9 +224,9 @@ class TwPascalExecutor:
                 name = name.strip().upper()
                 value = self._evaluate_expression(value_expr.strip())
                 self.constants[name] = value
-                self.interpreter.log_output(f"🔒 Constant {name} = {value}")
+                self.log_output(f"🔒 Constant {name} = {value}")
         except Exception as e:
-            self.interpreter.debug_output(f"CONST declaration error: {e}")
+            self.debug_output(f"CONST declaration error: {e}")
         return "continue"
 
     def _handle_assignment(self, command):
@@ -231,11 +248,11 @@ class TwPascalExecutor:
 
                     self.variables[var_name] = value
                     # Also store in interpreter variables for compatibility
-                    self.interpreter.variables[var_name] = value
+                    self.variables[var_name] = value
 
-                self.interpreter.log_output(f"✅ {var_name} := {value}")
+                self.log_output(f"✅ {var_name} := {value}")
         except Exception as e:
-            self.interpreter.debug_output(f"Assignment error: {e}")
+            self.debug_output(f"Assignment error: {e}")
         return "continue"
 
     def _handle_if(self, command):
@@ -253,12 +270,12 @@ class TwPascalExecutor:
                 cond_result = self._evaluate_expression(condition)
                 if cond_result:
                     # Execute THEN statement
-                    return self.interpreter.execute_line(then_stmt)
+                    return self.execute_line(then_stmt)
                 elif else_stmt:
                     # Execute ELSE statement
-                    return self.interpreter.execute_line(else_stmt)
+                    return self.execute_line(else_stmt)
         except Exception as e:
-            self.interpreter.debug_output(f"IF statement error: {e}")
+            self.debug_output(f"IF statement error: {e}")
         return "continue"
 
     def _handle_while(self, command):
@@ -273,13 +290,13 @@ class TwPascalExecutor:
                 cond_result = self._evaluate_expression(condition)
                 if cond_result:
                     # Execute statement and continue loop
-                    result = self.interpreter.execute_line(statement)
+                    result = self.execute_line(statement)
                     if result == "continue":
                         # Re-execute the WHILE statement to check condition again
                         return self._handle_while(command)
                 # Condition false, exit loop
         except Exception as e:
-            self.interpreter.debug_output(f"WHILE loop error: {e}")
+            self.debug_output(f"WHILE loop error: {e}")
         return "continue"
 
     def _handle_for(self, command):
@@ -303,7 +320,7 @@ class TwPascalExecutor:
 
                 # Initialize loop variable
                 self.variables[var_name] = start_val
-                self.interpreter.variables[var_name] = start_val
+                self.variables[var_name] = start_val
 
                 # Check if we should continue the loop
                 current_val = self.variables.get(var_name, start_val)
@@ -314,18 +331,18 @@ class TwPascalExecutor:
 
                 if should_continue:
                     # Execute statement
-                    result = self.interpreter.execute_line(statement)
+                    result = self.execute_line(statement)
                     if result == "continue":
                         # Increment/decrement and loop
                         if direction == "TO":
                             self.variables[var_name] = current_val + 1
                         else:
                             self.variables[var_name] = current_val - 1
-                        self.interpreter.variables[var_name] = self.variables[var_name]
+                        self.variables[var_name] = self.variables[var_name]
                         # Re-execute FOR to check condition
                         return self._handle_for(command)
         except Exception as e:
-            self.interpreter.debug_output(f"FOR loop error: {e}")
+            self.debug_output(f"FOR loop error: {e}")
         return "continue"
 
     def _handle_repeat(self, command):
@@ -338,7 +355,7 @@ class TwPascalExecutor:
                 condition = match.group(2).strip()
 
                 # Execute statement
-                result = self.interpreter.execute_line(statement)
+                result = self.execute_line(statement)
                 if result == "continue":
                     # Check condition
                     cond_result = self._evaluate_expression(condition)
@@ -347,7 +364,7 @@ class TwPascalExecutor:
                         return self._handle_repeat(command)
                 # Condition true, exit loop
         except Exception as e:
-            self.interpreter.debug_output(f"REPEAT loop error: {e}")
+            self.debug_output(f"REPEAT loop error: {e}")
         return "continue"
 
     def _handle_case(self, command):
@@ -367,9 +384,9 @@ class TwPascalExecutor:
                     if ":" in case:
                         value_part, stmt_part = case.split(":", 1)
                         if value_part.strip().upper() == str(selector).upper():
-                            return self.interpreter.execute_line(stmt_part.strip())
+                            return self.execute_line(stmt_part.strip())
         except Exception as e:
-            self.interpreter.debug_output(f"CASE statement error: {e}")
+            self.debug_output(f"CASE statement error: {e}")
         return "continue"
 
     def _handle_procedure(self, command):
@@ -386,9 +403,9 @@ class TwPascalExecutor:
                     "params": params,
                     "body": [],  # Would need to collect following lines until END
                 }
-                self.interpreter.log_output(f"📋 Procedure {proc_name} declared")
+                self.log_output(f"📋 Procedure {proc_name} declared")
         except Exception as e:
-            self.interpreter.debug_output(f"PROCEDURE declaration error: {e}")
+            self.debug_output(f"PROCEDURE declaration error: {e}")
         return "continue"
 
     def _handle_function(self, command):
@@ -409,9 +426,9 @@ class TwPascalExecutor:
                     "return_type": return_type,
                     "body": [],  # Would need to collect following lines until END
                 }
-                self.interpreter.log_output(f"🔧 Function {func_name} declared")
+                self.log_output(f"🔧 Function {func_name} declared")
         except Exception as e:
-            self.interpreter.debug_output(f"FUNCTION declaration error: {e}")
+            self.debug_output(f"FUNCTION declaration error: {e}")
         return "continue"
 
     def _handle_call(self, command):
@@ -424,14 +441,14 @@ class TwPascalExecutor:
                 args = match.group(2).strip() if match.group(2) else ""
 
                 if name in self.procedures:
-                    self.interpreter.log_output(f"📞 Calling procedure {name}")
+                    self.log_output(f"📞 Calling procedure {name}")
                     # Execute procedure (simplified)
                 elif name in self.functions:
-                    self.interpreter.log_output(f"🔧 Calling function {name}")
+                    self.log_output(f"🔧 Calling function {name}")
                     # Execute function and return result (simplified)
                     return "continue"
         except Exception as e:
-            self.interpreter.debug_output(f"Call error: {e}")
+            self.debug_output(f"Call error: {e}")
         return "continue"
 
     def _handle_readln(self, command):
@@ -445,7 +462,7 @@ class TwPascalExecutor:
 
                 for var in variables:
                     prompt = f"Enter value for {var}: "
-                    value = self.interpreter.get_user_input(prompt)
+                    value = self.get_user_input(prompt)
                     # Type conversion based on declared type
                     if var in self.data_types:
                         var_type = self.data_types[var]
@@ -461,9 +478,9 @@ class TwPascalExecutor:
                             pass  # Keep as string
 
                     self.variables[var] = value
-                    self.interpreter.variables[var] = value
+                    self.variables[var] = value
         except Exception as e:
-            self.interpreter.debug_output(f"READLN error: {e}")
+            self.debug_output(f"READLN error: {e}")
         return "continue"
 
     def _handle_writeln(self, command):
@@ -481,12 +498,12 @@ class TwPascalExecutor:
                     output_parts.append(str(value))
 
                 output = " ".join(output_parts)
-                self.interpreter.log_output(output)
+                self.log_output(output)
             else:
                 # WRITELN without parentheses
-                self.interpreter.log_output("")
+                self.log_output("")
         except Exception as e:
-            self.interpreter.debug_output(f"WRITELN error: {e}")
+            self.debug_output(f"WRITELN error: {e}")
         return "continue"
 
     def _handle_write(self, command):
@@ -505,9 +522,9 @@ class TwPascalExecutor:
 
                 output = " ".join(output_parts)
                 # Use debug output to avoid newline, or find another way
-                self.interpreter.log_output(output)
+                self.log_output(output)
         except Exception as e:
-            self.interpreter.debug_output(f"WRITE error: {e}")
+            self.debug_output(f"WRITE error: {e}")
         return "continue"
 
     def _evaluate_expression(self, expr):
@@ -561,7 +578,7 @@ class TwPascalExecutor:
 
             return eval(expr, safe_dict)
         except Exception as e:
-            self.interpreter.debug_output(f"Expression evaluation error: {e}")
+            self.debug_output(f"Expression evaluation error: {e}")
             return 0
 
     def _get_default_value(self, var_type):
@@ -620,11 +637,11 @@ class TwPascalExecutor:
 
             self.arrays[array_name] = create_array(array_dims)
             self.data_types[array_name] = f"ARRAY OF {element_type}"
-            self.interpreter.log_output(
+            self.log_output(
                 f"📊 Array {array_name} declared with dimensions {array_dims}"
             )
         except Exception as e:
-            self.interpreter.debug_output(f"Array declaration error: {e}")
+            self.debug_output(f"Array declaration error: {e}")
 
     def _assign_array_element(self, array_ref, value):
         """Assign value to array element"""
@@ -645,8 +662,8 @@ class TwPascalExecutor:
                     for idx in indices[:-1]:
                         array = array[idx]
                     array[indices[-1]] = value
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"📊 {array_name}[{','.join(map(str, indices))}] := {value}"
                     )
         except Exception as e:
-            self.interpreter.debug_output(f"Array assignment error: {e}")
+            self.debug_output(f"Array assignment error: {e}")

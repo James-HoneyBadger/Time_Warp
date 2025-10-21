@@ -17,8 +17,12 @@ The executor integrates with the Time_WarpInterpreter for shared functionality
 like variable management, turtle graphics, and output handling.
 """
 
-from .basic import TwBasicExecutor
+from .basic import TwBasicInterpreter
+from .pascal import TwPascalInterpreter
+from .prolog import TwPrologInterpreter
 
 __all__ = [
-    "TwBasicExecutor",
+    "TwBasicInterpreter",
+    "TwPascalInterpreter",
+    "TwPrologInterpreter",
 ]

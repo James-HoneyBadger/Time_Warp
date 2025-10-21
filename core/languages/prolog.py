@@ -23,17 +23,34 @@ programming, with support for facts, rules, queries, and basic backtracking.
 import re
 
 
-class TwPrologExecutor:
-    """Handles TW Prolog language command execution"""
+class TwPrologInterpreter:
+    """Standalone interpreter for TW Prolog language"""
 
-    def __init__(self, interpreter):
-        """Initialize with reference to main interpreter"""
-        self.interpreter = interpreter
+    def __init__(self):
         self.database = {}  # Facts and rules database
         self.variables = {}  # Query variables
         self.current_query = None
         self.backtrack_stack = []  # For backtracking
         self.cut_flag = False  # Cut operator
+        self.output_callback = None
+        self.program_lines = []
+
+    def set_output_callback(self, callback):
+        self.output_callback = callback
+
+    def log_output(self, text):
+        if self.output_callback:
+            self.output_callback(text)
+        else:
+            print(text)
+
+    def debug_output(self, text):
+        # For debugging - can be enhanced later
+        print(f"[DEBUG] {text}")
+
+    def execute_line(self, line):
+        """Execute a single line of Prolog code"""
+        return self.execute_command(line)
 
     def execute_command(self, command):
         """Execute a Prolog command and return the result"""
@@ -69,7 +86,7 @@ class TwPrologExecutor:
                 return self._handle_notrace()
 
         except Exception as e:
-            self.interpreter.debug_output(f"Prolog command error: {e}")
+            self.debug_output(f"Prolog command error: {e}")
             return "continue"
 
         return "continue"
@@ -92,11 +109,11 @@ class TwPrologExecutor:
 
                 self.database[predicate].append({"type": "fact", "args": args})
 
-                self.interpreter.log_output(
+                self.log_output(
                     f"📚 Fact added: {predicate}({', '.join(map(str, args))})"
                 )
         except Exception as e:
-            self.interpreter.debug_output(f"Fact definition error: {e}")
+            self.debug_output(f"Fact definition error: {e}")
         return "continue"
 
     def _handle_rule(self, command):
@@ -125,12 +142,12 @@ class TwPrologExecutor:
                         {"type": "rule", "head_args": head_args, "body": goals}
                     )
 
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"📋 Rule added: {predicate}({', '.join(map(str, head_args))}) "
                         f":- {', '.join(goals)}"
                     )
         except Exception as e:
-            self.interpreter.debug_output(f"Rule definition error: {e}")
+            self.debug_output(f"Rule definition error: {e}")
         return "continue"
 
     def _handle_query(self, command):
@@ -147,49 +164,49 @@ class TwPrologExecutor:
                 results = self._execute_query(goals)
 
                 if results:
-                    self.interpreter.log_output("✅ Query succeeded")
+                    self.log_output("✅ Query succeeded")
                     for result in results[:5]:  # Limit output
                         if result:
                             var_bindings = [f"{k} = {v}" for k, v in result.items()]
-                            self.interpreter.log_output(f"   {', '.join(var_bindings)}")
+                            self.log_output(f"   {', '.join(var_bindings)}")
                     if len(results) > 5:
-                        self.interpreter.log_output(
+                        self.log_output(
                             f"   ... and {len(results) - 5} more solutions"
                         )
                 else:
-                    self.interpreter.log_output("❌ Query failed - no solutions found")
+                    self.log_output("❌ Query failed - no solutions found")
         except Exception as e:
-            self.interpreter.debug_output(f"Query execution error: {e}")
+            self.debug_output(f"Query execution error: {e}")
         return "continue"
 
     def _handle_listing(self):
         """Handle LISTING command - show database contents"""
         try:
-            self.interpreter.log_output("📚 Prolog Database Contents:")
+            self.log_output("📚 Prolog Database Contents:")
             for predicate, clauses in self.database.items():
-                self.interpreter.log_output(f"\n{predicate}:")
+                self.log_output(f"\n{predicate}:")
                 for clause in clauses:
                     if clause["type"] == "fact":
                         args_str = ", ".join(map(str, clause["args"]))
-                        self.interpreter.log_output(f"  {predicate}({args_str}).")
+                        self.log_output(f"  {predicate}({args_str}).")
                     elif clause["type"] == "rule":
                         head_args_str = ", ".join(map(str, clause["head_args"]))
                         body_str = ", ".join(clause["body"])
-                        self.interpreter.log_output(
+                        self.log_output(
                             f"  {predicate}({head_args_str}) :- {body_str}."
                         )
         except Exception as e:
-            self.interpreter.debug_output(f"Listing error: {e}")
+            self.debug_output(f"Listing error: {e}")
         return "continue"
 
     def _handle_trace(self):
         """Handle TRACE command"""
-        self.interpreter.log_output("🔍 Tracing enabled")
+        self.log_output("🔍 Tracing enabled")
         return "continue"
 
     def _handle_notrace(self):
         """Handle NOTRACE command"""
-        self.interpreter.log_output("🔍 Tracing disabled")
+        self.log_output("🔍 Tracing disabled")
         return "continue"
 
     def _parse_arguments(self, args_str):
@@ -342,14 +359,14 @@ class TwPrologExecutor:
             arg = self._parse_term(arg_str)
             bound_arg = self._apply_bindings_to_term(arg, bindings)
             if bound_arg["type"] == "string":
-                self.interpreter.log_output(bound_arg["value"])
+                self.log_output(bound_arg["value"])
             else:
-                self.interpreter.log_output(str(bound_arg))
+                self.log_output(str(bound_arg))
             return [bindings]
 
         # nl/0 - newline
         elif goal == "nl":
-            self.interpreter.log_output("")
+            self.log_output("")
             return [bindings]
 
         # Arithmetic comparisons

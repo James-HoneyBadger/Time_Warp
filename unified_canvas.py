@@ -114,6 +114,7 @@ class UnifiedCanvas(tk.Canvas):
         self.cols = kwargs.pop('cols', 80)
         
         super().__init__(parent, **kwargs)
+        print(f"[DEBUG] UnifiedCanvas initialized with size {width}x{height}")
 
         # Canvas dimensions
         self.canvas_width = width
@@ -317,44 +318,6 @@ class UnifiedCanvas(tk.Canvas):
             return palette[index]
         return self.current_theme.foreground
 
-    def redraw(self):
-        """Redraw the entire canvas with current content"""
-        self.delete("all")
-        # Don't clear graphics_objects here - we'll recreate them
-
-        # Draw background
-        self.create_rectangle(0, 0, self.canvas_width, self.canvas_height,
-
-                              fill=self.current_theme.background,
-
-                              outline="")
-
-        x_offset = self.line_number_width if self.show_line_numbers else 0
-
-        # Draw each line
-        for line_num, line_text in enumerate(self.lines):
-            y = line_num * self.char_height
-
-            if self.show_line_numbers:
-                line_num_text = f"{line_num + 1:4d} "
-                self.create_text(5, y, text=line_num_text, font=self.font,
-                               fill=self.current_theme.panel_fg, anchor="nw")
-
-            self._draw_line_text(line_text, x_offset, y, line_num)
-
-        # Draw cursor if in input mode or text editing mode
-        if self.input_mode or (not self.input_mode and self.cursor_visible):
-            cursor_x = x_offset + self.cursor_col * self.char_width
-            cursor_y = self.cursor_line * self.char_height
-            self.create_rectangle(cursor_x, cursor_y,
-                               cursor_x + self.char_width,
-                               cursor_y + self.char_height,
-                               fill="", outline=self.current_theme.cursor_color,
-                               width=2)
-
-        # Recreate graphics on top
-        self._redraw_graphics()
-
     def _redraw_graphics(self):
         """Recreate all graphics objects"""
         self.graphics_objects.clear()
@@ -401,8 +364,15 @@ class UnifiedCanvas(tk.Canvas):
                            fill=color, anchor="nw")
 
     def prompt_input(self, prompt: str = "", callback=None):
-        """Obsolete: No input mode in output canvas"""
-        pass
+        """Set up input prompt in the output console"""
+        self.input_mode = True
+        self.input_callback = callback
+        self.input_buffer = ""
+        # Show prompt
+        if prompt:
+            self.write_text(prompt)
+        # The cursor will be shown in redraw() when input_mode is True
+        self.redraw()
 
     def _on_key_press(self, event):
         """Handle key press events"""
@@ -520,31 +490,36 @@ class UnifiedCanvas(tk.Canvas):
 
     def _delete_character(self, forward: bool = False):
         """Delete character at cursor position (or after cursor if forward=True)"""
-        def redraw(self):
-            """Redraw the entire canvas with current content (no input/cursor)"""
-            self.delete("all")
-            # Don't clear graphics_objects here - we'll recreate them
+        if self.cursor_line >= len(self.lines):
+            return
 
-            # Draw background
-            self.create_rectangle(0, 0, self.canvas_width, self.canvas_height,
-                                  fill=self.current_theme.background,
-                                  outline="")
+        current_line = self.lines[self.cursor_line]
+        if forward:
+            # Delete character after cursor
+            if self.cursor_col < len(current_line):
+                self.lines[self.cursor_line] = current_line[:self.cursor_col] + current_line[self.cursor_col + 1:]
+            elif self.cursor_line < len(self.lines) - 1:
+                # Join with next line
+                next_line = self.lines[self.cursor_line + 1]
+                self.lines[self.cursor_line] = current_line + next_line
+                del self.lines[self.cursor_line + 1]
+                del self.line_attributes[self.cursor_line + 1]
+        else:
+            # Delete character before cursor
+            if self.cursor_col > 0:
+                self.lines[self.cursor_line] = current_line[:self.cursor_col - 1] + current_line[self.cursor_col:]
+                self.cursor_col -= 1
+            elif self.cursor_line > 0:
+                # Join with previous line
+                prev_line = self.lines[self.cursor_line - 1]
+                prev_col = len(prev_line)
+                self.lines[self.cursor_line - 1] = prev_line + current_line
+                del self.lines[self.cursor_line]
+                del self.line_attributes[self.cursor_line]
+                self.cursor_line -= 1
+                self.cursor_col = prev_col
 
-            x_offset = self.line_number_width if self.show_line_numbers else 0
-
-            # Draw each line
-            for line_num, line_text in enumerate(self.lines):
-                y = line_num * self.char_height
-                if self.show_line_numbers:
-                    line_num_text = f"{line_num + 1:4d} "
-                    self.create_text(5, y, text=line_num_text, font=self.font,
-                                   fill=self.current_theme.panel_fg, anchor="nw")
-                self._draw_line_text(line_text, x_offset, y, line_num)
-
-            # Do NOT draw cursor or input prompt
-
-            # Recreate graphics on top
-            self._redraw_graphics()
+        self.redraw()
 
     def _move_cursor_right(self):
         """Move cursor right"""
@@ -611,8 +586,18 @@ class UnifiedCanvas(tk.Canvas):
 
     def _on_focus_in(self, event):
         """Handle focus in event"""
-        # Ensure canvas stays focused for input
-        self.focus_set()
+        # Avoid re-setting focus inside the focus-in handler which can
+        # trigger repeated focus events and cause the UI to hang.
+        try:
+            current = self.focus_get()
+            if current is not self:
+                # Only set focus if it's not already this widget
+                self.focus_set()
+        except Exception:
+            # If focus_get isn't available or fails, don't block
+            pass
+
+        # Start the cursor blink timer when we receive focus
         self.start_cursor_blink()
 
     def _on_focus_out(self, event):

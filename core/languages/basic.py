@@ -1,12 +1,12 @@
 
 """
-TW BASIC Unified Language Executor
+TW BASIC Language Executor
 ==================================
 
-Implements the unified TW BASIC language for the Time_Warp IDE, combining the features of
-BASIC, PILOT, and Logo into a single educational programming environment.
+- Implements the TW BASIC language for the Time_Warp IDE, combining the features of
+- BASIC, PILOT, and Logo into a single educational programming environment.
 
-Unified Language Features:
+- Language Features:
 - Line-numbered and structured BASIC syntax
 - PILOT-style colon-prefixed commands (T:, A:, J:, Y:, N:, etc.)
 - Logo-style turtle graphics commands (FORWARD, LEFT, RIGHT, etc.)
@@ -27,27 +27,80 @@ import random
 
 
 
-class TwBasicExecutor:
+class TwBasicInterpreter:
     """
-    Unified executor for the TW BASIC language (BASIC + PILOT + Logo).
-
-    Handles parsing and execution of all supported command styles:
-    - BASIC: line-numbered, PRINT, INPUT, LET, IF, FOR, etc.
-    - PILOT: colon-prefixed (T:, A:, J:, Y:, N:, etc.)
-    - Logo: turtle graphics (FORWARD, LEFT, REPEAT, etc.)
+    Interpreter for the TW BASIC language (BASIC + PILOT + Logo).
+    Standalone, does not require a unified interpreter.
     """
 
-    def __init__(self, interpreter):
-        """
-        Initialize the BASIC executor.
-
-        Args:
-            interpreter: Reference to the main Time_WarpInterpreter instance
-        """
-        self.interpreter = interpreter
+    def __init__(self):
         self.pygame_screen = None
         self.pygame_clock = None
         self.current_color = (255, 255, 255)  # White default
+        self.variables = {}
+        self.output_callback = None
+        self.program_lines = []
+        self.current_line = 0
+        self.running = False
+        self.ide_turtle_canvas = None
+        self.for_stack = []
+        self.stack = []
+        self.open_files = {}
+
+    def set_output_callback(self, callback):
+        # Set the output callback used by the IDE. Keep a debug trace when set.
+        self.output_callback = callback
+        try:
+            # Lightweight debug to help trace UI wiring during development
+            print(f"[TwBasicInterpreter] output_callback set: {bool(callback)}")
+        except Exception:
+            pass
+
+    def log_output(self, text):
+        # Always emit a small debug trace to stdout so we can confirm calls
+        try:
+            print(f"[TwBasicInterpreter.log_output] -> {text}")
+        except Exception:
+            pass
+
+        if self.output_callback:
+            try:
+                self.output_callback(text)
+            except Exception as e:
+                # If callback fails, fall back to printing and emit debug
+                print(f"[TwBasicInterpreter] output_callback error: {e}")
+                print(text)
+        else:
+            print(text)
+
+    def debug_output(self, text):
+        # For debugging - can be enhanced later
+        print(f"[DEBUG] {text}")
+
+    def evaluate_expression(self, expr):
+        """Simple expression evaluator for BASIC"""
+        try:
+            # Remove spaces
+            expr = expr.replace(" ", "")
+            
+            # Handle variables
+            for var_name, var_value in self.variables.items():
+                expr = re.sub(r'\b' + re.escape(var_name) + r'\b', str(var_value), expr)
+            
+            # Evaluate the expression
+            result = eval(expr, {"__builtins__": {}}, {})
+            return result
+        except Exception as e:
+            raise ValueError(f"Expression error: {e}")
+
+    def execute_line(self, line):
+        """Execute a single line of BASIC code"""
+        return self.execute_command(line)
+
+    def get_user_input(self, prompt):
+        """Get user input - placeholder for now"""
+        # This would need to be implemented with a proper input mechanism
+        return input(prompt) if prompt else input()
 
     def _init_pygame_graphics(self, width, height, title):
         """
@@ -70,13 +123,13 @@ class TwBasicExecutor:
 
             # Check if display is available
             display = os.environ.get("DISPLAY")
-            self.interpreter.log_output(f"🖥️  Display environment: {display}")
+            self.log_output(f"🖥️  Display environment: {display}")
 
             pygame.init()
 
             # Check available drivers
             drivers = pygame.display.get_driver()
-            self.interpreter.log_output(f"🎮 Pygame video driver: {drivers}")
+            self.log_output(f"🎮 Pygame video driver: {drivers}")
 
             self.pygame_screen = pygame.display.set_mode((width, height))
             pygame.display.set_caption(title)
@@ -84,15 +137,15 @@ class TwBasicExecutor:
             self.pygame_screen.fill((0, 0, 0))  # Black background
             pygame.display.flip()
 
-            self.interpreter.log_output(
+            self.log_output(
                 f"✅ Pygame window created: {width}x{height} '{title}'"
             )
             return True
         except ImportError:
-            self.interpreter.log_output("❌ Error: pygame not available for graphics")
+            self.log_output("❌ Error: pygame not available for graphics")
             return False
         except Exception as e:
-            self.interpreter.log_output(f"❌ Error initializing pygame: {e}")
+            self.log_output(f"❌ Error initializing pygame: {e}")
             return False
 
     def execute_command(self, command):
@@ -141,13 +194,13 @@ class TwBasicExecutor:
                                             array_dict[i] = elem
                                 else:
                                     array_dict = {}
-                                self.interpreter.variables[var_name] = array_dict
+                                self.variables[var_name] = array_dict
                             else:
-                                value = self.interpreter.evaluate_expression(expr)
-                                self.interpreter.variables[var_name] = value
+                                value = self.evaluate_expression(expr)
+                                self.variables[var_name] = value
                             return "continue"
                         except Exception as e:
-                            self.interpreter.debug_output(f"Variable assignment error: {e}")
+                            self.debug_output(f"Variable assignment error: {e}")
                             return "continue"
 
             # PILOT-style colon-prefixed commands
@@ -314,10 +367,10 @@ class TwBasicExecutor:
                 return self._handle_file_commands(cmd, parts)
 
             # Unknown command
-            self.interpreter.log_output(f"Unknown TW BASIC command: {cmd}")
+            self.log_output(f"Unknown TW BASIC command: {cmd}")
 
         except Exception as e:
-            self.interpreter.debug_output(f"TW BASIC command error: {e}")
+            self.debug_output(f"TW BASIC command error: {e}")
         return "continue"
 
     def _handle_let(self, command):
@@ -329,7 +382,7 @@ class TwBasicExecutor:
                 var_name = var_name.strip()
                 expr = expr.strip()
                 try:
-                    value = self.interpreter.evaluate_expression(expr)
+                    value = self.evaluate_expression(expr)
 
                     # Handle array assignment
                     if "(" in var_name and ")" in var_name:
@@ -339,16 +392,16 @@ class TwBasicExecutor:
                             var_name.index("(") + 1 : var_name.rindex(")")
                         ]
                         indices = [
-                            int(self.interpreter.evaluate_expression(idx.strip()))
+                            int(self.evaluate_expression(idx.strip()))
                             for idx in indices_str.split(",")
                         ]
 
                         # Get or create array
-                        if array_name not in self.interpreter.variables:
-                            self.interpreter.variables[array_name] = {}
+                        if array_name not in self.variables:
+                            self.variables[array_name] = {}
 
                         # Set array element
-                        current = self.interpreter.variables[array_name]
+                        current = self.variables[array_name]
                         for idx in indices[:-1]:
                             if idx not in current:
                                 current[idx] = {}
@@ -356,9 +409,9 @@ class TwBasicExecutor:
                         current[indices[-1]] = value
                     else:
                         # Simple variable assignment
-                        self.interpreter.variables[var_name] = value
+                        self.variables[var_name] = value
                 except Exception as e:
-                    self.interpreter.debug_output(f"Error in LET {assignment}: {e}")
+                    self.debug_output(f"Error in LET {assignment}: {e}")
         return "continue"
 
     def _handle_if(self, command):
@@ -373,18 +426,18 @@ class TwBasicExecutor:
                 else_cmd = m.group(3).strip() if m.group(3) else None
 
                 try:
-                    cond_val = self.interpreter.evaluate_expression(cond_expr)
+                    cond_val = self.evaluate_expression(cond_expr)
                 except Exception:
                     cond_val = False
 
                 if cond_val:
                     # Execute the THEN command
-                    return self.interpreter.execute_line(then_cmd)
+                    return self.execute_line(then_cmd)
                 elif else_cmd:
                     # Execute the ELSE command
-                    return self.interpreter.execute_line(else_cmd)
+                    return self.execute_line(else_cmd)
         except Exception as e:
-            self.interpreter.debug_output(f"IF statement error: {e}")
+            self.debug_output(f"IF statement error: {e}")
         return "continue"
 
     def _handle_for(self, command):
@@ -401,10 +454,10 @@ class TwBasicExecutor:
                 end_expr = m.group(3).strip()
                 step_expr = m.group(4).strip() if m.group(4) else None
 
-                start_val = self.interpreter.evaluate_expression(start_expr)
-                end_val = self.interpreter.evaluate_expression(end_expr)
+                start_val = self.evaluate_expression(start_expr)
+                end_val = self.evaluate_expression(end_expr)
                 step_val = (
-                    self.interpreter.evaluate_expression(step_expr)
+                    self.evaluate_expression(step_expr)
                     if step_expr is not None
                     else 1
                 )
@@ -424,24 +477,24 @@ class TwBasicExecutor:
                     step_val = 1
 
                 # Store the loop variable and position
-                self.interpreter.variables[var_name] = start_val
-                self.interpreter.for_stack.append(
+                self.variables[var_name] = start_val
+                self.for_stack.append(
                     {
                         "var": var_name,
                         "end": end_val,
                         "step": step_val,
-                        "for_line": self.interpreter.current_line,
+                        "for_line": self.current_line,
                     }
                 )
         except Exception as e:
-            self.interpreter.debug_output(f"FOR statement error: {e}")
+            self.debug_output(f"FOR statement error: {e}")
         return "continue"
 
     def _handle_print(self, command):
         """Handle PRINT output statement"""
         text = command[5:].strip()
         if not text:
-            self.interpreter.log_output("")
+            self.log_output("")
             return "continue"
 
         # Parse PRINT statement with proper comma and semicolon handling
@@ -497,17 +550,17 @@ class TwBasicExecutor:
                 else:
                     # Expression or variable
                     try:
-                        evaluated = self.interpreter.evaluate_expression(part)
+                        evaluated = self.evaluate_expression(part)
                         if isinstance(evaluated, str):
                             result_parts.append(evaluated)
                         else:
                             result_parts.append(str(evaluated))
                     except Exception as e:
-                        self.interpreter.debug_output(f"Expression error in PRINT: {e}")
+                        self.debug_output(f"Expression error in PRINT: {e}")
                         # For variables that failed evaluation, check if they exist directly
                         var_name = part.strip().upper()
-                        if var_name in self.interpreter.variables:
-                            result_parts.append(str(self.interpreter.variables[var_name]))
+                        if var_name in self.variables:
+                            result_parts.append(str(self.variables[var_name]))
                         else:
                             result_parts.append(str(part))
             i += 1
@@ -517,9 +570,9 @@ class TwBasicExecutor:
         if suppress_newline:
             # For semicolon, we need to append without newline
             # This is a limitation - we'll just print normally for now
-            self.interpreter.log_output(result)
+            self.log_output(result)
         else:
-            self.interpreter.log_output(result)
+            self.log_output(result)
         return "continue"
 
     def _handle_rem(self, command):
@@ -542,21 +595,21 @@ class TwBasicExecutor:
             prompt = f"Enter value for {input_text.strip()}:"
             var_name = input_text.strip()
 
-        value = self.interpreter.get_user_input(prompt)
+        value = self.get_user_input(prompt)
         try:
             if "." in value:
-                self.interpreter.variables[var_name] = float(value)
+                self.variables[var_name] = float(value)
             else:
-                self.interpreter.variables[var_name] = int(value)
+                self.variables[var_name] = int(value)
         except:
-            self.interpreter.variables[var_name] = value
+            self.variables[var_name] = value
         return "continue"
 
     def _handle_goto(self, command, parts):
         """Handle GOTO statement"""
         if len(parts) > 1:
             line_num = int(parts[1])
-            for i, (num, _) in enumerate(self.interpreter.program_lines):
+            for i, (num, _) in enumerate(self.program_lines):
                 if num == line_num:
                     return f"jump:{i}"
         return "continue"
@@ -566,16 +619,16 @@ class TwBasicExecutor:
         if len(parts) > 1:
             line_num = int(parts[1])
             # push next-line index
-            self.interpreter.stack.append(self.interpreter.current_line + 1)
-            for i, (num, _) in enumerate(self.interpreter.program_lines):
+            self.stack.append(self.current_line + 1)
+            for i, (num, _) in enumerate(self.program_lines):
                 if num == line_num:
                     return f"jump:{i}"
         return "continue"
 
     def _handle_return(self):
         """Handle RETURN statement"""
-        if self.interpreter.stack:
-            return f"jump:{self.interpreter.stack.pop()}"
+        if self.stack:
+            return f"jump:{self.stack.pop()}"
         return "continue"
 
     def _handle_next(self, command):
@@ -585,9 +638,9 @@ class TwBasicExecutor:
             var_spec = parts[1] if len(parts) > 1 else None
 
             # Find matching FOR on the stack
-            if not self.interpreter.for_stack:
+            if not self.for_stack:
                 # Log (not just debug) so tests can assert message
-                self.interpreter.log_output("NEXT without FOR")
+                self.log_output("NEXT without FOR")
                 return "continue"
 
             # If var specified, search from top for match, else take top
@@ -595,35 +648,35 @@ class TwBasicExecutor:
                 # strip possible commas
                 var_spec = var_spec.strip()
                 found_idx = None
-                for i in range(len(self.interpreter.for_stack) - 1, -1, -1):
-                    if self.interpreter.for_stack[i]["var"].upper() == var_spec.upper():
+                for i in range(len(self.for_stack) - 1, -1, -1):
+                    if self.for_stack[i]["var"].upper() == var_spec.upper():
                         found_idx = i
                         break
                 if found_idx is None:
-                    self.interpreter.debug_output(
+                    self.debug_output(
                         f"NEXT for unknown variable {var_spec}"
                     )
                     return "continue"
-                ctx = self.interpreter.for_stack[found_idx]
+                ctx = self.for_stack[found_idx]
                 # remove any inner loops above this one? keep nested intact
                 # Only pop if loop finishes
             else:
-                ctx = self.interpreter.for_stack[-1]
-                found_idx = len(self.interpreter.for_stack) - 1
+                ctx = self.for_stack[-1]
+                found_idx = len(self.for_stack) - 1
 
             var_name = ctx["var"]
             step = int(ctx["step"])
             end_val = int(ctx["end"])
 
             # Ensure variable exists (treat as integer)
-            current_val = self.interpreter.variables.get(var_name, 0)
+            current_val = self.variables.get(var_name, 0)
             try:
                 current_val = int(current_val)
             except Exception:
                 current_val = 0
 
             next_val = current_val + step
-            self.interpreter.variables[var_name] = int(next_val)
+            self.variables[var_name] = int(next_val)
 
             # Decide whether to loop
             loop_again = False
@@ -642,11 +695,11 @@ class TwBasicExecutor:
             else:
                 # pop this FOR from stack
                 try:
-                    self.interpreter.for_stack.pop(found_idx)
+                    self.for_stack.pop(found_idx)
                 except Exception:
                     pass
         except Exception as e:
-            self.interpreter.debug_output(f"NEXT statement error: {e}")
+            self.debug_output(f"NEXT statement error: {e}")
         return "continue"
 
     def _handle_dim(self, command, parts):
@@ -672,12 +725,12 @@ class TwBasicExecutor:
                     array = create_array_dict(dimensions)
 
                     # Store the array
-                    self.interpreter.variables[array_name] = array
-                    self.interpreter.log_output(
+                    self.variables[array_name] = array
+                    self.log_output(
                         f"Array {array_name} declared with dimensions {dimensions}"
                     )
         except Exception as e:
-            self.interpreter.debug_output(f"DIM statement error: {e}")
+            self.debug_output(f"DIM statement error: {e}")
         return "continue"
 
     def _handle_math_functions(self, cmd, parts):
@@ -690,77 +743,77 @@ class TwBasicExecutor:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    angle = float(self.interpreter.evaluate_expression(arg))
+                    angle = float(self.evaluate_expression(arg))
                     result = math.sin(math.radians(angle))
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"SIN({angle}°) = {result:.4f}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"SIN({angle}°) = {result:.4f}")
                 else:
-                    self.interpreter.log_output("SIN requires an angle parameter")
+                    self.log_output("SIN requires an angle parameter")
             elif cmd == "COS":
                 # COS(angle) - cosine of angle in degrees
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    angle = float(self.interpreter.evaluate_expression(arg))
+                    angle = float(self.evaluate_expression(arg))
                     result = math.cos(math.radians(angle))
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"COS({angle}°) = {result:.4f}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"COS({angle}°) = {result:.4f}")
                 else:
-                    self.interpreter.log_output("COS requires an angle parameter")
+                    self.log_output("COS requires an angle parameter")
             elif cmd == "TAN":
                 # TAN(angle) - tangent of angle in degrees
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    angle = float(self.interpreter.evaluate_expression(arg))
+                    angle = float(self.evaluate_expression(arg))
                     result = math.tan(math.radians(angle))
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"TAN({angle}°) = {result:.4f}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"TAN({angle}°) = {result:.4f}")
                 else:
-                    self.interpreter.log_output("TAN requires an angle parameter")
+                    self.log_output("TAN requires an angle parameter")
             elif cmd == "SQRT":
                 # SQRT(value) - square root
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    value = float(self.interpreter.evaluate_expression(arg))
+                    value = float(self.evaluate_expression(arg))
                     if value >= 0:
                         result = math.sqrt(value)
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(f"SQRT({value}) = {result:.4f}")
+                        self.variables["RESULT"] = result
+                        self.log_output(f"SQRT({value}) = {result:.4f}")
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "SQRT requires a non-negative value"
                         )
                 else:
-                    self.interpreter.log_output("SQRT requires a value parameter")
+                    self.log_output("SQRT requires a value parameter")
             elif cmd == "ABS":
                 # ABS(value) - absolute value
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    value = float(self.interpreter.evaluate_expression(arg))
+                    value = float(self.evaluate_expression(arg))
                     result = abs(value)
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"ABS({value}) = {result}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"ABS({value}) = {result}")
                 else:
-                    self.interpreter.log_output("ABS requires a value parameter")
+                    self.log_output("ABS requires a value parameter")
             elif cmd == "INT":
                 # INT(value) - integer part
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    value = float(self.interpreter.evaluate_expression(arg))
+                    value = float(self.evaluate_expression(arg))
                     result = int(value)
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"INT({value}) = {result}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"INT({value}) = {result}")
                 else:
-                    self.interpreter.log_output("INT requires a value parameter")
+                    self.log_output("INT requires a value parameter")
             elif cmd == "RND":
                 # RND() or RND(max) - random number
                 if len(parts) >= 2:
@@ -768,16 +821,16 @@ class TwBasicExecutor:
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
                     if arg:  # Has argument
-                        max_val = float(self.interpreter.evaluate_expression(arg))
+                        max_val = float(self.evaluate_expression(arg))
                         result = random.uniform(0, max_val)
                     else:  # No argument
                         result = random.random()
                 else:
                     result = random.random()
-                self.interpreter.variables["RESULT"] = result
-                self.interpreter.log_output(f"RND() = {result:.4f}")
+                self.variables["RESULT"] = result
+                self.log_output(f"RND() = {result:.4f}")
         except Exception as e:
-            self.interpreter.debug_output(f"Math function error: {e}")
+            self.debug_output(f"Math function error: {e}")
         return "continue"
 
     def _handle_string_functions(self, cmd, parts):
@@ -789,12 +842,12 @@ class TwBasicExecutor:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    text = str(self.interpreter.evaluate_expression(arg))
+                    text = str(self.evaluate_expression(arg))
                     result = len(text)
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"LEN('{text}') = {result}")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"LEN('{text}') = {result}")
                 else:
-                    self.interpreter.log_output("LEN requires a string parameter")
+                    self.log_output("LEN requires a string parameter")
             elif cmd == "MID":
                 # MID(string, start, length) - substring
                 if len(parts) >= 4:
@@ -804,18 +857,18 @@ class TwBasicExecutor:
                         args_str = args_str[1:-1]
                     args = [arg.strip() for arg in args_str.split(",")]
                     if len(args) >= 3:
-                        text = str(self.interpreter.evaluate_expression(args[0]))
-                        start = int(self.interpreter.evaluate_expression(args[1])) - 1  # BASIC is 1-based
-                        length = int(self.interpreter.evaluate_expression(args[2]))
+                        text = str(self.evaluate_expression(args[0]))
+                        start = int(self.evaluate_expression(args[1])) - 1  # BASIC is 1-based
+                        length = int(self.evaluate_expression(args[2]))
                         result = text[start : start + length]
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(
+                        self.variables["RESULT"] = result
+                        self.log_output(
                             f"MID('{text}', {start+1}, {length}) = '{result}'"
                         )
                     else:
-                        self.interpreter.log_output("MID requires string, start, and length parameters")
+                        self.log_output("MID requires string, start, and length parameters")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "MID requires string, start, and length parameters"
                     )
             elif cmd == "LEFT":
@@ -826,19 +879,19 @@ class TwBasicExecutor:
                         args_str = args_str[1:-1]
                     args = [arg.strip() for arg in args_str.split(",")]
                     if len(args) >= 2:
-                        text = str(self.interpreter.evaluate_expression(args[0]))
-                        length = int(self.interpreter.evaluate_expression(args[1]))
+                        text = str(self.evaluate_expression(args[0]))
+                        length = int(self.evaluate_expression(args[1]))
                         result = text[:length]
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(
+                        self.variables["RESULT"] = result
+                        self.log_output(
                             f"LEFT('{text}', {length}) = '{result}'"
                         )
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "LEFT requires string and length parameters"
                         )
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "LEFT requires string and length parameters"
                     )
             elif cmd == "RIGHT":
@@ -849,19 +902,19 @@ class TwBasicExecutor:
                         args_str = args_str[1:-1]
                     args = [arg.strip() for arg in args_str.split(",")]
                     if len(args) >= 2:
-                        text = str(self.interpreter.evaluate_expression(args[0]))
-                        length = int(self.interpreter.evaluate_expression(args[1]))
+                        text = str(self.evaluate_expression(args[0]))
+                        length = int(self.evaluate_expression(args[1]))
                         result = text[-length:]
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(
+                        self.variables["RESULT"] = result
+                        self.log_output(
                             f"RIGHT('{text}', {length}) = '{result}'"
                         )
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "RIGHT requires string and length parameters"
                         )
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "RIGHT requires string and length parameters"
                     )
             elif cmd == "INSTR":
@@ -872,22 +925,22 @@ class TwBasicExecutor:
                         args_str = args_str[1:-1]
                     args = [arg.strip() for arg in args_str.split(",")]
                     if len(args) >= 2:
-                        text = str(self.interpreter.evaluate_expression(args[0]))
-                        search = str(self.interpreter.evaluate_expression(args[1]))
+                        text = str(self.evaluate_expression(args[0]))
+                        search = str(self.evaluate_expression(args[1]))
                         pos = text.find(search)
                         result = (
                             pos + 1 if pos != -1 else 0
                         )  # BASIC is 1-based, 0 means not found
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(
+                        self.variables["RESULT"] = result
+                        self.log_output(
                             f"INSTR('{text}', '{search}') = {result}"
                         )
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "INSTR requires string and search parameters"
                         )
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "INSTR requires string and search parameters"
                     )
             elif cmd == "STR":
@@ -896,33 +949,33 @@ class TwBasicExecutor:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    value = self.interpreter.evaluate_expression(arg)
+                    value = self.evaluate_expression(arg)
                     result = str(value)
-                    self.interpreter.variables["RESULT"] = result
-                    self.interpreter.log_output(f"STR({value}) = '{result}'")
+                    self.variables["RESULT"] = result
+                    self.log_output(f"STR({value}) = '{result}'")
                 else:
-                    self.interpreter.log_output("STR requires a value parameter")
+                    self.log_output("STR requires a value parameter")
             elif cmd == "VAL":
                 # VAL(string) - convert string to number
                 if len(parts) >= 2:
                     arg = parts[1].strip()
                     if arg.startswith("(") and arg.endswith(")"):
                         arg = arg[1:-1]
-                    text = str(self.interpreter.evaluate_expression(arg))
+                    text = str(self.evaluate_expression(arg))
                     try:
                         result = float(text)
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(f"VAL('{text}') = {result}")
+                        self.variables["RESULT"] = result
+                        self.log_output(f"VAL('{text}') = {result}")
                     except ValueError:
                         result = 0
-                        self.interpreter.variables["RESULT"] = result
-                        self.interpreter.log_output(
+                        self.variables["RESULT"] = result
+                        self.log_output(
                             f"VAL('{text}') = {result} (conversion failed)"
                         )
                 else:
-                    self.interpreter.log_output("VAL requires a string parameter")
+                    self.log_output("VAL requires a string parameter")
         except Exception as e:
-            self.interpreter.debug_output(f"String function error: {e}")
+            self.debug_output(f"String function error: {e}")
         return "continue"
 
     def _handle_file_commands(self, cmd, parts):
@@ -946,21 +999,21 @@ class TwBasicExecutor:
                             try:
                                 file_obj = open(filename, mode_map[mode])
                                 if not hasattr(self.interpreter, "open_files"):
-                                    self.interpreter.open_files = {}
-                                self.interpreter.open_files[handle] = file_obj
-                                self.interpreter.log_output(
+                                    self.open_files = {}
+                                self.open_files[handle] = file_obj
+                                self.log_output(
                                     f"File '{filename}' opened as #{handle} for {mode}"
                                 )
                             except Exception as e:
-                                self.interpreter.log_output(f"Error opening file: {e}")
+                                self.log_output(f"Error opening file: {e}")
                         else:
-                            self.interpreter.log_output(
+                            self.log_output(
                                 "Invalid file mode. Use INPUT, OUTPUT, or APPEND"
                             )
                     else:
-                        self.interpreter.log_output("File handle must start with #")
+                        self.log_output("File handle must start with #")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         'OPEN syntax: OPEN "filename" FOR mode AS #handle'
                     )
             elif cmd == "CLOSE":
@@ -969,15 +1022,15 @@ class TwBasicExecutor:
                     handle = int(parts[1][1:])
                     if (
                         hasattr(self.interpreter, "open_files")
-                        and handle in self.interpreter.open_files
+                        and handle in self.open_files
                     ):
-                        self.interpreter.open_files[handle].close()
-                        del self.interpreter.open_files[handle]
-                        self.interpreter.log_output(f"File #{handle} closed")
+                        self.open_files[handle].close()
+                        del self.open_files[handle]
+                        self.log_output(f"File #{handle} closed")
                     else:
-                        self.interpreter.log_output(f"File #{handle} not open")
+                        self.log_output(f"File #{handle} not open")
                 else:
-                    self.interpreter.log_output("CLOSE syntax: CLOSE #handle")
+                    self.log_output("CLOSE syntax: CLOSE #handle")
             elif cmd == "READ":
                 # READ #handle, variable
                 if len(parts) >= 3 and parts[1].startswith("#") and parts[2] == ",":
@@ -985,30 +1038,30 @@ class TwBasicExecutor:
                     var_name = parts[3]
                     if (
                         hasattr(self.interpreter, "open_files")
-                        and handle in self.interpreter.open_files
+                        and handle in self.open_files
                     ):
                         try:
                             line = (
-                                self.interpreter.open_files[handle].readline().strip()
+                                self.open_files[handle].readline().strip()
                             )
                             if line:
                                 # Try to parse as number, otherwise keep as string
                                 try:
-                                    self.interpreter.variables[var_name] = float(line)
+                                    self.variables[var_name] = float(line)
                                 except ValueError:
-                                    self.interpreter.variables[var_name] = line
-                                self.interpreter.log_output(
+                                    self.variables[var_name] = line
+                                self.log_output(
                                     f"Read '{line}' into {var_name}"
                                 )
                             else:
-                                self.interpreter.variables["EOF"] = True
-                                self.interpreter.log_output("End of file reached")
+                                self.variables["EOF"] = True
+                                self.log_output("End of file reached")
                         except Exception as e:
-                            self.interpreter.log_output(f"Error reading file: {e}")
+                            self.log_output(f"Error reading file: {e}")
                     else:
-                        self.interpreter.log_output(f"File #{handle} not open")
+                        self.log_output(f"File #{handle} not open")
                 else:
-                    self.interpreter.log_output("READ syntax: READ #handle, variable")
+                    self.log_output("READ syntax: READ #handle, variable")
             elif cmd == "WRITE":
                 # WRITE #handle, expression
                 if len(parts) >= 3 and parts[1].startswith("#") and parts[2] == ",":
@@ -1016,20 +1069,20 @@ class TwBasicExecutor:
                     expr = " ".join(parts[3:])
                     if (
                         hasattr(self.interpreter, "open_files")
-                        and handle in self.interpreter.open_files
+                        and handle in self.open_files
                     ):
                         try:
-                            value = self.interpreter.evaluate_expression(expr)
-                            self.interpreter.open_files[handle].write(str(value) + "\n")
-                            self.interpreter.log_output(
+                            value = self.evaluate_expression(expr)
+                            self.open_files[handle].write(str(value) + "\n")
+                            self.log_output(
                                 f"Wrote '{value}' to file #{handle}"
                             )
                         except Exception as e:
-                            self.interpreter.log_output(f"Error writing to file: {e}")
+                            self.log_output(f"Error writing to file: {e}")
                     else:
-                        self.interpreter.log_output(f"File #{handle} not open")
+                        self.log_output(f"File #{handle} not open")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "WRITE syntax: WRITE #handle, expression"
                     )
             elif cmd == "EOF":
@@ -1042,28 +1095,28 @@ class TwBasicExecutor:
                     handle = int(parts[1][2:-1])
                     if (
                         hasattr(self.interpreter, "open_files")
-                        and handle in self.interpreter.open_files
+                        and handle in self.open_files
                     ):
                         try:
-                            current_pos = self.interpreter.open_files[handle].tell()
-                            self.interpreter.open_files[handle].readline()
+                            current_pos = self.open_files[handle].tell()
+                            self.open_files[handle].readline()
                             eof = (
-                                self.interpreter.open_files[handle].tell()
+                                self.open_files[handle].tell()
                                 == current_pos
                             )
-                            self.interpreter.open_files[handle].seek(
+                            self.open_files[handle].seek(
                                 current_pos
                             )  # Reset position
-                            self.interpreter.variables["RESULT"] = eof
-                            self.interpreter.log_output(f"EOF(#{handle}) = {eof}")
+                            self.variables["RESULT"] = eof
+                            self.log_output(f"EOF(#{handle}) = {eof}")
                         except Exception:
-                            self.interpreter.variables["RESULT"] = True
+                            self.variables["RESULT"] = True
                     else:
-                        self.interpreter.variables["RESULT"] = True
+                        self.variables["RESULT"] = True
                 else:
-                    self.interpreter.log_output("EOF syntax: EOF(#handle)")
+                    self.log_output("EOF syntax: EOF(#handle)")
         except Exception as e:
-            self.interpreter.debug_output(f"File command error: {e}")
+            self.debug_output(f"File command error: {e}")
         return "continue"
 
     def _handle_enhanced_graphics(self, cmd, parts):
@@ -1092,9 +1145,9 @@ class TwBasicExecutor:
 
                                 if (
                                     hasattr(self.interpreter, "ide_turtle_canvas")
-                                    and self.interpreter.ide_turtle_canvas
+                                    and self.ide_turtle_canvas
                                 ):
-                                    canvas = self.interpreter.ide_turtle_canvas
+                                    canvas = self.ide_turtle_canvas
                                     color_name = color if color else "black"
                                     canvas.draw_line(
                                         x1,
@@ -1103,7 +1156,7 @@ class TwBasicExecutor:
                                         y2,
                                         color=color_name
                                     )
-                                    self.interpreter.log_output(
+                                    self.log_output(
                                         f"Drew line from ({x1},{y1}) to ({x2},{y2})"
                                     )
                                 elif self.pygame_screen:
@@ -1115,21 +1168,21 @@ class TwBasicExecutor:
                                         (x1, y1),
                                         (x2, y2),
                                     )
-                                    self.interpreter.log_output(
+                                    self.log_output(
                                         f"Drew line from ({x1},{y1}) to ({x2},{y2})"
                                     )
                                 else:
-                                    self.interpreter.log_output(
+                                    self.log_output(
                                         "Graphics not initialized"
                                     )
                             else:
-                                self.interpreter.log_output("Invalid LINE coordinates")
+                                self.log_output("Invalid LINE coordinates")
                         else:
-                            self.interpreter.log_output(
+                            self.log_output(
                                 "LINE syntax: LINE (x1,y1)-(x2,y2) [,color]"
                             )
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "LINE syntax: LINE (x1,y1)-(x2,y2) [,color]"
                         )
             elif cmd == "BOX":
@@ -1147,9 +1200,9 @@ class TwBasicExecutor:
 
                         if (
                             hasattr(self.interpreter, "ide_turtle_canvas")
-                            and self.interpreter.ide_turtle_canvas
+                            and self.ide_turtle_canvas
                         ):
-                            canvas = self.interpreter.ide_turtle_canvas
+                            canvas = self.ide_turtle_canvas
                             canvas.draw_rectangle(
                                 x,
                                 y,
@@ -1158,7 +1211,7 @@ class TwBasicExecutor:
                                 filled=filled,
                                 color="black"
                             )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Drew {'filled ' if filled else ''}box at ({x},{y}) size {width}x{height}"
                             )
                         elif self.pygame_screen:
@@ -1173,15 +1226,15 @@ class TwBasicExecutor:
                                 pygame.draw.rect(
                                     self.pygame_screen, self.current_color, rect, 2
                                 )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Drew {'filled ' if filled else ''}box at ({x},{y}) size {width}x{height}"
                             )
                         else:
-                            self.interpreter.log_output("Graphics not initialized")
+                            self.log_output("Graphics not initialized")
                     else:
-                        self.interpreter.log_output("Invalid BOX coordinates")
+                        self.log_output("Invalid BOX coordinates")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "BOX syntax: BOX (x,y), width, height [,filled]"
                     )
             elif cmd == "TRIANGLE":
@@ -1212,15 +1265,15 @@ class TwBasicExecutor:
                         if valid and len(points) == 6:
                             if (
                                 hasattr(self.interpreter, "ide_turtle_canvas")
-                                and self.interpreter.ide_turtle_canvas
+                                and self.ide_turtle_canvas
                             ):
-                                canvas = self.interpreter.ide_turtle_canvas
+                                canvas = self.ide_turtle_canvas
                                 canvas.draw_polygon(
                                     points,
                                     filled=filled,
                                     color="black"
                                 )
-                                self.interpreter.log_output(
+                                self.log_output(
                                     f"Drew {'filled ' if filled else ''}triangle"
                                 )
                             elif self.pygame_screen:
@@ -1245,15 +1298,15 @@ class TwBasicExecutor:
                                         ],
                                         2,
                                     )
-                                self.interpreter.log_output(
+                                self.log_output(
                                     f"Drew {'filled ' if filled else ''}triangle"
                                 )
                             else:
-                                self.interpreter.log_output("Graphics not initialized")
+                                self.log_output("Graphics not initialized")
                         else:
-                            self.interpreter.log_output("Invalid TRIANGLE coordinates")
+                            self.log_output("Invalid TRIANGLE coordinates")
                     else:
-                        self.interpreter.log_output(
+                        self.log_output(
                             "TRIANGLE syntax: TRIANGLE (x1,y1)-(x2,y2)-(x3,y3) [,filled]"
                         )
             elif cmd == "ELLIPSE":
@@ -1271,9 +1324,9 @@ class TwBasicExecutor:
 
                         if (
                             hasattr(self.interpreter, "ide_turtle_canvas")
-                            and self.interpreter.ide_turtle_canvas
+                            and self.ide_turtle_canvas
                         ):
-                            canvas = self.interpreter.ide_turtle_canvas
+                            canvas = self.ide_turtle_canvas
                             if filled:
                                 canvas.create_oval(
                                     x,
@@ -1292,7 +1345,7 @@ class TwBasicExecutor:
                                     outline="black",
                                     tags="game_objects",
                                 )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Drew {'filled ' if filled else ''}ellipse at ({x},{y}) size {width}x{height}"
                             )
                         elif self.pygame_screen:
@@ -1307,15 +1360,15 @@ class TwBasicExecutor:
                                 pygame.draw.ellipse(
                                     self.pygame_screen, self.current_color, rect, 2
                                 )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Drew {'filled ' if filled else ''}ellipse at ({x},{y}) size {width}x{height}"
                             )
                         else:
-                            self.interpreter.log_output("Graphics not initialized")
+                            self.log_output("Graphics not initialized")
                     else:
-                        self.interpreter.log_output("Invalid ELLIPSE coordinates")
+                        self.log_output("Invalid ELLIPSE coordinates")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "ELLIPSE syntax: ELLIPSE (x,y), width, height [,filled]"
                     )
             elif cmd == "FILL":
@@ -1332,9 +1385,9 @@ class TwBasicExecutor:
                         # Flood fill is complex - for now just draw a small filled circle
                         if (
                             hasattr(self.interpreter, "ide_turtle_canvas")
-                            and self.interpreter.ide_turtle_canvas
+                            and self.ide_turtle_canvas
                         ):
-                            canvas = self.interpreter.ide_turtle_canvas
+                            canvas = self.ide_turtle_canvas
                             canvas.create_oval(
                                 x - 5,
                                 y - 5,
@@ -1343,7 +1396,7 @@ class TwBasicExecutor:
                                 fill=color,
                                 tags="game_objects",
                             )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Flood fill at ({x},{y}) with {color}"
                             )
                         elif self.pygame_screen:
@@ -1352,17 +1405,17 @@ class TwBasicExecutor:
                             pygame.draw.circle(
                                 self.pygame_screen, self.current_color, (x, y), 5
                             )
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Flood fill at ({x},{y}) with {color}"
                             )
                         else:
-                            self.interpreter.log_output("Graphics not initialized")
+                            self.log_output("Graphics not initialized")
                     else:
-                        self.interpreter.log_output("Invalid FILL coordinates")
+                        self.log_output("Invalid FILL coordinates")
                 else:
-                    self.interpreter.log_output("FILL syntax: FILL (x,y) [,color]")
+                    self.log_output("FILL syntax: FILL (x,y) [,color]")
         except Exception as e:
-            self.interpreter.debug_output(f"Enhanced graphics error: {e}")
+            self.debug_output(f"Enhanced graphics error: {e}")
         return "continue"
 
     def _handle_sound_commands(self, cmd, parts):
@@ -1377,10 +1430,10 @@ class TwBasicExecutor:
                     import winsound
 
                     winsound.Beep(int(frequency), int(duration * 1000))
-                    self.interpreter.log_output(f"Beep: {frequency}Hz for {duration}s")
+                    self.log_output(f"Beep: {frequency}Hz for {duration}s")
                 except ImportError:
                     # On non-Windows systems, just log
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"Beep: {frequency}Hz for {duration}s (simulated)"
                     )
             elif cmd == "PLAY":
@@ -1424,15 +1477,15 @@ class TwBasicExecutor:
                         import winsound
 
                         winsound.Beep(int(frequency), int(duration * 1000))
-                        self.interpreter.log_output(
+                        self.log_output(
                             f"Played {note_or_freq} for {duration}s"
                         )
                     except ImportError:
-                        self.interpreter.log_output(
+                        self.log_output(
                             f"Played {note_or_freq} for {duration}s (simulated)"
                         )
                 else:
-                    self.interpreter.log_output("PLAY syntax: PLAY note [,duration]")
+                    self.log_output("PLAY syntax: PLAY note [,duration]")
             elif cmd == "SOUND":
                 # SOUND frequency, duration, volume
                 if len(parts) >= 3:
@@ -1440,11 +1493,11 @@ class TwBasicExecutor:
                     duration = float(parts[2])
                     volume = float(parts[3]) if len(parts) > 3 else 1.0
 
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"Sound: {frequency}Hz, {duration}s, volume {volume}"
                     )
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "SOUND syntax: SOUND frequency, duration [,volume]"
                     )
             elif cmd == "NOTE":
@@ -1478,21 +1531,21 @@ class TwBasicExecutor:
                             import winsound
 
                             winsound.Beep(int(frequency), int(duration * 1000))
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Note: {note}{octave} for {duration}s"
                             )
                         except ImportError:
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"Note: {note}{octave} for {duration}s (simulated)"
                             )
                     else:
-                        self.interpreter.log_output("Invalid note name")
+                        self.log_output("Invalid note name")
                 else:
-                    self.interpreter.log_output(
+                    self.log_output(
                         "NOTE syntax: NOTE note, octave [,duration]"
                     )
         except Exception as e:
-            self.interpreter.debug_output(f"Sound command error: {e}")
+            self.debug_output(f"Sound command error: {e}")
         return "continue"
 
     def _handle_array_operations(self, cmd, parts):
@@ -1502,8 +1555,8 @@ class TwBasicExecutor:
                 # SORT array_name
                 if len(parts) >= 2:
                     array_name = parts[1]
-                    if array_name in self.interpreter.variables:
-                        array = self.interpreter.variables[array_name]
+                    if array_name in self.variables:
+                        array = self.variables[array_name]
                         if isinstance(array, dict):
                             try:
                                 # Convert dict values to list, sort, and convert back
@@ -1513,57 +1566,57 @@ class TwBasicExecutor:
                                 for i, val in enumerate(sorted_values):
                                     if i in array:
                                         array[i] = val
-                                self.interpreter.log_output(
+                                self.log_output(
                                     f"Array {array_name} sorted"
                                 )
                             except Exception:
-                                self.interpreter.log_output(
+                                self.log_output(
                                     "Array contains non-comparable elements"
                                 )
                         else:
-                            self.interpreter.log_output(f"{array_name} is not an array")
+                            self.log_output(f"{array_name} is not an array")
                     else:
-                        self.interpreter.log_output(f"Array {array_name} not found")
+                        self.log_output(f"Array {array_name} not found")
                 else:
-                    self.interpreter.log_output("SORT syntax: SORT array_name")
+                    self.log_output("SORT syntax: SORT array_name")
             elif cmd == "FIND":
                 # FIND array_name, value
                 if len(parts) >= 3:
                     array_name = parts[1]
-                    search_value = self.interpreter.evaluate_expression(parts[2])
+                    search_value = self.evaluate_expression(parts[2])
 
-                    if array_name in self.interpreter.variables:
-                        array = self.interpreter.variables[array_name]
+                    if array_name in self.variables:
+                        array = self.variables[array_name]
                         if isinstance(array, dict):
                             try:
                                 for idx, val in array.items():
                                     if val == search_value:
-                                        self.interpreter.variables["RESULT"] = idx
-                                        self.interpreter.log_output(
+                                        self.variables["RESULT"] = idx
+                                        self.log_output(
                                             f"Found {search_value} at index {idx} in {array_name}"
                                         )
                                         return "continue"
-                                self.interpreter.variables["RESULT"] = -1
-                                self.interpreter.log_output(
+                                self.variables["RESULT"] = -1
+                                self.log_output(
                                     f"Value {search_value} not found in {array_name}"
                                 )
                             except Exception:
-                                self.interpreter.variables["RESULT"] = -1
-                                self.interpreter.log_output(
+                                self.variables["RESULT"] = -1
+                                self.log_output(
                                     f"Error searching in {array_name}"
                                 )
                         else:
-                            self.interpreter.log_output(f"{array_name} is not an array")
+                            self.log_output(f"{array_name} is not an array")
                     else:
-                        self.interpreter.log_output(f"Array {array_name} not found")
+                        self.log_output(f"Array {array_name} not found")
                 else:
-                    self.interpreter.log_output("FIND syntax: FIND array_name, value")
+                    self.log_output("FIND syntax: FIND array_name, value")
             elif cmd in ["SUM", "AVG", "MIN", "MAX"]:
                 # SUM/AVG/MIN/MAX array_name
                 if len(parts) >= 2:
                     array_name = parts[1]
-                    if array_name in self.interpreter.variables:
-                        array = self.interpreter.variables[array_name]
+                    if array_name in self.variables:
+                        array = self.variables[array_name]
                         if isinstance(array, dict) and array:
                             try:
                                 values = list(array.values())
@@ -1580,24 +1633,24 @@ class TwBasicExecutor:
                                     result = max(values)
                                     operation = "maximum"
 
-                                self.interpreter.variables["RESULT"] = result
-                                self.interpreter.log_output(
+                                self.variables["RESULT"] = result
+                                self.log_output(
                                     f"Array {array_name} {operation}: {result}"
                                 )
                             except Exception:
-                                self.interpreter.log_output(
+                                self.log_output(
                                     "Array contains non-numeric elements"
                                 )
                         else:
-                            self.interpreter.log_output(
+                            self.log_output(
                                 f"{array_name} is not a valid array"
                             )
                     else:
-                        self.interpreter.log_output(f"Array {array_name} not found")
+                        self.log_output(f"Array {array_name} not found")
                 else:
-                    self.interpreter.log_output(f"{cmd} syntax: {cmd} array_name")
+                    self.log_output(f"{cmd} syntax: {cmd} array_name")
         except Exception as e:
-            self.interpreter.debug_output(f"Array operation error: {e}")
+            self.debug_output(f"Array operation error: {e}")
         return "continue"
 
     def _handle_game_commands(self, command, cmd, parts):
@@ -1613,17 +1666,17 @@ class TwBasicExecutor:
                         if len(parts) > 3
                         else "Time_Warp Game Window"
                     )
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"🎮 Game screen initialized: {width}x{height} - {title}"
                     )
 
                     # Initialize graphics - either IDE canvas or standalone pygame
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode - use turtle canvas
-                        canvas = self.interpreter.ide_turtle_canvas
+                        canvas = self.ide_turtle_canvas
                         canvas.delete("all")  # Clear canvas
                         canvas.config(
                             width=min(width, 600), height=min(height, 400)
@@ -1631,17 +1684,17 @@ class TwBasicExecutor:
                         canvas.create_text(
                             width // 2, 20, text=title, font=("Arial", 16), fill="white"
                         )
-                        self.interpreter.log_output(
+                        self.log_output(
                             "🎨 Graphics canvas initialized for game"
                         )
                     else:
                         # Standalone mode - use pygame
                         self._init_pygame_graphics(width, height, title)
-                        self.interpreter.log_output(
+                        self.log_output(
                             "🎮 Pygame graphics initialized for standalone game"
                         )
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMESCREEN parameters")
+                    self.log_output("Error: Invalid GAMESCREEN parameters")
         elif cmd == "GAMEBG":
             # GAMEBG r, g, b - set background color
             if len(parts) >= 4:
@@ -1650,34 +1703,34 @@ class TwBasicExecutor:
                     g = int(parts[2].rstrip(","))
                     b = int(parts[3].rstrip(","))
                     color = f"#{r:02x}{g:02x}{b:02x}"
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"🎨 Background color set to RGB({r},{g},{b})"
                     )
 
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode
-                        self.interpreter.ide_turtle_canvas.config(bg=color)
+                        self.ide_turtle_canvas.config(bg=color)
                     elif self.pygame_screen:
                         # Pygame mode
                         self.pygame_screen.fill((r, g, b))
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMEBG color values")
+                    self.log_output("Error: Invalid GAMEBG color values")
         elif cmd == "GAMELOOP":
-            self.interpreter.log_output("🔄 Game loop started")
+            self.log_output("🔄 Game loop started")
         elif cmd == "GAMEEND":
-            self.interpreter.log_output("🎮 Game ended")
+            self.log_output("🎮 Game ended")
         elif cmd == "GAMECLEAR":
             # Clear the game screen
-            self.interpreter.log_output("🧹 Game screen cleared")
+            self.log_output("🧹 Game screen cleared")
             if (
                 hasattr(self.interpreter, "ide_turtle_canvas")
-                and self.interpreter.ide_turtle_canvas
+                and self.ide_turtle_canvas
             ):
                 # IDE mode
-                self.interpreter.ide_turtle_canvas.delete("game_objects")
+                self.ide_turtle_canvas.delete("game_objects")
             elif self.pygame_screen:
                 # Pygame mode - fill with black
                 self.pygame_screen.fill((0, 0, 0))
@@ -1688,27 +1741,27 @@ class TwBasicExecutor:
                     r = int(parts[1].rstrip(","))
                     g = int(parts[2].rstrip(","))
                     b = int(parts[3].rstrip(","))
-                    self.interpreter.variables["GAME_COLOR"] = f"#{r:02x}{g:02x}{b:02x}"
+                    self.variables["GAME_COLOR"] = f"#{r:02x}{g:02x}{b:02x}"
                     self.current_color = (r, g, b)  # Store for pygame
-                    self.interpreter.log_output(
+                    self.log_output(
                         f"🎨 Drawing color set to RGB({r},{g},{b})"
                     )
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMECOLOR values")
+                    self.log_output("Error: Invalid GAMECOLOR values")
         elif cmd == "GAMEPOINT":
             # GAMEPOINT x, y - draw a point
             if len(parts) >= 3:
                 try:
                     x = int(parts[1].rstrip(","))
                     y = int(parts[2].rstrip(","))
-                    color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
+                    color = self.variables.get("GAME_COLOR", "#FFFFFF")
 
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode
-                        canvas = self.interpreter.ide_turtle_canvas
+                        canvas = self.ide_turtle_canvas
                         canvas.create_oval(
                             x,
                             y,
@@ -1726,7 +1779,7 @@ class TwBasicExecutor:
                             self.pygame_screen, self.current_color, (x, y), 1
                         )
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMEPOINT coordinates")
+                    self.log_output("Error: Invalid GAMEPOINT coordinates")
         elif cmd == "GAMERECT":
             # GAMERECT x, y, width, height, filled
             if len(parts) >= 6:
@@ -1736,14 +1789,14 @@ class TwBasicExecutor:
                     width = int(parts[3].rstrip(","))
                     height = int(parts[4].rstrip(","))
                     filled = int(parts[5])
-                    color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
+                    color = self.variables.get("GAME_COLOR", "#FFFFFF")
 
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode
-                        canvas = self.interpreter.ide_turtle_canvas
+                        canvas = self.ide_turtle_canvas
                         if filled:
                             canvas.create_rectangle(
                                 x,
@@ -1777,9 +1830,9 @@ class TwBasicExecutor:
                                 self.pygame_screen, self.current_color, rect, 2
                             )
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMERECT parameters")
+                    self.log_output("Error: Invalid GAMERECT parameters")
         elif cmd == "GAMELOOP":
-            self.interpreter.log_output("🔄 Game loop started")
+            self.log_output("🔄 Game loop started")
         elif cmd == "GAMETEXT":
             # GAMETEXT x, y, "text"
             if len(parts) >= 4:
@@ -1787,14 +1840,14 @@ class TwBasicExecutor:
                     x = int(parts[1].rstrip(","))
                     y = int(parts[2].rstrip(","))
                     text = " ".join(parts[3:]).strip('"')
-                    color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
+                    color = self.variables.get("GAME_COLOR", "#FFFFFF")
 
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode
-                        canvas = self.interpreter.ide_turtle_canvas
+                        canvas = self.ide_turtle_canvas
                         canvas.create_text(
                             x,
                             y,
@@ -1811,22 +1864,22 @@ class TwBasicExecutor:
                         text_surface = font.render(text, True, self.current_color)
                         self.pygame_screen.blit(text_surface, (x, y))
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMETEXT parameters")
+                    self.log_output("Error: Invalid GAMETEXT parameters")
         elif cmd == "GAMEUPDATE":
             # Update/refresh the display
             if (
                 hasattr(self.interpreter, "ide_turtle_canvas")
-                and self.interpreter.ide_turtle_canvas
+                and self.ide_turtle_canvas
             ):
                 # IDE mode
-                self.interpreter.ide_turtle_canvas.update()
-                self.interpreter.log_output("🔄 Display updated")
+                self.ide_turtle_canvas.update()
+                self.log_output("🔄 Display updated")
             elif self.pygame_screen:
                 # Pygame mode
                 import pygame
 
                 pygame.display.flip()
-                self.interpreter.log_output("🔄 Pygame display updated")
+                self.log_output("🔄 Pygame display updated")
         elif cmd == "GAMEDELAY":
             # GAMEDELAY milliseconds - delay for frame rate control
             if len(parts) >= 2:
@@ -1836,7 +1889,7 @@ class TwBasicExecutor:
 
                     time.sleep(delay_ms / 1000.0)  # Convert to seconds
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMEDELAY parameter")
+                    self.log_output("Error: Invalid GAMEDELAY parameter")
         elif cmd == "GAMECIRCLE":
             # GAMECIRCLE x, y, radius, filled (for 2-param version, assume filled=0)
             if len(parts) >= 4:
@@ -1845,14 +1898,14 @@ class TwBasicExecutor:
                     y = int(parts[2].rstrip(","))
                     radius = int(parts[3].rstrip(","))
                     filled = int(parts[4]) if len(parts) >= 5 else 0  # Default unfilled
-                    color = self.interpreter.variables.get("GAME_COLOR", "#FFFFFF")
+                    color = self.variables.get("GAME_COLOR", "#FFFFFF")
 
                     if (
                         hasattr(self.interpreter, "ide_turtle_canvas")
-                        and self.interpreter.ide_turtle_canvas
+                        and self.ide_turtle_canvas
                     ):
                         # IDE mode
-                        canvas = self.interpreter.ide_turtle_canvas
+                        canvas = self.ide_turtle_canvas
                         if filled:
                             canvas.create_oval(
                                 x - radius,
@@ -1889,24 +1942,24 @@ class TwBasicExecutor:
                                 2,
                             )
                 except ValueError:
-                    self.interpreter.log_output("Error: Invalid GAMECIRCLE parameters")
+                    self.log_output("Error: Invalid GAMECIRCLE parameters")
         elif cmd == "GAMEKEY":
             # GAMEKEY() - get pressed key (placeholder - would need real input handling)
-            self.interpreter.variables["LAST_KEY"] = ""  # Placeholder
-            self.interpreter.log_output("🎮 Key input checked")
+            self.variables["LAST_KEY"] = ""  # Placeholder
+            self.log_output("🎮 Key input checked")
         else:
             # Generic game command
-            self.interpreter.log_output(f"🎮 Game command: {command}")
+            self.log_output(f"🎮 Game command: {command}")
         return "continue"
 
     def _handle_multiplayer_commands(self, command, cmd, parts):
         """Handle multiplayer and networking commands"""
         # Placeholder for multiplayer commands
-        self.interpreter.log_output(f"Multiplayer command: {command}")
+        self.log_output(f"Multiplayer command: {command}")
         return "continue"
 
     def _handle_audio_commands(self, command, cmd, parts):
         """Handle audio system commands"""
         # Placeholder for audio commands
-        self.interpreter.log_output(f"Audio command: {command}")
+        self.log_output(f"Audio command: {command}")
         return "continue"

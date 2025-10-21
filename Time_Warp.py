@@ -1,3 +1,44 @@
+# --- UnifiedCanvasOutputHandler: Compatibility layer for interpreter output ---
+class UnifiedCanvasOutputHandler:
+    def __init__(self, unified_canvas):
+        self.unified_canvas = unified_canvas
+
+    def insert(self, position, text):
+        # Convert text output to unified canvas text rendering
+        # Command output should always start on a new line by default
+        import tkinter as tk
+        if position == "end" or position == tk.END:
+            # Always start command output on a new line
+            self.unified_canvas.write_text("\n")
+            self.unified_canvas.write_text(text)
+            # Force canvas update
+            self.unified_canvas.update_idletasks()
+        else:
+            # For other positions, just append for now
+            self.unified_canvas.write_text(text)
+            self.unified_canvas.update_idletasks()
+
+    def see(self, position):
+        # Unified canvas doesn't need scrolling, but we can implement if needed
+        pass
+
+    def request_input(self, prompt, input_type=str):
+        """Show input prompt in unified canvas and enable input handling."""
+        def input_callback(input_value):
+            try:
+                typed_value = input_type(input_value)
+                # Display the input value
+                self.unified_canvas.write_text(f"{typed_value}\n", color=7)
+                # Send input to interpreter
+                if hasattr(self, "_input_callback") and self._input_callback:
+                    self._input_callback(typed_value)
+            except ValueError:
+                # Invalid input type, reprompt
+                self.unified_canvas.write_text(f"\n❌ Invalid input type. Expected {input_type.__name__}.\n", color=4)
+                self.unified_canvas.prompt_input(prompt, lambda val: self._handle_input_callback(val, input_type))
+
+        self.unified_canvas.prompt_input(prompt, input_callback)
+import sys
 #!/usr/bin/env python3
 
 # Set pygame environment variable to suppress AVX2 warning
@@ -8,16 +49,15 @@ os.environ['PYGAME_DETECT_AVX2'] = '1'
 import warnings
 warnings.filterwarnings("ignore", message=".*avx2.*", category=RuntimeWarning)
 
-"""
-Time_Warp IDE - Simple Educational Programming Environment
+"""Time_Warp IDE - Simple Educational Programming Environment
 
-A minimal Tkinter-based IDE for running multi-language programs through the Time_Warp interpreter.
-Supports Time Warp, PILOT, BASIC, Logo, Pascal, and Prolog execution.
+A minimal Tkinter-based IDE for running multi-language programs through the Time_Warp
+interpreter. Supports TW BASIC, Pascal, and Prolog execution.
 
 Features:
 - Simple text editor with Courier font
 - One-click program execution
-- Integrated interpreter with 6 language support
+- Integrated interpreter with multiple language support
 - Turtle graphics for visual languages
 - Educational error messages
 
@@ -109,23 +149,40 @@ if not check_environment():
     print("❌ Environment setup failed. Please check the errors above.")
     sys.exit(1)
 
+# Check if we're in a headless environment
+try:
+    import tkinter as tk
+    root = tk.Tk()
+    root.withdraw()  # Hide the window immediately
+    root.destroy()
+    GUI_AVAILABLE = True
+except tk.TclError:
+    print("⚠️  GUI not available (headless environment detected)")
+    print("💡  Time_Warp IDE requires a graphical desktop environment to display the interface.")
+    print("💡  Please run this application on a system with X11, Wayland, or similar display server.")
+    GUI_AVAILABLE = False
+
+if not GUI_AVAILABLE:
+    print("\n🔧 To run Time_Warp IDE:")
+    print("   1. Use a graphical desktop environment")
+    print("   2. Connect via SSH with X11 forwarding: ssh -X username@hostname")
+    print("   3. Use VNC or similar remote desktop solution")
+    print("   4. Run on a local machine with display")
+    sys.exit(1)
+
 # Now import other modules after environment is verified
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from core.interpreter import Time_WarpInterpreter
+
 import os
 import json
 import re
+import platform
 from unified_canvas import UnifiedCanvas, Theme
+from core.languages import TwBasicInterpreter, TwPascalInterpreter, TwPrologInterpreter
+import threading
 
-# Import compiler system
-try:
-    from core.compiler import Time_WarpCompiler
-    COMPILER_AVAILABLE = True
-except ImportError:
-    COMPILER_AVAILABLE = False
-    Time_WarpCompiler = None
 
 # Import advanced editor features
 try:
@@ -344,9 +401,9 @@ class EnhancedCodeEditor(tk.Frame):
                 if line_text.strip().startswith("def ") or line_text.strip().startswith("class ") or "import " in line_text:
                     comment_char = "#"  # Python
                 elif "::" in line_text or line_text.strip().startswith("REM"):
-                    comment_char = "//"  # Time Warp style
+                    comment_char = "//"  # TW BASIC style
                 elif any(cmd in line_text.upper() for cmd in ["FORWARD", "PRINT", "REM"]):
-                    comment_char = ";"  # Time Warp style
+                    comment_char = ";"  # TW BASIC style
                 else:
                     comment_char = "#"  # Default
 
@@ -530,7 +587,6 @@ class TimeWarpApp:
     """
 
     def __init__(self, root):
-        print("[DEBUG] Entered TimeWarpApp.__init__")
         self.root = root
         self.root.title("Time_Warp IDE v1.3.0")
         self.root.geometry("1000x700")  # Increased size for better content visibility
@@ -540,15 +596,21 @@ class TimeWarpApp:
         self.selected_font_family = "Consolas"  # Default monospace font
         self.selected_font_size = 11  # Default font size
         self.config_path = os.path.expanduser("~/.Time_Warp/config.json")
-        self.interpreter = Time_WarpInterpreter()
-        self.interpreter.ide_turtle_canvas = None  # Will be set later
+        # Instantiate the three interpreters
+        self.tw_basic = TwBasicInterpreter()
+        self.pascal = TwPascalInterpreter()
+        self.prolog = TwPrologInterpreter()
+        self.current_language = "tw_basic"
+        # Plugin manager (optional)
         try:
             from plugins import PluginManager, PluginManagerDialog
             self.plugin_manager = PluginManager(self)
             self.plugin_manager_dialog = None
-        except Exception as e:
+        except Exception:
             self.plugin_manager = None
             self.plugin_manager_dialog = None
+
+        # Theme manager (optional)
         self.theme_manager = None
         try:
             from src.timewarp.utils.theme import ThemeManager, available_themes
@@ -560,38 +622,42 @@ class TimeWarpApp:
         self.status_label = tk.Label(self.root, text="Ready.", anchor="w", bg="#222", fg="#fff", font=(self.selected_font_family, 10))
         self.status_label.pack(side="bottom", fill="x")
 
-        # Initialize compiler system
-        self.compiler = None
-        if COMPILER_AVAILABLE:
-            try:
-                self.compiler = Time_WarpCompiler()
-                print("[DEBUG] Compiler system initialized successfully")
-            except Exception as e:
-                print(f"[WARNING] Could not initialize compiler system: {e}")
-                self.compiler = None
+        # Global keybindings
         self.root.bind("<F5>", lambda e: self.run_program())
         self.root.bind("<Control-r>", lambda e: self.run_program())
         self.root.bind("<Control-c>", lambda e: self._copy_text())
         self.root.bind("<Control-v>", lambda e: self._paste_text())
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        print("[DEBUG] Calling _create_ui()")
+
+        # Create UI and load configs
         self._create_ui()
-        print("[DEBUG] Calling _load_theme_config()")
         self._load_theme_config()
         self._load_font_config()
-        print("[DEBUG] Finished TimeWarpApp.__init__")
+
+    def get_current_interpreter(self):
+        """Get the current interpreter based on selected language"""
+        if self.current_language == "tw_basic":
+            return self.tw_basic
+        elif self.current_language == "pascal":
+            return self.pascal
+        elif self.current_language == "prolog":
+            return self.prolog
+        else:
+            return self.tw_basic  # default
+        # get_current_interpreter end
 
     def new_file(self):
         # Clear any loaded program
-        if hasattr(self.interpreter, 'program_lines'):
-            self.interpreter.program_lines = []
+        current_interpreter = self.get_current_interpreter()
+        if hasattr(current_interpreter, 'program_lines'):
+            current_interpreter.program_lines = []
         self.current_file = None
         self.unified_canvas.write_text("New program started. Previous program cleared.\n", color=10)
         self.status_label.config(text="🆕 New program started")
 
     def open_file(self):
         from tkinter import filedialog
-        file_path = filedialog.askopenfilename(filetypes=[("All Files", "*.*"), ("Time Warp", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
+        file_path = filedialog.askopenfilename(filetypes=[("All Files", "*.*"), ("TW BASIC", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
         if file_path:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
@@ -618,10 +684,11 @@ class TimeWarpApp:
 
         try:
             # Check if we have a line-numbered program to save
-            if hasattr(self.interpreter, 'program_lines') and self.interpreter.program_lines:
+            current_interpreter = self.get_current_interpreter()
+            if hasattr(current_interpreter, 'program_lines') and current_interpreter.program_lines:
                 # Save as line-numbered program
                 with open(file_path, "w", encoding="utf-8") as f:
-                    for line_num, cmd in self.interpreter.program_lines:
+                    for line_num, cmd in current_interpreter.program_lines:
                         f.write(f"{line_num} {cmd}\n")
                 self.unified_canvas.write_text(f"Program saved to {file_path}\n", color=10)
                 self.status_label.config(text=f"💾 Saved program: {file_path}")
@@ -636,14 +703,15 @@ class TimeWarpApp:
 
     def save_file_as(self):
         from tkinter import filedialog
-        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"), ("Time Warp", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"), ("TW BASIC", "*.tw"), ("Python", "*.py"), ("Text", "*.txt")])
         if file_path:
             try:
                 # Check if we have a line-numbered program to save
-                if hasattr(self.interpreter, 'program_lines') and self.interpreter.program_lines:
+                current_interpreter = self.get_current_interpreter()
+                if hasattr(current_interpreter, 'program_lines') and current_interpreter.program_lines:
                     # Save as line-numbered program
                     with open(file_path, "w", encoding="utf-8") as f:
-                        for line_num, cmd in self.interpreter.program_lines:
+                        for line_num, cmd in current_interpreter.program_lines:
                             f.write(f"{line_num} {cmd}\n")
                     self.unified_canvas.write_text(f"Program saved as {file_path}\n", color=10)
                     self.status_label.config(text=f"💾 Saved program as: {file_path}")
@@ -670,8 +738,9 @@ class TimeWarpApp:
     def clear_turtle(self):
         # Clear graphics from unified canvas
         self.unified_canvas.clear_graphics()
-        if hasattr(self.interpreter, "turtle_graphics"):
-            self.interpreter.turtle_graphics = None
+        current_interpreter = self.get_current_interpreter()
+        if hasattr(current_interpreter, "turtle_graphics"):
+            current_interpreter.turtle_graphics = None
         self.status_label.config(text="🧹 Graphics cleared.")
 
     def _toggle_line_numbers(self):
@@ -802,10 +871,11 @@ class TimeWarpApp:
     def _restart_interpreter(self):
         """Restart the interpreter"""
         try:
-            # Reinitialize the interpreter
-            self.interpreter = Time_WarpInterpreter()
+            # Reinitialize the current interpreter
+            current_interpreter = self.get_current_interpreter()
             # Reset unified canvas reference
-            self.interpreter.ide_unified_canvas = self.unified_canvas
+            if hasattr(current_interpreter, 'ide_unified_canvas'):
+                current_interpreter.ide_unified_canvas = self.unified_canvas
 
             # Create compatibility layer for interpreter
             class UnifiedCanvasOutputHandler:
@@ -829,10 +899,12 @@ class TimeWarpApp:
                     pass
 
             # Reset output widget reference for interpreter logging
-            self.interpreter.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
+            if hasattr(current_interpreter, 'output_widget'):
+                current_interpreter.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
 
             # Reset turtle canvas reference (unified canvas acts as turtle canvas too)
-            self.interpreter.ide_turtle_canvas = self.unified_canvas
+            if hasattr(current_interpreter, 'ide_turtle_canvas'):
+                current_interpreter.ide_turtle_canvas = self.unified_canvas
 
             self.unified_canvas.write_text("Interpreter restarted successfully.\n")
             self.status_label.config(text="🔄 Interpreter restarted.")
@@ -842,8 +914,17 @@ class TimeWarpApp:
 
     def _set_language(self, language):
         """Set the current programming language"""
+        valid_languages = ["tw_basic", "pascal", "prolog"]
+        if language not in valid_languages:
+            language = "tw_basic"
         self.current_language = language
-        self.status_label.config(text=f"💻 Language set to {language.upper()}")
+        if language == "tw_basic":
+            label = "TW BASIC"
+        elif language == "pascal":
+            label = "Pascal"
+        elif language == "prolog":
+            label = "Prolog"
+        self.status_label.config(text=f"💻 Language set to: {label}")
 
     def _open_settings(self):
         """Open settings dialog"""
@@ -876,7 +957,7 @@ class TimeWarpApp:
         import platform
         import sys
         
-        info = f"""📊 System Information:
+    info = f"""📊 System Information:
 
 Operating System: {platform.system()} {platform.release()}
 Platform: {platform.platform()}
@@ -884,9 +965,8 @@ Python Version: {sys.version.split()[0]}
 Architecture: {platform.machine()}
 
 Time_Warp IDE v1.3.0
-Available Languages: Time Warp, Pascal, Prolog"""
-        
-        messagebox.showinfo("System Info", info)
+Available Languages: TW BASIC, Pascal, Prolog"""
+    messagebox.showinfo("System Info", info)
 
     def _generate_report(self):
         """Generate a system report"""
@@ -950,9 +1030,57 @@ Full reporting functionality to be implemented."""
             self.status_label.config(text="❌ No code to execute.")
             return
         try:
-            result = self.interpreter.run_program(code, language='auto')
-            output_text = f"Program Output:\n{result}\n" if result is not None else "Program Output:\n<No output>\n"
-            self.unified_canvas.write_text(output_text)
+            def _run_in_thread(func, *fargs, **fkwargs):
+                def _target():
+                    try:
+                        func(*fargs, **fkwargs)
+                        # Ensure UI updates happen on main thread
+                        try:
+                            self.root.after(0, lambda: self.unified_canvas.redraw())
+                            self.root.after(0, lambda: self.status_label.config(text="🚀 Program executed."))
+                        except Exception:
+                            pass
+                    except Exception as e:
+                        try:
+                            self.root.after(0, lambda: self.unified_canvas.write_text(f"❌ Error: {e}\n"))
+                            self.root.after(0, lambda: self.status_label.config(text=f"❌ Execution error: {e}"))
+                        except Exception:
+                            pass
+
+                t = threading.Thread(target=_target, daemon=True)
+                t.start()
+
+            if self.current_language == "tw_basic":
+                # Set up graphics integration
+                self.tw_basic.ide_unified_canvas = self.unified_canvas
+                self.tw_basic.ide_turtle_canvas = self.unified_canvas
+                # Wrap output callback to ensure it is safe and visible in the UI
+                def _tw_basic_callback(text):
+                    try:
+                        print(f"[UI] Received basic output callback: {text}")
+                    except Exception:
+                        pass
+                    try:
+                        # Ensure writes happen on the Tk main thread
+                        self.root.after(0, lambda: self.unified_canvas.write_text(str(text) + "\n", color=10))
+                    except Exception as e:
+                        print(f"[UI] Error scheduling unified_canvas write: {e}")
+
+                self.tw_basic.set_output_callback(_tw_basic_callback)
+                # Run interpreter execution off the Tk main thread
+                _run_in_thread(self.tw_basic.execute_command, code)
+            elif self.current_language == "pascal":
+                # Set up graphics integration
+                self.pascal.ide_unified_canvas = self.unified_canvas
+                self.pascal.ide_turtle_canvas = self.unified_canvas
+                self.pascal.set_output_callback(lambda text: self.root.after(0, lambda: self.unified_canvas.write_text(str(text)+"\n", color=10)))
+                _run_in_thread(self.pascal.execute_command, code)
+            elif self.current_language == "prolog":
+                # Set up graphics integration
+                self.prolog.ide_unified_canvas = self.unified_canvas
+                self.prolog.ide_turtle_canvas = self.unified_canvas
+                self.prolog.set_output_callback(lambda text: self.root.after(0, lambda: self.unified_canvas.write_text(str(text)+"\n", color=10)))
+                _run_in_thread(self.prolog.execute_command, code)
             self.unified_canvas.redraw()
             self.status_label.config(text="🚀 Program executed.")
         except Exception as e:
@@ -965,7 +1093,7 @@ Full reporting functionality to be implemented."""
         about_text = """Time_Warp IDE v1.3.0
 
 An educational programming environment supporting multiple languages:
-• Time Warp: Unified educational language combining PILOT, BASIC, and Logo features
+• TW BASIC: Unified educational language (BASIC, PILOT, Logo features)
 • Pascal: Structured programming with educational focus
 • Prolog: Logic programming and AI concepts
 • Forth: Stack-based programming fundamentals
@@ -1139,211 +1267,6 @@ Features:
         tk.Button(button_frame, text="Cancel", command=font_dialog.destroy,
                  font=("Arial", 11)).pack(side="right", padx=5)
 
-    def _compile_to_executable(self):
-        """Compile the current program to a standalone executable"""
-        if not COMPILER_AVAILABLE or not self.compiler:
-            messagebox.showerror("Compiler Unavailable", "❌ Compiler system is not available.\n\nPlease ensure the compiler module is properly installed.")
-            return
-
-        # Get code from editor
-        if hasattr(self.editor, 'text_widget'):
-            code = self.editor.text_widget.get("1.0", tk.END).strip()
-        else:
-            code = self.editor.get("1.0", tk.END).strip()
-
-        if not code:
-            messagebox.showwarning("No Code", "❌ Please enter a program to compile.\n\nThe code editor is empty.")
-            return
-
-        # Detect language
-        language = self._detect_language_from_code(code)
-
-        # Create compilation dialog
-        compile_dialog = tk.Toplevel(self.root)
-        compile_dialog.title("📦 Compile to Executable")
-        compile_dialog.geometry("500x400")
-        compile_dialog.transient(self.root)
-        compile_dialog.grab_set()
-
-        tk.Label(compile_dialog, text="Compile Program to Executable", font=("Arial", 16, "bold")).pack(pady=10)
-
-        # Language info
-        info_frame = tk.Frame(compile_dialog)
-        info_frame.pack(fill="x", padx=20, pady=5)
-
-        tk.Label(info_frame, text=f"Detected Language: {language.upper()}", font=("Arial", 11, "bold")).pack(anchor="w")
-        tk.Label(info_frame, text=f"Code Length: {len(code)} characters", font=("Arial", 10)).pack(anchor="w")
-
-        # Output options
-        output_frame = tk.Frame(compile_dialog)
-        output_frame.pack(fill="x", padx=20, pady=10)
-
-        tk.Label(output_frame, text="Output Options:", font=("Arial", 12, "bold")).pack(anchor="w", pady=(0, 5))
-
-        # Output filename
-        name_frame = tk.Frame(output_frame)
-        name_frame.pack(fill="x", pady=2)
-        tk.Label(name_frame, text="Executable Name:", font=("Arial", 10)).pack(side="left")
-        output_name_var = tk.StringVar(value=f"program_{language}")
-        tk.Entry(name_frame, textvariable=output_name_var, width=30).pack(side="right")
-
-        # Output directory
-        dir_frame = tk.Frame(output_frame)
-        dir_frame.pack(fill="x", pady=2)
-        tk.Label(dir_frame, text="Output Directory:", font=("Arial", 10)).pack(side="left")
-        output_dir_var = tk.StringVar(value=os.getcwd())
-        tk.Entry(dir_frame, textvariable=output_dir_var, width=30).pack(side="right")
-
-        # Browse button for directory
-        def browse_directory():
-            from tkinter import filedialog
-            directory = filedialog.askdirectory(initialdir=output_dir_var.get())
-            if directory:
-                output_dir_var.set(directory)
-
-        tk.Button(dir_frame, text="Browse...", command=browse_directory).pack(side="right", padx=(5, 0))
-
-        # Compiler backend selection
-        backend_frame = tk.Frame(compile_dialog)
-        backend_frame.pack(fill="x", padx=20, pady=10)
-
-        tk.Label(backend_frame, text="Compiler Backend:", font=("Arial", 12, "bold")).pack(anchor="w", pady=(0, 5))
-
-        backend_var = tk.StringVar(value="auto")
-        backends = [("Auto (Recommended)", "auto")]
-        if hasattr(self.compiler, 'get_available_backends'):
-            available_backends = self.compiler.get_available_backends()
-            backends.extend([(f"{b.title()} Compiler", b) for b in available_backends])
-
-        for text, value in backends:
-            tk.Radiobutton(backend_frame, text=text, variable=backend_var, value=value).pack(anchor="w")
-
-        # Progress and status
-        progress_frame = tk.Frame(compile_dialog)
-        progress_frame.pack(fill="x", padx=20, pady=10)
-
-        progress_var = tk.DoubleVar()
-        progress_bar = ttk.Progressbar(progress_frame, variable=progress_var, maximum=100)
-        progress_bar.pack(fill="x", pady=5)
-
-        status_label = tk.Label(progress_frame, text="Ready to compile...", font=("Arial", 10))
-        status_label.pack(anchor="w")
-
-        # Buttons
-        button_frame = tk.Frame(compile_dialog)
-        button_frame.pack(fill="x", padx=20, pady=10)
-
-        def start_compilation():
-            """Start the compilation process"""
-            output_name = output_name_var.get().strip()
-            output_dir = output_dir_var.get().strip()
-            backend = backend_var.get()
-
-            if not output_name:
-                messagebox.showerror("Invalid Name", "❌ Please enter a valid executable name.")
-                return
-
-            if not output_dir or not os.path.isdir(output_dir):
-                messagebox.showerror("Invalid Directory", "❌ Please select a valid output directory.")
-                return
-
-            # Create output path
-            output_path = os.path.join(output_dir, output_name)
-
-            # Disable buttons during compilation
-            compile_btn.config(state="disabled")
-            cancel_btn.config(text="Close")
-
-            try:
-                status_label.config(text="🔄 Initializing compilation...")
-                progress_var.set(10)
-
-                status_label.config(text="📦 Compiling executable...")
-                progress_var.set(30)
-
-                # Perform compilation
-                result = self.compiler.compile_to_executable(code, language, output_path)
-
-                progress_var.set(80)
-
-                if result['success']:
-                    status_label.config(text="✅ Compilation completed successfully!")
-                    progress_var.set(100)
-
-                    # Show success message with details
-                    executable_path = result.get('executable', output_path)
-                    size = result.get('size', 0)
-                    compiler_used = result.get('compiler', 'Unknown')
-
-                    messagebox.showinfo("Compilation Successful",
-                                      f"✅ Executable compiled successfully!\n\n"
-                                      f"📁 Location: {executable_path}\n"
-                                      f"💻 Language: {language.upper()}\n"
-                                      f"🛠️ Compiler: {compiler_used}\n"
-                                      f"📏 Size: {size} bytes\n\n"
-                                      f"You can run it anytime with: ./{os.path.basename(executable_path)}\n"
-                                      f"Or choose 'Yes' below to run it now and see the output in the IDE.")
-
-                    # Ask if user wants to run the executable
-                    if messagebox.askyesno("Run Executable", "Would you like to run the compiled executable now?\n\nThe output will be displayed in the IDE's Output panel."):
-                        try:
-                            import subprocess
-                            # Run the executable and capture output
-                            result = subprocess.run(
-                                [executable_path],
-                                cwd=output_dir,
-                                capture_output=True,
-                                text=True,
-                                timeout=30  # 30 second timeout
-                            )
-
-                            # Display output in unified canvas
-                            output_text = f"🚀 Executable Output ({language.upper()}):\n\n"
-                            output_text += result.stdout
-                            if result.stderr:
-                                output_text += f"\n❌ Errors:\n{result.stderr}"
-                            output_text += f"\n✅ Exit code: {result.returncode}"
-                            self.unified_canvas.write_text(output_text)
-
-                            status_label.config(text="🚀 Executable completed!")
-                        except subprocess.TimeoutExpired:
-                            messagebox.showerror("Timeout", "❌ Executable timed out after 30 seconds.")
-                            status_label.config(text="⏰ Executable timed out.")
-                        except Exception as e:
-                            messagebox.showerror("Launch Error", f"❌ Could not launch executable: {str(e)}")
-                            status_label.config(text="❌ Launch failed.")
-
-                else:
-                    status_label.config(text="❌ Compilation failed.")
-                    progress_var.set(0)
-                    error_msg = result.get('error', 'Unknown error occurred')
-                    details = result.get('details', '')
-                    messagebox.showerror("Compilation Failed", f"❌ Compilation failed:\n\n{error_msg}\n\n{details}")
-
-            except Exception as e:
-                status_label.config(text="❌ Compilation error.")
-                progress_var.set(0)
-                messagebox.showerror("Compilation Error", f"❌ An error occurred during compilation:\n\n{str(e)}")
-
-            finally:
-                compile_btn.config(state="normal")
-                cancel_btn.config(text="Cancel")
-
-        def cancel_compilation():
-            """Cancel compilation or close dialog"""
-            if compile_btn.cget("state") == "disabled":
-                # Compilation in progress, can't cancel easily
-                if messagebox.askyesno("Cancel Compilation", "Compilation is in progress. Are you sure you want to cancel?"):
-                    compile_dialog.destroy()
-            else:
-                compile_dialog.destroy()
-
-        compile_btn = tk.Button(button_frame, text="📦 Compile", command=start_compilation,
-                               font=("Arial", 11, "bold"), bg="#4CAF50", fg="white")
-        compile_btn.pack(side="left", padx=5)
-
-        cancel_btn = tk.Button(button_frame, text="Cancel", command=cancel_compilation, font=("Arial", 11))
-        cancel_btn.pack(side="right", padx=5)
 
     def _preview_font(self, event=None):
         """Preview font changes"""
@@ -1380,6 +1303,48 @@ Features:
         # Update line numbers font (if enhanced editor)
         if hasattr(self.editor, 'line_numbers'):
             self.editor.line_numbers.config(font=(self.selected_font_family, self.selected_font_size - 2))
+
+    def _switch_to_editor_tab(self):
+        """Toolbar action: switch to the code editor tab and focus it"""
+        try:
+            self.notebook.select(self.editor_frame)
+            self.code_editor.focus_set()
+            if hasattr(self, 'status_label'):
+                self.status_label.config(text="📝 Code Editor tab active.")
+        except Exception:
+            pass
+
+    def _switch_to_output_tab(self):
+        """Toolbar action: switch to the output console tab and focus it"""
+        try:
+            self.notebook.select(self.output_frame)
+            self.unified_canvas.focus_set()
+            if hasattr(self, 'status_label'):
+                self.status_label.config(text="📊 Output Console tab active.")
+        except Exception:
+            pass
+
+    def _on_tab_changed(self, event=None):
+        """Handler for notebook tab change events; update focus and status"""
+        try:
+            idx = self.notebook.index("current")
+            # If index corresponds to editor_frame, focus editor; otherwise focus canvas
+            if idx == self.notebook.index(self.editor_frame):
+                try:
+                    self.code_editor.focus_set()
+                except Exception:
+                    pass
+                if hasattr(self, 'status_label'):
+                    self.status_label.config(text="📝 Code Editor tab active.")
+            else:
+                try:
+                    self.unified_canvas.focus_set()
+                except Exception:
+                    pass
+                if hasattr(self, 'status_label'):
+                    self.status_label.config(text="📊 Output Console tab active.")
+        except Exception:
+            pass
 
     def _save_font_config(self):
         """Save font configuration"""
@@ -1571,7 +1536,6 @@ Features:
             pass
 
     def _create_ui(self):
-        print("[DEBUG] Entered TimeWarpApp._create_ui")
         # Create menu bar
         self.menubar = tk.Menu(self.root)
         self.root.config(menu=self.menubar)
@@ -1628,11 +1592,12 @@ Features:
         run_menu.add_command(label="🔄 Restart Interpreter", command=self._restart_interpreter)
         self.menubar.add_cascade(label="▶️ Run", menu=run_menu)
 
+
         # === LANGUAGE MENU === 💻
         lang_menu = tk.Menu(self.menubar, tearoff=0)
-        lang_menu.add_command(label="⏰ Time Warp", command=lambda: self._set_language("time_warp"))
-        lang_menu.add_command(label=" Pascal", command=lambda: self._set_language("pascal"))
-        lang_menu.add_command(label="🧠 Prolog", command=lambda: self._set_language("prolog"))
+        lang_menu.add_command(label="⏰ TW BASIC", command=lambda: self._set_language("tw_basic"))
+        lang_menu.add_command(label="Pascal", command=lambda: self._set_language("pascal"))
+        lang_menu.add_command(label="Prolog", command=lambda: self._set_language("prolog"))
         lang_menu.add_separator()
         lang_menu.add_command(label="🔍 Auto-Detect", command=lambda: self._set_language("auto"))
         self.menubar.add_cascade(label="💻 Language", menu=lang_menu)
@@ -1642,9 +1607,6 @@ Features:
         tools_menu.add_command(label="🎨 Theme Selector...", command=self.open_theme_selector)
         tools_menu.add_command(label="🔤 Font Settings...", command=lambda: self._open_font_settings(None))
         tools_menu.add_separator()
-        if COMPILER_AVAILABLE and self.compiler:
-            tools_menu.add_command(label="📦 Compile to Executable...", command=self._compile_to_executable, accelerator="Ctrl+Shift+E")
-            tools_menu.add_separator()
         tools_menu.add_command(label="📦 Plugin Manager", command=self.open_plugin_manager)
         tools_menu.add_command(label="⚙️ Settings...", command=self._open_settings)
         tools_menu.add_separator()
@@ -1668,103 +1630,77 @@ Features:
         help_menu.add_command(label="💡 Feature Request", command=self._feature_request)
         help_menu.add_separator()
         help_menu.add_command(label="🔄 Check for Updates", command=self._check_updates)
+
         self.menubar.add_cascade(label="❓ Help", menu=help_menu)
 
 
+
+        # Toolbar intentionally omitted per user preference (no tab buttons)
+
         # --- Tabbed Canvas Layout ---
+        from tkinter import ttk
         # Main frame for padding and layout
         self.main_frame = tk.Frame(self.root, bg="black")
         self.main_frame.pack(expand=True, fill="both")
 
         # Create tabbed notebook for dual canvases
-        from tkinter import ttk
         self.notebook = ttk.Notebook(self.main_frame)
         self.notebook.pack(expand=True, fill="both")
 
-        # Code Editor tab
+        # Code Editor tab (left)
         self.editor_frame = tk.Frame(self.notebook, bg="#f8f8f8")
         self.code_editor = EnhancedCodeEditor(self.editor_frame)
         self.code_editor.pack(expand=True, fill="both")
         self.notebook.add(self.editor_frame, text="Code Editor")
 
-        # Output (UnifiedCanvas) tab
+        # Output (UnifiedCanvas) tab (right)
         self.output_frame = tk.Frame(self.notebook, bg="black")
         self.unified_canvas = UnifiedCanvas(self.output_frame, bg="black", relief="flat", bd=0,
-                                          font_family=self.selected_font_family,
-                                          font_size=self.selected_font_size)
+                              font_family=self.selected_font_family,
+                              font_size=self.selected_font_size)
+        # Quick visual sanity checks to ensure canvas is visible
+        try:
+            # Bind events for basic interactivity
+            self.unified_canvas.bind("<Key>", self.unified_canvas._on_key_press)
+            self.unified_canvas.bind("<Button-1>", self.unified_canvas._on_mouse_click)
+            self.unified_canvas.bind("<Configure>", self.unified_canvas._on_resize)
+            self.unified_canvas.bind("<FocusIn>", self.unified_canvas._on_focus_in)
+            self.unified_canvas.bind("<FocusOut>", self.unified_canvas._on_focus_out)
+        except Exception:
+            pass
         self.unified_canvas.pack(expand=True, fill="both", padx=0, pady=0)
+        try:
+            # Print a visible message and draw a small rectangle as a sanity check
+            self.unified_canvas.write_text("[System] Output console initialized.\n", color=15)
+            # Draw a small accent rectangle in the top-left corner
+            self.unified_canvas.draw_rectangle(10, 10, 60, 40, filled=True, color=self.unified_canvas.current_theme.accent)
+        except Exception:
+            pass
         self.notebook.add(self.output_frame, text="Output Console")
+
+        # Bind tab change events and set initial focus
+        self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_changed)
+        self.notebook.select(self.editor_frame)
+        self.code_editor.focus_set()
 
         # Make sure the main frame and root allow resizing
         self.root.resizable(True, True)
         self.main_frame.pack_propagate(False)  # Don't shrink to fit contents
 
-        # Set unified canvas reference for interpreter
-        self.interpreter.ide_unified_canvas = self.unified_canvas
-
-        # Create compatibility layer for interpreter
-        class UnifiedCanvasOutputHandler:
-            def __init__(self, unified_canvas):
-                self.unified_canvas = unified_canvas
-
-            def insert(self, position, text):
-                # Convert text output to unified canvas text rendering
-                # Command output should always start on a new line by default
-                if position == "end" or position == tk.END:
-                    # Always start command output on a new line
-                    self.unified_canvas.write_text("\n")
-                    self.unified_canvas.write_text(text)
-                    # Force canvas update
-                    self.unified_canvas.update_idletasks()
-                else:
-                    # For other positions, just append for now
-                    self.unified_canvas.write_text(text)
-                    # Force canvas update
-                    self.unified_canvas.update_idletasks()
-
-            def see(self, position):
-                # Unified canvas doesn't need scrolling, but we can implement if needed
-                pass
-
-            def request_input(self, prompt, input_type=str):
-                """Show input prompt in unified canvas and enable input handling."""
-                def input_callback(input_value):
-                    try:
-                        typed_value = input_type(input_value)
-                        # Display the input value
-                        self.unified_canvas.write_text(f"{typed_value}\n", color=7)
-                        # Send input to interpreter
-                        if hasattr(self, "_input_callback") and self._input_callback:
-                            self._input_callback(typed_value)
-                    except ValueError:
-                        # Invalid input type, reprompt
-                        self.unified_canvas.write_text(f"\n❌ Invalid input type. Expected {input_type.__name__}.\n", color=4)
-                        self.unified_canvas.prompt_input(prompt, lambda val: self._handle_input_callback(val, input_type))
-
-                self.unified_canvas.prompt_input(prompt, input_callback)
-
-            def _handle_input_callback(self, input_value, input_type):
-                """Handle input callback with type conversion"""
-                try:
-                    typed_value = input_type(input_value)
-                    self.unified_canvas.write_text(f"{typed_value}\n", color=7)
-                    if hasattr(self, "_input_callback") and self._input_callback:
-                        self._input_callback(typed_value)
-                except ValueError:
-                    self.unified_canvas.write_text(f"\n❌ Invalid input type. Expected {input_type.__name__}.\n", color=4)
-                    # Reprompt would go here if needed
+        # Set unified canvas reference for interpreters
+        self.tw_basic.ide_unified_canvas = self.unified_canvas
+        self.pascal.ide_unified_canvas = self.unified_canvas
+        self.prolog.ide_unified_canvas = self.unified_canvas
 
         # Set output widget reference for interpreter logging
-        self.interpreter.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
+        self.tw_basic.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
+        self.pascal.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
+        self.prolog.output_widget = UnifiedCanvasOutputHandler(self.unified_canvas)
 
         # Set turtle canvas reference (unified canvas acts as turtle canvas too)
-        self.interpreter.ide_turtle_canvas = self.unified_canvas
-
-        # Initialize the welcome screen
-        # self._show_welcome_screen()  # Moved to after mainloop starts
-
-        # Apply initial theme (but don't override the black background for welcome screen)
-        # self._apply_theme_stub(self.selected_theme)
+        self.tw_basic.ide_turtle_canvas = self.unified_canvas
+        self.pascal.ide_turtle_canvas = self.unified_canvas
+        self.prolog.ide_turtle_canvas = self.unified_canvas
 
         # Track when to show OK prompt
         self.show_ok_prompt = True  # Show OK on initial run
@@ -1790,20 +1726,18 @@ Features:
 
         # Display welcome text
         welcome_text = f"""
-Time_Warp IDE v1.3.0 - Educational Programming Environment
-{platform.system()} {platform.release()} - {platform.machine()}
+        Time_Warp IDE v1.3.0 - Educational Programming Environment
+        {platform.system()} {platform.release()} - {platform.machine()}
 
-Supports: Time Warp, Pascal, Prolog
+        Supports: TW BASIC, Pascal, Prolog
 
-{memory_info}
+        {memory_info}
 
-Type HELP for commands, or start programming!
+        Type HELP for commands, or start programming!
 
-OK
-"""
-
+        OK
+        """
         self.unified_canvas.write_text(welcome_text, color=15)  # White text
-
         # Start input prompt
         self._start_command_input()
 
@@ -1842,29 +1776,29 @@ OK
     def _show_help(self):
         """Show help information"""
         help_text = """
-Available Commands:
-  HELP     - Show this help
-  CLS      - Clear screen
-  EXIT     - Quit the IDE
+        Available Commands:
+            HELP     - Show this help
+            CLS      - Clear screen
+            EXIT     - Quit the IDE
 
-File Operations:
-  Use File menu to Load/Save programs
-  Line-numbered programs are stored in memory
-  RUN executes stored program
-  LIST shows stored program
-  NEW clears stored program
+        File Operations:
+            Use File menu to Load/Save programs
+            Line-numbered programs are stored in memory
+            RUN executes stored program
+            LIST shows stored program
+            NEW clears stored program
 
-Languages: Time_Warp programming language
+        Languages: TW BASIC
 
-Examples:
-  PRINT "Hello, World!"
-  10 PRINT "BASIC LINE"
-  FORWARD 100
-  T:Hello World!
-  ? "Hello"  (shortcut for PRINT)
+        Examples:
+            PRINT "Hello, World!"
+            10 PRINT "BASIC LINE"
+            FORWARD 100
+            T:Hello World!
+            ? "Hello"  (shortcut for PRINT)
 
-OK
-"""
+        OK
+        """
         self.unified_canvas.write_text(help_text, color=15)
 
     def _execute_command(self, command):
@@ -1875,27 +1809,30 @@ OK
             
             if command_upper == "RUN":
                 # Execute the stored program
-                if self.interpreter.program_lines:
-                    program_text = "\n".join([f"{line_num} {cmd}" for line_num, cmd in self.interpreter.program_lines])
-                    result = self.interpreter.run_program(program_text, language='time_warp', show_completion=True)
+                current_interpreter = self.get_current_interpreter()
+                if current_interpreter.program_lines:
+                    program_text = "\n".join([f"{line_num} {cmd}" for line_num, cmd in current_interpreter.program_lines])
+                    result = current_interpreter.run_program(program_text, language=self.current_language, show_completion=True)
                     return
                 else:
                     self.unified_canvas.write_text("No program loaded. Enter line-numbered commands first.\n", color=14)
                     return
             elif command_upper == "LIST":
                 # List the stored program
-                if self.interpreter.program_lines:
+                current_interpreter = self.get_current_interpreter()
+                if current_interpreter.program_lines:
                     # Clear screen for listing
                     self.unified_canvas.clear_screen()
                     self.unified_canvas.write_text("Program:\n", color=15)
-                    for line_num, cmd in self.interpreter.program_lines:
+                    for line_num, cmd in current_interpreter.program_lines:
                         self.unified_canvas.write_text(f"{line_num} {cmd}\n", color=15)
                 else:
                     self.unified_canvas.write_text("No program loaded.\n", color=14)
                 return
             elif command_upper.startswith("NEW"):
                 # Clear the stored program
-                self.interpreter.program_lines = []
+                current_interpreter = self.get_current_interpreter()
+                current_interpreter.program_lines = []
                 self.unified_canvas.write_text("Program cleared.\n", color=15)
                 return
 
@@ -1911,22 +1848,23 @@ OK
                     
                     if cmd:  # Must have a command after the line number
                         # Update or add the line
+                        current_interpreter = self.get_current_interpreter()
                         existing_index = None
-                        for i, (existing_num, _) in enumerate(self.interpreter.program_lines):
+                        for i, (existing_num, _) in enumerate(current_interpreter.program_lines):
                             if existing_num == line_num:
                                 existing_index = i
                                 break
 
                         if existing_index is not None:
-                            self.interpreter.program_lines[existing_index] = (line_num, cmd)
+                            current_interpreter.program_lines[existing_index] = (line_num, cmd)
                         else:
                             # Insert in line number order
                             insert_pos = 0
-                            for i, (existing_num, _) in enumerate(self.interpreter.program_lines):
+                            for i, (existing_num, _) in enumerate(current_interpreter.program_lines):
                                 if existing_num > line_num:
                                     break
                                 insert_pos = i + 1
-                            self.interpreter.program_lines.insert(insert_pos, (line_num, cmd))
+                            current_interpreter.program_lines.insert(insert_pos, (line_num, cmd))
 
                         # Line stored silently - no message needed
                         return
@@ -1939,8 +1877,9 @@ OK
                     self.unified_canvas.write_text("Invalid line number format.\n", color=12)
                     return
 
-            # Execute as Time_Warp command
-            result = self.interpreter.time_warp_executor.execute_command(command)
+            # Execute as current language command
+            current_interpreter = self.get_current_interpreter()
+            result = current_interpreter.execute_command(command)
         except Exception as e:
             self.unified_canvas.write_text(f"Error: {str(e)}\n", color=12)
 
@@ -1956,28 +1895,14 @@ OK
         """Detect programming language from code content"""
         lines = code.strip().split('\n')
         if not lines:
-            return 'pilot'
-
-        # Get first 10 lines for analysis
+            return 'time_warp'
+        # Simple detection: Pascal and Prolog have unique keywords
         first_lines = '\n'.join(lines[:10]).lower()
-        all_code = code.lower()
-
-        # Check file extension first if we have a current file
-        if hasattr(self, 'current_file') and self.current_file:
-            import os
-            _, ext = os.path.splitext(self.current_file.lower())
-            ext_map = {
-                '.pas': 'pascal',
-                '.plg': 'prolog',
-                '.logo': 'logo',
-                '.bas': 'basic',
-                '.pilot': 'pilot',
-                '.tw': 'time_warp'
-            }
-            if ext in ext_map:
-                return ext_map[ext]
-
-        # Time_Warp detection - check for unified language patterns FIRST to avoid conflicts
+        if any(word in first_lines for word in ["program ", "begin", "end.", "var ", "procedure", "function"]):
+            return "pascal"
+        if any(word in first_lines for word in [":-", "?-", "listing", "trace", "notrace"]):
+            return "prolog"
+        return "time_warp"
         # with established language syntax
         time_warp_commands = [
             "FORWARD", "BACK", "LEFT", "RIGHT", "PENUP", "PENDOWN", "CLEARSCREEN", "HOME",
@@ -2076,47 +2001,8 @@ OK
 
         return errors
 
-    def _validate_logo_syntax(self, lines):
-        """Validate Logo syntax"""
-        errors = []
 
-        for i, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line:
-                continue
-
-            # Check for unmatched brackets in REPEAT
-            if 'REPEAT' in line.upper():
-                open_brackets = line.count('[')
-                close_brackets = line.count(']')
-                if open_brackets != close_brackets:
-                    errors.append({
-                        'line': i,
-                        'message': f"Unmatched brackets in REPEAT: {open_brackets} opening, {close_brackets} closing"
-                    })
-
-        return errors
-
-    def _validate_pilot_syntax(self, lines):
-        """Validate PILOT syntax"""
-        errors = []
-        valid_commands = ['T:', 'A:', 'J:', 'Y:', 'N:', 'C:', 'R:', 'D:', 'E:', 'U:']
-
-        for i, line in enumerate(lines, 1):
-            line = line.strip()
-            if not line:
-                continue
-
-            # Check if line starts with valid PILOT command
-            if len(line) >= 2 and line[1] == ':':
-                command = line[:2].upper()
-                if command not in valid_commands:
-                    errors.append({
-                        'line': i,
-                        'message': f"Unknown PILOT command: {command}"
-                    })
-
-        return errors
+    # Logo and PILOT syntax validation removed (now unified in TW BASIC)
 
     def _validate_pascal_syntax(self, code):
         """Validate Pascal syntax (basic checks)"""
@@ -2204,7 +2090,6 @@ OK
 
 
 def main():
-    print("[DEBUG] Entered main()")
     import sys
     # Check for command line arguments
     if len(sys.argv) > 1:
@@ -2212,7 +2097,6 @@ def main():
             # Run in test mode: python Time_Warp.py --test test_file language
             test_file = sys.argv[2]
             language = sys.argv[3]
-            interpreter = Time_WarpInterpreter()
             try:
                 with open(test_file, 'r', encoding='utf-8') as f:
                     code = f.read()
@@ -2230,11 +2114,9 @@ def main():
             print("  python Time_Warp.py --test file lang    # Run test file")
             print("  python Time_Warp.py --help              # Show this help")
             return
-    print("[DEBUG] Instantiating TimeWarpApp and starting mainloop")
     root = tk.Tk()
     app = TimeWarpApp(root)
     root.mainloop()
-    print("[DEBUG] Exited mainloop")
 
 if __name__ == "__main__":
     main()

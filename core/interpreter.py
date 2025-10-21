@@ -71,7 +71,6 @@ except ImportError:
     print("ℹ️  PIL/Pillow not available - image features disabled")
 
 # Import language executors
-from .languages import TwBasicExecutor, TwPascalExecutor, TwPrologExecutor, TwTimeWarpExecutor
 
 # Import performance optimizations
 try:
@@ -459,6 +458,28 @@ except ImportError:
 
 
 class Time_WarpInterpreter:
+    def run_program(self, program_text, language=None):
+        """Run a program in the selected or detected language."""
+        # Reset state
+        self.program_lines = []
+        self.current_line = 0
+        self.running = True
+        # Split into lines and parse
+        lines = program_text.splitlines()
+        for line in lines:
+            parsed = self.parse_line(line)
+            if parsed:
+                self.program_lines.append(parsed)
+        # Execute each line
+        for line_num, command in self.program_lines:
+            lang = language or self.determine_command_type(command, self.current_language_mode)
+            if lang == "pascal" and hasattr(self, "pascal_executor"):
+                self.pascal_executor.execute_command(command)
+            elif lang == "prolog" and hasattr(self, "prolog_executor"):
+                self.prolog_executor.execute_command(command)
+            else:
+                self.tw_basic_executor.execute_command(command)
+        self.running = False
     """
     Main interpreter class for the Time_Warp IDE.
 
@@ -600,11 +621,9 @@ class Time_WarpInterpreter:
             self.advanced_robot.simulation_mode = True
 
 
+
         # Initialize unified language executor
         self.tw_basic_executor = TwBasicExecutor(self)
-        self.pascal_executor = TwPascalExecutor(self)
-        self.prolog_executor = TwPrologExecutor(self)
-        self.time_warp_executor = TwTimeWarpExecutor(self)
 
         # Language mode (optional explicit setting)
         self.current_language_mode = None
