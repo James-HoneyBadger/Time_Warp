@@ -144,7 +144,7 @@ class TwPilotExecutor:
         try:
             result = self.interpreter.evaluate_expression(condition)
             self.interpreter.match_flag = bool(result)
-        except:
+        except Exception:
             self.interpreter.match_flag = False
         # mark that the last command set the match flag so a following T: can be conditional
         self.interpreter._last_match_set = True
@@ -157,7 +157,7 @@ class TwPilotExecutor:
             result = self.interpreter.evaluate_expression(condition)
             # N: treat like a plain conditional (match when the condition is TRUE).
             self.interpreter.match_flag = bool(result)
-        except:
+        except Exception:
             # On error, default to no match
             self.interpreter.match_flag = False
         # mark that the last command set the match flag so a following T: can be conditional

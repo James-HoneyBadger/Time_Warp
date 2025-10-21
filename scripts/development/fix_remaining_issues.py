@@ -31,7 +31,7 @@ def fix_theme_application():
                         tab_frame = self.multi_tab_editor.tabs[tab_id]['frame']
                         try:
                             tab_frame.configure(bg=frame_bg)
-                        except:
+                        except Exception as e:
                             pass
                 except Exception as e:
                     print(f"Warning: Could not apply theme to multi-tab editor: {e}")'''

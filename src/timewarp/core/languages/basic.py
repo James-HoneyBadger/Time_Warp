@@ -328,7 +328,7 @@ class TwBasicExecutor:
                 self.interpreter.variables[var_name] = float(value)
             else:
                 self.interpreter.variables[var_name] = int(value)
-        except:
+        except Exception:
             self.interpreter.variables[var_name] = value
         return "continue"
 

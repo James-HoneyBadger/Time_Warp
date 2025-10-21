@@ -173,7 +173,7 @@ class Time_WarpIDE:
                         lf.write(
                             f"{datetime.now().isoformat()} - Loaded config: {snippet}\n"
                         )
-                except Exception:
+                except Exception as e:
                     pass
             except Exception:
                 pass
@@ -5802,7 +5802,7 @@ Happy coding through time! ⏰✨"""
             if hasattr(self, "main_container"):
                 try:
                     self.main_container.configure(style="Themed.TPanedWindow")
-                except:
+                except Exception as e:
                     pass
 
             # Ensure editor panel uses consistent colors
@@ -5837,7 +5837,7 @@ Happy coding through time! ⏰✨"""
                         fg=colors.get("text_primary", "#000000"),
                         insertbackground=colors.get("text_primary", "#000000"),
                     )
-                except:
+                except Exception as e:
                     pass
 
             # Apply theme to status bar
@@ -6108,7 +6108,7 @@ def main():
 
             tk.Button(root, text="Close", command=root.quit).pack(pady=20)
             root.mainloop()
-        except:
+        except Exception as e:
             pass
 
 

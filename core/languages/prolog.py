@@ -413,7 +413,7 @@ class TwPrologInterpreter:
             result = eval(bound_expr, safe_dict)
             if result:
                 return [bindings]
-        except:
+        except Exception:
             pass
         return []
 
@@ -431,7 +431,7 @@ class TwPrologInterpreter:
                         unification = self._unify_terms(element, item, bindings.copy())
                         if unification is not None:
                             return [unification]
-        except:
+        except Exception:
             pass
         return []
 

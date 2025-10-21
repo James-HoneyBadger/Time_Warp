@@ -265,7 +265,7 @@ class CompilerManager:
             # Clean up temporary directory
             try:
                 shutil.rmtree(temp_dir)
-            except:
+            except Exception:
                 pass
 
     def run_compiled_program(self, executable_path: str) -> Optional[subprocess.Popen]:
@@ -312,9 +312,9 @@ class CompilerManager:
                     process.kill()
                     if self.output_callback:
                         self.output_callback("⏰ Program execution timed out")
-                except Exception as e:
-                    if self.output_callback:
-                        self.output_callback(f"❌ Error running program: {str(e)}")
+                    except Exception:
+                        if self.output_callback:
+                            self.output_callback("❌ An error occurred while running the program.")
                 finally:
                     if process in self.running_processes:
                         self.running_processes.remove(process)

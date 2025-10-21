@@ -474,7 +474,7 @@ class TwPascalInterpreter:
                                 value = float(value)
                             else:
                                 value = int(value)
-                        except:
+                        except Exception:
                             pass  # Keep as string
 
                     self.variables[var] = value
@@ -608,7 +608,7 @@ class TwPascalInterpreter:
                 return bool(value)
             elif target_type == "CHAR":
                 return str(value)[0] if value else " "
-        except:
+        except Exception:
             pass
         return value
 

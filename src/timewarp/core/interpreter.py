@@ -1463,7 +1463,7 @@ class Time_WarpInterpreter:
                         jump_target = int(result.split(":")[1])
                         self.current_line = jump_target
                         continue
-                    except:
+                    except Exception:
                         pass
                 elif result == "error":
                     self.log_output("Program terminated due to error")

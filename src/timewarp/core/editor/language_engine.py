@@ -699,7 +699,7 @@ class PythonEngine(BaseLanguageEngine):
             # For now, just return original text
             # A full implementation would use a library like 'black'
             return text
-        except:
+        except Exception:
             return text
 
     def get_indentation(self, text: str, line_num: int) -> str:

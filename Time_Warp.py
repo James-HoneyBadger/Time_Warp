@@ -1293,11 +1293,11 @@ Full reporting functionality to be implemented."""
                 # Enqueue outputs so the UI poller flushes them on the main thread
                 def _tw_basic_callback(text):
                     try:
-                        # Put (text, color) to queue
-                        self._ui_output_queue.put((str(text) + "\n", 10))
+                        # Enqueue a normalized tuple: (text, color)
+                        self._ui_output_queue.put((str(text), 10))
                     except Exception:
                         try:
-                            self._ui_output_queue.put(str(text) + "\n")
+                            self._ui_output_queue.put((str(text), None))
                         except Exception:
                             pass
 
@@ -2348,12 +2348,13 @@ Features:
 
         # Ensure interpreters always have an output callback that enqueues into the UI queue.
         # This guarantees program output appears in the unified canvas regardless of the entry path.
-        def _enqueue_output(text):
+        def _enqueue_output(text, color=10):
             try:
-                self._ui_output_queue.put((str(text) + "\n", 10))
+                # Always enqueue a (text, color) tuple to keep shape consistent
+                self._ui_output_queue.put((str(text), color))
             except Exception:
                 try:
-                    self._ui_output_queue.put(str(text) + "\n")
+                    self._ui_output_queue.put((str(text), None))
                 except Exception:
                     pass
 
@@ -2375,28 +2376,16 @@ Features:
                 while True:
                     item = self._ui_output_queue.get_nowait()
                     try:
-                        # item is (text, color)
+                        # item is expected to be (text, color)
                         if isinstance(item, tuple) and len(item) >= 1:
                             text = item[0]
                             color = item[1] if len(item) > 1 else None
-                            # Ensure output starts on a new line to avoid being concatenated with existing content
-                            try:
-                                if not str(text).startswith("\n"):
-                                    self.unified_canvas.write_text("\n")
-                            except Exception:
-                                pass
-                            self.unified_canvas.write_text(
-                                str(text), color=color
-                            )
+                            # Write text exactly as provided; UnifiedCanvas handles internal newlines
+                            self.unified_canvas.write_text(str(text), color=color)
                         else:
-                            try:
-                                if not str(item).startswith("\n"):
-                                    self.unified_canvas.write_text("\n")
-                            except Exception:
-                                pass
                             self.unified_canvas.write_text(str(item))
-                    except Exception as ex:
-                        # Silently ignore write errors to avoid spamming stdout in the UI thread
+                    except Exception:
+                        # Ignore write errors to keep UI thread robust
                         pass
             except Exception:
                 # queue.Empty or other issues — ignore for now

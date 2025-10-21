@@ -91,7 +91,7 @@ class CodeGenerator:
             # Check constants first
             try:
                 return context.stdlib.get_constant(node.name)
-            except:
+            except Exception:
                 pass
 
             # Then check variables

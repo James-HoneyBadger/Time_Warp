@@ -124,7 +124,7 @@ class TwTimeWarpExecutor:
                                                     array_dict[i] = elem[1:-1]
                                                 else:
                                                     array_dict[i] = elem
-                                        except:
+                                        except Exception as e:
                                             array_dict[i] = elem
                                 else:
                                     array_dict = {}
@@ -395,7 +395,7 @@ class TwTimeWarpExecutor:
                 else:
                     float_val = float(value)
                     self.interpreter.variables[var_name] = float_val
-            except:
+            except Exception as e:
                 self.interpreter.variables[var_name] = value
         else:
             self.interpreter.variables[var_name] = ""
@@ -407,7 +407,7 @@ class TwTimeWarpExecutor:
         try:
             result = self.interpreter.evaluate_expression(condition)
             self.interpreter.match_flag = bool(result)
-        except:
+        except Exception as e:
             self.interpreter.match_flag = False
         self.interpreter._last_match_set = True
         return "continue"
@@ -418,7 +418,7 @@ class TwTimeWarpExecutor:
         try:
             result = self.interpreter.evaluate_expression(condition)
             self.interpreter.match_flag = bool(result)
-        except:
+        except Exception as e:
             self.interpreter.match_flag = False
         self.interpreter._last_match_set = True
         return "continue"
@@ -434,7 +434,7 @@ class TwTimeWarpExecutor:
                 if cond_val:
                     if label in self.interpreter.labels:
                         return f"jump:{self.interpreter.labels[label]}"
-            except:
+            except Exception as e:
                 pass
             return "continue"
 
@@ -494,7 +494,7 @@ class TwTimeWarpExecutor:
                     value = eval(interpolated)
                     self.interpreter.variables[var_name] = value
                     return "continue"
-                except:
+                except Exception as e:
                     pass
             if interpolated != expr:
                 self.interpreter.variables[var_name] = interpolated
@@ -686,7 +686,6 @@ class TwTimeWarpExecutor:
                 var_name = args[2]
                 text = self.interpreter.interpolate_text(text)
                 self.interpreter.variables[var_name] = str(len(text))
-
             elif operation == "UPPER" and len(args) >= 3:
                 text = args[1]
                 var_name = args[2]
@@ -698,7 +697,6 @@ class TwTimeWarpExecutor:
                 var_name = args[2]
                 text = self.interpreter.interpolate_text(text)
                 self.interpreter.variables[var_name] = text.lower()
-
         except Exception as e:
             self.interpreter.debug_output(f"String operation error: {e}")
 
@@ -806,7 +804,7 @@ class TwTimeWarpExecutor:
                                 if cond_val:
                                     if label in self.interpreter.labels:
                                         return f"jump:{self.interpreter.labels[label]}"
-                            except:
+                            except Exception as e:
                                 pass
 
         except Exception as e:
@@ -990,7 +988,7 @@ class TwTimeWarpExecutor:
                 self.interpreter.variables[var_name] = float(value)
             else:
                 self.interpreter.variables[var_name] = int(value)
-        except:
+        except Exception as e:
             self.interpreter.variables[var_name] = value
         return "continue"
 
@@ -1005,7 +1003,7 @@ class TwTimeWarpExecutor:
 
                 try:
                     cond_val = self.interpreter.evaluate_expression(cond_expr)
-                except:
+                except Exception as e:
                     cond_val = False
 
                 if cond_val:
@@ -1036,15 +1034,15 @@ class TwTimeWarpExecutor:
 
                 try:
                     start_val = int(start_val)
-                except:
+                except Exception as e:
                     start_val = 0
                 try:
                     end_val = int(end_val)
-                except:
+                except Exception as e:
                     end_val = 0
                 try:
                     step_val = int(step_val)
-                except:
+                except Exception as e:
                     step_val = 1
 
                 self.interpreter.variables[var_name] = start_val
@@ -1091,7 +1089,7 @@ class TwTimeWarpExecutor:
             current_val = self.interpreter.variables.get(var_name, 0)
             try:
                 current_val = int(current_val)
-            except:
+            except Exception as e:
                 current_val = 0
 
             next_val = current_val + step
@@ -1103,7 +1101,7 @@ class TwTimeWarpExecutor:
                     loop_again = next_val <= int(end_val)
                 else:
                     loop_again = next_val >= int(end_val)
-            except:
+            except Exception as e:
                 loop_again = False
 
             if loop_again:
@@ -1112,7 +1110,7 @@ class TwTimeWarpExecutor:
             else:
                 try:
                     self.interpreter.for_stack.pop(found_idx)
-                except:
+                except Exception as e:
                     pass
         except Exception as e:
             self.interpreter.debug_output(f"NEXT statement error: {e}")
@@ -1171,7 +1169,7 @@ class TwTimeWarpExecutor:
         """Handle FORWARD command"""
         try:
             distance = float(parts[1]) if len(parts) > 1 else 50.0
-        except:
+        except Exception as e:
             distance = 50.0
 
         if not self.interpreter.turtle_graphics:
@@ -1191,8 +1189,9 @@ class TwTimeWarpExecutor:
         """Handle BACK/BACKWARD command"""
         try:
             distance = float(parts[1]) if len(parts) > 1 else 50.0
-        except:
+        except Exception as e:
             distance = 50.0
+
         self.interpreter.turtle_forward(-distance)
         return "continue"
 

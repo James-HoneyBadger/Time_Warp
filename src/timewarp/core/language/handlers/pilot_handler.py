@@ -189,7 +189,7 @@ class PilotHandler:
             else:
                 try:
                     return str(self.interpreter.environment.get(var_name))
-                except:
+                except Exception:
                     return f"#{var_name}"  # Keep original if not found
 
         # Replace #VARIABLE patterns

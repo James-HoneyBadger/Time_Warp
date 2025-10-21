@@ -111,6 +111,17 @@ class UnifiedCanvas(tk.Canvas):
         line: Optional[int] = None,
     ):
         """Write text to the canvas with advanced formatting (always append for output console)"""
+        # Ensure we always append at the end of the buffer for output writes
+        try:
+            self.cursor_line = len(self.lines) - 1
+            self.cursor_col = len(self.lines[self.cursor_line])
+        except Exception:
+            # If internal state is inconsistent, fallback to default positions
+            if not self.lines:
+                self.lines = [""]
+                self.line_attributes = [{}]
+            self.cursor_line = len(self.lines) - 1
+            self.cursor_col = len(self.lines[self.cursor_line])
         self._append_text(text, color, style)
         # Use a debounced redraw to avoid blocking the UI when many writes occur
         try:
