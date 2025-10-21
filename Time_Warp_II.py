@@ -440,7 +440,6 @@ class TimeWarpApp:
     """
 
     def __init__(self, root):
-        print("[DEBUG] Entered TimeWarpApp.__init__")
         self.root = root
         self.root.title("Time_Warp IDE v1.3.0")
         self.root.geometry("1000x700")  # Increased size for better content visibility
@@ -470,12 +469,10 @@ class TimeWarpApp:
         self.root.bind("<Control-c>", lambda e: self._copy_text())
         self.root.bind("<Control-v>", lambda e: self._paste_text())
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        print("[DEBUG] Calling _create_ui()")
         self._create_ui()
-        print("[DEBUG] Calling _load_theme_config()")
         self._load_theme_config()
         self._load_font_config()
-        print("[DEBUG] Finished TimeWarpApp.__init__")
+        
 
     def new_file(self):
         self.editor.delete("1.0", tk.END)
@@ -993,7 +990,7 @@ Features:
             family = self.font_family_var.get()
             size = self.font_size_var.get()
             self.font_preview.config(font=(family, size))
-        except:
+        except Exception:
             pass
 
     def _apply_font_settings(self, dialog):
@@ -1133,7 +1130,7 @@ Features:
         # Update menu colors (limited Tkinter support)
         try:
             self.menubar.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
-        except:
+        except Exception:
             pass
         self.editor_tab.config(bg=colors["bg"])
         self.editor_frame.config(bg=colors["bg"])

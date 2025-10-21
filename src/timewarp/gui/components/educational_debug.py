@@ -357,6 +357,6 @@ class AdvancedDebugger:
         for window in list(self.debug_windows.values()):
             try:
                 window.destroy()
-            except:
+            except Exception:
                 pass
         self.debug_windows.clear()

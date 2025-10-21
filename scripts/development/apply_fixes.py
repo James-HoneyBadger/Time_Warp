@@ -61,7 +61,7 @@ def fix_theme_consistency():
             if hasattr(self, 'main_container'):
                 try:
                     self.main_container.configure(style="Themed.TPanedWindow")
-                except:
+                except Exception:
                     pass
             
             # Apply theme to all frames and panels
@@ -70,13 +70,13 @@ def fix_theme_consistency():
             if hasattr(self, 'editor_panel'):
                 try:
                     self.editor_panel.configure(style="Themed.TFrame", bg=frame_bg)
-                except:
+                except Exception:
                     pass
             
             if hasattr(self, 'graphics_output_panel'):
                 try:
                     self.graphics_output_panel.configure(style="Themed.TFrame", bg=frame_bg)
-                except:
+                except Exception:
                     pass
             
             # Apply theme to multi-tab editor with enhanced theming
@@ -88,7 +88,7 @@ def fix_theme_consistency():
                         tab_frame = self.multi_tab_editor.tabs[tab_id]['frame']
                         try:
                             tab_frame.configure(bg=frame_bg)
-                        except:
+                        except Exception:
                             pass
                 except Exception as e:
                     print(f"Warning: Could not apply theme to multi-tab editor: {e}")
@@ -101,14 +101,14 @@ def fix_theme_consistency():
                         fg=colors.get("fg_primary", "#000000"),
                         insertbackground=colors.get("fg_primary", "#000000")
                     )
-                except:
+                except Exception:
                     pass
             
             # Apply theme to turtle canvas area
             if hasattr(self, 'turtle_canvas'):
                 try:
                     self.turtle_canvas.configure(bg=colors.get("bg_primary", "#FFFFFF"))
-                except:
+                except Exception:
                     pass
             
             print(f"✅ Theme applied successfully: {self.current_theme}")

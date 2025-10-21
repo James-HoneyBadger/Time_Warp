@@ -83,7 +83,7 @@ class TimeWarpPlugin(BasePlugin):
                                 self.ide.menubar.entryconfig(i, "menu")[4][1]
                             )
                             break
-                    except:
+                    except Exception:
                         continue
 
                 if tools_menu:
@@ -123,7 +123,7 @@ class TimeWarpPlugin(BasePlugin):
                                 self.ide.menubar.entryconfig(i, "menu")[4][1]
                             )
                             break
-                    except:
+                    except Exception:
                         continue
 
                 if tools_menu:

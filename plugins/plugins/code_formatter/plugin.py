@@ -83,7 +83,7 @@ class TimeWarpPlugin(BaseTimeWarpPlugin):
                                 self.ide.menubar.entryconfig(i, "menu")[4][1]
                             )
                             break
-                    except:
+                    except Exception:
                         continue
 
                 if edit_menu:

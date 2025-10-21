@@ -161,7 +161,7 @@ class TimeWarpPerformanceBench:
             for executor, cmd in commands * 100:  # 1000 total operations
                 try:
                     executor.execute_command(cmd)
-                except:
+                except Exception:
                     pass  # Ignore errors for performance test
 
             root.destroy()
@@ -233,11 +233,11 @@ class TimeWarpPerformanceBench:
                 for file_path in temp_files:
                     try:
                         os.unlink(file_path)
-                    except:
+                    except Exception:
                         pass
                 try:
                     os.rmdir(temp_dir)
-                except:
+                except Exception:
                     pass
 
         return self.run_performance_test("File I/O Operations", file_io_test, 1000)

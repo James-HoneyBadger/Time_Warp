@@ -111,7 +111,7 @@ class PilotHandler:
         else:
             try:
                 value = str(self.interpreter.environment.get(var_name))
-            except:
+            except Exception:
                 value = ""
 
         # Process pattern
