@@ -72,6 +72,10 @@ class UnifiedCanvas(tk.Canvas):
     def __init__(self, parent, width: int = 1024, height: int = 768,
                  font_family: str = "Consolas", font_size: int = 12,
                  theme: Optional[Theme] = None, **kwargs):
+        # Extract our custom parameters
+        self.rows = kwargs.pop('rows', 25)
+        self.cols = kwargs.pop('cols', 80)
+        
         super().__init__(parent, **kwargs)
 
         # Canvas dimensions
@@ -152,9 +156,10 @@ class UnifiedCanvas(tk.Canvas):
         """Update font metrics when font changes"""
         self.char_width = self.font.measure("W")
         self.char_height = self.font.metrics("linespace")
-        visible_width = (self.canvas_width -
-                        (self.line_number_width if self.show_line_numbers
-                         else 0))
+        visible_width = (
+            self.canvas_width -
+            (self.line_number_width if self.show_line_numbers else 0)
+        )
         self.cols = max(1, visible_width // self.char_width)
         self.rows = max(1, self.canvas_height // self.char_height)
 
@@ -248,7 +253,8 @@ class UnifiedCanvas(tk.Canvas):
         # Ensure cursor position is valid
         if self.cursor_line >= len(self.lines):
             self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
-            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+            extend_count = self.cursor_line - len(self.line_attributes) + 1
+            self.line_attributes.extend([{}] * extend_count)
 
         lines = text.split('\n')
         for i, line_text in enumerate(lines):
@@ -281,9 +287,15 @@ class UnifiedCanvas(tk.Canvas):
 
         self.redraw()
 
-    def _insert_text_at_line(self, text: str, line_num: int,
-                           color: Optional[Union[str, int]] = None,
-                           style: str = "normal"):
+    def _insert_text_at_line(
+
+        self, text: str, line_num: int,
+
+        color: Optional[Union[str, int]] = None,
+
+        style: str = "normal"
+
+    ):
         """Insert text at specific line"""
         while len(self.lines) <= line_num:
             self.lines.append("")
@@ -322,7 +334,10 @@ class UnifiedCanvas(tk.Canvas):
 
         # Draw background
         self.create_rectangle(0, 0, self.canvas_width, self.canvas_height,
-                             fill=self.current_theme.background, outline="")
+
+                              fill=self.current_theme.background,
+
+                              outline="")
 
         x_offset = self.line_number_width if self.show_line_numbers else 0
 
