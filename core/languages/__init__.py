@@ -1,39 +1,24 @@
+
 """
-Time_Warp Language Support Modules
-==================================
+TW BASIC Unified Language Support Module
+=======================================
 
-This package contains executor classes for all supported programming languages
-in the Time_Warp IDE. Each language has its own executor that handles parsing,
-execution, and integration with the main interpreter.
+This package contains the unified executor class for TW BASIC, which combines
+the features of BASIC, PILOT, and Logo into a single educational language.
 
-Language Executors:
-- TwPilotExecutor: Handles TW PILOT commands (T:, A:, J:, Y:, N:, etc.)
-- TwBasicExecutor: Handles TW BASIC statements (PRINT, LET, GOTO, etc.)
-- TwLogoExecutor: Handles TW Logo commands (FORWARD, RIGHT, REPEAT, etc.)
-- TwPascalExecutor: Handles TW Pascal structured programming
-- TwPrologExecutor: Handles TW Prolog logic programming
-- TwTimeWarpExecutor: Handles unified Time_Warp language
+Language Executor:
+- TwBasicExecutor: Handles all TW BASIC commands, including classic BASIC, PILOT-style, and Logo-style turtle graphics.
 
 Each executor follows a consistent interface:
 - __init__(interpreter): Initialize with reference to main interpreter
 - execute_command(command): Execute a single command and return result
 
-The executors integrate with the Time_WarpInterpreter for shared functionality
+The executor integrates with the Time_WarpInterpreter for shared functionality
 like variable management, turtle graphics, and output handling.
 """
 
-from .pilot import TwPilotExecutor
 from .basic import TwBasicExecutor
-from .logo import TwLogoExecutor
-from .pascal import TwPascalExecutor
-from .prolog import TwPrologExecutor
-from .time_warp import TwTimeWarpExecutor
 
 __all__ = [
-    "TwPilotExecutor",
     "TwBasicExecutor",
-    "TwLogoExecutor",
-    "TwPascalExecutor",
-    "TwPrologExecutor",
-    "TwTimeWarpExecutor",
 ]

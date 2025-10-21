@@ -1,26 +1,23 @@
+
 """
-TW BASIC Language Executor
-==========================
+TW BASIC Unified Language Executor
+==================================
 
-Implements TW BASIC (Time_Warp Beginner's All-purpose Symbolic Instruction Code),
-an educational variant of the classic BASIC programming language for the Time_Warp IDE.
+Implements the unified TW BASIC language for the Time_Warp IDE, combining the features of
+BASIC, PILOT, and Logo into a single educational programming environment.
 
-Language Features:
-- Variable assignment with LET or direct assignment
-- Text output with PRINT
-- User input with INPUT
-- Control structures: IF/THEN/ELSE, FOR/NEXT loops, GOTO, GOSUB/RETURN
-- Mathematical functions: SIN, COS, TAN, SQRT, ABS, INT, RND
-- String operations: LEN, MID, LEFT, RIGHT, INSTR, STR$, VAL
-- Array operations: DIM, SORT, FIND, SUM, AVG, MIN, MAX
-- File I/O: OPEN, CLOSE, READ, WRITE, EOF
-- Graphics commands: LINE, BOX, TRIANGLE, ELLIPSE, FILL (with pygame)
-- Sound commands: BEEP, PLAY, SOUND, NOTE
-- Comments with REM
+Unified Language Features:
+- Line-numbered and structured BASIC syntax
+- PILOT-style colon-prefixed commands (T:, A:, J:, Y:, N:, etc.)
+- Logo-style turtle graphics commands (FORWARD, LEFT, RIGHT, etc.)
+- Variable assignment, arrays, and interpolation
+- Control flow: IF/THEN/ELSE, FOR/NEXT, REPEAT, GOTO, GOSUB, J:
+- Turtle graphics, pen/color control, shapes, and screen commands
+- Input/output, file I/O, math/string/array functions
+- Game, multimedia, and advanced commands
 
-The executor supports both traditional line-numbered BASIC programs and
-modern structured BASIC code. It integrates with pygame for graphics when available,
-falling back to text-based output otherwise.
+This executor maintains backward compatibility with existing BASIC, PILOT, and Logo programs,
+while providing a modern, consistent syntax for new programs.
 """
 
 import re
@@ -29,16 +26,15 @@ import math
 import random
 
 
+
 class TwBasicExecutor:
     """
-    Executor for TW BASIC programming language commands.
+    Unified executor for the TW BASIC language (BASIC + PILOT + Logo).
 
-    Handles parsing and execution of BASIC statements including variable assignment,
-    control flow, mathematical operations, and graphics commands. Supports both
-    traditional line-numbered syntax and modern structured programming.
-
-    The executor can optionally use pygame for graphics rendering when available,
-    providing visual output for drawing commands.
+    Handles parsing and execution of all supported command styles:
+    - BASIC: line-numbered, PRINT, INPUT, LET, IF, FOR, etc.
+    - PILOT: colon-prefixed (T:, A:, J:, Y:, N:, etc.)
+    - Logo: turtle graphics (FORWARD, LEFT, REPEAT, etc.)
     """
 
     def __init__(self, interpreter):
@@ -101,88 +97,227 @@ class TwBasicExecutor:
 
     def execute_command(self, command):
         """
-        Execute a BASIC command and return the execution result.
-
-        Parses the command and routes it to the appropriate handler method
-        based on the command keyword.
-
-        Args:
-            command (str): The BASIC command to execute
-
-        Returns:
-            str: Execution result ("continue", "end", or jump target)
+        Execute a TW BASIC (unified) command.
+        Routes to BASIC, PILOT, or Logo handlers as appropriate.
         """
         try:
-            # Strip inline comments (REM)
+            command = command.strip()
+            if not command:
+                return "continue"
+
+            # BASIC: Convert ? to PRINT for compatibility
+            if command.startswith('?'):
+                command = 'PRINT ' + command[1:].strip()
+
+            # Strip inline comments (REM, ; comments)
             if "REM" in command:
                 command = command.split("REM", 1)[0].strip()
+            if ";" in command and not command.startswith("REPEAT"):
+                command = command.split(";", 1)[0].strip()
+
+            # Modern variable assignment (var = expr)
+            if "=" in command and not command.upper().startswith(("IF", "FOR", "WHILE", "LET")):
+                parts = command.split("=", 1)
+                if len(parts) == 2:
+                    var_name = parts[0].strip()
+                    expr = parts[1].strip()
+                    if var_name.replace("_", "").replace(" ", "").isalnum() and not var_name[0].isdigit():
+                        try:
+                            if expr.startswith("[") and expr.endswith("]"):
+                                array_content = expr[1:-1].strip()
+                                if array_content:
+                                    elements = [e.strip() for e in array_content.split(",")]
+                                    array_dict = {}
+                                    for i, elem in enumerate(elements):
+                                        try:
+                                            if "." in elem or elem.isdigit() or (elem.startswith("-") and elem[1:].replace(".", "").isdigit()):
+                                                array_dict[i] = float(elem) if "." in elem else int(elem)
+                                            else:
+                                                if (elem.startswith('"') and elem.endswith('"')) or (elem.startswith("'") and elem.endswith("'")):
+                                                    array_dict[i] = elem[1:-1]
+                                                else:
+                                                    array_dict[i] = elem
+                                        except:
+                                            array_dict[i] = elem
+                                else:
+                                    array_dict = {}
+                                self.interpreter.variables[var_name] = array_dict
+                            else:
+                                value = self.interpreter.evaluate_expression(expr)
+                                self.interpreter.variables[var_name] = value
+                            return "continue"
+                        except Exception as e:
+                            self.interpreter.debug_output(f"Variable assignment error: {e}")
+                            return "continue"
+
+            # PILOT-style colon-prefixed commands
+            if len(command) > 1 and command[1] == ":":
+                cmd_type = command[:2]
+                if cmd_type == "T:":
+                    return self._handle_text_output(command)
+                elif cmd_type == "A:":
+                    return self._handle_accept_input(command)
+                elif cmd_type == "Y:":
+                    return self._handle_yes_condition(command)
+                elif cmd_type == "N:":
+                    return self._handle_no_condition(command)
+                elif cmd_type == "J:":
+                    return self._handle_jump(command)
+                elif cmd_type == "M:":
+                    return self._handle_match_jump(command)
+                elif cmd_type == "MT":
+                    return self._handle_match_text(command)
+                elif cmd_type == "C:":
+                    return self._handle_compute_or_return(command)
+                elif cmd_type == "U:":
+                    return self._handle_update_variable(command)
+                elif cmd_type == "R:":
+                    return self._handle_runtime_command(command)
+                elif cmd_type == "GAME":
+                    return self._handle_game_command(command)
+                elif cmd_type == "AUDIO":
+                    return self._handle_audio_command(command)
+                elif cmd_type == "F:":
+                    return self._handle_file_command(command)
+                elif cmd_type == "W:":
+                    return self._handle_web_command(command)
+                elif cmd_type == "D:":
+                    return self._handle_database_command(command)
+                elif cmd_type == "S:":
+                    return self._handle_string_command(command)
+                elif cmd_type == "DT":
+                    return self._handle_datetime_command(command)
+                elif cmd_type == "MATH":
+                    return self._handle_math_command(command)
+                elif cmd_type == "BRANCH":
+                    return self._handle_branch_command(command)
+                elif cmd_type == "MULTIMEDIA":
+                    return self._handle_multimedia_command(command)
+                elif cmd_type == "STORAGE":
+                    return self._handle_storage_command(command)
+                elif cmd_type == "L:":
+                    return "continue"  # Label definition
+
+            # BASIC-style commands
             parts = command.split()
             if not parts:
                 return "continue"
-
             cmd = parts[0].upper()
 
             if cmd == "LET":
                 return self._handle_let(command)
+            elif cmd == "PRINT":
+                return self._handle_print(command)
+            elif cmd == "INPUT":
+                return self._handle_input(command, parts)
             elif cmd == "IF":
                 return self._handle_if(command)
             elif cmd == "FOR":
                 return self._handle_for(command)
-            elif cmd == "PRINT":
-                return self._handle_print(command)
-            elif cmd == "REM":
-                return self._handle_rem(command)
-            elif cmd == "END":
-                return "end"
-            elif cmd == "INPUT":
-                return self._handle_input(command, parts)
+            elif cmd == "NEXT":
+                return self._handle_next(command)
             elif cmd == "GOTO":
                 return self._handle_goto(command, parts)
             elif cmd == "GOSUB":
                 return self._handle_gosub(command, parts)
             elif cmd == "RETURN":
                 return self._handle_return()
-            elif cmd == "NEXT":
-                return self._handle_next(command)
             elif cmd == "DIM":
                 return self._handle_dim(command, parts)
-            # Math Functions
-            elif cmd in ["SIN", "COS", "TAN", "SQRT", "ABS", "INT", "RND"]:
+            elif cmd == "END":
+                return "end"
+            elif cmd == "REM":
+                return "continue"
+
+            # Logo-style turtle graphics commands
+            if cmd in ["FORWARD", "FD"]:
+                return self._handle_forward(parts)
+            elif cmd in ["BACK", "BK", "BACKWARD"]:
+                return self._handle_backward(parts)
+            elif cmd in ["LEFT", "LT"]:
+                return self._handle_left(parts)
+            elif cmd in ["RIGHT", "RT"]:
+                return self._handle_right(parts)
+            elif cmd in ["PENUP", "PU"]:
+                return self._handle_penup()
+            elif cmd in ["PENDOWN", "PD"]:
+                return self._handle_pendown()
+            elif cmd in ["CLEARSCREEN", "CS"]:
+                return self._handle_clearscreen()
+            elif cmd == "HOME":
+                return self._handle_home()
+            elif cmd == "SETXY":
+                return self._handle_setxy(parts)
+            elif cmd in ["SETCOLOR", "SETCOLOUR", "COLOR"]:
+                return self._handle_setcolor(parts)
+            elif cmd == "SETPENSIZE":
+                return self._handle_setpensize(parts)
+            elif cmd in ["PENCOLOR", "PENCOLOUR"]:
+                return self._handle_setcolor(parts)
+            elif cmd in ["FILLCOLOR", "FILLCOLOUR"]:
+                return self._handle_setfillcolor(parts)
+            elif cmd == "BGCOLOR":
+                return self._handle_setbgcolor(parts)
+            elif cmd == "SETX":
+                return self._handle_setx(parts)
+            elif cmd == "SETY":
+                return self._handle_sety(parts)
+            elif cmd == "SETPOS":
+                return self._handle_setpos(parts)
+            elif cmd == "FONTSIZE":
+                return self._handle_fontsize(parts)
+            elif cmd == "FONTSTYLE":
+                return self._handle_fontstyle(parts)
+            elif cmd == "CIRCLE":
+                return self._handle_circle(parts)
+            elif cmd == "DOT":
+                return self._handle_dot(parts)
+            elif cmd == "RECT":
+                return self._handle_rect(parts)
+            elif cmd == "TEXT":
+                return self._handle_text(parts)
+            elif cmd == "SHOWTURTLE":
+                return self._handle_showturtle()
+            elif cmd == "HIDETURTLE":
+                return self._handle_hideturtle()
+            elif cmd == "REPEAT":
+                return self._handle_repeat(command)
+
+            # Macro commands
+            if cmd == "DEFINE":
+                return self._handle_define(command, parts[1] if len(parts) > 1 else "")
+            if cmd == "CALL":
+                return self._handle_call(parts[1] if len(parts) > 1 else "")
+
+            # Mathematical functions
+            if cmd in ["SIN", "COS", "TAN", "SQRT", "ABS", "INT", "RND"]:
                 return self._handle_math_functions(cmd, parts)
-            # String Functions
-            elif cmd in ["LEN", "MID", "LEFT", "RIGHT", "INSTR", "STR", "VAL"]:
+
+            # String functions
+            if cmd in ["LEN", "MID", "LEFT", "RIGHT", "INSTR", "STR", "VAL", "UPPER", "LOWER"]:
                 return self._handle_string_functions(cmd, parts)
-            # File I/O Commands
-            elif cmd in ["OPEN", "CLOSE", "READ", "WRITE", "EOF"]:
-                return self._handle_file_commands(cmd, parts)
-            # Enhanced Graphics Commands
-            elif cmd in ["LINE", "BOX", "TRIANGLE", "ELLIPSE", "FILL"]:
-                return self._handle_enhanced_graphics(cmd, parts)
-            # Sound Commands
-            elif cmd in ["BEEP", "PLAY", "SOUND", "NOTE"]:
-                return self._handle_sound_commands(cmd, parts)
-            # Array Operations
-            elif cmd in ["SORT", "FIND", "SUM", "AVG", "MIN", "MAX"]:
+
+            # Array operations
+            if cmd in ["SORT", "FIND", "SUM", "AVG", "MIN", "MAX"]:
                 return self._handle_array_operations(cmd, parts)
-            # Game and Graphics Commands
-            # Game Development Commands (BASIC style)
-            elif cmd.startswith("GAME"):
-                return self._handle_game_commands(command, cmd, parts)
-            # Multiplayer (BASIC style)
-            elif cmd.startswith("MP") or cmd.startswith("NET"):
-                return self._handle_multiplayer_commands(command, cmd, parts)
-            # Audio System Commands (BASIC style)
-            elif (
-                cmd.startswith("SOUND")
-                or cmd.startswith("MUSIC")
-                or cmd == "MASTERVOLUME"
-            ):
-                return self._handle_audio_commands(command, cmd, parts)
+
+            # Graphics commands
+            if cmd in ["LINE", "BOX", "TRIANGLE", "ELLIPSE", "FILL"]:
+                return self._handle_enhanced_graphics(cmd, parts)
+
+            # Sound commands
+            if cmd in ["BEEP", "PLAY", "SOUND", "NOTE", "PLAYNOTE", "SETSOUND"]:
+                return self._handle_sound_commands(cmd, parts)
+
+            # File operations
+            if cmd in ["OPEN", "CLOSE", "READ", "WRITE", "EOF"]:
+                return self._handle_file_commands(cmd, parts)
+
+            # Unknown command
+            self.interpreter.log_output(f"Unknown TW BASIC command: {cmd}")
 
         except Exception as e:
-            self.interpreter.debug_output(f"BASIC command error: {e}")
-            return "continue"
-
+            self.interpreter.debug_output(f"TW BASIC command error: {e}")
         return "continue"
 
     def _handle_let(self, command):
@@ -961,13 +1096,12 @@ class TwBasicExecutor:
                                 ):
                                     canvas = self.interpreter.ide_turtle_canvas
                                     color_name = color if color else "black"
-                                    canvas.create_line(
+                                    canvas.draw_line(
                                         x1,
                                         y1,
                                         x2,
                                         y2,
-                                        fill=color_name,
-                                        tags="game_objects",
+                                        color=color_name
                                     )
                                     self.interpreter.log_output(
                                         f"Drew line from ({x1},{y1}) to ({x2},{y2})"
@@ -1016,24 +1150,14 @@ class TwBasicExecutor:
                             and self.interpreter.ide_turtle_canvas
                         ):
                             canvas = self.interpreter.ide_turtle_canvas
-                            if filled:
-                                canvas.create_rectangle(
-                                    x,
-                                    y,
-                                    x + width,
-                                    y + height,
-                                    fill="black",
-                                    tags="game_objects",
-                                )
-                            else:
-                                canvas.create_rectangle(
-                                    x,
-                                    y,
-                                    x + width,
-                                    y + height,
-                                    outline="black",
-                                    tags="game_objects",
-                                )
+                            canvas.draw_rectangle(
+                                x,
+                                y,
+                                x + width,
+                                y + height,
+                                filled=filled,
+                                color="black"
+                            )
                             self.interpreter.log_output(
                                 f"Drew {'filled ' if filled else ''}box at ({x},{y}) size {width}x{height}"
                             )
@@ -1091,17 +1215,11 @@ class TwBasicExecutor:
                                 and self.interpreter.ide_turtle_canvas
                             ):
                                 canvas = self.interpreter.ide_turtle_canvas
-                                if filled:
-                                    canvas.create_polygon(
-                                        points, fill="black", tags="game_objects"
-                                    )
-                                else:
-                                    canvas.create_polygon(
-                                        points,
-                                        outline="black",
-                                        fill="",
-                                        tags="game_objects",
-                                    )
+                                canvas.draw_polygon(
+                                    points,
+                                    filled=filled,
+                                    color="black"
+                                )
                                 self.interpreter.log_output(
                                     f"Drew {'filled ' if filled else ''}triangle"
                                 )

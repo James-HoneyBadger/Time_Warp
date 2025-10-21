@@ -556,6 +556,10 @@ class TimeWarpApp:
         except Exception:
             pass
 
+        # Add status label at the bottom of the main window
+        self.status_label = tk.Label(self.root, text="Ready.", anchor="w", bg="#222", fg="#fff", font=(self.selected_font_family, 10))
+        self.status_label.pack(side="bottom", fill="x")
+
         # Initialize compiler system
         self.compiler = None
         if COMPILER_AVAILABLE:

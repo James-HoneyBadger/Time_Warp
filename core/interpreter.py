@@ -71,14 +71,7 @@ except ImportError:
     print("ℹ️  PIL/Pillow not available - image features disabled")
 
 # Import language executors
-from .languages import (
-    TwPilotExecutor,
-    TwBasicExecutor,
-    TwLogoExecutor,
-    TwPascalExecutor,
-    TwPrologExecutor,
-    TwTimeWarpExecutor,
-)
+from .languages import TwBasicExecutor, TwPascalExecutor, TwPrologExecutor, TwTimeWarpExecutor
 
 # Import performance optimizations
 try:
@@ -606,10 +599,9 @@ class Time_WarpInterpreter:
         if self.advanced_robot:
             self.advanced_robot.simulation_mode = True
 
-        # Initialize language executors
-        self.pilot_executor = TwPilotExecutor(self)
-        self.basic_executor = TwBasicExecutor(self)
-        self.logo_executor = TwLogoExecutor(self)
+
+        # Initialize unified language executor
+        self.tw_basic_executor = TwBasicExecutor(self)
         self.pascal_executor = TwPascalExecutor(self)
         self.prolog_executor = TwPrologExecutor(self)
         self.time_warp_executor = TwTimeWarpExecutor(self)
@@ -1553,195 +1545,17 @@ class Time_WarpInterpreter:
         return "pilot"
 
     def execute_line(self, line):
-        """Execute a single line of code"""
+        """Execute a single line of code (TW BASIC unified)"""
         line_num, command = self.parse_line(line)
-
         if not command:
             return "continue"
-
-        # Determine command type and execute
-        cmd_type = self.determine_command_type(command, self.current_language_mode)
-        self.debug_output(f"Command '{command}' determined as type: {cmd_type}")
-
-        if cmd_type == "pilot":
-            return self.pilot_executor.execute_command(command)
-        elif cmd_type == "basic":
-            return self.basic_executor.execute_command(command)
-        elif cmd_type == "logo":
-            return self.logo_executor.execute_command(command)
-        elif cmd_type == "pascal":
-            return self.pascal_executor.execute_command(command)
-        elif cmd_type == "prolog":
-            return self.prolog_executor.execute_command(command)
-        elif cmd_type == "time_warp":
-            return self.time_warp_executor.execute_command(command)
-
-        return "continue"
+        # All commands now routed to unified executor
+        return self.tw_basic_executor.execute_command(command)
 
     def load_program(self, program_text):
         """Load and parse a program"""
         # Reset program state but preserve variables
         self.labels = {}
-        self.program_lines = []
-        self.current_line = 0
-        self.stack = []
-        self.for_stack = []
-        self.match_flag = False
-        self._last_match_set = False
-        self.running = False
-
-        # Reset Time_Warp animation and media systems but preserve variables
-        self.tweens = []
-        self.timers = []
-        self.particles = []
-        self.sprites = {}
-        self.last_ms = None
-
-        lines = program_text.strip().split("\n")
-
-        # Parse lines and collect labels
-        self.program_lines = []
-        for i, line in enumerate(lines):
-            line_num, command = self.parse_line(line)
-            self.program_lines.append((line_num, command))
-
-            # Collect PILOT labels
-            if command.startswith("L:"):
-                label = command[2:].strip()
-                self.labels[label] = i
-
-        return True
-
-    def run_program(self, program_text, language=None, show_completion=True):
-        """Run a complete program
-
-        Args:
-            program_text (str): The program code to execute
-            language (str, optional): The programming language ('pilot', 'basic', 'logo', etc.)
-                                     Defaults to auto-detection
-            show_completion (bool): Whether to show "Program execution completed" message
-        """
-        # Store language preference
-        if language:
-            self.current_language = language.lower()
-            self.current_language_mode = language.lower()
-
-        # Preprocess Logo programs to handle multi-line REPEAT blocks
-        if language and language.lower() == "logo":
-            program_text = self._preprocess_logo_program(program_text)
-
-        # Preprocess Time_Warp programs for unified syntax
-        if language and language.lower() == "time_warp":
-            program_text = self._preprocess_time_warp_program(program_text)
-
-        if not self.load_program(program_text):
-            self.log_output("Error loading program")
-            return False
-
-        self.running = True
-        self.current_line = 0
-        max_iterations = 10000  # Prevent infinite loops
-        iterations = 0
-
-        try:
-            while (
-                self.current_line < len(self.program_lines)
-                and self.running
-                and iterations < max_iterations
-            ):
-                iterations += 1
-
-                if self.debug_mode and self.current_line in self.breakpoints:
-                    self.log_output(f"Breakpoint hit at line {self.current_line}")
-
-                line_num, command = self.program_lines[self.current_line]
-
-                # Skip empty lines
-                if not command.strip():
-                    self.current_line += 1
-                    continue
-
-                result = self.execute_line(command)
-
-                if result == "end":
-                    break
-                elif isinstance(result, str) and result.startswith("jump:"):
-                    try:
-                        jump_target = int(result.split(":")[1])
-                        self.current_line = jump_target
-                        continue
-                    except:
-                        pass
-                elif result == "error":
-                    self.log_output("Program terminated due to error")
-                    break
-
-                self.current_line += 1
-
-            if iterations >= max_iterations:
-                self.log_output("Program stopped: Maximum iterations reached")
-
-        except Exception as e:
-            self.log_output(f"Runtime error: {e}")
-        finally:
-            self.running = False
-            if show_completion:
-                self.log_output("Program execution completed")
-
-        return True
-
-    # Additional methods for debugger control, etc.
-    def step(self):
-        """Execute a single line and pause"""
-        # Implementation would go here
-        pass
-
-    def stop_program(self):
-        """Stop program execution"""
-        self.running = False
-
-    def set_debug_mode(self, enabled):
-        """Enable/disable debug mode"""
-        self.debug_mode = enabled
-
-    def toggle_breakpoint(self, line_number):
-        """Toggle breakpoint at line"""
-        if line_number in self.breakpoints:
-            self.breakpoints.remove(line_number)
-        else:
-            self.breakpoints.add(line_number)
-
-    def turtle_circle(self, radius):
-        """Draw a circle with given radius"""
-        if not self.turtle_graphics:
-            self.init_turtle_graphics()
-
-        if not self.turtle_graphics["canvas"] or not self.turtle_graphics["pen_down"]:
-            return
-
-        # Draw circle at current position
-        canvas = self.turtle_graphics["canvas"]
-        center_x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
-        center_y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
-
-        # Use unified canvas draw method to persist graphics
-        if hasattr(self, "ide_unified_canvas"):
-            self.ide_unified_canvas.draw_circle(
-                center_x, center_y, radius,
-                filled=False,
-                color=self.turtle_graphics["pen_color"],
-                width=self.turtle_graphics["pen_size"]
-            )
-        else:
-            circle_id = canvas.create_oval(
-                center_x - radius,
-                center_y - radius,
-                center_x + radius,
-                center_y + radius,
-                outline=self.turtle_graphics["pen_color"],
-                width=self.turtle_graphics["pen_size"],
-            )
-            self.turtle_graphics["lines"].append(circle_id)
 
     def turtle_dot(self, size):
         """Draw a filled dot at current position"""
