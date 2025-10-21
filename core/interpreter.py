@@ -778,15 +778,26 @@ class Time_WarpInterpreter:
                     f"🎨 Drawing line from ({canvas_old_x:.1f}, {canvas_old_y:.1f}) to ({canvas_new_x:.1f}, {canvas_new_y:.1f})"
                 )
 
-                line_id = canvas.create_line(
-                    canvas_old_x,
-                    canvas_old_y,
-                    canvas_new_x,
-                    canvas_new_y,
-                    fill=self.turtle_graphics["pen_color"],
-                    width=self.turtle_graphics["pen_size"],
-                )
-                self.turtle_graphics["lines"].append(line_id)
+                # Use unified canvas draw method to persist graphics
+                if hasattr(self, "ide_unified_canvas"):
+                    self.ide_unified_canvas.draw_line(
+                        canvas_old_x,
+                        canvas_old_y,
+                        canvas_new_x,
+                        canvas_new_y,
+                        color=self.turtle_graphics["pen_color"],
+                        width=self.turtle_graphics["pen_size"],
+                    )
+                else:
+                    line_id = canvas.create_line(
+                        canvas_old_x,
+                        canvas_old_y,
+                        canvas_new_x,
+                        canvas_new_y,
+                        fill=self.turtle_graphics["pen_color"],
+                        width=self.turtle_graphics["pen_size"],
+                    )
+                    self.turtle_graphics["lines"].append(line_id)
 
         self.update_turtle_display()
         self.log_output("Turtle moved")
@@ -873,18 +884,24 @@ class Time_WarpInterpreter:
             self.init_turtle_graphics()
 
         if self.turtle_graphics["canvas"]:
-            # Remove all drawn lines
-            for line_id in self.turtle_graphics["lines"]:
-                self.turtle_graphics["canvas"].delete(line_id)
-            self.turtle_graphics["lines"].clear()
+            # Clear all graphics using unified canvas
+            if hasattr(self, "ide_unified_canvas"):
+                self.ide_unified_canvas.graphics_commands.clear()
+                self.ide_unified_canvas.graphics_objects.clear()
+                self.ide_unified_canvas.redraw()
+            else:
+                # Remove all drawn lines
+                for line_id in self.turtle_graphics["lines"]:
+                    self.turtle_graphics["canvas"].delete(line_id)
+                self.turtle_graphics["lines"].clear()
 
-            # Clear all sprites
-            if "sprites" in self.turtle_graphics:
-                for sprite_name, sprite_data in self.turtle_graphics["sprites"].items():
-                    if sprite_data["canvas_id"]:
-                        self.turtle_graphics["canvas"].delete(sprite_data["canvas_id"])
-                        sprite_data["canvas_id"] = None
-                        sprite_data["visible"] = False
+                # Clear all sprites
+                if "sprites" in self.turtle_graphics:
+                    for sprite_name, sprite_data in self.turtle_graphics["sprites"].items():
+                        if sprite_data["canvas_id"]:
+                            self.turtle_graphics["canvas"].delete(sprite_data["canvas_id"])
+                            sprite_data["canvas_id"] = None
+                            sprite_data["visible"] = False
 
             self.update_turtle_display()
 
@@ -1699,15 +1716,24 @@ class Time_WarpInterpreter:
         center_x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
         center_y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
 
-        circle_id = canvas.create_oval(
-            center_x - radius,
-            center_y - radius,
-            center_x + radius,
-            center_y + radius,
-            outline=self.turtle_graphics["pen_color"],
-            width=self.turtle_graphics["pen_size"],
-        )
-        self.turtle_graphics["lines"].append(circle_id)
+        # Use unified canvas draw method to persist graphics
+        if hasattr(self, "ide_unified_canvas"):
+            self.ide_unified_canvas.draw_circle(
+                center_x, center_y, radius,
+                filled=False,
+                color=self.turtle_graphics["pen_color"],
+                width=self.turtle_graphics["pen_size"]
+            )
+        else:
+            circle_id = canvas.create_oval(
+                center_x - radius,
+                center_y - radius,
+                center_x + radius,
+                center_y + radius,
+                outline=self.turtle_graphics["pen_color"],
+                width=self.turtle_graphics["pen_size"],
+            )
+            self.turtle_graphics["lines"].append(circle_id)
 
     def turtle_dot(self, size):
         """Draw a filled dot at current position"""
@@ -1721,15 +1747,24 @@ class Time_WarpInterpreter:
         center_x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
         center_y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
 
-        dot_id = canvas.create_oval(
-            center_x - size // 2,
-            center_y - size // 2,
-            center_x + size // 2,
-            center_y + size // 2,
-            fill=self.turtle_graphics["pen_color"],
-            outline=self.turtle_graphics["pen_color"],
-        )
-        self.turtle_graphics["lines"].append(dot_id)
+        # Use unified canvas draw method to persist graphics
+        if hasattr(self, "ide_unified_canvas"):
+            self.ide_unified_canvas.draw_circle(
+                center_x, center_y, size // 2,
+                filled=True,
+                color=self.turtle_graphics["pen_color"],
+                width=1
+            )
+        else:
+            dot_id = canvas.create_oval(
+                center_x - size // 2,
+                center_y - size // 2,
+                center_x + size // 2,
+                center_y + size // 2,
+                fill=self.turtle_graphics["pen_color"],
+                outline=self.turtle_graphics["pen_color"],
+            )
+            self.turtle_graphics["lines"].append(dot_id)
 
     def turtle_rect(self, width, height, filled=False):
         """Draw a rectangle at current position"""
@@ -1743,16 +1778,25 @@ class Time_WarpInterpreter:
         x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
         y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
 
-        rect_id = canvas.create_rectangle(
-            x,
-            y,
-            x + width,
-            y + height,
-            outline=self.turtle_graphics["pen_color"],
-            fill=self.turtle_graphics.get("fill_color", "") if filled else "",
-            width=self.turtle_graphics["pen_size"],
-        )
-        self.turtle_graphics["lines"].append(rect_id)
+        # Use unified canvas draw method to persist graphics
+        if hasattr(self, "ide_unified_canvas"):
+            self.ide_unified_canvas.draw_rectangle(
+                x, y, x + width, y + height,
+                filled=filled,
+                color=self.turtle_graphics["pen_color"],
+                width=self.turtle_graphics["pen_size"]
+            )
+        else:
+            rect_id = canvas.create_rectangle(
+                x,
+                y,
+                x + width,
+                y + height,
+                outline=self.turtle_graphics["pen_color"],
+                fill=self.turtle_graphics.get("fill_color", "") if filled else "",
+                width=self.turtle_graphics["pen_size"],
+            )
+            self.turtle_graphics["lines"].append(rect_id)
 
     def turtle_text(self, text, size=12):
         """Draw text at current position"""
@@ -1766,15 +1810,22 @@ class Time_WarpInterpreter:
         x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
         y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
 
-        text_id = canvas.create_text(
-            x,
-            y,
-            text=text,
-            font=("Arial", int(size)),
-            fill=self.turtle_graphics["pen_color"],
-            anchor="nw",
-        )
-        self.turtle_graphics["lines"].append(text_id)
+        # Use unified canvas draw method to persist graphics
+        if hasattr(self, "ide_unified_canvas"):
+            self.ide_unified_canvas.draw_text(
+                x, y, text,
+                color=self.turtle_graphics["pen_color"]
+            )
+        else:
+            text_id = canvas.create_text(
+                x,
+                y,
+                text=text,
+                font=("Arial", int(size)),
+                fill=self.turtle_graphics["pen_color"],
+                anchor="nw",
+            )
+            self.turtle_graphics["lines"].append(text_id)
 
     def _preprocess_logo_program(self, program_text):
         """Preprocess Logo program to handle multi-line REPEAT blocks"""

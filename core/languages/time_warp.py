@@ -302,6 +302,22 @@ class TwTimeWarpExecutor:
                 return self._handle_setcolor(parts)
             elif cmd == "SETPENSIZE":
                 return self._handle_setpensize(parts)
+            elif cmd in ["PENCOLOR", "PENCOLOUR"]:
+                return self._handle_setcolor(parts)
+            elif cmd in ["FILLCOLOR", "FILLCOLOUR"]:
+                return self._handle_setfillcolor(parts)
+            elif cmd == "BGCOLOR":
+                return self._handle_setbgcolor(parts)
+            elif cmd == "SETX":
+                return self._handle_setx(parts)
+            elif cmd == "SETY":
+                return self._handle_sety(parts)
+            elif cmd == "SETPOS":
+                return self._handle_setpos(parts)
+            elif cmd == "FONTSIZE":
+                return self._handle_fontsize(parts)
+            elif cmd == "FONTSTYLE":
+                return self._handle_fontstyle(parts)
             elif cmd == "CIRCLE":
                 return self._handle_circle(parts)
             elif cmd == "DOT":
@@ -1299,6 +1315,72 @@ class TwTimeWarpExecutor:
         self.interpreter.turtle_graphics["visible"] = False
         self.interpreter.update_turtle_display()
         self.interpreter.log_output("Turtle is now hidden")
+        return "continue"
+
+    def _handle_setx(self, parts):
+        """Handle SETX command"""
+        if len(parts) >= 2:
+            x = float(parts[1])
+            if not self.interpreter.turtle_graphics:
+                self.interpreter.init_turtle_graphics()
+            current_y = self.interpreter.turtle_graphics["y"]
+            self.interpreter.turtle_setxy(x, current_y)
+            self.interpreter.log_output(f"Turtle X position set to {x}")
+        return "continue"
+
+    def _handle_sety(self, parts):
+        """Handle SETY command"""
+        if len(parts) >= 2:
+            y = float(parts[1])
+            if not self.interpreter.turtle_graphics:
+                self.interpreter.init_turtle_graphics()
+            current_x = self.interpreter.turtle_graphics["x"]
+            self.interpreter.turtle_setxy(current_x, y)
+            self.interpreter.log_output(f"Turtle Y position set to {y}")
+        return "continue"
+
+    def _handle_setpos(self, parts):
+        """Handle SETPOS command"""
+        if len(parts) >= 3:
+            x = float(parts[1])
+            y = float(parts[2])
+            self.interpreter.turtle_setxy(x, y)
+            self.interpreter.log_output(f"Turtle moved to position ({x}, {y})")
+        return "continue"
+
+    def _handle_setfillcolor(self, parts):
+        """Handle FILLCOLOR command"""
+        color = parts[1].lower() if len(parts) > 1 else "black"
+        if not self.interpreter.turtle_graphics:
+            self.interpreter.init_turtle_graphics()
+        self.interpreter.turtle_graphics["fill_color"] = color
+        self.interpreter.log_output(f"Fill color set to {color}")
+        return "continue"
+
+    def _handle_setbgcolor(self, parts):
+        """Handle BGCOLOR command"""
+        color = parts[1].lower() if len(parts) > 1 else "black"
+        if hasattr(self.interpreter, "ide_turtle_canvas"):
+            self.interpreter.ide_turtle_canvas.set_bg_color(color)
+        self.interpreter.log_output(f"Background color set to {color}")
+        return "continue"
+
+    def _handle_fontsize(self, parts):
+        """Handle FONTSIZE command"""
+        size = int(parts[1]) if len(parts) > 1 else 12
+        if not self.interpreter.turtle_graphics:
+            self.interpreter.init_turtle_graphics()
+        self.interpreter.turtle_graphics["font_size"] = size
+        self.interpreter.log_output(f"Font size set to {size}")
+        return "continue"
+
+    def _handle_fontstyle(self, parts):
+        """Handle FONTSTYLE command"""
+        style = parts[1].lower() if len(parts) > 1 else "normal"
+        if not self.interpreter.turtle_graphics:
+            self.interpreter.init_turtle_graphics()
+        self.interpreter.turtle_graphics["font_style"] = style
+        self.interpreter.log_output(f"Font style set to {style}")
         return "continue"
 
     def _handle_repeat(self, command):

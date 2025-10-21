@@ -117,7 +117,7 @@ from core.interpreter import Time_WarpInterpreter
 import os
 import json
 import re
-from unified_canvas import UnifiedCanvas
+from unified_canvas import UnifiedCanvas, Theme
 
 # Import compiler system
 try:
@@ -829,7 +829,7 @@ class TimeWarpApp:
 
     def _clear_all(self):
         """Clear all content from unified canvas"""
-        self.unified_canvas._clear_screen()
+        self.unified_canvas.clear_screen()
         self.status_label.config(text="🧹 All content cleared.")
 
     def _stop_program(self):
@@ -1441,15 +1441,15 @@ Features:
             "Material Dark": {"bg": "#263238", "fg": "#eeffff", "panel_bg": "#37474f", "panel_fg": "#eeffff", "accent": "#00bcd4"},
 
             # Light Themes
-            "Spring": {"bg": "#f0fff0", "fg": "#228b22", "panel_bg": "#e0ffe0", "panel_fg": "#228b22", "accent": "#32cd32"},
-            "Sunset": {"bg": "#fff5e6", "fg": "#ff4500", "panel_bg": "#ffe4b5", "panel_fg": "#ff4500", "accent": "#ff6347"},
-            "Candy": {"bg": "#fff0fa", "fg": "#d72660", "panel_bg": "#ffe0f7", "panel_fg": "#d72660", "accent": "#ff69b4"},
-            "Forest": {"bg": "#e6ffe6", "fg": "#006400", "panel_bg": "#cceccc", "panel_fg": "#006400", "accent": "#228b22"},
+            "Spring": {"bg": "#f0f8ff", "fg": "#2e8b57", "panel_bg": "#e6f3ff", "panel_fg": "#2e8b57", "accent": "#32cd32"},
+            "Sunset": {"bg": "#fff8f0", "fg": "#b22222", "panel_bg": "#ffe4b5", "panel_fg": "#b22222", "accent": "#ff6347"},
+            "Candy": {"bg": "#fdf5ff", "fg": "#8b008b", "panel_bg": "#fce4ff", "panel_fg": "#8b008b", "accent": "#ff69b4"},
+            "Forest": {"bg": "#f0fff0", "fg": "#006400", "panel_bg": "#e6f9e6", "panel_fg": "#006400", "accent": "#228b22"},
             "Solarized Light": {"bg": "#fdf6e3", "fg": "#586e75", "panel_bg": "#eee8d5", "panel_fg": "#586e75", "accent": "#268bd2"},
             "Gruvbox Light": {"bg": "#fbf1c7", "fg": "#3c3836", "panel_bg": "#ebdbb2", "panel_fg": "#3c3836", "accent": "#d79921"},
-            "One Light": {"bg": "#fafafa", "fg": "#383a42", "panel_bg": "#f0f0f0", "panel_fg": "#383a42", "accent": "#4078f2"},
+            "One Light": {"bg": "#fafafa", "fg": "#2c2c2c", "panel_bg": "#f0f0f0", "panel_fg": "#2c2c2c", "accent": "#4078f2"},
             "GitHub Light": {"bg": "#ffffff", "fg": "#24292f", "panel_bg": "#f6f8fa", "panel_fg": "#24292f", "accent": "#0969da"},
-            "Material Light": {"bg": "#fafafa", "fg": "#212121", "panel_bg": "#ffffff", "panel_fg": "#212121", "accent": "#1976d2"},
+            "Material Light": {"bg": "#ffffff", "fg": "#212121", "panel_bg": "#f5f5f5", "panel_fg": "#212121", "accent": "#1976d2"},
             "Minimal": {"bg": "#ffffff", "fg": "#000000", "panel_bg": "#f5f5f5", "panel_fg": "#000000", "accent": "#666666"},
         }
 
@@ -1460,10 +1460,31 @@ Features:
         self.main_frame.config(bg=colors["bg"])
 
         # Apply theme to unified canvas
-        # Note: UnifiedCanvas handles its own theming based on screen mode
+        if hasattr(self, 'unified_canvas'):
+            # Create Theme object for unified canvas
+            theme_data = {
+                'background': colors["bg"],
+                'foreground': colors["fg"],
+                'accent': colors["accent"],
+                'panel_bg': colors["panel_bg"],
+                'panel_fg': colors["panel_fg"],
+                'cursor': colors["fg"],
+                'selection_bg': self._get_selection_color(colors["bg"]),
+                'syntax': {
+                    'keyword': colors["accent"],
+                    'string': "#4ecdc4",
+                    'number': "#45b7d1",
+                    'comment': "#7d8796",
+                    'function': "#f9ca24",
+                    'variable': "#6c5ce7"
+                }
+            }
+            canvas_theme = Theme(theme_name, theme_data)
+            self.unified_canvas.set_theme(canvas_theme)
 
-        # Apply theme to status bar
-        self.status_label.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
+        # Apply theme to status bar (if it exists)
+        if hasattr(self, 'status_label') and self.status_label:
+            self.status_label.config(bg=colors["panel_bg"], fg=colors["panel_fg"])
 
         # Update menu colors (limited Tkinter support)
         try:
@@ -1473,6 +1494,24 @@ Features:
 
         # Force UI update
         self.root.update_idletasks()
+
+    def _get_selection_color(self, bg_color):
+        """Calculate appropriate selection color based on background"""
+        # Convert hex to RGB
+        bg_color = bg_color.lstrip('#')
+        r = int(bg_color[0:2], 16)
+        g = int(bg_color[2:4], 16)
+        b = int(bg_color[4:6], 16)
+
+        # Calculate brightness (YIQ formula)
+        brightness = (r * 299 + g * 587 + b * 114) / 1000
+
+        if brightness > 128:  # Light background
+            # Use darker selection for light backgrounds
+            return "#add8e6"  # Light blue
+        else:  # Dark background
+            # Use lighter selection for dark backgrounds
+            return "#4a90e2"  # Medium blue
 
     def _save_theme_config(self, theme_name):
         """Save theme configuration to file"""
@@ -1739,7 +1778,7 @@ Features:
         import platform
 
         # Clear canvas and set to unified mode
-        self.unified_canvas._clear_screen()
+        self.unified_canvas.clear_screen()
 
         # Display welcome text
         welcome_text = f"""
@@ -1771,7 +1810,7 @@ OK
                 if command_upper == "HELP":
                     self._show_help()
                 elif command_upper in ["CLS", "CLEAR"]:
-                    self.unified_canvas._clear_screen()
+                    self.unified_canvas.clear_screen()
                     # Reset cursor position after clearing
                     self.unified_canvas.cursor_x = 0
                     self.unified_canvas.cursor_y = 0
@@ -1845,7 +1884,7 @@ OK
                 # List the stored program
                 if self.interpreter.program_lines:
                     # Clear screen for listing
-                    self.unified_canvas._clear_screen()
+                    self.unified_canvas.clear_screen()
                     self.unified_canvas.write_text("Program:\n", color=15)
                     for line_num, cmd in self.interpreter.program_lines:
                         self.unified_canvas.write_text(f"{line_num} {cmd}\n", color=15)

@@ -1,226 +1,722 @@
 """
-Unified Canvas System for Time_Warp IDE
+Time Warp IDE Unified Canvas System
 
-Implements GW BASIC screen modes with unified text and graphics rendering.
-Supports keyboard input prompts and multiple display modes.
+A modern, feature-rich canvas system designed specifically for
+the Time Warp IDE. Supports dynamic theming, font customization,
+syntax highlighting, and advanced text/graphics rendering.
 """
 
 import tkinter as tk
 import tkinter.font as tkfont
+from typing import Dict, List, Optional, Union
+
+
+class Theme:
+    """Theme configuration for Time Warp IDE"""
+
+    def __init__(self, name: str, colors: Dict[str, str]):
+        self.name = name
+        self.colors = colors
+
+    @property
+    def background(self) -> str:
+        return self.colors.get('background', '#000000')
+
+    @property
+    def foreground(self) -> str:
+        return self.colors.get('foreground', '#ffffff')
+
+    @property
+    def accent(self) -> str:
+        return self.colors.get('accent', '#00ff00')
+
+    @property
+    def panel_bg(self) -> str:
+        return self.colors.get('panel_bg', '#333333')
+
+    @property
+    def panel_fg(self) -> str:
+        return self.colors.get('panel_fg', '#ffffff')
+
+    @property
+    def cursor_color(self) -> str:
+        return self.colors.get('cursor', '#ffffff')
+
+    @property
+    def selection_bg(self) -> str:
+        return self.colors.get('selection_bg', '#444444')
+
+    @property
+    def syntax_colors(self) -> Dict[str, str]:
+        return self.colors.get('syntax', {
+            'keyword': '#ff6b6b',
+            'string': '#4ecdc4',
+            'number': '#45b7d1',
+            'comment': '#7d8796',
+            'function': '#f9ca24',
+            'variable': '#6c5ce7'
+        })
 
 
 class UnifiedCanvas(tk.Canvas):
     """
-    A completely rewritten UnifiedCanvas class for text and graphics rendering.
-    Ensures proper text rendering, cursor positioning, and CR/LF handling.
+    Modern unified canvas for Time Warp IDE with advanced features:
+    - Dynamic theming support
+    - Customizable fonts
+    - Syntax highlighting
+    - Line numbers
+    - Advanced text and graphics rendering
+    - Modern IDE features
     """
 
-    def __init__(self, parent, rows=25, cols=80, font_family="Courier", font_size=12, **kwargs):
+    def __init__(self, parent, width: int = 1024, height: int = 768,
+                 font_family: str = "Consolas", font_size: int = 12,
+                 theme: Optional[Theme] = None, **kwargs):
         super().__init__(parent, **kwargs)
 
-        # Canvas configuration
-        self.rows = rows
-        self.cols = cols
+        # Canvas dimensions
+        self.canvas_width = width
+        self.canvas_height = height
+        self.config(width=width, height=height)
+
+        # Font configuration
         self.font_family = font_family
         self.font_size = font_size
+        self.font = tkfont.Font(family=font_family, size=font_size)
 
-        # Store background color from kwargs or default to black
-        self.bg_color = kwargs.get('bg', 'black')
+        # Theme system
+        self.current_theme = theme or self._create_default_theme()
 
-        # Initialize font and character dimensions
-        self.font = tkfont.Font(family=self.font_family, size=self.font_size)
-        self.char_width = self.font.measure("W")
-        self.char_height = self.font.metrics("linespace")
+        # Text buffer system (modern approach)
+        self.lines: List[str] = []
+        self.line_attributes: List[Dict] = []
+        self.cursor_line = 0
+        self.cursor_col = 0
 
-        # Initialize screen buffer
-        self.screen_buffer = [[" " for _ in range(self.cols)] for _ in range(self.rows)]
-        self.cursor_x = 0
-        self.cursor_y = 0
+        # Display settings
+        self.show_line_numbers = False
+        self.line_number_width = 50
+        self.tab_size = 4
+        self.word_wrap = False
 
-        # Configure canvas size
-        self.config(width=self.cols * self.char_width, height=self.rows * self.char_height)
+        # Update font metrics after all attributes are set
+        self.update_font_metrics()
+
+        # Graphics layer
+        self.graphics_objects: List[int] = []
+        self.graphics_commands: List[Dict] = []
+
+        # Input handling
+        self.input_mode = False
+        self.input_callback = None
+        self.input_buffer = ""
+
+        # Cursor blinking
+        self.cursor_visible = True
+        self.cursor_blink_timer = None
+        self.start_cursor_blink()
+
+    def start_cursor_blink(self):
+        """Start the cursor blinking timer"""
+        if self.cursor_blink_timer:
+            self.after_cancel(self.cursor_blink_timer)
+        self.cursor_blink_timer = self.after(500, self._blink_cursor)
+
+    def stop_cursor_blink(self):
+        """Stop the cursor blinking timer"""
+        if self.cursor_blink_timer:
+            self.after_cancel(self.cursor_blink_timer)
+            self.cursor_blink_timer = None
+
+    def _blink_cursor(self):
+        """Toggle cursor visibility and schedule next blink"""
+        self.cursor_visible = not self.cursor_visible
+        self.redraw()
+        self.cursor_blink_timer = self.after(500, self._blink_cursor)
 
         # Bind events
         self.bind("<Key>", self._on_key_press)
+        self.bind("<Button-1>", self._on_mouse_click)
+        self.bind("<Configure>", self._on_resize)
+        self.bind("<FocusIn>", self._on_focus_in)
+        self.bind("<FocusOut>", self._on_focus_out)
         self.focus_set()
 
-    def clear_screen(self):
-        """Clear the entire screen and reset the cursor."""
-        self.screen_buffer = [[" " for _ in range(self.cols)] for _ in range(self.rows)]
-        self.cursor_x = 0
-        self.cursor_y = 0
+        # Apply theme after all attributes are initialized
+        self.apply_theme(self.current_theme)
+
+        # Initialize with empty content
+        self.clear_all()
+
+    def update_font_metrics(self):
+        """Update font metrics when font changes"""
+        self.char_width = self.font.measure("W")
+        self.char_height = self.font.metrics("linespace")
+        visible_width = (self.canvas_width -
+                        (self.line_number_width if self.show_line_numbers
+                         else 0))
+        self.cols = max(1, visible_width // self.char_width)
+        self.rows = max(1, self.canvas_height // self.char_height)
+
+    def _create_default_theme(self) -> Theme:
+        """Create the default dark theme"""
+        return Theme("Time Warp Dark", {
+            'background': '#1a1a1a',
+            'foreground': '#ffffff',
+            'accent': '#00ff88',
+            'panel_bg': '#2d2d2d',
+            'panel_fg': '#ffffff',
+            'cursor': '#ffffff',
+            'selection_bg': '#404040',
+            'syntax': {
+                'keyword': '#ff6b6b',
+                'string': '#4ecdc4',
+                'number': '#45b7d1',
+                'comment': '#7d8796',
+                'function': '#f9ca24',
+                'variable': '#6c5ce7'
+            }
+        })
+
+    def apply_theme(self, theme: Theme):
+        """Apply a theme to the canvas"""
+        self.current_theme = theme
+        self.config(bg=theme.background)
         self.redraw()
 
+    def set_font(self, family: str, size: int):
+        """Dynamically update font settings"""
+        self.font_family = family
+        self.font_size = size
+        self.font.config(family=family, size=size)
+        self.update_font_metrics()
+        self.redraw()
+
+    def set_theme(self, theme: Theme):
+        """Apply a new theme"""
+        self.apply_theme(theme)
+
+    def toggle_line_numbers(self):
+        """Toggle line number display"""
+        self.show_line_numbers = not self.show_line_numbers
+        self.update_font_metrics()
+        self.redraw()
+
+    def clear_all(self):
+        """Clear all content from canvas"""
+        self.lines = [""]
+        self.line_attributes = [{}]
+        self.cursor_line = 0
+        self.cursor_col = 0
+        self.graphics_objects.clear()
+        self.redraw()
+
+    def clear_screen(self):
+        """Clear the screen (alias for clear_all for compatibility)"""
+        self.clear_all()
+
     def clear_text(self):
-        """Clear all text from the canvas."""
-        self.clear_screen()
+        """Clear only text content"""
+        self.lines = [""]
+        self.line_attributes = [{}]
+        self.cursor_line = 0
+        self.cursor_col = 0
+        self.redraw()
 
     def clear_graphics(self):
-        """Clear all graphics from the canvas."""
-        # For now, just clear the screen since graphics are integrated
-        self.clear_screen()
+        """Clear only graphics content"""
+        for obj_id in self.graphics_objects:
+            self.delete(obj_id)
+        self.graphics_objects.clear()
+        self.graphics_commands.clear()
 
+    def write_text(self, text: str, color: Optional[Union[str, int]] = None,
+                   style: str = "normal", line: Optional[int] = None):
+        """Write text to the canvas with advanced formatting"""
+        if line is not None:
+            self._insert_text_at_line(text, line, color, style)
+        else:
+            self._append_text(text, color, style)
+        self.redraw()
+
+    def _append_text(self, text: str, color: Optional[Union[str, int]] = None,
+                     style: str = "normal"):
+        """Append text at cursor position"""
+        if isinstance(color, int):
+            color = self._get_color_from_index(color)
+
+        # Ensure cursor position is valid
+        if self.cursor_line >= len(self.lines):
+            self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
+            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+
+        lines = text.split('\n')
+        for i, line_text in enumerate(lines):
+            if i > 0:
+                self.cursor_line += 1
+                self.cursor_col = 0
+                if self.cursor_line >= len(self.lines):
+                    self.lines.append("")
+                    self.line_attributes.append({})
+
+            current_line = self.lines[self.cursor_line]
+            before = current_line[:self.cursor_col]
+            after = current_line[self.cursor_col:]
+            new_line = before + line_text + after
+            self.lines[self.cursor_line] = new_line
+
+            if color or style != "normal":
+                line_attrs = self.line_attributes[self.cursor_line]
+                if 'segments' not in line_attrs:
+                    line_attrs['segments'] = []
+                start_col = self.cursor_col
+                end_col = start_col + len(line_text)
+                line_attrs['segments'].append({
+                    'start': start_col,
+                    'end': end_col,
+                    'color': color or self.current_theme.foreground,
+                    'style': style
+                })
+            self.cursor_col += len(line_text)
+
+        self.redraw()
+
+    def _insert_text_at_line(self, text: str, line_num: int,
+                           color: Optional[Union[str, int]] = None,
+                           style: str = "normal"):
+        """Insert text at specific line"""
+        while len(self.lines) <= line_num:
+            self.lines.append("")
+            self.line_attributes.append({})
+
+        if isinstance(color, int):
+            color = self._get_color_from_index(color)
+
+        self.lines[line_num] = text
+        if color or style != "normal":
+            self.line_attributes[line_num] = {
+                'segments': [{
+                    'start': 0,
+                    'end': len(text),
+                    'color': color or self.current_theme.foreground,
+                    'style': style
+                }]
+            }
+
+    def _get_color_from_index(self, index: int) -> str:
+        """Convert color index to actual color"""
+        palette = [
+            "#000000", "#000080", "#008000", "#008080", "#800000",
+            "#800080", "#808000", "#c0c0c0", "#808080", "#0000ff",
+            "#00ff00", "#00ffff", "#ff0000", "#ff00ff", "#ffff00",
+            "#ffffff"
+        ]
+        if 0 <= index < len(palette):
+            return palette[index]
+        return self.current_theme.foreground
+
+    def redraw(self):
+        """Redraw the entire canvas with current content"""
+        self.delete("all")
+        # Don't clear graphics_objects here - we'll recreate them
+
+        # Draw background
+        self.create_rectangle(0, 0, self.canvas_width, self.canvas_height,
+                             fill=self.current_theme.background, outline="")
+
+        x_offset = self.line_number_width if self.show_line_numbers else 0
+
+        # Draw each line
+        for line_num, line_text in enumerate(self.lines):
+            y = line_num * self.char_height
+
+            if self.show_line_numbers:
+                line_num_text = f"{line_num + 1:4d} "
+                self.create_text(5, y, text=line_num_text, font=self.font,
+                               fill=self.current_theme.panel_fg, anchor="nw")
+
+            self._draw_line_text(line_text, x_offset, y, line_num)
+
+        # Draw cursor if in input mode or text editing mode
+        if self.input_mode or (not self.input_mode and self.cursor_visible):
+            cursor_x = x_offset + self.cursor_col * self.char_width
+            cursor_y = self.cursor_line * self.char_height
+            self.create_rectangle(cursor_x, cursor_y,
+                               cursor_x + self.char_width,
+                               cursor_y + self.char_height,
+                               fill="", outline=self.current_theme.cursor_color,
+                               width=2)
+
+        # Recreate graphics on top
+        self._redraw_graphics()
+
+        # Ensure display is updated
+        self.update_idletasks()
+
+    def _redraw_graphics(self):
+        """Recreate all graphics objects"""
+        self.graphics_objects.clear()
+        for cmd in self.graphics_commands:
+            if cmd['type'] == 'line':
+                obj_id = self.create_line(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
+                                        fill=cmd['color'], width=cmd['width'], **cmd.get('kwargs', {}))
+            elif cmd['type'] == 'rectangle':
+                obj_id = self.create_rectangle(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
+                                             outline=cmd['color'], fill=cmd['fill_color'],
+                                             width=cmd['width'], **cmd.get('kwargs', {}))
+            elif cmd['type'] == 'circle':
+                obj_id = self.create_oval(cmd['x1'], cmd['y1'], cmd['x2'], cmd['y2'],
+                                        outline=cmd['color'], fill=cmd['fill_color'],
+                                        width=cmd['width'], **cmd.get('kwargs', {}))
+            elif cmd['type'] == 'text':
+                obj_id = self.create_text(cmd['x'], cmd['y'], text=cmd['text'],
+                                        fill=cmd['color'], font=self.font, **cmd.get('kwargs', {}))
+            self.graphics_objects.append(obj_id)
+
+    def _draw_line_text(self, text: str, x_offset: int, y: int,
+                       line_num: int):
+        """Draw a single line of text with formatting"""
+        attrs = (self.line_attributes[line_num]
+                if line_num < len(self.line_attributes) else {})
+
+        if 'segments' in attrs and attrs['segments']:
+            for segment in attrs['segments']:
+                start = segment['start']
+                end = min(segment['end'], len(text))
+                if start < end:
+                    segment_text = text[start:end]
+                    x = x_offset + start * self.char_width
+                    color = segment.get('color',
+                                       self.current_theme.foreground)
+                    self.create_text(x, y, text=segment_text, font=self.font,
+                                   fill=color, anchor="nw")
+        else:
+            color = attrs.get('color', self.current_theme.foreground)
+            self.create_text(x_offset, y, text=text, font=self.font,
+                           fill=color, anchor="nw")
+
+    def prompt_input(self, prompt: str = "", callback=None):
+        """Enter input mode with prompt"""
+        self.input_mode = True
+        self.input_callback = callback
+        self.input_buffer = ""
+
+        if prompt:
+            self.write_text(f"{prompt} ")
+        self.redraw()
+
+        # Ensure canvas has focus for input
+        self.focus_set()
+
+    def _on_key_press(self, event):
+        """Handle key press events"""
+        key = event.keysym
+        char = event.char
+
+        # Handle special keys first
+        if key == "Return":
+            if self.input_mode:
+                if self.input_callback:
+                    self.input_callback(self.input_buffer)
+                self.input_mode = False
+                self.write_text("\n")
+                self.redraw()
+                return "break"
+            else:
+                # Insert newline in text editor mode
+                self._insert_newline()
+                return "break"
+
+        elif key == "BackSpace":
+            if self.input_mode:
+                if self.input_buffer:
+                    self.input_buffer = self.input_buffer[:-1]
+                    if self.cursor_col > 0:
+                        self.cursor_col -= 1
+                        current_line = self.lines[self.cursor_line]
+                        self.lines[self.cursor_line] = current_line[:-1]
+                    self.redraw()
+                return "break"
+            else:
+                # Delete character in text editor mode
+                self._delete_character()
+                return "break"
+
+        elif key == "Delete":
+            self._delete_character(forward=True)
+            return "break"
+
+        elif key == "Left":
+            self._move_cursor_left()
+            return "break"
+
+        elif key == "Right":
+            self._move_cursor_right()
+            return "break"
+
+        elif key == "Up":
+            self._move_cursor_up()
+            return "break"
+
+        elif key == "Down":
+            self._move_cursor_down()
+            return "break"
+
+        elif key == "Home":
+            self.cursor_col = 0
+            self.redraw()
+            return "break"
+
+        elif key == "End":
+            if self.cursor_line < len(self.lines):
+                self.cursor_col = len(self.lines[self.cursor_line])
+            self.redraw()
+            return "break"
+
+        elif key == "Tab":
+            if not self.input_mode:
+                self._insert_text("\t")
+                return "break"
+
+        # Handle printable characters
+        elif char and char.isprintable():
+            if self.input_mode:
+                self.input_buffer += char
+                self._append_text(char)
+                return "break"
+            else:
+                # Insert character in text editor mode
+                self._insert_text(char)
+                return "break"
+
+        return "break"
+
+    def _insert_text(self, text: str):
+        """Insert text at cursor position in text editor mode"""
+        if self.cursor_line >= len(self.lines):
+            self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
+            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+
+        current_line = self.lines[self.cursor_line]
+        before = current_line[:self.cursor_col]
+        after = current_line[self.cursor_col:]
+        self.lines[self.cursor_line] = before + text + after
+        self.cursor_col += len(text)
+        self.redraw()
+
+    def _insert_newline(self):
+        """Insert a newline at cursor position"""
+        if self.cursor_line >= len(self.lines):
+            self.lines.extend([""] * (self.cursor_line - len(self.lines) + 1))
+            self.line_attributes.extend([{}] * (self.cursor_line - len(self.line_attributes) + 1))
+
+        current_line = self.lines[self.cursor_line]
+        before = current_line[:self.cursor_col]
+        after = current_line[self.cursor_col:]
+
+        self.lines[self.cursor_line] = before
+        self.lines.insert(self.cursor_line + 1, after)
+        self.line_attributes.insert(self.cursor_line + 1, {})
+
+        self.cursor_line += 1
+        self.cursor_col = 0
+        self.redraw()
+
+    def _delete_character(self, forward: bool = False):
+        """Delete character at cursor position (or after cursor if forward=True)"""
+        if forward:
+            # Delete forward (Delete key)
+            if self.cursor_col < len(self.lines[self.cursor_line]):
+                current_line = self.lines[self.cursor_line]
+                self.lines[self.cursor_line] = current_line[:self.cursor_col] + current_line[self.cursor_col + 1:]
+            elif self.cursor_line < len(self.lines) - 1:
+                # Join with next line
+                next_line = self.lines[self.cursor_line + 1]
+                self.lines[self.cursor_line] += next_line
+                self.lines.pop(self.cursor_line + 1)
+                self.line_attributes.pop(self.cursor_line + 1)
+        else:
+            # Delete backward (Backspace)
+            if self.cursor_col > 0:
+                current_line = self.lines[self.cursor_line]
+                self.lines[self.cursor_line] = current_line[:self.cursor_col - 1] + current_line[self.cursor_col:]
+                self.cursor_col -= 1
+            elif self.cursor_line > 0:
+                # Join with previous line
+                prev_line = self.lines[self.cursor_line - 1]
+                prev_length = len(prev_line)
+                self.lines[self.cursor_line - 1] = prev_line + self.lines[self.cursor_line]
+                self.lines.pop(self.cursor_line)
+                self.line_attributes.pop(self.cursor_line)
+                self.cursor_line -= 1
+                self.cursor_col = prev_length
+
+        self.redraw()
+
+    def _move_cursor_left(self):
+        """Move cursor left"""
+        if self.cursor_col > 0:
+            self.cursor_col -= 1
+        elif self.cursor_line > 0:
+            self.cursor_line -= 1
+            self.cursor_col = len(self.lines[self.cursor_line])
+        self.redraw()
+
+    def _move_cursor_right(self):
+        """Move cursor right"""
+        if self.cursor_col < len(self.lines[self.cursor_line]):
+            self.cursor_col += 1
+        elif self.cursor_line < len(self.lines) - 1:
+            self.cursor_line += 1
+            self.cursor_col = 0
+        self.redraw()
+
+    def _move_cursor_up(self):
+        """Move cursor up"""
+        if self.cursor_line > 0:
+            self.cursor_line -= 1
+            self.cursor_col = min(self.cursor_col, len(self.lines[self.cursor_line]))
+        self.redraw()
+
+    def _move_cursor_down(self):
+        """Move cursor down"""
+        if self.cursor_line < len(self.lines) - 1:
+            self.cursor_line += 1
+            self.cursor_col = min(self.cursor_col, len(self.lines[self.cursor_line]))
+        self.redraw()
+
+    def _on_mouse_click(self, event):
+        """Handle mouse click events"""
+        x_offset = self.line_number_width if self.show_line_numbers else 0
+        col = max(0, (event.x - x_offset) // self.char_width)
+        line = max(0, event.y // self.char_height)
+
+        if line < len(self.lines):
+            self.cursor_line = line
+            self.cursor_col = min(col, len(self.lines[line]))
+            self.redraw()
+
+        # Ensure canvas gets focus when clicked
+        self.focus_set()
+
+    def _on_resize(self, event):
+        """Handle canvas resize"""
+        self.canvas_width = event.width
+        self.canvas_height = event.height
+        self.update_font_metrics()
+        self.redraw()
+
+    def _on_focus_in(self, event):
+        """Handle focus in event"""
+        # Ensure canvas stays focused for input
+        self.focus_set()
+        self.start_cursor_blink()
+
+    def _on_focus_out(self, event):
+        """Handle focus out event"""
+        self.stop_cursor_blink()
+        self.cursor_visible = False
+        self.redraw()
+
+    # Graphics methods (enhanced)
+    def draw_line(self, x1: float, y1: float, x2: float, y2: float,
+                  color: Optional[str] = None, width: int = 1, **kwargs):
+        """Draw a line"""
+        color = color or self.current_theme.accent
+        line_id = self.create_line(x1, y1, x2, y2, fill=color,
+                                 width=width, **kwargs)
+        self.graphics_objects.append(line_id)
+        self.graphics_commands.append({
+            'type': 'line',
+            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
+            'color': color, 'width': width, 'kwargs': kwargs
+        })
+        return line_id
+
+    def draw_rectangle(self, x1: float, y1: float, x2: float, y2: float,
+                      filled: bool = False, color: Optional[str] = None,
+                      width: int = 1, **kwargs):
+        """Draw a rectangle"""
+        color = color or self.current_theme.accent
+        fill_color = color if filled else ""
+        rect_id = self.create_rectangle(x1, y1, x2, y2, outline=color,
+                                      fill=fill_color, width=width, **kwargs)
+        self.graphics_objects.append(rect_id)
+        self.graphics_commands.append({
+            'type': 'rectangle',
+            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
+            'color': color, 'fill_color': fill_color, 'width': width, 'kwargs': kwargs
+        })
+        return rect_id
+
+    def draw_circle(self, center_x: float, center_y: float, radius: float,
+                   filled: bool = False, color: Optional[str] = None,
+                   width: int = 1, **kwargs):
+        """Draw a circle"""
+        color = color or self.current_theme.accent
+        x1 = center_x - radius
+        y1 = center_y - radius
+        x2 = center_x + radius
+        y2 = center_y + radius
+        fill_color = color if filled else ""
+        circle_id = self.create_oval(x1, y1, x2, y2, outline=color,
+                                   fill=fill_color, width=width, **kwargs)
+        self.graphics_objects.append(circle_id)
+        self.graphics_commands.append({
+            'type': 'circle',
+            'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
+            'color': color, 'fill_color': fill_color, 'width': width, 'kwargs': kwargs
+        })
+        return circle_id
+
+    def draw_text(self, x: float, y: float, text: str,
+                  color: Optional[str] = None, **kwargs):
+        """Draw text at graphics coordinates"""
+        color = color or self.current_theme.foreground
+        text_id = self.create_text(x, y, text=text, fill=color,
+                                 font=self.font, **kwargs)
+        self.graphics_objects.append(text_id)
+        self.graphics_commands.append({
+            'type': 'text',
+            'x': x, 'y': y, 'text': text, 'color': color, 'kwargs': kwargs
+        })
+        return text_id
+
+    # Legacy compatibility methods
     def set_cursor(self, x, y):
-        """Set cursor position."""
-        self.cursor_x = x
-        self.cursor_y = y
+        """Legacy cursor positioning"""
+        self.cursor_col = x
+        self.cursor_line = y
 
     def set_text_color(self, color):
-        """Set text color (placeholder for compatibility)."""
+        """Legacy text color setting"""
         pass
 
     def set_bg_color(self, color):
-        """Set background color (placeholder for compatibility)."""
+        """Legacy background color setting"""
         pass
 
     def get_mode_info(self):
-        """Get current mode information."""
+        """Get current canvas mode information"""
         return {
-            "name": "Unified Canvas",
-            "width": self.cols * self.char_width,
-            "height": self.rows * self.char_height,
+            "name": "Time Warp Unified Canvas",
+            "width": self.canvas_width,
+            "height": self.canvas_height,
             "text_cols": self.cols,
             "text_rows": self.rows,
-            "colors": 16,
-            "type": "unified"
+            "theme": self.current_theme.name,
+            "font_family": self.font_family,
+            "font_size": self.font_size,
+            "type": "modern_unified"
         }
 
     def get_palette(self):
-        """Get current color palette."""
-        return ["black", "blue", "green", "cyan", "red", "magenta", "brown", "lightgray",
-                "darkgray", "lightblue", "lightgreen", "lightcyan", "lightred", "lightmagenta",
-                "yellow", "white"]
+        """Get color palette (legacy compatibility)"""
+        return ["#000000", "#000080", "#008000", "#008080", "#800000",
+                "#800080", "#808000", "#c0c0c0", "#808080", "#0000ff",
+                "#00ff00", "#00ffff", "#ff0000", "#ff00ff", "#ffff00",
+                "#ffffff"]
 
-    def write_text(self, text, color=None):
-        """Write text to the canvas at the current cursor position with optional color."""
-        if color is None:
-            color = "black"  # Default color
-        elif isinstance(color, int):
-            # Map integer color to a hex code (e.g., 12 -> "#FF00FF")
-            palette = ["black", "blue", "green", "cyan", "red", "magenta", "brown", "lightgray",
-                       "darkgray", "lightblue", "lightgreen", "lightcyan", "lightred", "lightmagenta",
-                       "yellow", "white"]
-            color = palette[color % len(palette)]
-
-        for char in text:
-            if char == "\n":
-                self.cursor_x = 0
-                self.cursor_y += 1
-            elif char == "\r":
-                self.cursor_x = 0
-            else:
-                if self.cursor_x < self.cols and self.cursor_y < self.rows:
-                    self.screen_buffer[self.cursor_y][self.cursor_x] = char
-                    self.cursor_x += 1
-
-            # Handle scrolling if cursor goes out of bounds
-            if self.cursor_x >= self.cols:
-                self.cursor_x = 0
-                self.cursor_y += 1
-            if self.cursor_y >= self.rows:
-                self.scroll_up()
-                self.cursor_y = self.rows - 1
-
-        self.redraw(color=color)
-
-    def redraw(self, color="black"):
-        """Redraw the entire canvas based on the screen buffer with the specified color."""
-        self.delete("all")
-
-        # Fill the background with the configured background color
-        self.create_rectangle(
-            0, 0, self.cols * self.char_width, self.rows * self.char_height,
-            fill=self.bg_color, outline=self.bg_color, tags="background"
-        )
-
-        # Render each character in the buffer
-        for row in range(self.rows):
-            for col in range(self.cols):
-                char = self.screen_buffer[row][col]
-                if char.strip():  # Ensure non-empty characters are rendered
-                    x = col * self.char_width
-                    y = row * self.char_height
-                    self.create_text(
-                        x, y, text=char, font=self.font, fill=color, anchor="nw"
-                    )
-
-    def scroll_up(self):
-        """Scroll the screen up by one line."""
-        self.screen_buffer.pop(0)
-        self.screen_buffer.append([" " for _ in range(self.cols)])
-
-    def _on_key_press(self, event):
-        """Handle key press events for input."""
-        if hasattr(self, 'input_active') and self.input_active:
-            # Handle input mode
-            key = event.keysym
-            char = event.char
-
-            if key == "Return":
-                # Submit input
-                if hasattr(self, 'input_callback') and self.input_callback:
-                    self.input_callback(self.input_buffer)
-                self.input_active = False
-                # Move to next line
-                self.write_text("\n")
-                return "break"
-
-            elif key == "BackSpace":
-                if self.input_buffer:
-                    self.input_buffer = self.input_buffer[:-1]
-                    # Move cursor back
-                    if self.cursor_x > 0:
-                        self.cursor_x -= 1
-                        self.screen_buffer[self.cursor_y][self.cursor_x] = ' '
-                    elif self.cursor_y > 0:
-                        self.cursor_y -= 1
-                        self.cursor_x = self.cols - 1
-                        self.screen_buffer[self.cursor_y][self.cursor_x] = ' '
-                    self.redraw()
-                return "break"
-
-            elif char and char.isprintable():
-                self.input_buffer += char
-                self.write_text(char)
-                return "break"
-
-            return "break"
-        else:
-            # Handle normal text input
-            if event.keysym == "Return":
-                self.write_text("\n")
-            elif event.keysym == "BackSpace":
-                if self.cursor_x > 0:
-                    self.cursor_x -= 1
-                    self.screen_buffer[self.cursor_y][self.cursor_x] = " "
-                elif self.cursor_y > 0:
-                    self.cursor_y -= 1
-                    self.cursor_x = self.cols - 1
-                    self.screen_buffer[self.cursor_y][self.cursor_x] = " "
-                self.redraw()
-            elif event.char.isprintable():
-                self.write_text(event.char)
-
-    def prompt_input(self, prompt_text, callback):
-        """Display input prompt and wait for user input"""
-        self.input_prompt = prompt_text if prompt_text else ""
-        self.input_callback = callback
-        self.input_buffer = ""
-        self.input_active = True
-
-        # Display prompt
-        if self.input_prompt:
-            self.write_text(f"{self.input_prompt} ")
-
-        # Ensure cursor is below the prompt
-        self.cursor_x = 0
-        self.cursor_y += 1
-        if self.cursor_y >= self.rows:
-            self.scroll_up()
-            self.cursor_y = self.rows - 1
-
-        # Focus the canvas for input
-        self.focus_set()
-
-    # Alias for compatibility
-    _clear_screen = clear_screen
+    def set_screen_mode(self, mode):
+        """Legacy screen mode setting (no-op)"""
+        pass
