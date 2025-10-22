@@ -1,33 +1,12 @@
-<<<<<<< HEAD
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-.pytest_cache/
-*.egg-info/
-dist/
-build/
-
-# Virtual Environment
-timewarp_venv/
-venv/
-env/
-ENV/
-=======
 # Rust build artifacts
 target/
 Cargo.lock
->>>>>>> 066f2538e86bb3d8413c1ab261082a1d003dc877
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-<<<<<<< HEAD
 *~
 
 # OS files
@@ -71,40 +50,8 @@ config.json
 # Cache directories
 .cache/
 
-# Test and temporary files
-test_*.py
-*_test.py
-debug_*.py
-benchmark_*.py
-stress_test_*.py
-*_backup.py
-*_corrupted*.py
-temp_*.py
-edge_case_*.py
-diagnose_*.py
-
-# Documentation files (will be generated)
-*_SUMMARY.md
-*_REPORT.md
-*_GUIDE.md
-*_COMPLETE.md
-
-# Game and demo files (examples only)
-demo_*.py
-run_*_direct.py
-
-# File system test files
-"test
-"test_file.txt"
-test file with spaces.txt
-unicode_test.txt
 # Build directory
 build/
-
-# Scripts (development only - don't ignore)
-# scripts/
-
-=======
 
 # OS files
 .DS_Store
@@ -116,4 +63,3 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
->>>>>>> 066f2538e86bb3d8413c1ab261082a1d003dc877
