@@ -1,8 +1,0 @@
-T:Hello World Program
-A:This is a simple PILOT program that demonstrates compilation to executable.
-T:Welcome to Time_Warp!
-A:This program will display a greeting message.
-T:Ready to compile?
-Y:Yes
-N:No
-T:Goodbye!

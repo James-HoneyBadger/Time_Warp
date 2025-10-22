@@ -1,7 +1,0 @@
-T: Debug Test
-A: NAME
-Y: *NAME* == "Alice"
-T: Match flag should be set now
-MT: This should show if NAME is Alice
-T: Program end
-END
