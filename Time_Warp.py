@@ -793,6 +793,30 @@ class TimeWarpApp:
         )
         self.status_label.config(text="🆕 New program started")
 
+    def _display_test_output(self):
+        """Display test output in the unified canvas and switch to output tab"""
+        import subprocess
+        import sys
+
+        try:
+            # Clear the output canvas first
+            self.unified_canvas.clear_screen()
+            # Switch to output tab
+            self.notebook.select(self.output_frame)
+            # Run tests
+            result = subprocess.run(
+                [sys.executable, "scripts/run_tests.py"],
+                capture_output=True,
+                text=True,
+            )
+            output = result.stdout + "\n" + result.stderr
+            # Display in unified canvas
+            self.unified_canvas.write_text("🧪 Test Output:\n\n" + output)
+        except Exception as e:
+            self.unified_canvas.write_text(
+                f"❌ Could not display test output:\n\n{str(e)}"
+            )
+
     def open_file(self):
         from tkinter import filedialog
 
@@ -2164,6 +2188,10 @@ Features:
             label="🐢 Switch to Turtle Graphics",
             command=self.toggle_turtle_graphics,
         )
+        view_menu.add_separator()
+        view_menu.add_command(
+            label="📊 Display Test Output", command=self._display_test_output
+        )
         self.menubar.add_cascade(label="View", menu=view_menu)
 
         # === RUN MENU === ▶️
@@ -2263,6 +2291,8 @@ Features:
         )
 
         self.menubar.add_cascade(label="Help", menu=help_menu)
+
+
 
         # Toolbar intentionally omitted per user preference (no tab buttons)
 
@@ -2370,6 +2400,7 @@ Features:
             try:
                 # Always enqueue a (text, color) tuple to keep shape consistent
                 self._ui_output_queue.put((str(text), color))
+                # enqueue recorded (no diagnostics file in normal mode)
             except Exception:
                 try:
                     self._ui_output_queue.put((str(text), None))
@@ -2403,11 +2434,21 @@ Features:
                             txt = str(text)
                             if not txt.endswith("\n"):
                                 txt = txt + "\n"
-                            # Write text; UnifiedCanvas will schedule redraws but we also
-                            # force a redraw after the flush to make output visible.
-                            self.unified_canvas.write_text(txt, color=color)
+                            # Default to theme foreground (or accent) if none provided
+                            write_color = (
+                                self.unified_canvas.current_theme.foreground
+                                if color is None
+                                else color
+                            )
+                            # Write the text
+                            self.unified_canvas.write_text(txt, color=write_color)
+                            # Add visual flash to indicate output
+                            self.unified_canvas.flash_accent()
                         else:
-                            self.unified_canvas.write_text(str(item))
+                            # Non-tuple items: use theme foreground for visibility
+                            self.unified_canvas.write_text(
+                                str(item), color=self.unified_canvas.current_theme.foreground
+                            )
                     except Exception:
                         # Ignore write errors to keep UI thread robust
                         pass
@@ -2423,6 +2464,7 @@ Features:
             # freshly-written text is painted on-screen promptly.
             try:
                 self.unified_canvas.redraw()
+                # No diagnostics snapshot in normal mode
             except Exception:
                 pass
 
@@ -2671,16 +2713,22 @@ Features:
                         return
                     else:
                         # Invalid line number format - no command after line number
-                        self.unified_canvas.write_text(
-                            "Invalid line number format - missing command.\n",
-                            color=12,
-                        )
+                        try:
+                            self.unified_canvas.write_text(
+                                "Invalid line number format - missing command.\n",
+                                color=12,
+                            )
+                        except Exception:
+                            pass
                         return
                 except (ValueError, IndexError):
                     # Invalid line number format
-                    self.unified_canvas.write_text(
-                        "Invalid line number format.\n", color=12
-                    )
+                    try:
+                        self.unified_canvas.write_text(
+                            "Invalid line number format.\n", color=12
+                        )
+                    except Exception:
+                        pass
                     return
 
             # Execute as current language command

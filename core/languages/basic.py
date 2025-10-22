@@ -1,4 +1,3 @@
-
 """
 TW BASIC Language Executor
 ==================================
@@ -49,11 +48,7 @@ class TwBasicInterpreter:
     def set_output_callback(self, callback):
         # Set the output callback used by the IDE. Keep a debug trace when set.
         self.output_callback = callback
-        try:
-            # Output callback registered
-            pass
-        except Exception:
-            pass
+        # Output callback registered
 
     def log_output(self, text):
         # Route output to the registered callback or fallback to stdout
@@ -162,6 +157,11 @@ class TwBasicInterpreter:
         try:
             command = command.strip()
             if not command:
+                return "continue"
+
+            # Reject purely numeric commands (invalid line numbers without commands)
+            if command.isdigit():
+                self.log_output(f"Invalid command: {command} - line numbers must be followed by a command.")
                 return "continue"
 
             # BASIC: Convert ? to PRINT for compatibility
@@ -1832,10 +1832,6 @@ class TwBasicInterpreter:
 
                         rect = pygame.Rect(x, y, width, height)
                         if filled:
-                            pygame.draw.rect(
-                                self.pygame_screen, self.current_color, rect
-                            )
-                        else:
                             pygame.draw.rect(
                                 self.pygame_screen, self.current_color, rect, 2
                             )

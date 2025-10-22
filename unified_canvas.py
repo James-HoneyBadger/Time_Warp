@@ -482,6 +482,30 @@ class UnifiedCanvas(tk.Canvas):
                 )
             self.graphics_objects.append(obj_id)
 
+    def flash_accent(self, duration_ms: int = 300):
+        """Draw a small accent rectangle in the top-left that disappears after duration_ms"""
+        try:
+            # Draw accent rectangle and schedule removal
+            rect_id = self.create_rectangle(
+                8,
+                8,
+                60,
+                40,
+                outline=self.current_theme.accent,
+                fill=self.current_theme.accent,
+            )
+
+            def _remove():
+                try:
+                    self.delete(rect_id)
+                    self.redraw()
+                except Exception:
+                    pass
+
+            self.after(duration_ms, _remove)
+        except Exception:
+            pass
+
     def _draw_line_text(self, text: str, x_offset: int, y: int, line_num: int):
         """Draw a single line of text with formatting"""
         attrs = (
