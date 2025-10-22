@@ -30,14 +30,13 @@ try:
 
     CORE_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️ Core components not available: {e}")
+    import logging
+
+    logging.warning("⚠️ Core components not available: %s", e)
     CORE_AVAILABLE = False
 
 # Import plugins (from root level)
 try:
-    import os
-    import sys
-
     # Add root directory to path for plugins
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     if root_dir not in sys.path:
@@ -46,7 +45,9 @@ try:
 
     PLUGINS_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️ Plugin system not available: {e}")
+    import logging
+
+    logging.warning("⚠️ Plugin system not available: %s", e)
     PLUGINS_AVAILABLE = False
 
 # Import GUI components
@@ -81,9 +82,11 @@ class Time_WarpIDE:
 
     def __init__(self):
         """Initialize Time_Warp IDE"""
-        print("🚀 Starting Time_Warp IDE 1.2...")
-        print("⏰ Enhanced Educational Programming Environment")
-        print("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
+        import logging
+
+        logging.info("🚀 Starting Time_Warp IDE 1.2...")
+        logging.info("⏰ Enhanced Educational Programming Environment")
+        logging.info("🔥 New: Multi-tab editor, Enhanced graphics, Theme selector!")
 
         # Initialize main window
         self.root = tk.Tk()
@@ -135,12 +138,16 @@ class Time_WarpIDE:
 
         # Ensure theme is applied to multi-tab editor specifically
         if hasattr(self, "multi_tab_editor"):
-            try:
-                colors = self.theme_manager.get_colors()
-                self.multi_tab_editor.apply_theme(colors)
-                print("✅ Initial theme applied to multi-tab editor")
-            except Exception as e:
-                print(f"⚠️ Failed to apply initial theme to editor: {e}")
+                try:
+                    colors = self.theme_manager.get_colors()
+                    self.multi_tab_editor.apply_theme(colors)
+                    import logging
+
+                    logging.info("✅ Initial theme applied to multi-tab editor")
+                except Exception as e:
+                    import logging
+
+                    logging.warning("⚠️ Failed to apply initial theme to editor: %s", e)
 
         # Load plugins
         self.load_plugins()
@@ -165,7 +172,9 @@ class Time_WarpIDE:
                         "line_numbers"
                     ),
                 }
-                print(f"🔍 Config path: {cfg_path} | keys: {snippet}")
+                import logging
+
+                logging.debug("🔍 Config path: %s | keys: %s", cfg_path, snippet)
                 # Write a small startup log for debugging
                 try:
                     log_file = cfg_path.parent / "startup.log"
@@ -173,9 +182,11 @@ class Time_WarpIDE:
                         lf.write(
                             f"{datetime.now().isoformat()} - Loaded config: {snippet}\n"
                         )
-                except Exception as e:
+                except Exception:
+                    # Don't fail startup for log write problems
                     pass
             except Exception:
+                # Ignored: best-effort config reading
                 pass
         except Exception as e:
             print(f"⚠️ Theme loading error: {e}")

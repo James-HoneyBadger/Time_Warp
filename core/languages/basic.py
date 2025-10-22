@@ -613,12 +613,17 @@ class TwBasicInterpreter:
 
     def _handle_goto(self, command, parts):
         """Handle GOTO statement"""
-                    if len(parts) >= 2:
-                        try:
-                            delay_ms = int(parts[1])
-                            # use module-level time
-                            time.sleep(delay_ms / 1000.0)  # Convert to seconds
-                        except ValueError:
+        # GOTO expects a line number: GOTO <line_number>
+        if len(parts) >= 2:
+            try:
+                line_num = int(parts[1])
+                # find the target line index in program_lines
+                for i, (num, _) in enumerate(self.program_lines):
+                    if num == line_num:
+                        return f"jump:{i}"
+            except ValueError:
+                # If it's not an integer, ignore and continue execution
+                pass
     def _handle_gosub(self, command, parts):
         """Handle GOSUB statement"""
         if len(parts) > 1:
