@@ -38,6 +38,9 @@ struct TimeWarpApp {
     input_prompt: String,
     user_input: String,
     current_input_var: String,
+    show_about: bool,
+    turtle_zoom: f32,
+    turtle_pan: egui::Vec2,
 }
 
 impl Default for TimeWarpApp {
@@ -67,6 +70,9 @@ impl Default for TimeWarpApp {
             input_prompt: String::new(),
             user_input: String::new(),
             current_input_var: String::new(),
+            show_about: false,
+            turtle_zoom: 1.0,
+            turtle_pan: egui::vec2(0.0, 0.0),
         }
     }
 }
@@ -451,9 +457,62 @@ impl eframe::App for TimeWarpApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_visuals(egui::Visuals::light());
 
+        // Handle keyboard shortcuts
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::N)) {
+            self.code.clear();
+            self.output = "New file created.".to_string();
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::O)) {
+            if let Some(path) = FileDialog::new()
+                .add_filter("Text", &["txt", "twb", "twp", "tpr"])
+                .pick_file() {
+                if let Ok(content) = std::fs::read_to_string(&path) {
+                    self.code = content;
+                    self.output = format!("Opened file: {}", path.display());
+                    self.last_file_path = Some(path.display().to_string());
+                }
+            }
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::S)) {
+            if let Some(path) = &self.last_file_path {
+                if std::fs::write(path, &self.code).is_ok() {
+                    self.output = format!("Saved to {}", path);
+                }
+            } else if let Some(path) = FileDialog::new()
+                .set_file_name("untitled.twb")
+                .save_file() {
+                if std::fs::write(&path, &self.code).is_ok() {
+                    self.output = format!("Saved to {}", path.display());
+                    self.last_file_path = Some(path.display().to_string());
+                }
+            }
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::F)) {
+            self.show_find_replace = true;
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::R)) {
+            self.show_find_replace = true;
+        }
+        if ctx.input(|i| i.key_pressed(egui::Key::F5)) {
+            self.active_tab = 1;
+            self.execute_code();
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.modifiers.shift && i.key_pressed(egui::Key::C)) {
+            self.output = String::new();
+            self.turtle_commands.clear();
+            self.turtle_state = TurtleState {
+                x: 200.0,
+                y: 200.0,
+                angle: 0.0,
+                color: egui::Color32::BLACK,
+            };
+            self.turtle_zoom = 1.0;
+            self.turtle_pan = egui::vec2(0.0, 0.0);
+        }
+
         egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
-                ui.menu_button("�� File", |ui| {
+                ui.menu_button("📁 File", |ui| {
                     if ui.button("📄 New File").clicked() {
                         self.code.clear();
                         self.output = "New file created.".to_string();
@@ -486,6 +545,48 @@ impl eframe::App for TimeWarpApp {
                         }
                         ui.close_menu();
                     }
+                    if ui.button("💾 Save As...").clicked() {
+                        if let Some(path) = FileDialog::new()
+                            .set_file_name("untitled.twb")
+                            .save_file() {
+                            if std::fs::write(&path, &self.code).is_ok() {
+                                self.output = format!("Saved to {}", path.display());
+                                self.last_file_path = Some(path.display().to_string());
+                            }
+                        }
+                        ui.close_menu();
+                    }
+                });
+                ui.menu_button("✏️ Edit", |ui| {
+                    if ui.button("🔍 Find...").clicked() {
+                        self.show_find_replace = true;
+                        ui.close_menu();
+                    }
+                    if ui.button("🔄 Replace...").clicked() {
+                        self.show_find_replace = true;
+                        ui.close_menu();
+                    }
+                    ui.separator();
+                    if ui.button("↶ Undo").clicked() {
+                        // Note: egui TextEdit doesn't have built-in undo, this is a placeholder
+                        ui.close_menu();
+                    }
+                    if ui.button("↷ Redo").clicked() {
+                        // Note: egui TextEdit doesn't have built-in redo, this is a placeholder
+                        ui.close_menu();
+                    }
+                });
+                ui.menu_button("👁️ View", |ui| {
+                    if ui.selectable_label(self.show_line_numbers, "📏 Show Line Numbers").clicked() {
+                        self.show_line_numbers = !self.show_line_numbers;
+                        ui.close_menu();
+                    }
+                });
+                ui.menu_button("❓ Help", |ui| {
+                    if ui.button("ℹ️ About").clicked() {
+                        self.show_about = true;
+                        ui.close_menu();
+                    }
                 });
             });
         });
@@ -500,7 +601,19 @@ impl eframe::App for TimeWarpApp {
                 }
                 ui.separator();
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.button("Run ▶").clicked() {
+                    if ui.button("🗑️ Clear Output").on_hover_text("Clear the output and graphics (Ctrl+Shift+C)").clicked() {
+                        self.output = String::new();
+                        self.turtle_commands.clear();
+                        self.turtle_state = TurtleState {
+                            x: 200.0,
+                            y: 200.0,
+                            angle: 0.0,
+                            color: egui::Color32::BLACK,
+                        };
+                        self.turtle_zoom = 1.0;
+                        self.turtle_pan = egui::vec2(0.0, 0.0);
+                    }
+                    if ui.button("Run ▶").on_hover_text("Execute the code (F5)").clicked() {
                         self.active_tab = 1; // Switch to Output tab when running
                         self.execute_code();
                     }
@@ -611,16 +724,29 @@ impl eframe::App for TimeWarpApp {
                                 });
                             }
                             ui.label("Turtle Graphics:");
+                            ui.horizontal(|ui| {
+                                ui.label("Zoom:");
+                                ui.add(egui::DragValue::new(&mut self.turtle_zoom).range(0.1..=5.0).speed(0.1));
+                                if ui.button("🔍 Reset View").clicked() {
+                                    self.turtle_zoom = 1.0;
+                                    self.turtle_pan = egui::vec2(0.0, 0.0);
+                                }
+                            });
                             ui.add_space(4.0);
 
                             // Simple canvas for turtle graphics
                             let canvas_size = egui::vec2(400.0, 300.0);
-                            let (rect, _response) = ui.allocate_exact_size(canvas_size, egui::Sense::hover());
+                            let (rect, response) = ui.allocate_exact_size(canvas_size, egui::Sense::drag());
+
+                            // Handle pan
+                            if response.dragged() {
+                                self.turtle_pan += response.drag_delta() / self.turtle_zoom;
+                            }
 
                             ui.painter().rect_filled(rect, 0.0, egui::Color32::WHITE);
                             ui.painter().rect_stroke(rect, 0.0, egui::Stroke::new(1.0, egui::Color32::BLACK));
 
-                            // Draw turtle lines
+                            // Draw turtle lines with zoom and pan
                             for command in &self.turtle_commands {
                                 if command.starts_with("LINE ") {
                                     let parts: Vec<&str> = command.split_whitespace().collect();
@@ -632,8 +758,14 @@ impl eframe::App for TimeWarpApp {
                                             parts[4].parse::<f32>(),
                                         ) {
                                             let center = rect.center();
-                                            let start = egui::pos2(center.x + x1, center.y + y1);
-                                            let end = egui::pos2(center.x + x2, center.y + y2);
+                                            let start = egui::pos2(
+                                                center.x + (x1 + self.turtle_pan.x) * self.turtle_zoom,
+                                                center.y + (y1 + self.turtle_pan.y) * self.turtle_zoom
+                                            );
+                                            let end = egui::pos2(
+                                                center.x + (x2 + self.turtle_pan.x) * self.turtle_zoom,
+                                                center.y + (y2 + self.turtle_pan.y) * self.turtle_zoom
+                                            );
                                             ui.painter().line_segment([start, end], egui::Stroke::new(2.0, egui::Color32::BLACK));
                                         }
                                     }
@@ -642,11 +774,11 @@ impl eframe::App for TimeWarpApp {
 
                             // Draw turtle
                             let center = rect.center();
-                            let turtle_x = center.x + self.turtle_state.x;
-                            let turtle_y = center.y + self.turtle_state.y;
+                            let turtle_x = center.x + (self.turtle_state.x + self.turtle_pan.x) * self.turtle_zoom;
+                            let turtle_y = center.y + (self.turtle_state.y + self.turtle_pan.y) * self.turtle_zoom;
 
                             // Draw a simple triangle for the turtle
-                            let size = 8.0;
+                            let size = 8.0 * self.turtle_zoom;
                             let angle_rad = self.turtle_state.angle.to_radians();
                             let points = [
                                 egui::pos2(
@@ -673,9 +805,50 @@ impl eframe::App for TimeWarpApp {
                     _ => {}
                 }
             });
+        egui::TopBottomPanel::bottom("status_bar").show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.label(format!("Language: {}", self.language));
+                ui.separator();
+                ui.label(format!("Lines: {}", self.code.lines().count()));
+                ui.separator();
+                if self.is_executing {
+                    ui.label("⚡ Executing...");
+                } else if self.waiting_for_input {
+                    ui.label("⌨️ Waiting for input");
+                } else {
+                    ui.label("✅ Ready");
+                }
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if let Some(path) = &self.last_file_path {
+                        ui.label(format!("File: {}", path));
+                    } else {
+                        ui.label("File: Untitled");
+                    }
+                });
+            });
         });
-    }
-}
+
+        // About dialog
+        if self.show_about {
+            egui::Window::new("About Time Warp IDE")
+                .collapsible(false)
+                .resizable(false)
+                .show(ctx, |ui| {
+                    ui.vertical_centered(|ui| {
+                        ui.heading("Time Warp IDE");
+                        ui.label("Version 1.0.0");
+                        ui.label("A modern, educational programming environment");
+                        ui.label("built in Rust using the egui framework.");
+                        ui.separator();
+                        ui.label("Supports TW BASIC, TW Pascal, and TW Prolog");
+                        ui.label("with interactive input and turtle graphics.");
+                        ui.separator();
+                        if ui.button("Close").clicked() {
+                            self.show_about = false;
+                        }
+                    });
+                });
+        });
 
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {

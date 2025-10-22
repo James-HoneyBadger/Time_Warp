@@ -1,0 +1,2 @@
+# Custom wordlist for spellcheck
+# Add words that should be ignored here, one per line

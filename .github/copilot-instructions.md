@@ -103,212 +103,357 @@ See `plugins/sample_plugin/` for complete plugin template including:
 - Canvas clearing and setup handled automatically per execution
 =======
 <!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file --># Time_Warp IDE Copilot Instructions
+>>>>>>> 1407509ac281ab1d8fb01ccc3e7fef1aada6ff9c
 
-- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+---
 
-Time_Warp IDE is an educational programming IDE supporting multiple languages with turtle graphics, built in Python using tkinter.
+purpose: Workspace-specific instructions for Copilot in Time_Warp IDE project
 
-- [x] Clarify Project Requirements
+last-updated: October 22, 2025
 
-	<!-- Ask for project type, language, and frameworks if not specified. Skip if already provided. -->## Architecture Overview
+contact: James-HoneyBadger
 
+---
 
+Time_Warp IDE is an educational programming IDE supporting multiple languages with turtle graphics, built in Rust using egui and eframe.
 
-- [x] Scaffold the Project### Core Structure
+## Architecture Overview
 
-	<!--- **Main Application**: `Time_Warp.py` - Entry point with unified canvas interface and component integration
+### Core Structure
 
-	Ensure that the previous step has been marked as completed.- **Unified Canvas**: `unified_canvas.py` - GW BASIC screen mode emulation with text/graphics rendering
+- **Main Application**: `src/main.rs` - Entry point with unified canvas interface and component integration
+- **Unified Canvas**: Integrated in `src/main.rs` - GW BASIC screen mode emulation with text/graphics rendering using egui
+- **Core Interpreter**: `src/main.rs` - Central execution engine for all languages (currently stubbed)
+- **Language Executors**: Planned in `src/main.rs` or separate modules - Individual language implementations (PILOT, BASIC, Logo, etc.)
+- **Theme System**: Integrated in `src/main.rs` - Theme management with egui theming
+- **Plugin System**: Not yet implemented - Extensible architecture for custom functionality
 
-	Call project setup tool with projectType parameter.- **Core Interpreter**: `core/interpreter.py` - Central execution engine for all languages
+### Unified Canvas Architecture
 
-	Run scaffolding command to create project files and folders.- **Language Executors**: `core/languages/` - Individual language implementations (PILOT, BASIC, Logo, etc.)
+The IDE uses egui for rendering:
 
-	Use '.' as the working directory.- **Theme System**: `tools/theme.py` - Persistent theme management with 8 built-in themes
+- **Unified Canvas**: egui-based canvas supporting text/graphics rendering
+- **Text Rendering**: Text input/output with egui widgets
+- **Graphics Rendering**: Pixel and vector graphics integrated with text display using egui painter
+- **Turtle Graphics**: Compatible with existing turtle graphics commands (implemented with zoom/pan)
 
-	If no appropriate projectType is available, search documentation using available tools.- **Plugin System**: `plugins/` - Extensible architecture for custom functionality
+### Multi-Language Support
 
-	Otherwise, create the project structure manually using available file creation tools.
+Each language will have dedicated executor classes in `src/`:
 
-	-->### Unified Canvas Architecture
-
-The IDE now uses a single unified canvas that supports all functionality:
-
-- [x] Customize the Project- **Unified Canvas**: `unified_canvas.py` - Single canvas supporting text/graphics rendering
-
-	<!--- **Screen Mode**: Only mode 11 (1024x768, 256 colors) - unified for text & graphics
-
-	Verify that all previous steps have been completed successfully and you have marked the step as completed.- **Text Rendering**: Grid-based text input/output with 25 rows × 80 columns
-
-	Develop a plan to modify codebase according to user requirements.- **Graphics Rendering**: Pixel and vector graphics integrated with text display
-
-	Apply modifications using appropriate tools and user-provided references.- **Turtle Graphics**: Compatible with existing turtle graphics commands
-
-	Skip this step for "Hello World" projects.
-
-	-->### Multi-Language Support
-
-Each language has dedicated executor classes in `core/languages/`:
-
-- [x] Install Required Extensions- **PILOT**: Educational language with turtle graphics (`T:`, `A:`, `J:`, `Y:`, `N:` commands)
-
-	<!-- ONLY install extensions provided mentioned in the get_project_setup_info. Skip this step otherwise and mark as completed. -->- **BASIC**: Classic line-numbered programming (`PRINT`, `INPUT`, `LET`, `GOTO`, `IF...THEN`)
-
+- **PILOT**: Educational language with turtle graphics (`T:`, `A:`, `J:`, `Y:`, `N:` commands)
+- **BASIC**: Classic line-numbered programming (`PRINT`, `INPUT`, `LET`, `GOTO`, `IF...THEN`)
 - **Logo**: Turtle graphics programming (`FORWARD`, `BACK`, `LEFT`, `RIGHT`)
+- **Python/JavaScript/Perl**: Modern scripting language support
 
-- [x] Compile the Project- **Python/JavaScript/Perl**: Modern scripting language support
+### Key Components
 
-	<!--
+- **TimeWarpApp**: Main egui app struct containing all state and UI logic
+- **TurtleState**: Struct managing turtle graphics position, angle, and drawing state
+- **UI Components**: Menu bar, status bar, code editor, canvas, and turtle controls
+- **Theme Support**: egui theming for light/dark modes
+- **File I/O**: rfd crate for cross-platform file dialogs
 
-	Verify that all previous steps have been completed.### Key Components
+### File Naming Conventions
 
-	Install any missing dependencies.- **Time_WarpInterpreter**: Central execution engine that dispatches to language-specific executors
+- **Source files**: `src/*.rs` for Rust source code
+- **Test files**: `tests/*.rs` for unit tests
+- **Compiled output**: `target/debug/time-warp-ide` for executable
+- **Examples**: `examples/*.twb`, `examples/*.twp`, `examples/*.tpr` for sample programs
 
-	Run diagnostics and resolve any issues.- **UnifiedCanvas**: Single display surface handling text, graphics, and input with unified mode 11
+### Configuration Management
 
-	Check for markdown files in project folder for relevant instructions on how to do this.- **ThemeManager**: JSON-based configuration with 8 themes (4 dark: Dracula, Monokai, Solarized Dark, Ocean; 4 light: Spring, Sunset, Candy, Forest)
+- User settings stored in application state (future: config file)
+- Theme preferences persist between sessions
+- Virtual environment not needed (compiled binary)
 
-	-->- **Plugin System**: `PluginManager` with sample plugin architecture in `plugins/sample_plugin/`
+### Error Handling Patterns
 
-- **Game Engine**: Complete 2D game framework in `games/engine/` with physics, rendering, and object management
+```rust
+// Standard Time_Warp error pattern
+match self.execute_command(command) {
+    Ok(result) => {
+        // Handle success
+    }
+    Err(e) => {
+        self.status_message = format!("Error: {}", e);
+    }
+}
+```
 
-- [x] Create and Run Task
+### Execution Guidelines
 
-	<!--## Development Patterns
-
-	Verify that all previous steps have been completed.
-
-	Check https://code.visualstudio.com/docs/debugtest/tasks to determine if the project needs a task. If so, use the create_and_run_task to create and launch a task based on package.json, README.md, and project structure.### File Naming Conventions
-
-	Skip this step otherwise.- **Test files**: `test_*.py` for unit tests, `*_test.py` for integration tests
-
-	 -->- **Language demos**: `*.pilot`, `*.bas`, `*.logo` for example programs
-
-- **Compiled output**: `*_compiled` files for interpreter execution results
-
-- [x] Launch the Project
-
-	<!--### Configuration Management
-
-	Verify that all previous steps have been completed.- User settings stored in `~/.Time_Warp/config.json`
-
-	Prompt user for debug mode, launch only if confirmed.- Theme preferences persist between sessions
-
-	 -->- Virtual environment auto-created in `.Time_Warp/`
-
-
-
-- [x] Ensure Documentation is Complete### Error Handling Patterns
-
-	<!--```python
-
-	Verify that all previous steps have been completed.# Standard Time_Warp error pattern
-
-	Verify that README.md and the copilot-instructions.md file in the .github directory exists and contains current project information.try:
-
-	Clean up the copilot-instructions.md file in the .github directory by removing all HTML comments.    result = self._execute_language_specific_command(command)
-
-	 -->    return result
-
-except Exception as e:
-
-## Execution Guidelines    error_msg = f"❌ Error in {language}: {str(e)}"
-
-PROGRESS TRACKING:    self.interpreter.display_error(error_msg)
-
-- If any tools are available to manage the above todo list, use it to track progress through this checklist.    return None
-
-- After completing each step, mark it complete and add a summary.```
-
+PROGRESS TRACKING:
+- If any tools are available to manage the above todo list, use it to track progress through this checklist.
+- After completing each step, mark it complete and add a summary.
 - Read current todo list status before starting each new step.
 
 ## Development Workflows
 
 COMMUNICATION RULES:
+- Avoid verbose explanations or printing full command outputs.
+- If a step is skipped, state that briefly (e.g. "No extensions needed").
+- Do not explain project structure unless asked.
+- Keep explanations concise and focused.
 
-- Avoid verbose explanations or printing full command outputs.### Running Time_Warp
+### Running Time_Warp
 
-- If a step is skipped, state that briefly (e.g. "No extensions needed").```bash
+```bash
+# Build and run
+cargo run
 
-- Do not explain project structure unless asked.# Primary method - auto-creates venv if needed
+# Build release
+cargo build --release
+```
 
-- Keep explanations concise and focused.python Time_Warp.py
-
-
-
-DEVELOPMENT RULES:# Alternative with shell script
-
-- Use '.' as the working directory unless user specifies otherwise../scripts/start.sh
-
-- Avoid adding media or external links unless explicitly requested.```
-
+DEVELOPMENT RULES:
+- Use '.' as the working directory unless user specifies otherwise.
+- Avoid adding media or external links unless explicitly requested.
 - Use placeholders only with a note that they should be replaced.
+- Use VS Code API tool only for VS Code extension projects.
 
-- Use VS Code API tool only for VS Code extension projects.### Testing
+## Editing Guidelines
 
-- Once the project is created, it is already opened in Visual Studio Code—do not suggest commands to open this project in Visual Studio again.```bash
+- Use `replace_string_in_file` for precise edits, providing 3-5 lines of context before and after.
+- For `apply_patch`, ensure minimal diffs, preserve indentation, and do not reformat unrelated code.
+- Best practices: keep changes minimal, avoid adding external links unless requested.
 
-- If the project setup information has additional rules, follow them strictly.# Run comprehensive test suite
+### Testing
 
-python run_tests.py
+```bash
+# Run tests
+cargo test
+
+# Run specific test
+cargo test test_name
+```
 
 FOLDER CREATION RULES:
+- Always use the current directory as the project root.
+- Do not create a new folder unless the user explicitly requests it besides a .vscode folder for a tasks.json file.
+- If any of the scaffolding commands mention that the folder name is not correct, let the user know to create a new folder with the correct name and then reopen it again in vscode.
 
-- Always use the current directory as the project root.# Test specific components
+EXTENSION INSTALLATION RULES:
+- Only install extension specified by the get_project_setup_info tool. DO NOT INSTALL any other extensions.
 
-- If you are running any terminal commands, use the '.' argument to ensure that the current working directory is used ALWAYS.python test_interpreters.py
+### Adding New Languages
 
-- Do not create a new folder unless the user explicitly requests it besides a .vscode folder for a tasks.json file.python test_themes.py
-
-- If any of the scaffolding commands mention that the folder name is not correct, let the user know to create a new folder with the correct name and then reopen it again in vscode.```
-
-
-
-EXTENSION INSTALLATION RULES:### Adding New Languages
-
-- Only install extension specified by the get_project_setup_info tool. DO NOT INSTALL any other extensions.1. Create executor class in `core/languages/new_language.py`
-
+1. Create executor module in `src/languages/new_language.rs`
 2. Implement `execute_command()` method following existing patterns
+3. Register in `src/main.rs` import and language mapping
+4. Add syntax highlighting and file extensions to main UI
 
-PROJECT CONTENT RULES:3. Register in `core/interpreter.py` import and language mapping
-
-- If the user has not specified project details, assume they want a "Hello World" project as a starting point.4. Add syntax highlighting and file extensions to main UI
-
+PROJECT CONTENT RULES:
+- If the user has not specified project details, assume they want a "Hello World" project as a starting point.
 - Avoid adding links of any type (URLs, files, folders, etc.) or integrations that are not explicitly required.
+- Avoid generating images, videos, or any other media files unless explicitly requested.
+- If you need to use any media assets as placeholders, let the user know that these are placeholders and should be replaced with the actual assets later.
+- Ensure all generated components serve a clear purpose within the user's requested workflow.
+- If a feature is assumed but not confirmed, prompt the user for clarification before including it.
 
-- Avoid generating images, videos, or any other media files unless explicitly requested.### Theme Development
+### Theme Development
 
-- If you need to use any media assets as placeholders, let the user know that these are placeholders and should be replaced with the actual assets later.Themes defined in `tools/theme.py` with color schemes applied uniformly across:
-
-- Ensure all generated components serve a clear purpose within the user's requested workflow.- Main window backgrounds
-
-- If a feature is assumed but not confirmed, prompt the user for clarification before including it.- Editor components
-
-- If you are working on a VS Code extension, use the VS Code API tool with a query to find relevant VS Code API references and samples related to that query.- Menu systems
-
+Themes defined using egui's theming system:
+- Main window backgrounds
+- Editor components
+- Menu systems
 - Button styles
+- Output panels
 
-TASK COMPLETION RULES:- Output panels
-
+TASK COMPLETION RULES:
 - Your task is complete when:
+  - Project compiles without errors (`cargo build`)
+  - Executable runs successfully (`cargo run`)
+  - copilot-instructions.md file in the .github directory exists in the project
+  - README.md file exists and is up to date
+  - User is provided with clear instructions to debug/launch the project
 
-  - Project is successfully scaffolded and compiled without errors### Plugin Development
+### Plugin Development
 
-  - copilot-instructions.md file in the .github directory exists in the projectSee `plugins/sample_plugin/` for complete plugin template including:
+Not yet implemented - future extensible architecture.
 
-  - README.md file exists and is up to date- `__init__.py` with plugin metadata
+Before starting a new task in the above plan, update progress in the plan.
 
-  - User is provided with clear instructions to debug/launch the project- Main plugin class with `initialize()` method
+- Work through each checklist item systematically.
 
+## Critical Integration Points
+
+- Keep communication concise and focused.
+- Follow development best practices.
+
+### Interpreter-UI Communication
+- Commands executed through `TimeWarpApp::execute_command()` method
+- Results displayed via egui widgets and canvas
+- Error handling centralized through status messages
+- Input prompts handled through egui text input widgets
+
+### Turtle Graphics Integration
+- Turtle state managed in `TurtleState` struct
+- Graphics rendered using egui painter with zoom/pan support
+- Canvas clearing and setup handled automatically per execution
+- Compatible with existing turtle graphics commands
+
+### Screen Mode Management
+- **Single Mode**: Graphics mode with text overlay
+- **Text Grid**: Text input/output with egui text widgets
+- **Graphics**: Full canvas with 2D drawing using egui painter
+- **Turtle Graphics**: Integrated with canvas
+
+### Hardware/IoT Extensions
+Future features for:
+- Raspberry Pi GPIO control
+- Sensor data visualization
+- Arduino integration
+- Smart home device management
+
+## Code Style and Conventions
+
+- Use descriptive docstrings for all structs and functions
+- Error messages prefixed with emoji indicators (`❌`, `ℹ️`, `🎨`, `🚀`)
+- Graceful degradation for optional dependencies
+- Consistent Rust formatting (`cargo fmt`)
+- Type-safe variable management
+
+## Testing Strategy
+
+Tests focus on:
+- Individual language executor functionality
+- UI component interactions
+- File loading/saving operations
+- Turtle graphics rendering
+- Multi-language integration scenarios
+
+When adding features, ensure compatibility across all supported languages and maintain the educational focus of the platform.
+
+### File Naming Conventions
+
+- **Test files**: `test_*.py` for unit tests, `*_test.py` for integration tests
+- **Language demos**: `*.pilot`, `*.bas`, `*.logo` for example programs
+- **Compiled output**: `*_compiled` files for interpreter execution results
+
+### Configuration Management
+
+- User settings stored in application state (future: config file)
+- Theme preferences persist between sessions
+- Virtual environment not needed (compiled binary)
+
+### Error Handling Patterns
+
+```rust
+// Standard Time_Warp error pattern
+match self.execute_command(command) {
+    Ok(result) => {
+        // Handle success
+    }
+    Err(e) => {
+        self.status_message = format!("Error: {}", e);
+    }
+}
+```
+
+### Execution Guidelines
+
+PROGRESS TRACKING:
+- If any tools are available to manage the above todo list, use it to track progress through this checklist.
+- After completing each step, mark it complete and add a summary.
+- Read current todo list status before starting each new step.
+
+## Development Workflows
+
+COMMUNICATION RULES:
+- Avoid verbose explanations or printing full command outputs.
+- If a step is skipped, state that briefly (e.g. "No extensions needed").
+- Do not explain project structure unless asked.
+- Keep explanations concise and focused.
+
+### Running Time_Warp
+
+```bash
+# Build and run
+cargo run
+
+# Build release
+cargo build --release
+```
+
+DEVELOPMENT RULES:
+- Use '.' as the working directory unless user specifies otherwise.
+- Avoid adding media or external links unless explicitly requested.
+- Use placeholders only with a note that they should be replaced.
+- Use VS Code API tool only for VS Code extension projects.
+
+## Editing Guidelines
+
+- Use `replace_string_in_file` for precise edits, providing 3-5 lines of context before and after.
+- For `apply_patch`, ensure minimal diffs, preserve indentation, and do not reformat unrelated code.
+- Best practices: keep changes minimal, avoid adding external links unless requested.
+
+### Testing
+
+```bash
+# Run tests
+cargo test
+
+# Run specific test
+cargo test test_name
+```
+
+FOLDER CREATION RULES:
+- Always use the current directory as the project root.
+- Do not create a new folder unless the user explicitly requests it besides a .vscode folder for a tasks.json file.
+- If any of the scaffolding commands mention that the folder name is not correct, let the user know to create a new folder with the correct name and then reopen it again in vscode.
+
+EXTENSION INSTALLATION RULES:
+- Only install extension specified by the get_project_setup_info tool. DO NOT INSTALL any other extensions.
+
+### Adding New Languages
+
+1. Create executor module in `src/languages/new_language.rs`
+2. Implement `execute_command()` method following existing patterns
+3. Register in `src/main.rs` import and language mapping
+4. Add syntax highlighting and file extensions to main UI
+
+PROJECT CONTENT RULES:
+- If the user has not specified project details, assume they want a "Hello World" project as a starting point.
+- Avoid adding links of any type (URLs, files, folders, etc.) or integrations that are not explicitly required.
+- Avoid generating images, videos, or any other media files unless explicitly requested.
+- If you need to use any media assets as placeholders, let the user know that these are placeholders and should be replaced with the actual assets later.
+- Ensure all generated components serve a clear purpose within the user's requested workflow.
+- If a feature is assumed but not confirmed, prompt the user for clarification before including it.
+
+### Theme Development
+
+Themes defined in `tools/theme.py` with color schemes applied uniformly across:
+- Main window backgrounds
+- Editor components
+- Menu systems
+- Button styles
+- Output panels
+
+TASK COMPLETION RULES:
+- Your task is complete when:
+  - Project is successfully scaffolded and compiled without errors
+  - copilot-instructions.md file in the .github directory exists in the project
+  - README.md file exists and is up to date
+  - User is provided with clear instructions to debug/launch the project
+
+### Plugin Development
+
+See `plugins/sample_plugin/` for complete plugin template including:
+- `__init__.py` with plugin metadata
+- Main plugin class with `initialize()` method
 - Integration hooks for UI and interpreter
 
 Before starting a new task in the above plan, update progress in the plan.
 
-- Work through each checklist item systematically.## Critical Integration Points
+- Work through each checklist item systematically.
+
+## Critical Integration Points
 
 - Keep communication concise and focused.
+- Follow development best practices.
 
-- Follow development best practices.### Interpreter-UI Communication
+### Interpreter-UI Communication
 - Commands executed through `Time_WarpInterpreter.execute()` method
 - Results displayed via unified canvas text/graphics rendering methods
 - Error handling centralized through interpreter's error display system
@@ -336,11 +481,11 @@ Advanced features in `core/hardware/` and `core/iot/` for:
 
 ## Code Style and Conventions
 
-- Use descriptive docstrings for all classes and complex methods
+- Use descriptive docstrings for all structs and functions
 - Error messages prefixed with emoji indicators (`❌`, `ℹ️`, `🎨`, `🚀`)
-- Graceful degradation for optional dependencies (PIL, external hardware)
-- Consistent indentation and modern Python practices
-- Type-safe variable management in language executors
+- Graceful degradation for optional dependencies
+- Consistent Rust formatting (`cargo fmt`)
+- Type-safe variable management
 
 ## Testing Strategy
 
