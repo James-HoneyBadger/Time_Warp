@@ -850,9 +850,9 @@ class Time_WarpIDE:
 
             except Exception as e:
                 self.write_to_console(f"💥 Execution error: {str(e)}\n")
-                self.root.after(
-                    0, lambda: self.update_status(f"Execution error: {str(e)}")
-                )
+                # Capture exception string in default arg to avoid referencing outer scope later
+                err_str = str(e)
+                self.root.after(0, lambda err=err_str: self.update_status(f"Execution error: {err}"))
 
         # Start execution thread
         self.execution_thread = threading.Thread(target=run_in_thread, daemon=True)
@@ -4580,8 +4580,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
     def load_plugin_list(self, treeview):
         """Load and display available plugins in the treeview"""
         try:
-            import json
-            import os
+            # json/os are module-level imports
 
             # Initialize plugin tracking if not exists
             if not hasattr(self, "loaded_plugins"):
@@ -4630,8 +4629,7 @@ Remember: Every expert was once a beginner. Your coding journey is unique and va
         """Enable a plugin by name"""
         try:
             import importlib.util
-            import json
-            import os
+            # json/os are module-level imports
 
             # Find plugin directory
             plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
@@ -4775,8 +4773,7 @@ Author: {info.get('author', 'Unknown')}
     def get_plugin_info_from_manifest(self, plugin_name):
         """Get plugin info from manifest file"""
         try:
-            import json
-            import os
+            # json/os are module-level imports
 
             plugins_dir = os.path.join(os.path.dirname(__file__), "..", "..", "plugins", "plugins")
             if not os.path.exists(plugins_dir):

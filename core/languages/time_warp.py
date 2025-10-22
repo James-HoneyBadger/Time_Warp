@@ -434,7 +434,7 @@ class TwTimeWarpExecutor:
                 if cond_val:
                     if label in self.interpreter.labels:
                         return f"jump:{self.interpreter.labels[label]}"
-            except Exception as e:
+            except Exception as _:
                 pass
             return "continue"
 
@@ -494,7 +494,7 @@ class TwTimeWarpExecutor:
                     value = eval(interpolated)
                     self.interpreter.variables[var_name] = value
                     return "continue"
-                except Exception as e:
+                except Exception as _:
                     pass
             if interpolated != expr:
                 self.interpreter.variables[var_name] = interpolated
@@ -704,8 +704,7 @@ class TwTimeWarpExecutor:
 
     def _handle_datetime_command(self, command):
         """Handle DT: date/time commands"""
-        import time
-        from datetime import datetime
+    # use top-level imports for time/datetime
 
         cmd = command[3:].strip()
         parts = cmd.split(" ", 2)
@@ -804,7 +803,7 @@ class TwTimeWarpExecutor:
                                 if cond_val:
                                     if label in self.interpreter.labels:
                                         return f"jump:{self.interpreter.labels[label]}"
-                            except Exception as e:
+                            except Exception as _:
                                 pass
 
         except Exception as e:
@@ -1110,7 +1109,7 @@ class TwTimeWarpExecutor:
             else:
                 try:
                     self.interpreter.for_stack.pop(found_idx)
-                except Exception as e:
+                except Exception as _:
                     pass
         except Exception as e:
             self.interpreter.debug_output(f"NEXT statement error: {e}")

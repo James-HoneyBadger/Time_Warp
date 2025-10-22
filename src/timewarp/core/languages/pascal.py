@@ -19,7 +19,6 @@ This module handles TW Pascal command execution including:
 import math
 import random
 import re
-import time
 
 
 class TwPascalExecutor:
@@ -412,7 +411,7 @@ class TwPascalExecutor:
             match = re.match(r"(\w+)\s*\((.*?)\)", command)
             if match:
                 name = match.group(1).upper()
-                args = match.group(2).strip() if match.group(2) else ""
+                _args = match.group(2).strip() if match.group(2) else ""
 
                 if name in self.procedures:
                     self.interpreter.log_output(f"📞 Calling procedure {name}")
@@ -582,7 +581,7 @@ class TwPascalExecutor:
                 return bool(value)
             elif target_type == "CHAR":
                 return str(value)[0] if value else " "
-        except Exception as e:
+        except Exception:
             pass
         return value
 

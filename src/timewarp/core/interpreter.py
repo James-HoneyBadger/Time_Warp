@@ -662,7 +662,7 @@ class Time_WarpInterpreter:
         if not self.turtle_graphics:
             self.init_turtle_graphics()
 
-        import math
+    # math is available at module level
 
         # Calculate new position
         heading_rad = math.radians(self.turtle_graphics["heading"])
@@ -751,7 +751,7 @@ class Time_WarpInterpreter:
 
         # Draw new turtle if visible
         if self.turtle_graphics["visible"]:
-            import math
+            # math is available at module level
 
             x = self.turtle_graphics["x"] + self.turtle_graphics["center_x"]
             y = self.turtle_graphics["center_y"] - self.turtle_graphics["y"]
