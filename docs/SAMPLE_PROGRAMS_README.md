@@ -1,10 +1,10 @@
 # TW BASIC, TW Pascal, and TW Prolog Sample Programs
 
-This directory contains sample programs demonstrating the features of the Time Warp IDE's three supported languages.
+This directory contains sample programs demonstrating the features of the Time Warp IDE's three supported languages. These examples are located in the `examples/` directory.
 
 ## TW BASIC Samples
 
-### `tw_basic_sample.twb`
+### `examples/tw_basic_sample.twb`
 A comprehensive demonstration of TW BASIC's unified features:
 - **GW BASIC**: Variables, arithmetic, PRINT statements
 - **PILOT**: Interactive questions (T:) and answers (A:)
@@ -17,7 +17,7 @@ A comprehensive demonstration of TW BASIC's unified features:
 - Turtle graphics with FORWARD, RIGHT, etc.
 - Logo's REPEAT loop structure
 
-### `tw_basic_game.twb`
+### `examples/tw_basic_game.twb`
 A traditional line-numbered BASIC program implementing a number guessing game.
 
 **Features demonstrated:**
@@ -30,7 +30,7 @@ A traditional line-numbered BASIC program implementing a number guessing game.
 
 ## TW Pascal Samples
 
-### `tw_pascal_sample.twp`
+### `examples/tw_pascal_sample.twp`
 An introductory Pascal program showing basic language features.
 
 **Features demonstrated:**
@@ -40,7 +40,7 @@ An introductory Pascal program showing basic language features.
 - Control structures (if, for, case)
 - String handling
 
-### `tw_pascal_advanced.twp`
+### `examples/tw_pascal_advanced.twp`
 An advanced Pascal program demonstrating procedures and functions.
 
 **Features demonstrated:**
@@ -52,7 +52,7 @@ An advanced Pascal program demonstrating procedures and functions.
 
 ## TW Prolog Samples
 
-### `tw_prolog_sample.tpr`
+### `examples/tw_prolog_sample.tpr`
 A basic Prolog program with facts, rules, and queries.
 
 **Features demonstrated:**
@@ -62,7 +62,7 @@ A basic Prolog program with facts, rules, and queries.
 - Rules (adult/1, child/1, favorite_color/2)
 - Query execution in the goal section
 
-### `tw_prolog_advanced.tpr`
+### `examples/tw_prolog_advanced.tpr`
 An advanced Prolog program showing recursion and arithmetic.
 
 **Features demonstrated:**

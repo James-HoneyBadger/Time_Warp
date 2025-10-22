@@ -99,9 +99,34 @@ goal
   write(Person, " likes ", Color), nl.
 ```
 
+## Project Structure
+
+```
+Time_Warp/
+├── Cargo.toml              # Rust project configuration
+├── src/
+│   └── main.rs            # Main IDE implementation
+├── examples/              # Sample programs for all languages
+│   ├── tw_basic_sample.twb
+│   ├── tw_basic_game.twb
+│   ├── tw_pascal_sample.twp
+│   ├── tw_pascal_advanced.twp
+│   ├── tw_prolog_sample.tpr
+│   └── tw_prolog_advanced.tpr
+├── docs/
+│   └── SAMPLE_PROGRAMS_README.md  # Detailed examples guide
+├── .github/
+│   └── copilot-instructions.md    # Development guidelines
+└── README.md             # This file
+```
+
 ## Sample Programs
 
-See `SAMPLE_PROGRAMS_README.md` for comprehensive examples demonstrating all language features.
+See `docs/SAMPLE_PROGRAMS_README.md` for comprehensive examples demonstrating all language features. Sample programs are available in the `examples/` directory:
+
+- **TW BASIC**: `examples/tw_basic_sample.twb`, `examples/tw_basic_game.twb`
+- **TW Pascal**: `examples/tw_pascal_sample.twp`, `examples/tw_pascal_advanced.twp`
+- **TW Prolog**: `examples/tw_prolog_sample.tpr`, `examples/tw_prolog_advanced.tpr`
 
 ## Architecture
 
