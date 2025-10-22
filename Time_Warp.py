@@ -2443,7 +2443,7 @@ Features:
                             # Write the text
                             self.unified_canvas.write_text(txt, color=write_color)
                             # Add visual flash to indicate output
-                            self.unified_canvas.flash_accent()
+                            # self.unified_canvas.flash_accent()  # Commented out to prevent persistent green block
                         else:
                             # Non-tuple items: use theme foreground for visibility
                             self.unified_canvas.write_text(
@@ -2615,7 +2615,9 @@ Features:
                                 try:
                                     # Execute each command; interpreter's execute_command should call log_output which
                                     # is wired to enqueue into the UI queue via set_output_callback
-                                    current_interpreter.execute_command(cmd)
+                                    if not cmd.strip().isdigit():
+                                        current_interpreter.execute_command(cmd)
+                                    # Skip invalid numeric commands
                                 except Exception:
                                     # Continue even if one line errors
                                     pass
@@ -2681,7 +2683,7 @@ Features:
                     line_num = int(parts[0])
                     cmd = parts[1] if len(parts) > 1 else ""
 
-                    if cmd:  # Must have a command after the line number
+                    if cmd and not cmd.strip().isdigit():  # Must have a non-numeric command after the line number
                         # Update or add the line
                         current_interpreter = self.get_current_interpreter()
                         existing_index = None
@@ -2712,10 +2714,10 @@ Features:
                         # Line stored silently - no message needed
                         return
                     else:
-                        # Invalid line number format - no command after line number
+                        # Invalid line number format
                         try:
                             self.unified_canvas.write_text(
-                                "Invalid line number format - missing command.\n",
+                                "Invalid line number format.\n",
                                 color=12,
                             )
                         except Exception:

@@ -221,7 +221,7 @@ class UnifiedCanvas(tk.Canvas):
         self.schedule_redraw()
         self.cursor_blink_timer = self.after(500, self._blink_cursor)
 
-    def schedule_redraw(self, delay: int = 50):
+    def schedule_redraw(self, delay: int = 100):
         """Schedule a debounced redraw on the Tk mainloop.
 
         Multiple calls within `delay` ms will coalesce into a single redraw.

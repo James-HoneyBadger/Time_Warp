@@ -263,6 +263,10 @@ class TwBasicInterpreter:
                 return "continue"
             cmd = parts[0].upper()
 
+            if cmd.isdigit():
+                self.log_output(f"Invalid command: {cmd} - line numbers must be followed by a command.")
+                return "continue"
+
             if cmd == "LET":
                 return self._handle_let(command)
             elif cmd == "PRINT":

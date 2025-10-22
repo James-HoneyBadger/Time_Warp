@@ -671,7 +671,7 @@ class Time_WarpInterpreter:
             "pen_down": True,
             "pen_color": self._turtle_color_palette[self._turtle_color_index],
             "pen_size": 2,
-            "visible": True,
+            "visible": False,  # Hidden by default
             "canvas": None,
             "window": None,
             "center_x": 300,  # Default center
