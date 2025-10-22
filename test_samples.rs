@@ -78,6 +78,15 @@ impl TestApp {
                     output.push_str(&text);
                     output.push('\n');
                 }
+                CommandResult::Goto(line_num) => {
+                    if let Some(pos) = self.program_lines.iter().position(|(ln, _)| *ln == line_num) {
+                        self.current_line = pos;
+                        continue;
+                    } else {
+                        output.push_str(&format!("Line {} not found\n", line_num));
+                        break;
+                    }
+                }
                 CommandResult::Continue => {}
                 CommandResult::End => break,
                 _ => {} // Skip other results for this test
@@ -105,6 +114,18 @@ impl TestApp {
         if cmd.starts_with("LET ") {
             self.handle_let_command(cmd.strip_prefix("LET ").unwrap_or(""));
             return CommandResult::Continue;
+        }
+        
+        if cmd.starts_with("IF ") {
+            return self.handle_if_command(cmd.strip_prefix("IF ").unwrap_or(""));
+        }
+        
+        if cmd.starts_with("GOTO ") {
+            if let Some(line_num_str) = cmd.strip_prefix("GOTO ") {
+                if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
+                    return CommandResult::Goto(line_num);
+                }
+            }
         }
         
         // Turtle graphics commands
@@ -170,6 +191,60 @@ impl TestApp {
             };
             
             self.variables.insert(var_name.to_string(), value);
+        }
+    }
+
+    fn handle_if_command(&self, condition: &str) -> CommandResult {
+        if let Some((cond, then_part)) = condition.split_once(" THEN ") {
+            let then_part = then_part.trim();
+            
+            if self.evaluate_condition(cond.trim()) {
+                if then_part.starts_with("GOTO ") {
+                    if let Some(line_num_str) = then_part.strip_prefix("GOTO ") {
+                        if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
+                            return CommandResult::Goto(line_num);
+                        }
+                    }
+                }
+                // Could handle other THEN actions here
+            }
+        }
+        CommandResult::Continue
+    }
+
+    fn evaluate_condition(&self, condition: &str) -> bool {
+        // Simple condition evaluation
+        if let Some((left, op_right)) = condition.split_once('=') {
+            let (op, right) = if op_right.starts_with('=') {
+                ("==", &op_right[1..])
+            } else {
+                ("=", op_right)
+            };
+            
+            let left_val = self.get_value(left.trim());
+            let right_val = self.get_value(right.trim());
+            
+            match op {
+                "=" | "==" => left_val == right_val,
+                "<>" => left_val != right_val,
+                "<" => left_val < right_val,
+                ">" => left_val > right_val,
+                "<=" => left_val <= right_val,
+                ">=" => left_val >= right_val,
+                _ => false,
+            }
+        } else {
+            false
+        }
+    }
+
+    fn get_value(&self, expr: &str) -> String {
+        if let Some(value) = self.variables.get(expr) {
+            value.clone()
+        } else if let Ok(_) = expr.parse::<i32>() {
+            expr.to_string()
+        } else {
+            expr.to_string()
         }
     }
 
