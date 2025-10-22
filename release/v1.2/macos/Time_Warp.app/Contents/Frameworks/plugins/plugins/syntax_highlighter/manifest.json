@@ -1,9 +1,0 @@
-{
-  "name": "Syntax Highlighter",
-  "version": "1.1.0",
-  "author": "JAMES Development Team",
-  "description": "Enhanced syntax highlighting for PILOT, BASIC, Logo, and other supported languages",
-  "entry_point": "plugin.py",
-  "api_version": "2.0",
-  "permissions": ["editor", "menu"]
-}
