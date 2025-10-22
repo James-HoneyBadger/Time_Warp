@@ -117,8 +117,8 @@ impl TimeWarpApp {
         let mut output = String::new();
         
         while self.current_line < self.program_lines.len() {
-            let (_, command) = &self.program_lines[self.current_line];
-            let result = self.execute_basic_command(command);
+            let command = self.program_lines[self.current_line].1.clone();
+            let result = self.execute_basic_command(&command);
             
             match result {
                 CommandResult::Output(text) => {
@@ -137,7 +137,7 @@ impl TimeWarpApp {
                 CommandResult::Input(var_name, prompt) => {
                     self.waiting_for_input = true;
                     self.current_input_var = var_name;
-                    self.input_prompt = prompt;
+                    self.input_prompt = prompt.clone();
                     output.push_str(&prompt);
                     break; // Wait for user input
                 }
@@ -400,8 +400,8 @@ impl TimeWarpApp {
         output.push('\n');
         
         while self.current_line < self.program_lines.len() {
-            let (_, command) = &self.program_lines[self.current_line];
-            let result = self.execute_basic_command(command);
+            let command = self.program_lines[self.current_line].1.clone();
+            let result = self.execute_basic_command(&command);
             
             match result {
                 CommandResult::Output(text) => {
@@ -420,7 +420,7 @@ impl TimeWarpApp {
                 CommandResult::Input(var_name, prompt) => {
                     self.waiting_for_input = true;
                     self.current_input_var = var_name;
-                    self.input_prompt = prompt;
+                    self.input_prompt = prompt.clone();
                     output.push_str(&prompt);
                     break; // Wait for user input again
                 }
@@ -678,6 +678,9 @@ impl eframe::App for TimeWarpApp {
 }
 
 fn main() -> eframe::Result<()> {
+    // Quick test of TW BASIC functionality
+    test_tw_basic();
+    
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1200.0, 800.0])
@@ -690,4 +693,28 @@ fn main() -> eframe::Result<()> {
         options,
         Box::new(|_cc| Box::new(TimeWarpApp::default())),
     )
+}
+
+fn test_tw_basic() {
+    println!("Testing TW BASIC functionality...");
+    
+    let mut app = TimeWarpApp::default();
+    
+    // Test simple PRINT
+    let code1 = "10 PRINT \"Hello World\"";
+    let result1 = app.execute_tw_basic(code1);
+    println!("Test 1 - PRINT: {}", result1);
+    
+    // Test LET and variable
+    let code2 = "20 LET X = 42\n30 PRINT \"X = \"; X";
+    let result2 = app.execute_tw_basic(code2);
+    println!("Test 2 - LET and variables: {}", result2);
+    
+    // Test turtle graphics
+    let code3 = "40 FORWARD 50\n50 RIGHT 90\n60 FORWARD 50";
+    let result3 = app.execute_tw_basic(code3);
+    println!("Test 3 - Turtle graphics: {}", result3);
+    println!("Turtle commands: {:?}", app.turtle_commands);
+    
+    println!("TW BASIC tests completed.\n");
 }
