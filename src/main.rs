@@ -1,13 +1,11 @@
 use eframe::egui;
 use rfd::FileDialog;
-use std::collections::HashMap;
 
 #[derive(Clone)]
 struct TurtleState {
     x: f32,
     y: f32,
     angle: f32, // in degrees
-    pen_down: bool,
     color: egui::Color32,
 }
 
@@ -16,10 +14,7 @@ struct TimeWarpApp {
     output: String,
     language: String,
     active_tab: usize, // 0 = Editor, 1 = Output & Turtle
-    code_history: Vec<String>,
-    code_history_index: usize,
     last_file_path: Option<String>,
-    variables: HashMap<String, String>,
     show_line_numbers: bool,
     find_text: String,
     replace_text: String,
@@ -28,10 +23,6 @@ struct TimeWarpApp {
     turtle_commands: Vec<String>,
     is_executing: bool,
     waiting_for_input: bool,
-    input_prompt: String,
-    user_input: String,
-    current_input_var: String,
-    output_scroll: usize,
 }
 
 impl Default for TimeWarpApp {
@@ -41,10 +32,7 @@ impl Default for TimeWarpApp {
             output: String::from("Welcome to Time Warp IDE!\n"),
             language: String::from("TW BASIC"),
             active_tab: 0, // Start with Editor tab
-            code_history: vec![String::new()],
-            code_history_index: 0,
             last_file_path: None,
-            variables: HashMap::new(),
             show_line_numbers: false,
             find_text: String::new(),
             replace_text: String::new(),
@@ -53,16 +41,11 @@ impl Default for TimeWarpApp {
                 x: 200.0,
                 y: 200.0,
                 angle: 0.0,
-                pen_down: true,
                 color: egui::Color32::BLACK,
             },
             turtle_commands: Vec::new(),
             is_executing: false,
             waiting_for_input: false,
-            input_prompt: String::new(),
-            user_input: String::new(),
-            current_input_var: String::new(),
-            output_scroll: 0,
         }
     }
 }
