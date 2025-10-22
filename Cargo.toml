@@ -1,26 +1,9 @@
-[package][package][package]
-
+[package]
 name = "time-warp-ide"
-
-version = "0.1.0"name = "time-warp-ide"name = "time-warp-ide"
-
+version = "0.1.0"
 edition = "2021"
 
-version = "0.1.0"version = "0.1.0"
-
 [dependencies]
-
-eframe = "0.24"edition = "2021"edition = "2024"
-
+eframe = "0.24"
 egui = "0.24"
-
 rfd = "0.14"
-
-[dependencies][dependencies]
-
-eframe = "0.24"# Use eframe (egui framework) for desktop GUI
-
-egui = "0.24"eframe = "0.22"
-
-rfd = "0.14"egui = "0.22"
-rfd = "0.11"
