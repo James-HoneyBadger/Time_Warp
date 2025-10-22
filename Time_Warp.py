@@ -35,19 +35,19 @@ class UnifiedCanvasOutputHandler:
 
     def _do_insert(self, position, text):
         import tkinter as tk
-
-        if position == "end" or position == tk.END:
-            # Always start command output on a new line
-            self.unified_canvas.write_text("\n")
-            self.unified_canvas.write_text(text)
+        # Write the provided text directly. Normalization (ensuring a trailing
+        # newline) is handled by the caller or the UI queue flusher so we avoid
+        # inserting extra leading newlines here which could hide output.
+        try:
+            self.unified_canvas.write_text(str(text))
             try:
                 self.unified_canvas.update_idletasks()
             except Exception:
                 pass
-        else:
-            self.unified_canvas.write_text(text)
+        except Exception:
+            # Best-effort fallback to print
             try:
-                self.unified_canvas.update_idletasks()
+                print(text)
             except Exception:
                 pass
 
@@ -2380,8 +2380,14 @@ Features:
                         if isinstance(item, tuple) and len(item) >= 1:
                             text = item[0]
                             color = item[1] if len(item) > 1 else None
-                            # Write text exactly as provided; UnifiedCanvas handles internal newlines
-                            self.unified_canvas.write_text(str(text), color=color)
+                            # Normalize text: ensure it ends with a single newline so each
+                            # queued message appears on its own line in the console.
+                            txt = str(text)
+                            if not txt.endswith("\n"):
+                                txt = txt + "\n"
+                            # Write text; UnifiedCanvas will schedule redraws but we also
+                            # force a redraw after the flush to make output visible.
+                            self.unified_canvas.write_text(txt, color=color)
                         else:
                             self.unified_canvas.write_text(str(item))
                     except Exception:
@@ -2393,6 +2399,12 @@ Features:
             # Schedule next poll
             try:
                 self.root.after(50, _flush_ui_queue)
+            except Exception:
+                pass
+            # Force an immediate redraw after flushing the queue to ensure
+            # freshly-written text is painted on-screen promptly.
+            try:
+                self.unified_canvas.redraw()
             except Exception:
                 pass
 
