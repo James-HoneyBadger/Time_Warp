@@ -1,0 +1,60 @@
+domains
+  list = integer*
+
+predicates
+  fibonacci(integer, integer)
+  factorial(integer, integer)
+  sum_list(list, integer)
+  length_list(list, integer)
+  average_list(list, real)
+
+clauses
+  fibonacci(0, 0).
+  fibonacci(1, 1).
+  fibonacci(N, Result) :-
+    N > 1,
+    N1 = N - 1,
+    N2 = N - 2,
+    fibonacci(N1, R1),
+    fibonacci(N2, R2),
+    Result = R1 + R2.
+
+  factorial(0, 1).
+  factorial(N, Result) :-
+    N > 0,
+    N1 = N - 1,
+    factorial(N1, R1),
+    Result = N * R1.
+
+  sum_list([], 0).
+  sum_list([H|T], Sum) :-
+    sum_list(T, TailSum),
+    Sum = H + TailSum.
+
+  length_list([], 0).
+  length_list([_|T], Length) :-
+    length_list(T, TailLength),
+    Length = TailLength + 1.
+
+  average_list(List, Average) :-
+    sum_list(List, Sum),
+    length_list(List, Length),
+    Length > 0,
+    Average = Sum / Length.
+
+goal
+  write("Fibonacci of 10: "),
+  fibonacci(10, FibResult),
+  write(FibResult), nl,
+
+  write("Factorial of 5: "),
+  factorial(5, FactResult),
+  write(FactResult), nl,
+
+  write("Sum of [1,2,3,4,5]: "),
+  sum_list([1,2,3,4,5], SumResult),
+  write(SumResult), nl,
+
+  write("Average of [10,20,30]: "),
+  average_list([10,20,30], AvgResult),
+  write(AvgResult), nl.

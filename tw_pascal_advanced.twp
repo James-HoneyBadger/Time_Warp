@@ -1,0 +1,47 @@
+program AdvancedPascal;
+var
+  numbers: array[1..5] of integer;
+  i, sum, max: integer;
+
+function factorial(n: integer): integer;
+begin
+  if n <= 1 then
+    factorial := 1
+  else
+    factorial := n * factorial(n - 1);
+end;
+
+procedure find_max(arr: array[1..5] of integer; var result: integer);
+var
+  i: integer;
+begin
+  result := arr[1];
+  for i := 2 to 5 do
+    if arr[i] > result then
+      result := arr[i];
+end;
+
+procedure calculate_sum(arr: array[1..5] of integer; var result: integer);
+var
+  i: integer;
+begin
+  result := 0;
+  for i := 1 to 5 do
+    result := result + arr[i];
+end;
+
+begin
+  writeln('Enter 5 numbers:');
+  for i := 1 to 5 do
+  begin
+    write('Number ', i, ': ');
+    readln(numbers[i]);
+  end;
+
+  calculate_sum(numbers, sum);
+  find_max(numbers, max);
+
+  writeln('Sum: ', sum);
+  writeln('Maximum: ', max);
+  writeln('Factorial of 5: ', factorial(5));
+end.
