@@ -1,0 +1,23 @@
+REM TW BASIC Sample Program
+REM Demonstrates GW BASIC, PILOT, and Logo features
+
+LET X = 42
+PRINT "Hello, TW BASIC!"
+PRINT "X = "; X
+
+REM PILOT-style interaction
+T: What is your name?
+A: NAME$
+PRINT "Hello, "; NAME$
+
+REM Logo turtle graphics
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+FORWARD 100
+RIGHT 90
+
+PRINT "Square drawn!"

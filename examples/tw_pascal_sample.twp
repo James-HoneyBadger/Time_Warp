@@ -1,0 +1,12 @@
+program HelloPascal;
+var
+  name: string;
+  age: integer;
+begin
+  writeln('What is your name?');
+  readln(name);
+  writeln('Hello, ', name);
+  writeln('How old are you?');
+  readln(age);
+  writeln('You are ', age, ' years old.');
+end.

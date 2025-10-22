@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python
 __pycache__/
 *.pyc
@@ -15,12 +16,18 @@ timewarp_venv/
 venv/
 env/
 ENV/
+=======
+# Rust build artifacts
+target/
+Cargo.lock
+>>>>>>> 066f2538e86bb3d8413c1ab261082a1d003dc877
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+<<<<<<< HEAD
 *~
 
 # OS files
@@ -97,3 +104,16 @@ build/
 # Scripts (development only - don't ignore)
 # scripts/
 
+=======
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+>>>>>>> 066f2538e86bb3d8413c1ab261082a1d003dc877
