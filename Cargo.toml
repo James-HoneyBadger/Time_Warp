@@ -1,12 +1,20 @@
-[package][package]
+[package][package][package]
 
-name = "time-warp-ide"name = "time-warp-ide"
+name = "time-warp-ide"
+
+version = "0.1.0"name = "time-warp-ide"name = "time-warp-ide"
+
+edition = "2021"
 
 version = "0.1.0"version = "0.1.0"
 
-edition = "2021"edition = "2024"
+[dependencies]
 
+eframe = "0.24"edition = "2021"edition = "2024"
 
+egui = "0.24"
+
+rfd = "0.14"
 
 [dependencies][dependencies]
 
