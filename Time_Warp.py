@@ -38,16 +38,34 @@ class UnifiedCanvasOutputHandler:
         # Write the provided text directly. Normalization (ensuring a trailing
         # newline) is handled by the caller or the UI queue flusher so we avoid
         # inserting extra leading newlines here which could hide output.
+        # Temporary debug logging: record insert attempts to /tmp/time_warp_ui.log
+        try:
+            with open(".diagnostics/time_warp_ui.log", "a", encoding="utf-8") as _lf:
+                _lf.write(f"_do_insert called pos={position!r} text={text!r}\n")
+        except Exception:
+            pass
+
+        # Write the provided text directly. Normalization is handled by caller.
         try:
             self.unified_canvas.write_text(str(text))
             try:
                 self.unified_canvas.update_idletasks()
             except Exception:
                 pass
-        except Exception:
-            # Best-effort fallback to print
+            try:
+                with open(".diagnostics/time_warp_ui.log", "a", encoding="utf-8") as _lf:
+                    _lf.write("write_text succeeded\n")
+            except Exception:
+                pass
+        except Exception as _write_err:
+            # Best-effort fallback to print and log the error
             try:
                 print(text)
+            except Exception:
+                pass
+            try:
+                with open(".diagnostics/time_warp_ui.log", "a", encoding="utf-8") as _lf:
+                    _lf.write(f"write_text failed: {_write_err!r}\n")
             except Exception:
                 pass
 
