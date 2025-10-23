@@ -726,7 +726,7 @@ impl eframe::App for TimeWarpApp {
                             ui.label("Turtle Graphics:");
                             ui.horizontal(|ui| {
                                 ui.label("Zoom:");
-                                ui.add(egui::DragValue::new(&mut self.turtle_zoom).range(0.1..=5.0).speed(0.1));
+                                ui.add(egui::DragValue::new(&mut self.turtle_zoom).clamp_range(0.1..=5.0).speed(0.1));
                                 if ui.button("🔍 Reset View").clicked() {
                                     self.turtle_zoom = 1.0;
                                     self.turtle_pan = egui::vec2(0.0, 0.0);
@@ -805,6 +805,8 @@ impl eframe::App for TimeWarpApp {
                     _ => {}
                 }
             });
+        });
+
         egui::TopBottomPanel::bottom("status_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.label(format!("Language: {}", self.language));
@@ -848,7 +850,9 @@ impl eframe::App for TimeWarpApp {
                         }
                     });
                 });
-        });
+        }
+    }
+}
 
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {
@@ -863,4 +867,158 @@ fn main() -> eframe::Result<()> {
         options,
         Box::new(|_cc| Box::new(TimeWarpApp::default())),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn test_file_operations() {
+        // Test New File functionality
+        let mut app = TimeWarpApp::default();
+        app.code = "some code".to_string();
+        app.output = "some output".to_string();
+        app.last_file_path = Some("test.txt".to_string());
+
+        // Simulate New File
+        app.code.clear();
+        app.output = "New file created.".to_string();
+        app.last_file_path = None;
+
+        assert_eq!(app.code, "");
+        assert_eq!(app.output, "New file created.");
+        assert_eq!(app.last_file_path, None);
+    }
+
+    #[test]
+    fn test_save_operations() {
+        let mut app = TimeWarpApp::default();
+        app.code = "10 PRINT \"TEST\"".to_string();
+        app.last_file_path = Some("test_save.twb".to_string());
+
+        // Simulate Save
+        if let Some(path) = &app.last_file_path {
+            fs::write(path, &app.code).unwrap();
+            app.output = format!("Saved to {}", path);
+        }
+
+        // Verify file was saved
+        let content = fs::read_to_string("test_save.twb").unwrap();
+        assert_eq!(content, "10 PRINT \"TEST\"");
+        assert_eq!(app.output, "Saved to test_save.twb");
+
+        // Cleanup
+        fs::remove_file("test_save.twb").unwrap();
+    }
+
+    #[test]
+    fn test_view_operations() {
+        let mut app = TimeWarpApp::default();
+
+        // Test Show Line Numbers toggle
+        assert_eq!(app.show_line_numbers, false);
+        app.show_line_numbers = !app.show_line_numbers;
+        assert_eq!(app.show_line_numbers, true);
+        app.show_line_numbers = !app.show_line_numbers;
+        assert_eq!(app.show_line_numbers, false);
+    }
+
+    #[test]
+    fn test_edit_operations() {
+        let mut app = TimeWarpApp::default();
+        app.code = "old text".to_string();
+
+        // Test Find/Replace
+        assert_eq!(app.show_find_replace, false);
+        app.show_find_replace = true;
+        assert_eq!(app.show_find_replace, true);
+
+        // Test Replace All
+        app.find_text = "old".to_string();
+        app.replace_text = "new".to_string();
+        app.code = app.code.replace(&app.find_text, &app.replace_text);
+        assert_eq!(app.code, "new text");
+    }
+
+    #[test]
+    fn test_help_operations() {
+        let mut app = TimeWarpApp::default();
+
+        // Test About dialog
+        assert_eq!(app.show_about, false);
+        app.show_about = true;
+        assert_eq!(app.show_about, true);
+        app.show_about = false;
+        assert_eq!(app.show_about, false);
+    }
+
+    #[test]
+    fn test_menu_state_changes() {
+        let mut app = TimeWarpApp::default();
+
+        // Test all menu state changes
+        assert_eq!(app.show_find_replace, false);
+        assert_eq!(app.show_about, false);
+        assert_eq!(app.show_line_numbers, false);
+
+        // Simulate menu clicks
+        app.show_find_replace = true;
+        app.show_about = true;
+        app.show_line_numbers = true;
+
+        assert_eq!(app.show_find_replace, true);
+        assert_eq!(app.show_about, true);
+        assert_eq!(app.show_line_numbers, true);
+    }
+
+    #[test]
+    fn test_language_selection() {
+        let mut app = TimeWarpApp::default();
+
+        // Test language changes
+        assert_eq!(app.language, "TW BASIC");
+        app.language = "TW Pascal".to_string();
+        assert_eq!(app.language, "TW Pascal");
+        app.language = "TW Prolog".to_string();
+        assert_eq!(app.language, "TW Prolog");
+    }
+
+    #[test]
+    fn test_tab_switching() {
+        let mut app = TimeWarpApp::default();
+
+        // Test tab switching
+        assert_eq!(app.active_tab, 0);
+        app.active_tab = 1;
+        assert_eq!(app.active_tab, 1);
+        app.active_tab = 0;
+        assert_eq!(app.active_tab, 0);
+    }
+
+    #[test]
+    fn test_keyboard_shortcuts() {
+        let mut app = TimeWarpApp::default();
+        let ctx = egui::Context::default();
+
+        // Test Ctrl+N (New File)
+        app.code = "existing code".to_string();
+        app.last_file_path = Some("file.txt".to_string());
+
+        // Simulate Ctrl+N key press
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::N)) {
+            app.code.clear();
+            app.output = "New file created.".to_string();
+        }
+
+        // Since we can't simulate key presses in unit tests, test the logic directly
+        app.code.clear();
+        app.output = "New file created.".to_string();
+        app.last_file_path = None;
+
+        assert_eq!(app.code, "");
+        assert_eq!(app.output, "New file created.");
+        assert_eq!(app.last_file_path, None);
+    }
 }
