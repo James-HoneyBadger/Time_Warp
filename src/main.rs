@@ -1245,14 +1245,14 @@ impl eframe::App for TimeWarpApp {
         }
 
         egui::TopBottomPanel::top("menu_bar")
-            .min_height(32.0)
+            .min_height(40.0)
             .show(ctx, |ui| {
             ui.painter().rect_filled(
                 ui.available_rect_before_wrap(),
                 0.0,
-                egui::Color32::from_rgb(240, 240, 240),
+                egui::Color32::from_rgb(220, 220, 220),
             );
-            ui.add_space(4.0);
+            ui.add_space(6.0);
             egui::menu::bar(ui, |ui| {
                 // Test button
                 if ui.button("TEST").clicked() {
@@ -1368,7 +1368,7 @@ impl eframe::App for TimeWarpApp {
                     }
                 });
             });
-            ui.add_space(4.0);
+            ui.add_space(6.0);
         });
 
         // Enhanced Toolbar
