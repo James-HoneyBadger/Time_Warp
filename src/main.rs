@@ -75,6 +75,10 @@ struct TimeWarpApp {
     total_lines: usize,
     execution_timeout_ms: u64,
 
+    // Error notification
+    error_message: Option<String>,
+    error_timer: f64,
+
     // Menu state
     show_file_menu: bool,
     show_edit_menu: bool,
@@ -149,6 +153,10 @@ impl Default for TimeWarpApp {
             total_lines: 1,
             execution_timeout_ms: 5000, // 5 seconds default timeout
 
+            // Error notification defaults
+            error_message: None,
+            error_timer: 0.0,
+
             // Menu state defaults
             show_file_menu: false,
             show_edit_menu: false,
@@ -167,6 +175,11 @@ impl Default for TimeWarpApp {
 }
 
 impl TimeWarpApp {
+    fn show_error(&mut self, message: String) {
+        self.error_message = Some(message);
+        self.error_timer = 0.0;
+    }
+
     fn execute_code(&mut self) {
         self.active_tab = 1; // Switch to Output tab when running
         self.is_executing = true;
@@ -1112,6 +1125,32 @@ impl TimeWarpApp {
         self.show_completion = false;
     }
 
+    fn render_syntax_highlighted_editor(&mut self, ui: &mut egui::Ui) {
+        // For now, use the regular text editor with enhanced syntax highlighting
+        // TODO: Implement full custom syntax-highlighted editor
+        ui.add(
+            egui::TextEdit::multiline(&mut self.code)
+                .font(egui::TextStyle::Monospace)
+                .desired_width(f32::INFINITY)
+                .desired_rows(20)
+        );
+
+        // Handle keyboard shortcuts for completion
+        if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Space)) {
+            self.trigger_completion();
+        }
+    }
+
+    fn trigger_completion(&mut self) {
+        // Get current word at cursor (simplified - would need proper cursor position)
+        let words: Vec<&str> = self.code.split_whitespace().collect();
+        let current_word = words.last().copied().unwrap_or("").to_string();
+        self.completion_query = current_word.clone();
+        self.completion_items = self.get_completion_suggestions(&current_word);
+        self.completion_selected = 0;
+        self.show_completion = !self.completion_items.is_empty();
+    }
+
     // Syntax highlighting methods
     #[allow(dead_code)]
     fn highlight_syntax(&self, text: &str) -> Vec<(String, egui::Color32)> {
@@ -1120,48 +1159,145 @@ impl TimeWarpApp {
         }
 
         let mut highlighted = Vec::new();
-        let mut current_pos = 0;
+        let lines: Vec<&str> = text.lines().collect();
 
-        // Simple syntax highlighting - split by whitespace and check for keywords
+        for line in lines {
+            let line_highlighted = self.highlight_line(line);
+            highlighted.extend(line_highlighted);
+            // Add newline back
+            highlighted.push(("\n".to_string(), egui::Color32::BLACK));
+        }
+
+        // Remove the last newline if the original text didn't end with one
+        if !text.ends_with('\n') && !highlighted.is_empty() {
+            highlighted.pop();
+        }
+
+        highlighted
+    }
+
+    fn highlight_line(&self, line: &str) -> Vec<(String, egui::Color32)> {
+        if line.trim().is_empty() {
+            return vec![(line.to_string(), egui::Color32::BLACK)];
+        }
+
+        let mut highlighted = Vec::new();
+        let chars: Vec<char> = line.chars().collect();
+        let mut i = 0;
+
+        // Get keywords for current language
         let keywords = self.get_language_keywords();
-        let keyword_set: std::collections::HashSet<&str> = keywords.into_iter().collect();
+        let keyword_set: std::collections::HashSet<String> = keywords.into_iter().map(|k| k.to_uppercase()).collect();
 
-        for word in text.split_whitespace() {
-            // Find the word in the original text
-            if let Some(start) = text[current_pos..].find(word) {
-                let actual_start = current_pos + start;
-                let actual_end = actual_start + word.len();
+        while i < chars.len() {
+            // Check for comments first (REM for BASIC, // for others, etc.)
+            if self.is_comment_start(&line[i..]) {
+                // Comment - rest of line is comment
+                highlighted.push((line[i..].to_string(), egui::Color32::from_rgb(0, 128, 0))); // Green
+                break;
+            }
 
-                // Add any text before this word
-                if actual_start > current_pos {
-                    highlighted.push((
-                        text[current_pos..actual_start].to_string(),
-                        egui::Color32::BLACK,
-                    ));
+            // Check for strings
+            if chars[i] == '"' {
+                // Find end of string
+                let mut end = i + 1;
+                while end < chars.len() && chars[end] != '"' {
+                    // Handle escaped quotes
+                    if chars[end] == '\\' && end + 1 < chars.len() {
+                        end += 1; // Skip escaped character
+                    }
+                    end += 1;
+                }
+                if end < chars.len() {
+                    end += 1; // Include closing quote
                 }
 
-                // Color the word
-                let color = if keyword_set.contains(word.to_uppercase().as_str()) {
-                    egui::Color32::BLUE // Keywords in blue
-                } else if word.parse::<f64>().is_ok() {
-                    egui::Color32::GREEN // Numbers in green
-                } else if word.starts_with('"') && word.ends_with('"') {
-                    egui::Color32::RED // Strings in red
-                } else {
-                    egui::Color32::BLACK // Default black
-                };
+                // Add text before string
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
 
-                highlighted.push((word.to_string(), color));
-                current_pos = actual_end;
+                // Add string
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(163, 21, 21))); // Red
+                i = end;
+                continue;
+            }
+
+            // Check for numbers (integers and floats)
+            if chars[i].is_ascii_digit() || (chars[i] == '-' && i + 1 < chars.len() && chars[i + 1].is_ascii_digit()) {
+                let mut end = i + 1;
+                let mut has_dot = false;
+                while end < chars.len() {
+                    if chars[end].is_ascii_digit() {
+                        end += 1;
+                    } else if chars[end] == '.' && !has_dot {
+                        has_dot = true;
+                        end += 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Add text before number
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+
+                // Add number
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(0, 128, 128))); // Teal
+                i = end;
+                continue;
+            }
+
+            // Check for keywords
+            let remaining = &line[i..];
+            let mut found_keyword = false;
+            for keyword in &keyword_set {
+                if remaining.to_uppercase().starts_with(keyword) {
+                    let keyword_len = keyword.len();
+                    // Check if it's a complete word (followed by space, punctuation, or end)
+                    let next_char = if i + keyword_len < chars.len() {
+                        chars[i + keyword_len]
+                    } else {
+                        ' '
+                    };
+
+                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ':' || next_char == ';' {
+                        // Add text before keyword
+                        if i > 0 {
+                            highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                        }
+
+                        // Add keyword
+                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255))); // Blue
+                        i += keyword_len;
+                        found_keyword = true;
+                        break;
+                    }
+                }
+            }
+
+            if !found_keyword {
+                i += 1;
             }
         }
 
         // Add any remaining text
-        if current_pos < text.len() {
-            highlighted.push((text[current_pos..].to_string(), egui::Color32::BLACK));
+        if i < line.len() {
+            highlighted.push((line[i..].to_string(), egui::Color32::BLACK));
         }
 
         highlighted
+    }
+
+    fn is_comment_start(&self, text: &str) -> bool {
+        match self.language.as_str() {
+            "TW BASIC" => text.to_uppercase().starts_with("REM "),
+            "TW Pascal" => text.starts_with("//") || text.starts_with("(*"),
+            "TW Prolog" => text.starts_with("%"),
+            "PILOT" => text.starts_with("#"),
+            _ => false,
+        }
     }
 }
 
@@ -1730,22 +1866,20 @@ impl eframe::App for TimeWarpApp {
                                                 self.show_completion = false;
                                             }
 
-                                            // Regular code editor
-                                            let text_edit = egui::TextEdit::multiline(&mut self.code)
-                                                .font(egui::TextStyle::Monospace)
-                                                .desired_width(f32::INFINITY)
-                                                .desired_rows(20);
-
-                                            let response = ui.add(text_edit);
-
-                                            // Update cursor position tracking
-                                            if let Some(cursor_range) = response.cursor_range {
-                                                let cursor_pos = cursor_range.primary.ccursor.index;
-                                                let lines: Vec<&str> = self.code[..cursor_pos].split('\n').collect();
-                                                self.cursor_line = lines.len();
-                                                self.cursor_column = lines.last().map(|l| l.chars().count()).unwrap_or(0) + 1;
-                                                self.total_lines = self.code.lines().count().max(1);
+                                            // Syntax-highlighted code editor
+                                            if self.syntax_highlighting_enabled {
+                                                self.render_syntax_highlighted_editor(ui);
+                                            } else {
+                                                ui.add(
+                                                    egui::TextEdit::multiline(&mut self.code)
+                                                        .font(egui::TextStyle::Monospace)
+                                                        .desired_width(f32::INFINITY)
+                                                        .desired_rows(20)
+                                                );
                                             }
+
+                                            // Update line count (cursor position tracking needs different approach in egui)
+                                            self.total_lines = self.code.lines().count().max(1);
 
                                             // Show completion popup
                                             if self.show_completion && !self.completion_items.is_empty() {
@@ -2076,6 +2210,11 @@ impl eframe::App for TimeWarpApp {
 
                         ui.separator();
 
+                        // Timeout setting
+                        ui.label(format!("⏰ Timeout: {}ms", self.execution_timeout_ms));
+
+                        ui.separator();
+
                         // View options status
                         if self.show_line_numbers {
                             ui.label("📏 Line Numbers: ON");
@@ -2113,6 +2252,63 @@ impl eframe::App for TimeWarpApp {
                         }
                     });
                 });
+        }
+
+        // Error notification toast
+        if let Some(ref error_msg) = self.error_message {
+            let toast_duration = 3.0; // Show for 3 seconds
+            if self.error_timer < toast_duration {
+                self.error_timer += ctx.input(|i| i.unstable_dt).min(0.1) as f64; // Cap delta time
+
+                // Position toast at bottom center
+                let screen_rect = ctx.screen_rect();
+                let toast_width = 400.0;
+                let toast_height = 60.0;
+                let toast_pos = egui::pos2(
+                    screen_rect.center().x - toast_width / 2.0,
+                    screen_rect.bottom() - toast_height - 20.0,
+                );
+
+                let mut dismiss_clicked = false;
+                egui::Area::new("error_toast")
+                    .fixed_pos(toast_pos)
+                    .show(ctx, |ui| {
+                        egui::Frame::none()
+                            .fill(egui::Color32::from_rgb(220, 53, 69)) // Red background
+                            .stroke(egui::Stroke::new(2.0, egui::Color32::from_rgb(176, 42, 55)))
+                            .rounding(egui::Rounding::same(8.0))
+                            .shadow(egui::epaint::Shadow::small_dark())
+                            .show(ui, |ui| {
+                                ui.set_width(toast_width);
+                                ui.set_height(toast_height);
+                                ui.horizontal(|ui| {
+                                    ui.add_space(12.0);
+                                    ui.label(egui::RichText::new("❌").size(20.0));
+                                    ui.add_space(8.0);
+                                    ui.vertical(|ui| {
+                                        ui.add_space(8.0);
+                                        ui.label(egui::RichText::new("Error").color(egui::Color32::WHITE).size(14.0));
+                                        ui.label(egui::RichText::new(error_msg).color(egui::Color32::from_rgb(255, 235, 235)).size(12.0));
+                                    });
+                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                        ui.add_space(8.0);
+                                        if ui.button("✕").clicked() {
+                                            dismiss_clicked = true;
+                                        }
+                                    });
+                                });
+                            });
+                    });
+
+                if dismiss_clicked {
+                    self.error_message = None;
+                    self.error_timer = 0.0;
+                }
+            } else {
+                // Auto-dismiss after timeout
+                self.error_message = None;
+                self.error_timer = 0.0;
+            }
         }
     }
 }
