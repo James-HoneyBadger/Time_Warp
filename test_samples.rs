@@ -87,9 +87,16 @@ impl TestApp {
                         break;
                     }
                 }
+                CommandResult::Input(var_name, prompt) => {
+                    // For testing, simulate input
+                    let test_input = "Test User";
+                    output.push_str(&prompt);
+                    output.push_str(&test_input);
+                    output.push('\n');
+                    self.variables.insert(var_name, test_input.to_string());
+                }
                 CommandResult::Continue => {}
                 CommandResult::End => break,
-                _ => {} // Skip other results for this test
             }
             
             self.current_line += 1;
@@ -126,6 +133,12 @@ impl TestApp {
                     return CommandResult::Goto(line_num);
                 }
             }
+        }
+        
+        if cmd.starts_with("INPUT ") {
+            let var_name = cmd.strip_prefix("INPUT ").unwrap_or("").trim();
+            let prompt = format!("? "); // BASIC style prompt
+            return CommandResult::Input(var_name.to_string(), prompt);
         }
         
         // Turtle graphics commands
@@ -323,4 +336,14 @@ fn main() {
     
     let result2 = app2.execute_tw_basic(game_code);
     println!("Output:\n{}", result2);
+
+    // Test INPUT command
+    println!("=== TW BASIC INPUT Test ===");
+    let mut app3 = TestApp::new();
+    let input_code = "10 PRINT \"Enter your name:\"
+20 INPUT NAME$
+30 PRINT \"Hello, \"; NAME$; \"!\"";
+    
+    let result3 = app3.execute_tw_basic(input_code);
+    println!("Output:\n{}", result3);
 }

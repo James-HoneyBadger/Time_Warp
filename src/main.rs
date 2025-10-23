@@ -86,6 +86,7 @@ impl TimeWarpApp {
             "TW BASIC" => self.execute_tw_basic(&code),
             "TW Pascal" => self.execute_tw_pascal(&code),
             "TW Prolog" => self.execute_tw_prolog(&code),
+            "PILOT" => self.execute_pilot(&code),
             _ => format!("Language '{}' not yet supported for execution", self.language),
         };
         if self.is_executing && !self.waiting_for_input {
@@ -208,6 +209,113 @@ impl TimeWarpApp {
         }
         
         CommandResult::Output(format!("Unknown command: {}", cmd))
+    }
+
+    fn execute_pilot_command(&mut self, command: &str) -> CommandResult {
+        let cmd = command.trim();
+
+        if cmd.is_empty() {
+            return CommandResult::Continue;
+        }
+
+        // T: Type command - display text
+        if cmd.starts_with("T:") {
+            let text = cmd.strip_prefix("T:").unwrap_or("").trim();
+            let processed_text = self.process_pilot_text(text);
+            return CommandResult::Output(processed_text);
+        }
+
+        // A: Accept command - accept input
+        if cmd.starts_with("A:") {
+            let var_part = cmd.strip_prefix("A:").unwrap_or("").trim();
+            if let Some((var_name, prompt)) = self.parse_pilot_input(var_part) {
+                return CommandResult::Input(var_name, prompt);
+            }
+        }
+
+        // J: Jump command
+        if cmd.starts_with("J:") {
+            let label = cmd.strip_prefix("J:").unwrap_or("").trim();
+            if let Ok(line_num) = label.parse::<u32>() {
+                return CommandResult::Goto(line_num);
+            } else {
+                // Try to find label
+                for (line_num, line) in &self.program_lines {
+                    if line.contains(&format!("*{}", label)) {
+                        return CommandResult::Goto(*line_num);
+                    }
+                }
+            }
+        }
+
+        // Y: Yes command - conditional jump
+        if cmd.starts_with("Y:") {
+            let label = cmd.strip_prefix("Y:").unwrap_or("").trim();
+            // For now, always jump (could be enhanced with user choice)
+            if let Ok(line_num) = label.parse::<u32>() {
+                return CommandResult::Goto(line_num);
+            }
+        }
+
+        // N: No command - conditional jump
+        if cmd.starts_with("N:") {
+            let _label = cmd.strip_prefix("N:").unwrap_or("").trim();
+            // For now, don't jump (could be enhanced with user choice)
+            return CommandResult::Continue;
+        }
+
+        // E: End command
+        if cmd.starts_with("E:") {
+            return CommandResult::End;
+        }
+
+        // Label (starts with *)
+        if cmd.starts_with("*") {
+            return CommandResult::Continue;
+        }
+
+        CommandResult::Output(format!("Unknown PILOT command: {}", cmd))
+    }
+
+    fn process_pilot_text(&self, text: &str) -> String {
+        let mut result = String::new();
+        let mut chars = text.chars().peekable();
+
+        while let Some(ch) = chars.next() {
+            if ch == '#' {
+                // Variable reference in PILOT
+                let mut var_name = String::new();
+                while let Some(&next_ch) = chars.peek() {
+                    if next_ch.is_alphanumeric() || next_ch == '_' {
+                        var_name.push(chars.next().unwrap());
+                    } else {
+                        break;
+                    }
+                }
+                if let Some(value) = self.variables.get(&var_name) {
+                    result.push_str(value);
+                } else {
+                    result.push('#');
+                    result.push_str(&var_name);
+                }
+            } else {
+                result.push(ch);
+            }
+        }
+
+        result
+    }
+
+    fn parse_pilot_input(&self, var_part: &str) -> Option<(String, String)> {
+        // A:variable or A:variable,prompt
+        if var_part.contains(',') {
+            let parts: Vec<&str> = var_part.split(',').map(|s| s.trim()).collect();
+            if parts.len() >= 2 {
+                let prompt = parts[1].to_string();
+                return Some((parts[0].to_string(), prompt));
+            }
+        }
+        Some((var_part.to_string(), "? ".to_string()))
     }
 
     fn process_print_text(&self, text: &str) -> String {
@@ -404,11 +512,15 @@ impl TimeWarpApp {
         let mut output = self.output.clone();
         output.push_str(&self.user_input);
         output.push('\n');
-        
+
         while self.current_line < self.program_lines.len() {
             let command = self.program_lines[self.current_line].1.clone();
-            let result = self.execute_basic_command(&command);
-            
+            let result = match self.language.as_str() {
+                "TW BASIC" => self.execute_basic_command(&command),
+                "PILOT" => self.execute_pilot_command(&command),
+                _ => CommandResult::Output("Unsupported language for continuation".to_string()),
+            };
+
             match result {
                 CommandResult::Output(text) => {
                     output.push_str(&text);
@@ -433,12 +545,12 @@ impl TimeWarpApp {
                 CommandResult::Continue => {}
                 CommandResult::End => break,
             }
-            
+
             self.current_line += 1;
         }
-        
+
         self.output = format!("[Output for {}]\n{}", self.language, output);
-        
+
         if self.current_line >= self.program_lines.len() && !self.waiting_for_input {
             self.output.push_str("Program completed.\n");
         }
@@ -450,6 +562,60 @@ impl TimeWarpApp {
 
     fn execute_tw_prolog(&mut self, _code: &str) -> String {
         "TW Prolog execution not yet implemented".to_string()
+    }
+
+    fn execute_pilot(&mut self, code: &str) -> String {
+        // Parse PILOT program lines
+        self.program_lines.clear();
+        for (line_num, line) in code.lines().enumerate() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            self.program_lines.push((line_num as u32 + 1, line.to_string()));
+        }
+
+        // Execute the program
+        self.current_line = 0;
+        let mut output = String::new();
+
+        while self.current_line < self.program_lines.len() {
+            let command = self.program_lines[self.current_line].1.clone();
+            let result = self.execute_pilot_command(&command);
+
+            match result {
+                CommandResult::Output(text) => {
+                    output.push_str(&text);
+                    output.push('\n');
+                }
+                CommandResult::Goto(line_num) => {
+                    if let Some(pos) = self.program_lines.iter().position(|(ln, _)| *ln == line_num) {
+                        self.current_line = pos;
+                        continue;
+                    } else {
+                        output.push_str(&format!("Line {} not found\n", line_num));
+                        break;
+                    }
+                }
+                CommandResult::Input(var_name, prompt) => {
+                    self.waiting_for_input = true;
+                    self.current_input_var = var_name;
+                    self.input_prompt = prompt.clone();
+                    output.push_str(&prompt);
+                    break; // Wait for user input
+                }
+                CommandResult::Continue => {}
+                CommandResult::End => break,
+            }
+
+            self.current_line += 1;
+        }
+
+        if output.is_empty() && !self.waiting_for_input {
+            "PILOT program executed successfully".to_string()
+        } else {
+            output
+        }
     }
 }
 
@@ -596,7 +762,7 @@ impl eframe::App for TimeWarpApp {
                 ui.heading("Time Warp IDE");
                 ui.separator();
                 ui.label("Language:");
-                for lang in ["TW BASIC", "TW Pascal", "TW Prolog"] {
+                for lang in ["TW BASIC", "TW Pascal", "TW Prolog", "PILOT"] {
                     ui.selectable_value(&mut self.language, lang.to_string(), lang);
                 }
                 ui.separator();
@@ -842,7 +1008,7 @@ impl eframe::App for TimeWarpApp {
                         ui.label("A modern, educational programming environment");
                         ui.label("built in Rust using the egui framework.");
                         ui.separator();
-                        ui.label("Supports TW BASIC, TW Pascal, and TW Prolog");
+                        ui.label("Supports TW BASIC, TW Pascal, TW Prolog, and PILOT");
                         ui.label("with interactive input and turtle graphics.");
                         ui.separator();
                         if ui.button("Close").clicked() {

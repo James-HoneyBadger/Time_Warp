@@ -1,0 +1,4 @@
+10 PRINT "Enter your name:"
+20 INPUT NAME$
+30 PRINT "Hello, "; NAME$; "!"
+40 END
