@@ -1,9 +1,0 @@
-/Users/daddy/Time Warp/Time_Warp_Rust/target/debug/deps/zerofrom-13e3b738cdd740b9.d: /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/lib.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/macro_impls.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/zero_from.rs
-
-/Users/daddy/Time Warp/Time_Warp_Rust/target/debug/deps/libzerofrom-13e3b738cdd740b9.rlib: /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/lib.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/macro_impls.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/zero_from.rs
-
-/Users/daddy/Time Warp/Time_Warp_Rust/target/debug/deps/libzerofrom-13e3b738cdd740b9.rmeta: /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/lib.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/macro_impls.rs /Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/zero_from.rs
-
-/Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/lib.rs:
-/Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/macro_impls.rs:
-/Users/daddy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerofrom-0.1.6/src/zero_from.rs:
