@@ -79,6 +79,12 @@ struct TimeWarpApp {
     error_message: Option<String>,
     error_timer: f64,
 
+    // Undo/Redo history
+    undo_history: Vec<String>,
+    undo_position: usize,
+    max_undo_steps: usize,
+    previous_code: String,
+
     // Syntax highlighting
     #[allow(dead_code)]
     syntax_highlighting_enabled: bool,
@@ -151,6 +157,12 @@ impl Default for TimeWarpApp {
             error_message: None,
             error_timer: 0.0,
 
+            // Undo/Redo defaults
+            undo_history: Vec::new(),
+            undo_position: 0,
+            max_undo_steps: 100,
+            previous_code: String::new(),
+
             // Syntax highlighting defaults
             syntax_highlighting_enabled: true,
 
@@ -166,6 +178,165 @@ impl TimeWarpApp {
     fn show_error(&mut self, message: String) {
         self.error_message = Some(message);
         self.error_timer = 0.0;
+    }
+
+    fn save_undo_state(&mut self) {
+        // Remove any redo states after current position
+        self.undo_history.truncate(self.undo_position);
+        
+        // Add current state to history
+        self.undo_history.push(self.code.clone());
+        self.undo_position = self.undo_history.len();
+        
+        // Limit history size
+        if self.undo_history.len() > self.max_undo_steps {
+            self.undo_history.remove(0);
+            self.undo_position -= 1;
+        }
+    }
+
+    fn undo(&mut self) -> bool {
+        if self.undo_position > 0 {
+            self.undo_position -= 1;
+            self.code = self.undo_history[self.undo_position].clone();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn redo(&mut self) -> bool {
+        if self.undo_position < self.undo_history.len() - 1 {
+            self.undo_position += 1;
+            self.code = self.undo_history[self.undo_position].clone();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn move_line_up(&mut self) {
+        let lines: Vec<&str> = self.code.lines().collect();
+        if lines.is_empty() {
+            return;
+        }
+
+        // Find current line based on cursor position (simplified - use first line for now)
+        // In a real implementation, we'd track cursor position properly
+        let current_line = 0; // TODO: Get actual cursor line
+
+        if current_line > 0 {
+            let mut new_lines = lines.clone();
+            new_lines.swap(current_line - 1, current_line);
+            self.code = new_lines.join("\n");
+            if self.code.is_empty() {
+                self.code = String::new();
+            } else {
+                self.code.push('\n');
+            }
+            self.save_undo_state();
+        }
+    }
+
+    fn move_line_down(&mut self) {
+        let lines: Vec<&str> = self.code.lines().collect();
+        if lines.is_empty() {
+            return;
+        }
+
+        // Find current line based on cursor position (simplified - use first line for now)
+        let current_line = 0; // TODO: Get actual cursor line
+
+        if current_line < lines.len() - 1 {
+            let mut new_lines = lines.clone();
+            new_lines.swap(current_line, current_line + 1);
+            self.code = new_lines.join("\n");
+            if self.code.is_empty() {
+                self.code = String::new();
+            } else {
+                self.code.push('\n');
+            }
+            self.save_undo_state();
+        }
+    }
+
+    fn render_syntax_highlighted_text(&self, ui: &mut egui::Ui, text: &str) {
+        // Basic syntax highlighting for BASIC keywords
+        let keywords = [
+            "PRINT", "WRITELN", "INPUT", "READLN", "LET", "IF", "THEN", "ELSE", "END", "STOP",
+            "FOR", "TO", "STEP", "NEXT", "WHILE", "WEND", "GOTO", "GOSUB", "RETURN", "REM",
+            "CLS", "COLOR", "LOCATE", "BEEP", "SLEEP", "RANDOMIZE", "DIM", "DATA", "READ", "RESTORE",
+            "FORWARD", "FD", "BACK", "BK", "LEFT", "LT", "RIGHT", "RT", "PENUP", "PU", "PENDOWN", "PD",
+            "AND", "OR", "NOT", "SIN", "COS", "TAN", "SQR", "ABS", "INT", "LOG", "EXP", "ATN", "RND"
+        ];
+
+        let lines: Vec<&str> = text.lines().collect();
+        
+        for (line_num, line) in lines.iter().enumerate() {
+            // Show line number
+            ui.horizontal(|ui| {
+                ui.label(egui::RichText::new(format!("{:3}: ", line_num + 1)).weak().monospace());
+                
+                // Split line into tokens and highlight
+                let mut remaining = *line;
+                let mut first = true;
+                
+                while !remaining.is_empty() {
+                    let mut found_keyword = false;
+                    
+                    // Check for keywords at start of remaining text
+                    for keyword in &keywords {
+                        if remaining.to_uppercase().starts_with(&keyword.to_uppercase()) {
+                            let keyword_len = keyword.len();
+                            if remaining.len() == keyword_len || 
+                               !remaining.chars().nth(keyword_len).unwrap_or(' ').is_alphanumeric() {
+                                if !first {
+                                    ui.add_space(4.0);
+                                }
+                                ui.label(egui::RichText::new(&remaining[..keyword_len])
+                                    .color(egui::Color32::from_rgb(86, 156, 214)) // Blue for keywords
+                                    .monospace());
+                                remaining = &remaining[keyword_len..];
+                                found_keyword = true;
+                                first = false;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if !found_keyword {
+                        // Find next space or end
+                        let space_pos = remaining.find(' ').unwrap_or(remaining.len());
+                        let token = &remaining[..space_pos];
+                        
+                        if !first {
+                            ui.add_space(4.0);
+                        }
+                        
+                        // Check if it's a number
+                        if token.parse::<f64>().is_ok() {
+                            ui.label(egui::RichText::new(token)
+                                .color(egui::Color32::from_rgb(181, 206, 168)) // Green for numbers
+                                .monospace());
+                        } else if token.starts_with('"') && token.ends_with('"') {
+                            ui.label(egui::RichText::new(token)
+                                .color(egui::Color32::from_rgb(206, 145, 120)) // Orange for strings
+                                .monospace());
+                        } else {
+                            ui.label(egui::RichText::new(token)
+                                .color(egui::Color32::WHITE) // White for identifiers/comments
+                                .monospace());
+                        }
+                        
+                        remaining = &remaining[space_pos..];
+                        if space_pos < remaining.len() {
+                            remaining = &remaining[1..]; // Skip space
+                        }
+                        first = false;
+                    }
+                }
+            });
+        }
     }
 
     fn execute_code(&mut self) {
@@ -1128,18 +1299,32 @@ impl TimeWarpApp {
     }
 
     fn render_syntax_highlighted_editor(&mut self, ui: &mut egui::Ui) {
-        // For now, use the regular text editor with enhanced syntax highlighting
-        // TODO: Implement full custom syntax-highlighted editor
-        ui.add(
+        // Custom syntax highlighting implementation
+        let response = ui.add(
             egui::TextEdit::multiline(&mut self.code)
                 .font(egui::TextStyle::Monospace)
                 .desired_width(f32::INFINITY)
                 .desired_rows(20)
         );
 
+        // Check if code changed and save undo state
+        if response.changed() && self.code != self.previous_code {
+            self.save_undo_state();
+            self.previous_code = self.code.clone();
+        }
+
         // Handle keyboard shortcuts for completion
         if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Space)) {
             self.trigger_completion();
+        }
+
+        // Handle undo/redo keyboard shortcuts
+        if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Z) && !i.modifiers.shift) {
+            self.undo();
+        }
+        if ui.input(|i| (i.modifiers.ctrl && i.key_pressed(egui::Key::Y)) || 
+                     (i.modifiers.ctrl && i.modifiers.shift && i.key_pressed(egui::Key::Z))) {
+            self.redo();
         }
 
         // Auto-completion triggers
@@ -1152,6 +1337,16 @@ impl TimeWarpApp {
                 // Small delay to avoid triggering on every keystroke
                 self.trigger_completion();
             }
+        }
+
+        // Render syntax highlighted preview below the editor
+        if !self.code.is_empty() && self.active_tab == 0 {
+            ui.separator();
+            ui.label(egui::RichText::new("Syntax Highlighted Preview:").small().weak());
+            
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                self.render_syntax_highlighted_text(ui, &self.code);
+            });
         }
     }
 
@@ -1362,11 +1557,11 @@ impl eframe::App for TimeWarpApp {
                     }
                     ui.separator();
                     if ui.button("↶ Undo").clicked() {
-                        // Note: egui TextEdit doesn't have built-in undo, this is a placeholder
+                        self.undo();
                         ui.close_menu();
                     }
                     if ui.button("↷ Redo").clicked() {
-                        // Note: egui TextEdit doesn't have built-in redo, this is a placeholder
+                        self.redo();
                         ui.close_menu();
                     }
                     ui.separator();
@@ -1383,7 +1578,8 @@ impl eframe::App for TimeWarpApp {
                         ui.close_menu();
                     }
                     if ui.button("↕️ Move Line").clicked() {
-                        // Placeholder for move line functionality
+                        // For now, just show a message - full implementation needs cursor tracking
+                        self.show_error("Move line functionality not yet implemented".to_string());
                         ui.close_menu();
                     }
                 });

@@ -94,6 +94,10 @@ pub enum Expression {
         operator: BinaryOperator,
         right: Box<Expression>,
     },
+    UnaryOp {
+        operator: UnaryOperator,
+        operand: Box<Expression>,
+    },
     FunctionCall {
         name: String,
         arguments: Vec<Expression>,
@@ -120,6 +124,12 @@ pub enum BinaryOperator {
     GreaterEqual,
     And,
     Or,
+}
+
+#[derive(Debug, Clone)]
+pub enum UnaryOperator {
+    Not,
+    Minus,
 }
 
 #[derive(Debug, Clone)]
@@ -526,10 +536,8 @@ impl Parser {
             Some(Token::Penup) => self.parse_penup_statement(),
             Some(Token::Pendown) => self.parse_pendown_statement(),
             Some(Token::GraphicsForward) => self.parse_forward_statement(),
+            Some(Token::GraphicsRight) => self.parse_right_statement(),
             Some(Token::Rem) => self.parse_rem_statement(),
-            Some(Token::Identifier(ref id)) if id.to_uppercase() == "RIGHT" => {
-                self.parse_right_statement()
-            }
             _ => Err(InterpreterError::ParseError(format!(
                 "Unexpected token in statement: {:?}",
                 self.current_token
@@ -1082,15 +1090,17 @@ impl Parser {
         if let Some(Token::Minus) = self.current_token {
             self.advance();
             let expr = self.parse_power()?;
-            Ok(Expression::BinaryOp {
-                left: Box::new(Expression::Number(0.0)),
-                operator: BinaryOperator::Minus,
-                right: Box::new(expr),
+            Ok(Expression::UnaryOp {
+                operator: UnaryOperator::Minus,
+                operand: Box::new(expr),
             })
         } else if let Some(Token::Not) = self.current_token {
-            // NOT is not implemented yet, just parse the expression
             self.advance();
-            self.parse_power()
+            let expr = self.parse_power()?;
+            Ok(Expression::UnaryOp {
+                operator: UnaryOperator::Not,
+                operand: Box::new(expr),
+            })
         } else {
             self.parse_power()
         }
@@ -1308,6 +1318,29 @@ impl BasicInterpreter {
                     Ok(value.clone())
                 } else {
                     Ok(Value::Number(0.0)) // Default to 0 for undefined variables
+                }
+            }
+            Expression::UnaryOp { operator, operand } => {
+                let operand_val = self.evaluate_expression(operand)?;
+                match operator {
+                    UnaryOperator::Not => match operand_val {
+                        Value::Number(n) => {
+                            if n == 0.0 {
+                                Ok(Value::Number(1.0))
+                            } else {
+                                Ok(Value::Number(0.0))
+                            }
+                        }
+                        _ => Err(InterpreterError::TypeError(
+                            "NOT requires numeric operand".to_string(),
+                        )),
+                    },
+                    UnaryOperator::Minus => match operand_val {
+                        Value::Number(n) => Ok(Value::Number(-n)),
+                        _ => Err(InterpreterError::TypeError(
+                            "Unary minus requires numeric operand".to_string(),
+                        )),
+                    },
                 }
             }
             Expression::BinaryOp {
@@ -1593,6 +1626,22 @@ impl BasicInterpreter {
                     ))
                 }
             }
+            "RANDOMIZE" => {
+                if arguments.len() == 1 {
+                    if let Value::Number(seed) = arguments[0] {
+                        self.random_seed = seed as u64;
+                        Ok(Value::Number(0.0))
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "RANDOMIZE requires numeric argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "RANDOMIZE requires 1 argument".to_string(),
+                    ))
+                }
+            }
             "LEN" => {
                 if arguments.len() == 1 {
                     if let Value::String(s) = &arguments[0] {
@@ -1629,6 +1678,127 @@ impl BasicInterpreter {
                 } else {
                     Err(InterpreterError::RuntimeError(
                         "MID requires 3 arguments".to_string(),
+                    ))
+                }
+            }
+            "LEFT" => {
+                if arguments.len() == 2 {
+                    if let (Value::String(s), Value::Number(length)) =
+                        (&arguments[0], &arguments[1])
+                    {
+                        let len = *length as usize;
+                        if len >= s.len() {
+                            Ok(Value::String(s.clone()))
+                        } else {
+                            Ok(Value::String(s[..len].to_string()))
+                        }
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "LEFT requires string, number arguments".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "LEFT requires 2 arguments".to_string(),
+                    ))
+                }
+            }
+            "RIGHT" => {
+                if arguments.len() == 2 {
+                    if let (Value::String(s), Value::Number(length)) =
+                        (&arguments[0], &arguments[1])
+                    {
+                        let len = *length as usize;
+                        if len >= s.len() {
+                            Ok(Value::String(s.clone()))
+                        } else {
+                            let start = s.len() - len;
+                            Ok(Value::String(s[start..].to_string()))
+                        }
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "RIGHT requires string, number arguments".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "RIGHT requires 2 arguments".to_string(),
+                    ))
+                }
+            }
+            "CHR" => {
+                if arguments.len() == 1 {
+                    if let Value::Number(n) = arguments[0] {
+                        if n >= 0.0 && n <= 255.0 {
+                            Ok(Value::String((n as u8 as char).to_string()))
+                        } else {
+                            Err(InterpreterError::RuntimeError(
+                                "CHR argument must be between 0 and 255".to_string(),
+                            ))
+                        }
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "CHR requires numeric argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "CHR requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "ASC" => {
+                if arguments.len() == 1 {
+                    if let Value::String(s) = &arguments[0] {
+                        if !s.is_empty() {
+                            Ok(Value::Number(s.as_bytes()[0] as f64))
+                        } else {
+                            Err(InterpreterError::RuntimeError(
+                                "ASC requires non-empty string".to_string(),
+                            ))
+                        }
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "ASC requires string argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "ASC requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "VAL" => {
+                if arguments.len() == 1 {
+                    if let Value::String(s) = &arguments[0] {
+                        if let Ok(num) = s.trim().parse::<f64>() {
+                            Ok(Value::Number(num))
+                        } else {
+                            Ok(Value::Number(0.0))
+                        }
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "VAL requires string argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "VAL requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "STR" => {
+                if arguments.len() == 1 {
+                    if let Value::Number(n) = arguments[0] {
+                        Ok(Value::String(n.to_string()))
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "STR requires numeric argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "STR requires 1 argument".to_string(),
                     ))
                 }
             }
