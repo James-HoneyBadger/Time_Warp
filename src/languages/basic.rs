@@ -69,7 +69,6 @@ pub enum Token {
     LessEqual,
     Greater,
     GreaterEqual,
-    Assign, // =
 
     // Punctuation
     LParen,
@@ -86,11 +85,8 @@ pub enum Token {
 
     // Graphics commands
     GraphicsForward,
-    GraphicsRight,
 
     // Special
-    LineNumber(usize),
-    Eol,       // End of line
     EndOfFile, // End of file
 }
 
@@ -578,7 +574,7 @@ impl Parser {
     fn parse_let_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume LET
         let var_name = self.parse_identifier()?;
-        self.expect(&Token::Assign)?;
+        self.expect(&Token::Equal)?;
         let expression = self.parse_expression()?;
         Ok(Statement::Let {
             variable: var_name,
@@ -593,7 +589,7 @@ impl Parser {
 
         while let Some(ref token) = self.current_token {
             match token {
-                Token::Colon | Token::Eol | Token::EndOfFile => break,
+                Token::Colon | Token::EndOfFile => break,
                 Token::Comma => {
                     separator = PrintSeparator::Comma;
                     self.advance();
@@ -634,7 +630,7 @@ impl Parser {
                         else_statements: Some(else_statements),
                     });
                 }
-                Token::Colon | Token::Eol | Token::EndOfFile => break,
+                Token::Colon | Token::EndOfFile => break,
                 _ => {
                     let stmt = self.parse_statement()?;
                     then_statements.push(stmt);
@@ -652,7 +648,7 @@ impl Parser {
     fn parse_for_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume FOR
         let variable = self.parse_identifier()?;
-        self.expect(&Token::Assign)?;
+        self.expect(&Token::Equal)?;
         let start = self.parse_expression()?;
         self.expect(&Token::To)?;
         let end = self.parse_expression()?;
@@ -893,7 +889,7 @@ impl Parser {
         let mut comment = String::new();
         while let Some(ref token) = self.current_token {
             match token {
-                Token::Eol | Token::EndOfFile => break,
+                Token::EndOfFile => break,
                 Token::String(s) => {
                     comment.push_str(s);
                     self.advance();
@@ -1157,7 +1153,7 @@ impl Parser {
 
         while let Some(ref token) = self.current_token {
             match token {
-                Token::Colon | Token::Eol | Token::EndOfFile => break,
+                Token::Colon | Token::EndOfFile => break,
                 _ => {
                     let stmt = self.parse_statement()?;
                     statements.push(stmt);

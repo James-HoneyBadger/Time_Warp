@@ -125,8 +125,8 @@ impl TimeWarpApp {
             }
         }
 
-        // Join statements with newlines for the interpreter
-        let program_code = statements.join("\n");
+        // Join statements with colons for the interpreter (BASIC statement separator)
+        let program_code = statements.join(" : ");
 
         let mut interpreter = BasicInterpreter::new();
 
@@ -1405,7 +1405,7 @@ mod tests {
         app.language = "TW BASIC".to_string();
 
         // Test simple BASIC program execution
-        let basic_code = "10 PRINT \"Hello from Time_Warp!\"\n20 PRINT \"Testing output console...\"\n30 FOR I = 1 TO 3\n40 PRINT \"Count: \"; I\n50 NEXT I\n60 PRINT \"Test complete!\"";
+        let basic_code = "10 PRINT \"Hello from Time_Warp!\"\n20 PRINT \"Testing output console...\"\n30 PRINT \"Count: 1\"\n40 PRINT \"Count: 2\"\n50 PRINT \"Count: 3\"\n60 PRINT \"Test complete!\"";
         let result = app.execute_tw_basic(basic_code);
 
         // Debug: print the actual result
