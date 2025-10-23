@@ -999,8 +999,6 @@ impl TimeWarpApp {
     fn is_comment_start_static(text: &str, language: &str) -> bool {
         match language {
             "TW BASIC" => text.starts_with("REM ") || text.starts_with("'"),
-            "TW Pascal" => text.starts_with("//") || text.starts_with("(*") || text.starts_with("{"),
-            "TW Prolog" => text.starts_with("%"),
             _ => text.starts_with("//") || text.starts_with("#"),
         }
     }
@@ -1059,54 +1057,6 @@ impl TimeWarpApp {
                 "DEF",
                 "FN",
                 "REM",
-            ],
-            "TW Pascal" => vec![
-                "program",
-                "begin",
-                "end",
-                "var",
-                "const",
-                "type",
-                "procedure",
-                "function",
-                "if",
-                "then",
-                "else",
-                "for",
-                "to",
-                "downto",
-                "do",
-                "while",
-                "repeat",
-                "until",
-                "case",
-                "of",
-                "writeln",
-                "write",
-                "readln",
-                "read",
-                "integer",
-                "real",
-                "char",
-                "string",
-                "boolean",
-                "array",
-                "record",
-                "true",
-                "false",
-                "and",
-                "or",
-                "not",
-                "div",
-                "mod",
-                "nil",
-                "new",
-                "dispose",
-            ],
-            "TW Prolog" => vec![
-                ":-", "?-", "is", "not", "true", "false", "fail", "cut", "!", "write", "nl",
-                "read", "assert", "retract", "consult", "listing", "halt", "member", "append",
-                "length", "reverse", "sort", "findall", "bagof", "setof",
             ],
             _ => vec![],
         }
@@ -1234,17 +1184,6 @@ impl TimeWarpApp {
 
 impl eframe::App for TimeWarpApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Auto-execute Prolog code for testing (run once)
-        static mut HAS_EXECUTED: bool = false;
-        unsafe {
-            if !HAS_EXECUTED && self.language == "TW Prolog" && !self.code.is_empty() {
-                HAS_EXECUTED = true;
-                println!("Executing Prolog code...");
-                self.execute_code();
-                println!("Execution result: {}", self.output);
-            }
-        }
-
         // Enhanced visual styling
         let mut visuals = egui::Visuals::light();
         visuals.window_fill = egui::Color32::from_rgb(250, 250, 252);
@@ -1585,7 +1524,7 @@ impl eframe::App for TimeWarpApp {
 
                         // Language selector
                         ui.label("Language:");
-                        for lang in ["TW BASIC", "TW Pascal", "TW Prolog"] {
+                        for lang in ["TW BASIC"] {
                             ui.selectable_value(&mut self.language, lang.to_string(), lang);
                         }
 
@@ -2229,7 +2168,7 @@ impl eframe::App for TimeWarpApp {
                         ui.label("A modern, educational programming environment");
                         ui.label("built in Rust using the egui framework.");
                         ui.separator();
-                        ui.label("Supports TW BASIC, TW Pascal, and TW Prolog");
+                        ui.label("Supports TW BASIC with Logo turtle graphics");
                         ui.label("with interactive input and turtle graphics.");
                         ui.separator();
                         if ui.button("Close").clicked() {
@@ -2421,12 +2360,8 @@ mod tests {
     fn test_language_selection() {
         let mut app = TimeWarpApp::default();
 
-        // Test language changes
+        // Test language is TW BASIC by default
         assert_eq!(app.language, "TW BASIC");
-        app.language = "TW Pascal".to_string();
-        assert_eq!(app.language, "TW Pascal");
-        app.language = "TW Prolog".to_string();
-        assert_eq!(app.language, "TW Prolog");
     }
 
     #[test]
@@ -2491,5 +2426,25 @@ mod tests {
         assert!(result.contains("Count: 2"));
         assert!(result.contains("Count: 3"));
         assert!(result.contains("Test complete!"));
+    }
+
+    #[test]
+    fn test_enhanced_basic_commands() {
+        let mut app = TimeWarpApp::default();
+        app.language = "TW BASIC".to_string();
+
+        // Test WRITELN command (Pascal-style with newline)
+        let writeln_code = "WRITELN \"Hello with newline\"";
+        let result = app.execute_tw_basic(writeln_code);
+        println!("WRITELN result: {:?}", result);
+        assert!(result.contains("Hello with newline"));
+
+        // Test turtle graphics commands
+        let turtle_code = "FORWARD 50\nRIGHT 90\nBACK 25";
+        let result = app.execute_tw_basic(turtle_code);
+        println!("Turtle commands result: {:?}", result);
+        assert!(result.contains("Moved forward 50"));
+        assert!(result.contains("Turned right 90"));
+        assert!(result.contains("Moved back 25"));
     }
 }

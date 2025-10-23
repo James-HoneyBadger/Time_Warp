@@ -1,0 +1,7 @@
+PRINT "Hello from enhanced BASIC!"
+WRITELN "This uses WRITELN"
+FORWARD 50
+RIGHT 90
+FORWARD 50
+READLN NAME
+PRINT "Hello "; NAME

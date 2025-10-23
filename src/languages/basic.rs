@@ -7,6 +7,8 @@ pub enum Token {
     // Keywords
     Let,
     Print,
+    Writeln,
+    Readln,
     If,
     Then,
     Else,
@@ -14,6 +16,12 @@ pub enum Token {
     Stop,
     Cls,
     Color,
+    Forward,
+    Back,
+    Left,
+    Right,
+    Penup,
+    Pendown,
     GraphicsForward,
     GraphicsRight,
     Input,
@@ -124,6 +132,14 @@ pub enum Statement {
         expressions: Vec<Expression>,
         separator: PrintSeparator,
     },
+    Writeln {
+        expressions: Vec<Expression>,
+        separator: PrintSeparator,
+    },
+    Readln {
+        prompt: Option<String>,
+        variables: Vec<String>,
+    },
     If {
         condition: Expression,
         then_statements: Vec<Statement>,
@@ -170,6 +186,20 @@ pub enum Statement {
     Color {
         color: Expression,
     },
+    Forward {
+        distance: Expression,
+    },
+    Back {
+        distance: Expression,
+    },
+    Left {
+        angle: Expression,
+    },
+    Right {
+        angle: Expression,
+    },
+    Penup,
+    Pendown,
     GraphicsForward {
         distance: Expression,
     },
@@ -267,6 +297,8 @@ impl Tokenizer {
                     let token = match ident.as_str() {
                         "LET" => Token::Let,
                         "PRINT" => Token::Print,
+                        "WRITELN" => Token::Writeln,
+                        "READLN" => Token::Readln,
                         "IF" => Token::If,
                         "THEN" => Token::Then,
                         "ELSE" => Token::Else,
@@ -274,8 +306,20 @@ impl Tokenizer {
                         "STOP" => Token::Stop,
                         "CLS" => Token::Cls,
                         "COLOR" => Token::Color,
-                        "FORWARD" => Token::GraphicsForward,
-                        "RIGHT" => Token::GraphicsRight,
+                        "FORWARD" => Token::Forward,
+                        "FD" => Token::Forward,
+                        "BACK" => Token::Back,
+                        "BK" => Token::Back,
+                        "LEFT" => Token::Left,
+                        "LT" => Token::Left,
+                        "RIGHT" => Token::Right,
+                        "RT" => Token::Right,
+                        "PENUP" => Token::Penup,
+                        "PU" => Token::Penup,
+                        "PENDOWN" => Token::Pendown,
+                        "PD" => Token::Pendown,
+                        "GRAPHICSFORWARD" => Token::GraphicsForward,
+                        "GRAPHICSRIGHT" => Token::GraphicsRight,
                         "INPUT" => Token::Input,
                         "DIM" => Token::Dim,
                         "DATA" => Token::Data,
@@ -457,6 +501,8 @@ impl Parser {
         match self.current_token {
             Some(Token::Let) => self.parse_let_statement(),
             Some(Token::Print) => self.parse_print_statement(),
+            Some(Token::Writeln) => self.parse_writeln_statement(),
+            Some(Token::Readln) => self.parse_readln_statement(),
             Some(Token::If) => self.parse_if_statement(),
             Some(Token::For) => self.parse_for_statement(),
             Some(Token::Next) => self.parse_next_statement(),
@@ -473,6 +519,12 @@ impl Parser {
             Some(Token::Stop) => self.parse_stop_statement(),
             Some(Token::Cls) => self.parse_cls_statement(),
             Some(Token::Color) => self.parse_color_statement(),
+            Some(Token::Forward) => self.parse_turtle_forward_statement(),
+            Some(Token::Back) => self.parse_turtle_back_statement(),
+            Some(Token::Left) => self.parse_turtle_left_statement(),
+            Some(Token::Right) => self.parse_turtle_right_statement(),
+            Some(Token::Penup) => self.parse_penup_statement(),
+            Some(Token::Pendown) => self.parse_pendown_statement(),
             Some(Token::GraphicsForward) => self.parse_forward_statement(),
             Some(Token::Rem) => self.parse_rem_statement(),
             Some(Token::Identifier(ref id)) if id.to_uppercase() == "RIGHT" => {
@@ -525,6 +577,104 @@ impl Parser {
             expressions,
             separator,
         })
+    }
+
+    fn parse_writeln_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume WRITELN
+        let mut expressions = Vec::new();
+        let mut separator = PrintSeparator::None;
+
+        while let Some(ref token) = self.current_token {
+            match token {
+                Token::Colon | Token::EndOfFile => break,
+                Token::Comma => {
+                    separator = PrintSeparator::Comma;
+                    self.advance();
+                    break;
+                }
+                Token::Semicolon => {
+                    separator = PrintSeparator::Semicolon;
+                    self.advance();
+                    break;
+                }
+                _ => {
+                    let expr = self.parse_expression()?;
+                    expressions.push(expr);
+                }
+            }
+        }
+
+        Ok(Statement::Writeln {
+            expressions,
+            separator,
+        })
+    }
+
+    fn parse_readln_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume READLN
+        let mut prompt = None;
+        let mut variables = Vec::new();
+
+        // Check for optional prompt
+        if let Some(Token::String(ref s)) = self.current_token {
+            prompt = Some(s.clone());
+            self.advance();
+            if let Some(Token::Comma) = self.current_token {
+                self.advance();
+            }
+        }
+
+        // Parse variable list
+        while let Some(ref token) = self.current_token {
+            match token {
+                Token::Identifier(ref var) => {
+                    variables.push(var.clone());
+                    self.advance();
+                    if let Some(Token::Comma) = self.current_token {
+                        self.advance();
+                    } else {
+                        break;
+                    }
+                }
+                _ => break,
+            }
+        }
+
+        Ok(Statement::Readln { prompt, variables })
+    }
+
+    fn parse_turtle_forward_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume FORWARD
+        let distance = self.parse_expression()?;
+        Ok(Statement::Forward { distance })
+    }
+
+    fn parse_turtle_back_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume BACK
+        let distance = self.parse_expression()?;
+        Ok(Statement::Back { distance })
+    }
+
+    fn parse_turtle_left_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume LEFT
+        let angle = self.parse_expression()?;
+        Ok(Statement::Left { angle })
+    }
+
+    fn parse_turtle_right_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume RIGHT
+        let angle = self.parse_expression()?;
+        Ok(Statement::Right { angle })
+    }
+
+    fn parse_penup_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PENUP
+        Ok(Statement::Penup)
+    }
+
+    fn parse_pendown_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PENDOWN
+        Ok(Statement::Pendown)
     }
 
     fn parse_if_statement(&mut self) -> Result<Statement, InterpreterError> {
@@ -1525,6 +1675,114 @@ impl BasicInterpreter {
                 }
                 output.push_str(&result);
                 output.push('\n');
+                Ok(None)
+            }
+            Statement::Writeln {
+                ref expressions,
+                ref separator,
+            } => {
+                let mut result = String::new();
+                for (i, expr) in expressions.iter().enumerate() {
+                    if i > 0 {
+                        match separator {
+                            PrintSeparator::Comma => result.push('\t'),
+                            PrintSeparator::Semicolon => {}
+                            PrintSeparator::None => result.push(' '),
+                        }
+                    }
+                    let value = self.evaluate_expression(expr)?;
+                    match value {
+                        Value::Number(n) => result.push_str(&format!("{}", n)),
+                        Value::String(s) => result.push_str(&s),
+                    }
+                }
+                output.push_str(&result);
+                output.push('\n');
+                Ok(None)
+            }
+            Statement::Readln {
+                ref prompt,
+                ref variables,
+            } => {
+                if let Some(prompt_text) = prompt {
+                    output.push_str(prompt_text);
+                } else {
+                    output.push_str("? ");
+                }
+                // For now, return the prompt - input handling would need more complex logic
+                Ok(Some(format!(
+                    "Input required for variables: {:?}",
+                    variables
+                )))
+            }
+            Statement::Forward { ref distance } => {
+                let dist_value = self.evaluate_expression(distance)?;
+                if let Value::Number(dist) = dist_value {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "FORWARD".to_string(),
+                        value: dist as f32,
+                        color: None,
+                    });
+                    output.push_str(&format!("Moved forward {}", dist));
+                    output.push('\n');
+                }
+                Ok(None)
+            }
+            Statement::Back { ref distance } => {
+                let dist_value = self.evaluate_expression(distance)?;
+                if let Value::Number(dist) = dist_value {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "FORWARD".to_string(),
+                        value: -(dist as f32),
+                        color: None,
+                    });
+                    output.push_str(&format!("Moved back {}", dist));
+                    output.push('\n');
+                }
+                Ok(None)
+            }
+            Statement::Left { ref angle } => {
+                let angle_value = self.evaluate_expression(angle)?;
+                if let Value::Number(ang) = angle_value {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "TURN".to_string(),
+                        value: -(ang as f32),
+                        color: None,
+                    });
+                    output.push_str(&format!("Turned left {} degrees", ang));
+                    output.push('\n');
+                }
+                Ok(None)
+            }
+            Statement::Right { ref angle } => {
+                let angle_value = self.evaluate_expression(angle)?;
+                if let Value::Number(ang) = angle_value {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "TURN".to_string(),
+                        value: ang as f32,
+                        color: None,
+                    });
+                    output.push_str(&format!("Turned right {} degrees", ang));
+                    output.push('\n');
+                }
+                Ok(None)
+            }
+            Statement::Penup => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "PENUP".to_string(),
+                    value: 0.0,
+                    color: None,
+                });
+                output.push_str("Pen up\n");
+                Ok(None)
+            }
+            Statement::Pendown => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "PENDOWN".to_string(),
+                    value: 0.0,
+                    color: None,
+                });
+                output.push_str("Pen down\n");
                 Ok(None)
             }
             Statement::If {
