@@ -97,7 +97,7 @@ impl Default for TimeWarpApp {
         Self {
             code: String::new(),
             output: String::from("Welcome to Time Warp IDE!\n"),
-            language: String::from("TW Prolog"),
+            language: String::from("TW BASIC"),
             active_tab: 0, // Start with Editor tab
             last_file_path: None,
             show_line_numbers: false,
@@ -174,9 +174,6 @@ impl TimeWarpApp {
         let code = self.code.clone();
         let result = match self.language.as_str() {
             "TW BASIC" => self.execute_tw_basic(&code),
-            "TW Pascal" => self.execute_tw_pascal(&code),
-            "TW Prolog" => self.execute_tw_prolog(&code),
-            "PILOT" => self.execute_pilot(&code),
             _ => format!(
                 "Language '{}' not yet supported for execution",
                 self.language
@@ -253,66 +250,6 @@ impl TimeWarpApp {
         }
     }
 
-    fn execute_pilot(&mut self, code: &str) -> String {
-        // Parse PILOT program lines
-        self.program_lines.clear();
-        for (line_num, line) in code.lines().enumerate() {
-            let line = line.trim();
-            if line.is_empty() {
-                continue;
-            }
-            // PILOT uses labels like T:, A:, J:, Y:, N:
-            self.program_lines
-                .push((line_num as u32 + 1, line.to_string()));
-        }
-
-        // Execute the program
-        self.current_line = 0;
-        let mut output = String::new();
-
-        while self.current_line < self.program_lines.len() {
-            let command = self.program_lines[self.current_line].1.clone();
-            let result = self.execute_pilot_command(&command);
-
-            match result {
-                CommandResult::Output(text) => {
-                    output.push_str(&text);
-                    output.push('\n');
-                }
-                CommandResult::Goto(line_num) => {
-                    if let Some(pos) = self
-                        .program_lines
-                        .iter()
-                        .position(|(ln, _)| *ln == line_num)
-                    {
-                        self.current_line = pos;
-                        continue;
-                    } else {
-                        output.push_str(&format!("Label {} not found\n", line_num));
-                        break;
-                    }
-                }
-                CommandResult::Input(var_name, prompt) => {
-                    self.waiting_for_input = true;
-                    self.current_input_var = var_name;
-                    self.input_prompt = prompt.clone();
-                    output.push_str(&prompt);
-                    break; // Wait for user input
-                }
-                CommandResult::Continue => {}
-                CommandResult::End => break,
-            }
-
-            self.current_line += 1;
-        }
-
-        if output.is_empty() && !self.waiting_for_input {
-            "PILOT program executed successfully".to_string()
-        } else {
-            output
-        }
-    }
-
     fn execute_basic_command(&mut self, command: &str) -> CommandResult {
         let cmd = command.trim();
 
@@ -324,6 +261,19 @@ impl TimeWarpApp {
             let text = cmd.strip_prefix("PRINT ").unwrap_or("");
             let processed_text = self.process_print_text(text);
             return CommandResult::Output(processed_text);
+        }
+
+        if cmd.starts_with("WRITELN ") {
+            let text = cmd.strip_prefix("WRITELN ").unwrap_or("");
+            let processed_text = self.process_print_text(text);
+            return CommandResult::Output(processed_text + "\n");
+        }
+
+        if cmd.starts_with("READLN ") {
+            let var_part = cmd.strip_prefix("READLN ").unwrap_or("");
+            if let Some((var_name, prompt)) = self.parse_input_command(var_part) {
+                return CommandResult::Input(var_name, prompt);
+            }
         }
 
         if cmd.starts_with("LET ") {
@@ -340,6 +290,14 @@ impl TimeWarpApp {
 
         if cmd.starts_with("IF ") {
             return self.handle_if_command(cmd.strip_prefix("IF ").unwrap_or(""));
+        }
+
+        if cmd.starts_with("WHILE ") {
+            return self.handle_while_command(cmd.strip_prefix("WHILE ").unwrap_or(""));
+        }
+
+        if cmd.starts_with("FOR ") {
+            return self.handle_for_command(cmd.strip_prefix("FOR ").unwrap_or(""));
         }
 
         if cmd.starts_with("GOTO ") {
@@ -360,67 +318,6 @@ impl TimeWarpApp {
         }
 
         CommandResult::Output(format!("Unknown command: {}", cmd))
-    }
-
-    fn execute_pilot_command(&mut self, command: &str) -> CommandResult {
-        let cmd = command.trim();
-
-        if cmd.is_empty() {
-            return CommandResult::Continue;
-        }
-
-        // PILOT commands start with single letters followed by :
-        if cmd.starts_with("T:") {
-            // Type/Print command
-            let text = cmd.strip_prefix("T:").unwrap_or("").trim();
-            let processed_text = self.process_pilot_text(text);
-            return CommandResult::Output(processed_text);
-        }
-
-        if cmd.starts_with("A:") {
-            // Accept/Input command
-            let var_part = cmd.strip_prefix("A:").unwrap_or("").trim();
-            if let Some((var_name, prompt)) = self.parse_pilot_input_command(var_part) {
-                return CommandResult::Input(var_name, prompt);
-            }
-        }
-
-        if cmd.starts_with("J:") {
-            // Jump command
-            let label = cmd.strip_prefix("J:").unwrap_or("").trim();
-            if let Ok(line_num) = label.parse::<u32>() {
-                return CommandResult::Goto(line_num);
-            } else {
-                // Handle label-based jumps (for future enhancement)
-                return CommandResult::Output(format!("Label jump to '{}' not implemented", label));
-            }
-        }
-
-        if cmd.starts_with("Y:") {
-            // Yes/No condition (simplified)
-            let _condition = cmd.strip_prefix("Y:").unwrap_or("").trim();
-            // For now, treat as always true for demo
-            return CommandResult::Continue;
-        }
-
-        if cmd.starts_with("N:") {
-            // No condition (simplified)
-            let _condition = cmd.strip_prefix("N:").unwrap_or("").trim();
-            // For now, treat as always false for demo
-            return CommandResult::Continue;
-        }
-
-        // Turtle graphics commands for PILOT
-        if let Some(result) = self.handle_turtle_command(cmd) {
-            return result;
-        }
-
-        if cmd == "E:" {
-            // End command
-            return CommandResult::End;
-        }
-
-        CommandResult::Output(format!("Unknown PILOT command: {}", cmd))
     }
 
     fn process_print_text(&self, text: &str) -> String {
@@ -501,58 +398,9 @@ impl TimeWarpApp {
         Some((var_part.to_string(), format!("? ")))
     }
 
-    fn process_pilot_text(&self, text: &str) -> String {
-        let mut result = String::new();
-        let mut chars = text.chars().peekable();
 
-        while let Some(ch) = chars.next() {
-            if ch == '"' {
-                // Handle quoted strings
-                while let Some(ch) = chars.next() {
-                    if ch == '"' {
-                        break;
-                    }
-                    result.push(ch);
-                }
-            } else if ch == '#' {
-                // Variable reference in PILOT (using # instead of direct names)
-                let mut var_name = String::new();
-                while let Some(&next_ch) = chars.peek() {
-                    if next_ch.is_alphanumeric() || next_ch == '_' || next_ch == '$' {
-                        var_name.push(chars.next().unwrap());
-                    } else {
-                        break;
-                    }
-                }
-                if let Some(value) = self.variables.get(&var_name) {
-                    result.push_str(value);
-                } else {
-                    result.push('#');
-                    result.push_str(&var_name);
-                }
-            } else {
-                result.push(ch);
-            }
-        }
 
-        result
-    }
 
-    fn parse_pilot_input_command(&self, var_part: &str) -> Option<(String, String)> {
-        // A:variable or A:"prompt",variable
-        if var_part.contains(',') {
-            let parts: Vec<&str> = var_part.split(',').map(|s| s.trim()).collect();
-            if parts.len() >= 2 {
-                let prompt = if parts[0].starts_with('"') && parts[0].ends_with('"') {
-                    parts[0][1..parts[0].len() - 1].to_string()
-                } else {
-                    parts[0].to_string()
-                };
-                return Some((parts[1].to_string(), prompt));
-            }
-        }
-        Some((var_part.to_string(), format!("? ")))
-    }
 
     fn handle_if_command(&self, condition: &str) -> CommandResult {
         if let Some((cond, then_part)) = condition.split_once(" THEN ") {
@@ -567,6 +415,67 @@ impl TimeWarpApp {
                     }
                 }
                 // Could handle other THEN actions here
+            }
+        }
+        CommandResult::Continue
+    }
+
+    fn handle_while_command(&mut self, condition: &str) -> CommandResult {
+        // WHILE condition DO command
+        if let Some((cond, do_part)) = condition.split_once(" DO ") {
+            if self.evaluate_condition(cond.trim()) {
+                // Execute the DO part - for now, just handle GOTO
+                let do_cmd = do_part.trim();
+                if do_cmd.starts_with("GOTO ") {
+                    if let Some(line_num_str) = do_cmd.strip_prefix("GOTO ") {
+                        if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
+                            return CommandResult::Goto(line_num);
+                        }
+                    }
+                }
+            }
+        }
+        CommandResult::Continue
+    }
+
+    fn handle_for_command(&mut self, loop_spec: &str) -> CommandResult {
+        // FOR variable = start TO end [STEP step] DO command
+        if let Some((var_spec, do_part)) = loop_spec.split_once(" DO ") {
+            if let Some((var_part, range_part)) = var_spec.split_once(" = ") {
+                let var_name = var_part.trim();
+                if let Some((start_part, end_part)) = range_part.split_once(" TO ") {
+                    let start_val = self.get_value(start_part.trim());
+                    let end_val = self.get_value(end_part.trim());
+                    
+                    // Initialize loop variable if not set
+                    if !self.variables.contains_key(var_name) {
+                        self.variables.insert(var_name.to_string(), start_val.clone());
+                    }
+                    
+                    let current_val = self.variables.get(var_name).unwrap_or(&start_val).clone();
+                    let current_num: f64 = current_val.parse().unwrap_or(0.0);
+                    let end_num: f64 = end_val.parse().unwrap_or(0.0);
+                    
+                    if current_num <= end_num {
+                        // Execute the DO part
+                        let do_cmd = do_part.trim();
+                        if do_cmd.starts_with("GOTO ") {
+                            if let Some(line_num_str) = do_cmd.strip_prefix("GOTO ") {
+                                if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
+                                    return CommandResult::Goto(line_num);
+                                }
+                            }
+                        }
+                        // Increment loop variable
+                        let step = if let Some(step_part) = range_part.split(" STEP ").nth(1) {
+                            step_part.trim().parse().unwrap_or(1.0)
+                        } else {
+                            1.0
+                        };
+                        let new_val = (current_num + step).to_string();
+                        self.variables.insert(var_name.to_string(), new_val);
+                    }
+                }
             }
         }
         CommandResult::Continue
@@ -704,10 +613,6 @@ impl TimeWarpApp {
         if self.language == "TW BASIC" {
             // BASIC execution is now handled directly in the input processing
             // since we store the interpreter instance
-        } else if self.language == "TW Pascal" {
-            self.continue_pascal_execution();
-        } else if self.language == "PILOT" {
-            self.continue_pilot_execution();
         }
     }
 
@@ -760,88 +665,11 @@ impl TimeWarpApp {
         }
     }
 
-    fn continue_pascal_execution(&mut self) {
-        // Continue Pascal execution from where we left off
-        let code = self.code.clone();
-        let result = self.execute_tw_pascal(&code);
-        self.output = format!("[Output for {}]\n{}", self.language, result);
 
-        if !self.waiting_for_input {
-            self.output.push_str("Program completed.\n");
-        }
-    }
 
-    fn continue_pilot_execution(&mut self) {
-        // Continue PILOT execution from where we left off
-        let code = self.code.clone();
-        let result = self.execute_pilot(&code);
-        self.output = format!("[Output for {}]\n{}", self.language, result);
 
-        if !self.waiting_for_input {
-            self.output.push_str("Program completed.\n");
-        }
-    }
 
-    fn execute_tw_pascal(&mut self, code: &str) -> String {
-        use crate::languages::pascal::{CommandResult, PascalInterpreter};
 
-        let mut interpreter = PascalInterpreter::new();
-
-        // Parse program into lines
-        let lines: Vec<&str> = code.lines().collect();
-        let mut output = String::new();
-
-        // Start from current_pascal_line if continuing, otherwise from 0
-        let start_line = if self.waiting_for_input && self.language == "TW Pascal" {
-            self.current_pascal_line
-        } else {
-            self.current_pascal_line = 0;
-            0
-        };
-
-        for (i, line) in lines.iter().enumerate().skip(start_line) {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('{') || trimmed.starts_with("(*") {
-                continue;
-            }
-
-            let result = interpreter.execute_statement_with_vars(trimmed, &mut self.variables);
-
-            match result {
-                CommandResult::Output(text) => {
-                    output.push_str(&text);
-                    output.push('\n');
-                }
-                CommandResult::Input(var_name, prompt) => {
-                    self.waiting_for_input = true;
-                    self.current_input_var = var_name;
-                    self.input_prompt = prompt.clone();
-                    self.current_pascal_line = i + 1; // Continue from next line
-                    output.push_str(&prompt);
-                    // Don't continue execution until input is provided
-                    return output;
-                }
-                CommandResult::Continue => {}
-                CommandResult::End => {
-                    self.current_pascal_line = 0; // Reset for next run
-                    break;
-                }
-            }
-        }
-
-        self.current_pascal_line = 0; // Reset for next run
-        if output.is_empty() {
-            "Pascal program executed successfully".to_string()
-        } else {
-            output
-        }
-    }
-
-    fn execute_tw_prolog(&mut self, code: &str) -> String {
-        use crate::languages::prolog::PrologInterpreter;
-        let mut interpreter = PrologInterpreter::new();
-        interpreter.execute(code)
-    }
 
     // Clipboard operations
     fn copy_text(&mut self, ctx: &egui::Context) {
@@ -1056,9 +884,35 @@ impl TimeWarpApp {
                 continue;
             }
 
+            // Check for operators
+            if "+-*/=<>!&|^%".contains(chars[i]) {
+                let mut end = i + 1;
+                // Handle compound operators like ==, !=, <=, >=, +=, etc.
+                if end < chars.len() && "+-*/=<>!&|^%".contains(chars[end]) {
+                    end += 1;
+                }
+
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(128, 64, 0))); // Orange-brown for operators
+                i = end;
+                continue;
+            }
+
+            // Check for brackets and parentheses
+            if "(){}[]".contains(chars[i]) {
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..i+1].to_string(), egui::Color32::from_rgb(128, 0, 128))); // Purple for brackets
+                i += 1;
+                continue;
+            }
+
             // Check for keywords
             let remaining = &line[i..];
-            let mut found_keyword = false;
+            let mut _found_keyword = false;
             for keyword in &keyword_set {
                 if remaining.to_uppercase().starts_with(keyword) {
                     let keyword_len = keyword.len();
@@ -1074,13 +928,63 @@ impl TimeWarpApp {
                         }
                         highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255)));
                         i += keyword_len;
-                        found_keyword = true;
+                        _found_keyword = true;
                         break;
                     }
                 }
             }
 
-            if !found_keyword {
+            // Check for operators
+            if "+-*/=<>!&|^%".contains(chars[i]) {
+                let mut end = i + 1;
+                // Handle compound operators like ==, !=, <=, >=, +=, etc.
+                if end < chars.len() && "+-*/=<>!&|^%".contains(chars[end]) {
+                    end += 1;
+                }
+
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(128, 64, 0))); // Orange-brown for operators
+                i = end;
+                continue;
+            }
+
+            // Check for brackets and parentheses
+            if "(){}[]".contains(chars[i]) {
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..i+1].to_string(), egui::Color32::from_rgb(128, 0, 128))); // Purple for brackets
+                i += 1;
+                continue;
+            }
+
+            // Check for keywords
+            let remaining = &line[i..];
+            let mut _found_keyword = false;
+            for keyword in &keyword_set {
+                if remaining.to_uppercase().starts_with(keyword) {
+                    let keyword_len = keyword.len();
+                    let next_char = if i + keyword_len < chars.len() {
+                        chars[i + keyword_len]
+                    } else {
+                        ' '
+                    };
+
+                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ';' || next_char == ':' {
+                        if i > 0 {
+                            highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                        }
+                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255)));
+                        i += keyword_len;
+                        _found_keyword = true;
+                        break;
+                    }
+                }
+            }
+
+            if !_found_keyword {
                 i += 1;
             }
         }
@@ -1097,7 +1001,6 @@ impl TimeWarpApp {
             "TW BASIC" => text.starts_with("REM ") || text.starts_with("'"),
             "TW Pascal" => text.starts_with("//") || text.starts_with("(*") || text.starts_with("{"),
             "TW Prolog" => text.starts_with("%"),
-            "PILOT" => text.starts_with("#"),
             _ => text.starts_with("//") || text.starts_with("#"),
         }
     }
@@ -1205,10 +1108,6 @@ impl TimeWarpApp {
                 "read", "assert", "retract", "consult", "listing", "halt", "member", "append",
                 "length", "reverse", "sort", "findall", "bagof", "setof",
             ],
-            "PILOT" => vec![
-                "T:", "A:", "J:", "Y:", "N:", "C:", "R:", "E:", "PAUSE", "COMPUTE", "MATCH", "USE",
-                "ACCEPT", "TYPE", "TN:", "TA:", "TJ:", "TY:", "TN:",
-            ],
             _ => vec![],
         }
     }
@@ -1247,7 +1146,8 @@ impl TimeWarpApp {
 
             // Add BASIC commands that might be partially typed
             let basic_commands = vec![
-                "PRINT", "INPUT", "LET", "IF", "THEN", "ELSE", "FOR", "TO", "STEP", "NEXT",
+                "PRINT", "WRITELN", "INPUT", "READLN", "LET", "IF", "THEN", "ELSE", "WHILE", "DO", "FOR", "TO", "STEP", "NEXT",
+                "FORWARD", "FD", "BACK", "BK", "LEFT", "LT", "RIGHT", "RT", "PENUP", "PU", "PENDOWN", "PD",
                 "WHILE", "WEND", "GOTO", "GOSUB", "RETURN", "END", "CLS", "LOCATE", "COLOR",
                 "BEEP", "SLEEP", "RANDOMIZE"
             ];
@@ -1290,6 +1190,18 @@ impl TimeWarpApp {
         // Handle keyboard shortcuts for completion
         if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Space)) {
             self.trigger_completion();
+        }
+
+        // Auto-completion triggers
+        if let Some(text) = ui.input(|i| i.events.iter().find_map(|e| match e {
+            egui::Event::Text(text) => Some(text.clone()),
+            _ => None,
+        })) {
+            // Trigger completion after typing certain characters
+            if text.chars().any(|c| c == '.' || c == '(' || c == ' ') {
+                // Small delay to avoid triggering on every keystroke
+                self.trigger_completion();
+            }
         }
     }
 
@@ -1400,6 +1312,30 @@ impl eframe::App for TimeWarpApp {
         if ctx.input(|i| i.key_pressed(egui::Key::F5)) {
             self.active_tab = 1;
             self.execute_code();
+        }
+        // Debug shortcuts
+        if ctx.input(|i| i.key_pressed(egui::Key::F9)) {
+            self.debug_mode = !self.debug_mode;
+            if !self.debug_mode {
+                self.stop_debug_session();
+            }
+        }
+        if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::F5)) {
+            if self.debug_mode {
+                self.start_debug_session();
+            }
+        }
+        if ctx.input(|i| i.key_pressed(egui::Key::F10)) {
+            if self.debug_mode && self.debug_state == DebugState::Paused {
+                self.step_debug();
+            }
+        }
+        if ctx.input(|i| i.key_pressed(egui::Key::F11)) {
+            if self.debug_mode && self.debug_state == DebugState::Running {
+                self.debug_state = DebugState::Paused;
+            } else if self.debug_mode && self.debug_state == DebugState::Paused {
+                self.debug_state = DebugState::Running;
+            }
         }
         if ctx.input(|i| i.modifiers.ctrl && i.modifiers.shift && i.key_pressed(egui::Key::C)) {
             self.output = String::new();
@@ -1649,7 +1585,7 @@ impl eframe::App for TimeWarpApp {
 
                         // Language selector
                         ui.label("Language:");
-                        for lang in ["TW BASIC", "TW Pascal", "TW Prolog", "PILOT"] {
+                        for lang in ["TW BASIC", "TW Pascal", "TW Prolog"] {
                             ui.selectable_value(&mut self.language, lang.to_string(), lang);
                         }
 
@@ -2125,17 +2061,23 @@ impl eframe::App for TimeWarpApp {
 
                                     // Debug Controls
                                     ui.horizontal(|ui| {
-                                        if ui.button("▶️ Start Debug").clicked() && self.debug_mode {
+                                        if ui.button("▶️ Start Debug").on_hover_text("Start debugging session (Ctrl+F5)").clicked() && self.debug_mode {
                                             self.start_debug_session();
                                         }
-                                        if ui.button("⏸️ Pause").clicked() && self.debug_mode {
+                                        if ui.button("⏯️ Continue").on_hover_text("Continue execution from paused state").clicked() && self.debug_mode && self.debug_state == DebugState::Paused {
+                                            self.debug_state = DebugState::Running;
+                                        }
+                                        if ui.button("⏸️ Pause").on_hover_text("Pause execution (F11)").clicked() && self.debug_mode && self.debug_state == DebugState::Running {
                                             self.debug_state = DebugState::Paused;
                                         }
-                                        if ui.button("⏹️ Stop").clicked() && self.debug_mode {
+                                        if ui.button("⏹️ Stop").on_hover_text("Stop debugging session").clicked() && self.debug_mode {
                                             self.stop_debug_session();
                                         }
-                                        if ui.button("⏭️ Step").clicked() && self.debug_mode && self.debug_state == DebugState::Paused {
+                                        if ui.button("⏭️ Step").on_hover_text("Step to next line (F10)").clicked() && self.debug_mode && self.debug_state == DebugState::Paused {
                                             self.step_debug();
+                                        }
+                                        if ui.button("🔄 Reset").on_hover_text("Restart debug session").clicked() && self.debug_mode {
+                                            self.start_debug_session(); // Restart debug session
                                         }
                                     });
 
@@ -2162,11 +2104,22 @@ impl eframe::App for TimeWarpApp {
 
                                     // Variables
                                     ui.collapsing("Variables", |ui| {
+                                        ui.label("📊 Debug Variables:");
                                         if self.debug_variables.is_empty() {
-                                            ui.label("No variables to display");
+                                            ui.label("  No debug variables");
                                         } else {
                                             for (name, value) in &self.debug_variables {
-                                                ui.label(format!("{} = {}", name, value));
+                                                ui.label(format!("  {} = \"{}\"", name, value));
+                                            }
+                                        }
+
+                                        ui.separator();
+                                        ui.label("🔢 Program Variables:");
+                                        if self.variables.is_empty() {
+                                            ui.label("  No program variables");
+                                        } else {
+                                            for (name, value) in &self.variables {
+                                                ui.label(format!("  {} = \"{}\"", name, value));
                                             }
                                         }
                                     });
@@ -2231,6 +2184,19 @@ impl eframe::App for TimeWarpApp {
 
                         // Timeout setting
                         ui.label(format!("⏰ Timeout: {}ms", self.execution_timeout_ms));
+
+                        ui.separator();
+
+                        // Debug mode status
+                        if self.debug_mode {
+                            match self.debug_state {
+                                DebugState::Running => { ui.colored_label(egui::Color32::GREEN, "🐛 Debug: Running"); },
+                                DebugState::Paused => { ui.colored_label(egui::Color32::YELLOW, "🐛 Debug: Paused"); },
+                                DebugState::Stopped => { ui.colored_label(egui::Color32::RED, "🐛 Debug: Stopped"); },
+                            }
+                        } else {
+                            ui.colored_label(egui::Color32::GRAY, "🐛 Debug: Off (F9 to toggle)");
+                        }
 
                         ui.separator();
 
@@ -2500,65 +2466,11 @@ mod tests {
         assert_eq!(app.last_file_path, None);
     }
 
-    #[test]
-    fn test_pilot_execution() {
-        let mut app = TimeWarpApp::default();
-        app.language = "PILOT".to_string();
 
-        // Test basic PILOT T: command
-        let code = "T:Hello World!\nT:This is PILOT\nE:";
-        let result = app.execute_pilot(code);
-        assert!(result.contains("Hello World!"));
-        assert!(result.contains("This is PILOT"));
 
-        // Test PILOT A: command (input)
-        let input_code = "T:Enter your name:\nA:#NAME\nT:Hello #NAME\nE:";
-        let result = app.execute_pilot(input_code);
-        assert!(result.contains("Enter your name:"));
-        assert!(result.contains("?")); // Default prompt
-                                       // Should be waiting for input
-        assert!(app.waiting_for_input);
-        assert_eq!(app.current_input_var, "#NAME");
-    }
 
-    #[test]
-    fn test_pilot_input_parsing() {
-        let app = TimeWarpApp::default();
 
-        // Test simple variable input
-        let result = app.parse_pilot_input_command("#NAME");
-        assert_eq!(result, Some(("#NAME".to_string(), "? ".to_string())));
 
-        // Test input with custom prompt
-        let result = app.parse_pilot_input_command("\"Enter name\",#NAME");
-        assert_eq!(
-            result,
-            Some(("#NAME".to_string(), "Enter name".to_string()))
-        );
-    }
-
-    #[test]
-    fn test_pilot_text_processing() {
-        let mut app = TimeWarpApp::default();
-
-        // Test text without variables
-        let result = app.process_pilot_text("Hello World");
-        assert_eq!(result, "Hello World");
-
-        // Test text with quoted strings
-        let result = app.process_pilot_text("\"Hello\" World");
-        assert_eq!(result, "Hello World");
-
-        // Test text with variables (when variable exists)
-        app.variables
-            .insert("NAME".to_string(), "Alice".to_string());
-        let result = app.process_pilot_text("Hello #NAME");
-        assert_eq!(result, "Hello Alice");
-
-        // Test text with undefined variables
-        let result = app.process_pilot_text("Hello #UNKNOWN");
-        assert_eq!(result, "Hello #UNKNOWN");
-    }
 
     #[test]
     fn test_basic_program_execution() {
