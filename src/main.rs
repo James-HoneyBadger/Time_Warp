@@ -863,7 +863,9 @@ impl TimeWarpApp {
     }
 
     fn render_debug_editor(&mut self, ui: &mut egui::Ui) {
-        let filename = self.last_file_path.as_ref()
+        let filename = self
+            .last_file_path
+            .as_ref()
             .and_then(|p| std::path::Path::new(p).file_name())
             .and_then(|n| n.to_str())
             .unwrap_or("untitled");
@@ -1039,13 +1041,6 @@ impl TimeWarpApp {
         suggestions.dedup();
 
         suggestions
-    }
-
-    fn update_completion(&mut self, query: &str) {
-        self.completion_query = query.to_string();
-        self.completion_items = self.get_completion_suggestions(query);
-        self.completion_selected = 0;
-        self.show_completion = !self.completion_items.is_empty();
     }
 
     #[allow(dead_code)]
@@ -1616,13 +1611,34 @@ impl eframe::App for TimeWarpApp {
                                             let should_select_up = self.show_completion && input.key_pressed(egui::Key::ArrowUp);
                                             let should_insert_completion = self.show_completion && input.key_pressed(egui::Key::Enter);
 
-                                            // Handle completion actions that modify self
-                                            if should_trigger_completion {
+                                            // Calculate all needed data before any mutable borrows
+                                            let (current_word, selected_item, insert_start, insert_end) = {
                                                 let cursor_pos = self.code.len();
                                                 let before_cursor = &self.code[..cursor_pos];
                                                 let words: Vec<&str> = before_cursor.split_whitespace().collect();
                                                 let current_word = words.last().copied().unwrap_or("");
-                                                self.update_completion(current_word);
+
+                                                let (selected_item, insert_start, insert_end) = if should_insert_completion {
+                                                    if let Some(selected) = self.completion_items.get(self.completion_selected) {
+                                                        let start_pos = cursor_pos - current_word.len();
+                                                        (Some(selected.clone()), start_pos, cursor_pos)
+                                                    } else {
+                                                        (None, 0, 0)
+                                                    }
+                                                } else {
+                                                    (None, 0, 0)
+                                                };
+
+                                                (current_word, selected_item, insert_start, insert_end)
+                                            };
+
+                                            // Now do all mutable operations
+                                            if should_trigger_completion {
+                                                // self.update_completion(current_word);
+                                                self.completion_query = current_word.to_string();
+                                                self.completion_items = self.get_completion_suggestions(&current_word);
+                                                self.completion_selected = 0;
+                                                self.show_completion = !self.completion_items.is_empty();
                                             } else if should_hide_completion {
                                                 self.show_completion = false;
                                             } else if should_select_down {
@@ -1633,16 +1649,9 @@ impl eframe::App for TimeWarpApp {
                                                 if self.completion_selected > 0 {
                                                     self.completion_selected = self.completion_selected.saturating_sub(1);
                                                 }
-                                            } else if should_insert_completion {
-                                                if let Some(selected) = self.completion_items.get(self.completion_selected) {
-                                                    let cursor_pos = self.code.len();
-                                                    let before_cursor = &self.code[..cursor_pos];
-                                                    let words: Vec<&str> = before_cursor.split_whitespace().collect();
-                                                    let current_word = words.last().copied().unwrap_or("");
-                                                    let start_pos = cursor_pos - current_word.len();
-                                                    self.code.replace_range(start_pos..cursor_pos, selected);
-                                                    self.show_completion = false;
-                                                }
+                                            } else if let Some(selected) = selected_item {
+                                                self.code.replace_range(insert_start..insert_end, &selected);
+                                                self.show_completion = false;
                                             }
 
                                             // Regular code editor
