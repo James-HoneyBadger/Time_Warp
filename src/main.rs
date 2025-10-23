@@ -69,6 +69,12 @@ struct TimeWarpApp {
     // BASIC interpreter instance for continuation after input
     basic_interpreter: Option<crate::languages::basic::BasicInterpreter>,
 
+    // Menu state
+    show_file_menu: bool,
+    show_edit_menu: bool,
+    show_view_menu: bool,
+    show_help_menu: bool,
+
     // Syntax highlighting
     #[allow(dead_code)]
     syntax_highlighting_enabled: bool,
@@ -130,6 +136,12 @@ impl Default for TimeWarpApp {
 
             // BASIC interpreter instance for continuation after input
             basic_interpreter: None,
+
+            // Menu state defaults
+            show_file_menu: false,
+            show_edit_menu: false,
+            show_view_menu: false,
+            show_help_menu: false,
 
             // Syntax highlighting defaults
             syntax_highlighting_enabled: true,
@@ -1232,26 +1244,44 @@ impl eframe::App for TimeWarpApp {
             self.turtle_pan = egui::vec2(0.0, 0.0);
         }
 
-        egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
+        egui::TopBottomPanel::top("menu_bar")
+            .min_height(32.0)
+            .show(ctx, |ui| {
+            ui.painter().rect_filled(
+                ui.available_rect_before_wrap(),
+                0.0,
+                egui::Color32::from_rgb(240, 240, 240),
+            );
+            ui.add_space(4.0);
             egui::menu::bar(ui, |ui| {
-                ui.menu_button("📁 File", |ui| {
-                    if ui.button("📄 New File").clicked() {
-                        self.code.clear();
-                        self.output = "New file created.".to_string();
-                        ui.close_menu();
-                    }
-                    if ui.button("📂 Open File...").clicked() {
-                        if let Some(path) = FileDialog::new()
-                            .add_filter("Text", &["txt", "twb", "twp", "tpr"])
-                            .pick_file()
-                        {
-                            if let Ok(content) = std::fs::read_to_string(&path) {
-                                self.code = content;
-                                self.output = format!("Opened file: {}", path.display());
-                                self.last_file_path = Some(path.display().to_string());
-                            }
+                // Test button
+                if ui.button("TEST").clicked() {
+                    self.output = "Test button clicked!".to_string();
+                }
+                
+                // File menu
+                if ui.button("📁 File").clicked() {
+                    self.show_file_menu = !self.show_file_menu;
+                }
+                egui::popup::popup_below_widget(ui, egui::Id::new("file_menu"), &ui.button("📁 File").rect, |ui| {
+                    if self.show_file_menu {
+                        if ui.button("📄 New File").clicked() {
+                            self.code.clear();
+                            self.output = "New file created.".to_string();
+                            self.show_file_menu = false;
                         }
-                        ui.close_menu();
+                        if ui.button("📂 Open File...").clicked() {
+                            if let Some(path) = FileDialog::new()
+                                .add_filter("Text", &["txt", "twb", "twp", "tpr"])
+                                .pick_file()
+                            {
+                                if let Ok(content) = std::fs::read_to_string(&path) {
+                                    self.code = content;
+                                    self.output = format!("Opened file: {}", path.display());
+                                    self.last_file_path = Some(path.display().to_string());
+                                }
+                            }
+                            self.show_file_menu = false;
                     }
                     if ui.button("💾 Save").clicked() {
                         if let Some(path) = &self.last_file_path {
@@ -1342,9 +1372,11 @@ impl eframe::App for TimeWarpApp {
                     }
                 });
             });
+            ui.add_space(4.0);
         });
 
-        // Enhanced Toolbar
+        // Enhanced Toolbar - temporarily disabled for menu testing
+        /*
         egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
             ui.add_space(2.0);
             egui::Frame::none()
@@ -1463,6 +1495,7 @@ impl eframe::App for TimeWarpApp {
                 });
             ui.add_space(2.0);
         });
+        */
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
@@ -1766,16 +1799,16 @@ impl eframe::App for TimeWarpApp {
                                                         Ok(result) => match result {
                                                             crate::languages::basic::ExecutionResult::Complete { output, graphics_commands } => {
                                                                 self.process_graphics_commands(&graphics_commands);
-                                                                self.output = format!("[Output for {}]\n{}{}", self.language, self.output, output);
+                                                                self.output = format!("{}{}", self.output, output);
                                                                 self.basic_interpreter = None;
                                                             }
                                                             crate::languages::basic::ExecutionResult::NeedInput { prompt, partial_output, partial_graphics } => {
                                                                 self.process_graphics_commands(&partial_graphics);
-                                                                self.output = format!("[Output for {}]\n{}{}{}", self.language, self.output, partial_output, prompt);
+                                                                self.output = format!("{}{}{}", self.output, partial_output, prompt);
                                                                 // Keep waiting for more input
                                                             }
                                                             crate::languages::basic::ExecutionResult::Error(err) => {
-                                                                self.output = format!("[Output for {}]\n{}Error: {:?}", self.language, self.output, err);
+                                                                self.output = format!("{}Error: {:?}", self.output, err);
                                                                 self.basic_interpreter = None;
                                                             }
                                                         },
