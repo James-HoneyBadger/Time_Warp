@@ -1,0 +1,13 @@
+R: Simple PILOT Input Test
+R: Tests the A: command for user input
+
+*START
+T: Welcome to PILOT Input Test!
+T: Please enter your name:
+A: #NAME
+T: Hello, #NAME! Nice to meet you.
+T: Please enter your age:
+A: #AGE
+T: You are #AGE years old.
+T: Thank you for testing PILOT input!
+E:

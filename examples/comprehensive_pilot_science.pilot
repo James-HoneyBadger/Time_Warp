@@ -1,0 +1,299 @@
+T:TW PILOT - Interactive Science Quiz & Tutorial System
+T:============================================================
+T:Welcome to the TW PILOT Science Learning System!
+T:This program demonstrates advanced PILOT features including:
+T:- Interactive branching based on user responses
+T:- Multiple choice questions with validation
+T:- Score tracking and progress monitoring
+T:- Remedial instruction for incorrect answers
+T:- Comprehensive tutorial content
+T:- Input validation and error handling
+T:============================================================
+T:
+T:Let's begin your science learning journey!
+T:
+
+*MAIN_MENU
+T:=== MAIN MENU ===
+T:Choose a topic to study:
+T:1. Basic Physics
+T:2. Earth Science
+T:3. Biology Fundamentals
+T:4. Chemistry Basics
+T:5. View Progress Report
+T:6. Exit Program
+T:
+A:Enter your choice (1-6):
+J:*INVALID_MENU:TN<1:TN>6
+J:*PHYSICS:TN=1
+J:*EARTH_SCIENCE:TN=2
+J:*BIOLOGY:TN=3
+J:*CHEMISTRY:TN=4
+J:*PROGRESS:TN=5
+J:*EXIT:TN=6
+
+*INVALID_MENU
+T:Invalid choice! Please enter a number between 1 and 6.
+J:*MAIN_MENU
+
+*PHYSICS
+T:=== PHYSICS TUTORIAL ===
+T:Physics is the study of matter, energy, and their interactions.
+T:Let's start with some basic concepts.
+T:
+T:Question 1: What is the SI unit of force?
+T:A) Newton    B) Joule    C) Watt    D) Pascal
+A:Your answer (A, B, C, or D):
+J:*PHYSICS_Q1_WRONG:TA<>A:TA<>a
+J:*PHYSICS_Q2
+
+*PHYSICS_Q1_WRONG
+T:Not quite! The Newton (N) is the SI unit of force.
+T:Remember: Force = mass × acceleration (F = ma)
+T:Let's try another question.
+J:*PHYSICS_Q2
+
+*PHYSICS_Q2
+T:Question 2: Which of these is NOT a fundamental force?
+T:A) Gravity    B) Electromagnetism    C) Nuclear    D) Friction
+A:Your answer:
+J:*PHYSICS_Q2_CORRECT:TA=D:TA=d
+J:*PHYSICS_Q2_WRONG
+
+*PHYSICS_Q2_WRONG
+T:Incorrect. Friction is not a fundamental force - it's a contact force
+T:that results from electromagnetic interactions between surfaces.
+T:The four fundamental forces are: Gravity, Electromagnetism,
+T:Strong Nuclear, and Weak Nuclear.
+J:*PHYSICS_Q3
+
+*PHYSICS_Q2_CORRECT
+T:Excellent! Friction is indeed not a fundamental force.
+J:*PHYSICS_Q3
+
+*PHYSICS_Q3
+T:Question 3: What is the speed of light in vacuum?
+T:A) 300,000 km/s    B) 150,000 km/s    C) 450,000 km/s    D) 600,000 km/s
+A:Your answer:
+J:*PHYSICS_Q3_CORRECT:TA=A:TA=a
+J:*PHYSICS_Q3_WRONG
+
+*PHYSICS_Q3_WRONG
+T:Not correct. The speed of light in vacuum is approximately 300,000 km/s.
+T:This is a fundamental constant in physics, often denoted as 'c'.
+J:*PHYSICS_COMPLETE
+
+*PHYSICS_Q3_CORRECT
+T:Perfect! The speed of light (c) is approximately 300,000 km/s.
+J:*PHYSICS_COMPLETE
+
+*PHYSICS_COMPLETE
+T:Physics section completed! You now understand basic force concepts.
+J:*MAIN_MENU
+
+*EARTH_SCIENCE
+T:=== EARTH SCIENCE TUTORIAL ===
+T:Earth Science studies our planet and its place in the universe.
+T:
+T:Question 1: What is the Earth's core primarily made of?
+T:A) Iron and Nickel    B) Rock and Soil    C) Water and Ice    D) Gas and Air
+A:Your answer:
+J:*EARTH_Q1_CORRECT:TA=A:TA=a
+J:*EARTH_Q1_WRONG
+
+*EARTH_Q1_WRONG
+T:Incorrect. The Earth's core is primarily composed of iron and nickel.
+T:The outer core is liquid, while the inner core is solid.
+J:*EARTH_Q2
+
+*EARTH_Q1_CORRECT
+T:Correct! The Earth's core consists mainly of iron (Fe) and nickel (Ni).
+J:*EARTH_Q2
+
+*EARTH_Q2
+T:Question 2: Which layer of the Earth is the thinnest?
+T:A) Crust    B) Mantle    C) Outer Core    D) Inner Core
+A:Your answer:
+J:*EARTH_Q2_CORRECT:TA=A:TA=a
+J:*EARTH_Q2_WRONG
+
+*EARTH_Q2_WRONG
+T:Not quite. The crust is indeed the thinnest layer of the Earth.
+T:It's only about 5-70 km thick, compared to the mantle (2900 km)
+T:and core (about 3500 km total).
+J:*EARTH_Q3
+
+*EARTH_Q2_CORRECT
+T:Right! The Earth's crust is the thinnest layer, ranging from
+T:5-10 km under oceans to 30-70 km under continents.
+J:*EARTH_Q3
+
+*EARTH_Q3
+T:Question 3: What causes earthquakes?
+T:A) Wind    B) Sudden movement of tectonic plates
+T:C) Ocean currents    D) Solar flares
+A:Your answer:
+J:*EARTH_Q3_CORRECT:TA=B:TA=b
+J:*EARTH_Q3_WRONG
+
+*EARTH_Q3_WRONG
+T:Incorrect. Earthquakes are caused by the sudden release of energy
+T:in the Earth's crust, usually due to tectonic plate movements.
+T:This creates seismic waves that we feel as earthquakes.
+J:*EARTH_COMPLETE
+
+*EARTH_Q3_CORRECT
+T:Excellent! Earthquakes occur when tectonic plates suddenly move
+T:and release built-up stress along fault lines.
+J:*EARTH_COMPLETE
+
+*EARTH_COMPLETE
+T:Earth Science section completed! You understand Earth's structure and processes.
+J:*MAIN_MENU
+
+*BIOLOGY
+T:=== BIOLOGY FUNDAMENTALS ===
+T:Biology is the study of living organisms and their interactions.
+T:
+T:Question 1: What is the basic unit of life?
+T:A) Atom    B) Molecule    C) Cell    D) Tissue
+A:Your answer:
+J:*BIO_Q1_CORRECT:TA=C:TA=c
+J:*BIO_Q1_WRONG
+
+*BIO_Q1_WRONG
+T:Not correct. The cell is the basic unit of life.
+T:All living organisms are composed of one or more cells.
+J:*BIO_Q2
+
+*BIO_Q1_CORRECT
+T:Correct! The cell is the fundamental unit of all living things.
+J:*BIO_Q2
+
+*BIO_Q2
+T:Question 2: Which organelle is known as the 'powerhouse' of the cell?
+T:A) Nucleus    B) Mitochondria    C) Ribosome    D) Lysosome
+A:Your answer:
+J:*BIO_Q2_CORRECT:TA=B:TA=b
+J:*BIO_Q2_WRONG
+
+*BIO_Q2_WRONG
+T:Incorrect. Mitochondria are known as the powerhouse of the cell
+T:because they generate ATP (energy) through cellular respiration.
+J:*BIO_Q3
+
+*BIO_Q2_CORRECT
+T:Perfect! Mitochondria produce energy (ATP) for the cell
+T:through the process of cellular respiration.
+J:*BIO_Q3
+
+*BIO_Q3
+T:Question 3: What is photosynthesis?
+T:A) Process of cell division
+T:B) Process where plants make food using sunlight
+T:C) Process of breathing
+T:D) Process of digestion
+A:Your answer:
+J:*BIO_Q3_CORRECT:TA=B:TA=b
+J:*BIO_Q3_WRONG
+
+*BIO_Q3_WRONG
+T:Not quite. Photosynthesis is the process by which green plants
+T:and some other organisms use sunlight to synthesize foods with
+T:the help of chlorophyll. The equation is:
+T:6CO2 + 6H2O + light energy → C6H12O6 + 6O2
+J:*BIOLOGY_COMPLETE
+
+*BIO_Q3_CORRECT
+T:Excellent! Photosynthesis converts light energy into chemical energy
+T:stored in glucose, while releasing oxygen as a byproduct.
+J:*BIOLOGY_COMPLETE
+
+*BIOLOGY_COMPLETE
+T:Biology section completed! You understand cellular structure and processes.
+J:*MAIN_MENU
+
+*CHEMISTRY
+T:=== CHEMISTRY BASICS ===
+T:Chemistry studies matter, its properties, and transformations.
+T:
+T:Question 1: What is the atomic number?
+T:A) Number of protons    B) Number of neutrons
+T:C) Total mass    D) Number of electrons
+A:Your answer:
+J:*CHEM_Q1_CORRECT:TA=A:TA=a
+J:*CHEM_Q1_WRONG
+
+*CHEM_Q1_WRONG
+T:Incorrect. The atomic number equals the number of protons
+T:in an atom's nucleus. It determines the element's identity.
+J:*CHEM_Q2
+
+*CHEM_Q1_CORRECT
+T:Correct! The atomic number (Z) is the number of protons
+T:in the nucleus of an atom.
+J:*CHEM_Q2
+
+*CHEM_Q2
+T:Question 2: What is the pH of pure water at 25°C?
+T:A) 1    B) 7    C) 14    D) 0
+A:Your answer:
+J:*CHEM_Q2_CORRECT:TA=B:TA=b
+J:*CHEM_Q2_WRONG
+
+*CHEM_Q2_WRONG
+T:Not correct. Pure water has a pH of 7, which is neutral.
+T:pH below 7 is acidic, above 7 is basic (alkaline).
+J:*CHEM_Q3
+
+*CHEM_Q2_CORRECT
+T:Perfect! Pure water is neutral with pH = 7.
+T:[H+] = [OH-] = 10^-7 M at 25°C.
+J:*CHEM_Q3
+
+*CHEM_Q3
+T:Question 3: What type of bond involves sharing electrons?
+T:A) Ionic    B) Covalent    C) Metallic    D) Hydrogen
+A:Your answer:
+J:*CHEM_Q3_CORRECT:TA=B:TA=b
+J:*CHEM_Q3_WRONG
+
+*CHEM_Q3_WRONG
+T:Incorrect. Covalent bonds involve sharing of electrons
+T:between atoms. Ionic bonds involve transfer of electrons,
+T:while metallic bonds involve a 'sea' of shared electrons.
+J:*CHEMISTRY_COMPLETE
+
+*CHEM_Q3_CORRECT
+T:Excellent! Covalent bonds form when atoms share electrons
+T:to achieve stable electron configurations.
+J:*CHEMISTRY_COMPLETE
+
+*CHEMISTRY_COMPLETE
+T:Chemistry section completed! You understand atomic structure and bonding.
+J:*MAIN_MENU
+
+*PROGRESS
+T:=== PROGRESS REPORT ===
+T:This feature would track your quiz scores and learning progress.
+T:In a full implementation, it would show:
+T:- Scores for each subject
+T:- Time spent learning
+T:- Areas needing improvement
+T:- Certificates of completion
+T:
+T:For now, you've completed the interactive tutorial sections!
+J:*MAIN_MENU
+
+*EXIT
+T:Thank you for using the TW PILOT Science Learning System!
+T:You have completed an interactive educational experience
+T:demonstrating advanced PILOT programming features including:
+T:- Conditional branching based on user input
+T:- Multiple choice questions with validation
+T:- Remedial instruction for learning reinforcement
+T:- Modular program structure with subroutines
+T:- Input processing and error handling
+T:
+T:Keep exploring and learning!
+E:

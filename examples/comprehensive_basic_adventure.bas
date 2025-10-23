@@ -1,0 +1,196 @@
+10 REM TW BASIC - Comprehensive Adventure Game
+20 REM This program demonstrates advanced BASIC features
+30 REM including arrays, subroutines, input validation, and game logic
+40
+50 REM Initialize game variables
+60 DIM ROOMS$(10)
+70 DIM ITEMS$(5)
+80 DIM INVENTORY$(5)
+90 DIM ROOM_ITEMS(10, 5)
+100
+110 REM Room descriptions
+120 ROOMS$(1) = "You are in a dark forest clearing. Paths lead north and east."
+130 ROOMS$(2) = "You are in a dense forest. You hear strange noises."
+140 ROOMS$(3) = "You are at a peaceful lake. The water is crystal clear."
+150 ROOMS$(4) = "You are in a mysterious cave. It's damp and cold."
+160 ROOMS$(5) = "You are in an ancient temple. Strange symbols cover the walls."
+170 ROOMS$(6) = "You are in a sunny meadow. Flowers bloom everywhere."
+180 ROOMS$(7) = "You are in a dark dungeon. Chains hang from the walls."
+190 ROOMS$(8) = "You are in a treasure chamber. Gold coins litter the floor."
+200 ROOMS$(9) = "You are in a magical garden. Exotic plants surround you."
+210 ROOMS$(10) = "You are at the game exit. Congratulations!"
+220
+230 REM Item descriptions
+240 ITEMS$(1) = "rusty key"
+250 ITEMS$(2) = "magic amulet"
+260 ITEMS$(3) = "golden sword"
+270 ITEMS$(4) = "healing potion"
+280 ITEMS$(5) = "treasure map"
+290
+300 REM Place items in rooms
+310 ROOM_ITEMS(4, 1) = 1  REM Key in cave
+320 ROOM_ITEMS(5, 2) = 2  REM Amulet in temple
+330 ROOM_ITEMS(7, 3) = 3  REM Sword in dungeon
+340 ROOM_ITEMS(8, 4) = 4  REM Potion in treasure chamber
+350 ROOM_ITEMS(9, 5) = 5  REM Map in garden
+360
+370 REM Game state variables
+380 CURRENT_ROOM = 1
+390 INVENTORY_COUNT = 0
+400 GAME_WON = 0
+410
+420 REM Main game loop
+430 GOSUB 1000  REM Display current room
+440 GOSUB 1100  REM Show available items
+450 GOSUB 1200  REM Get player command
+460 GOSUB 1300  REM Process command
+470 IF GAME_WON = 0 THEN GOTO 420
+480
+490 REM Game over
+500 PRINT "Thank you for playing the TW BASIC Adventure!"
+510 PRINT "You collected"; INVENTORY_COUNT; "treasures."
+520 END
+530
+1000 REM Subroutine: Display current room
+1010 CLS
+1020 PRINT "=== TW BASIC Adventure Game ==="
+1030 PRINT
+1040 PRINT ROOMS$(CURRENT_ROOM)
+1050 PRINT
+1060 RETURN
+1070
+1100 REM Subroutine: Show available items
+1110 PRINT "Items in this room:"
+1120 ITEMS_FOUND = 0
+1130 FOR I = 1 TO 5
+1140   IF ROOM_ITEMS(CURRENT_ROOM, I) > 0 THEN
+1150     ITEM_ID = ROOM_ITEMS(CURRENT_ROOM, I)
+1160     PRINT "  - "; ITEMS$(ITEM_ID)
+1170     ITEMS_FOUND = 1
+1180   END IF
+1190 NEXT I
+1200 IF ITEMS_FOUND = 0 THEN PRINT "  (none)"
+1210 PRINT
+1220 RETURN
+1230
+1300 REM Subroutine: Process player command
+1310 IF COMMAND$ = "N" OR COMMAND$ = "NORTH" THEN GOSUB 2000
+1320 IF COMMAND$ = "S" OR COMMAND$ = "SOUTH" THEN GOSUB 2010
+1330 IF COMMAND$ = "E" OR COMMAND$ = "EAST" THEN GOSUB 2020
+1340 IF COMMAND$ = "W" OR COMMAND$ = "WEST" THEN GOSUB 2030
+1350 IF LEFT$(COMMAND$, 4) = "TAKE" THEN GOSUB 2100
+1360 IF LEFT$(COMMAND$, 4) = "DROP" THEN GOSUB 2200
+1370 IF COMMAND$ = "INVENTORY" OR COMMAND$ = "INV" THEN GOSUB 2300
+1380 IF COMMAND$ = "HELP" THEN GOSUB 2400
+1390 IF COMMAND$ = "QUIT" THEN GAME_WON = 1
+1400 RETURN
+1410
+2000 REM Move North
+2010 IF CURRENT_ROOM = 1 THEN CURRENT_ROOM = 2
+2020 IF CURRENT_ROOM = 2 THEN CURRENT_ROOM = 5
+2030 IF CURRENT_ROOM = 3 THEN CURRENT_ROOM = 6
+2040 IF CURRENT_ROOM = 4 THEN CURRENT_ROOM = 7
+2050 IF CURRENT_ROOM = 5 THEN CURRENT_ROOM = 8
+2060 IF CURRENT_ROOM = 6 THEN CURRENT_ROOM = 9
+2070 IF CURRENT_ROOM = 7 THEN CURRENT_ROOM = 10: GAME_WON = 1
+2080 RETURN
+2090
+2100 REM Move South
+2110 IF CURRENT_ROOM = 2 THEN CURRENT_ROOM = 1
+2120 IF CURRENT_ROOM = 5 THEN CURRENT_ROOM = 2
+2130 IF CURRENT_ROOM = 6 THEN CURRENT_ROOM = 3
+2140 IF CURRENT_ROOM = 7 THEN CURRENT_ROOM = 4
+2150 IF CURRENT_ROOM = 8 THEN CURRENT_ROOM = 5
+2160 IF CURRENT_ROOM = 9 THEN CURRENT_ROOM = 6
+2170 RETURN
+2180
+2200 REM Move East
+2210 IF CURRENT_ROOM = 1 THEN CURRENT_ROOM = 3
+2220 IF CURRENT_ROOM = 2 THEN CURRENT_ROOM = 4
+2230 IF CURRENT_ROOM = 5 THEN CURRENT_ROOM = 7
+2240 IF CURRENT_ROOM = 6 THEN CURRENT_ROOM = 8
+2250 RETURN
+2260
+2300 REM Move West
+2310 IF CURRENT_ROOM = 3 THEN CURRENT_ROOM = 1
+2320 IF CURRENT_ROOM = 4 THEN CURRENT_ROOM = 2
+2330 IF CURRENT_ROOM = 7 THEN CURRENT_ROOM = 5
+2340 IF CURRENT_ROOM = 8 THEN CURRENT_ROOM = 6
+2350 RETURN
+2360
+2400 REM Take item
+2410 ITEM_NAME$ = MID$(COMMAND$, 6, LEN(COMMAND$) - 5)
+2420 ITEM_NAME$ = LTRIM$(RTRIM$(ITEM_NAME$))
+2430
+2440 REM Find item in current room
+2450 FOR I = 1 TO 5
+2460   IF ROOM_ITEMS(CURRENT_ROOM, I) > 0 THEN
+2470     ITEM_ID = ROOM_ITEMS(CURRENT_ROOM, I)
+2480     IF ITEMS$(ITEM_ID) = ITEM_NAME$ THEN
+2490       REM Add to inventory
+2500       INVENTORY_COUNT = INVENTORY_COUNT + 1
+2510       INVENTORY$(INVENTORY_COUNT) = ITEMS$(ITEM_ID)
+2520       ROOM_ITEMS(CURRENT_ROOM, I) = 0
+2530       PRINT "You took the "; ITEMS$(ITEM_ID); "."
+2540       RETURN
+2550     END IF
+2560   END IF
+2570 NEXT I
+2580 PRINT "I don't see that item here."
+2590 RETURN
+2600
+2700 REM Drop item
+2710 ITEM_NAME$ = MID$(COMMAND$, 6, LEN(COMMAND$) - 5)
+2720 ITEM_NAME$ = LTRIM$(RTRIM$(ITEM_NAME$))
+2730
+2740 REM Find item in inventory
+2750 FOR I = 1 TO INVENTORY_COUNT
+2760   IF INVENTORY$(I) = ITEM_NAME$ THEN
+2770     REM Remove from inventory and place in room
+2780     FOR J = 1 TO 5
+2790       IF ROOM_ITEMS(CURRENT_ROOM, J) = 0 THEN
+2800         ROOM_ITEMS(CURRENT_ROOM, J) = I
+2810         EXIT FOR
+2820       END IF
+2830     NEXT J
+2840
+2850     REM Shift inventory
+2860     FOR K = I TO INVENTORY_COUNT - 1
+2870       INVENTORY$(K) = INVENTORY$(K + 1)
+2880     NEXT K
+2890     INVENTORY_COUNT = INVENTORY_COUNT - 1
+2900     PRINT "You dropped the "; ITEM_NAME$; "."
+2910     RETURN
+2920   END IF
+2930 NEXT I
+2940 PRINT "You don't have that item."
+2950 RETURN
+2960
+3000 REM Show inventory
+3010 PRINT "Your inventory:"
+3020 IF INVENTORY_COUNT = 0 THEN
+3030   PRINT "  (empty)"
+3040 ELSE
+3050   FOR I = 1 TO INVENTORY_COUNT
+3060     PRINT "  - "; INVENTORY$(I)
+3070   NEXT I
+3080 END IF
+3090 PRINT
+3100 RETURN
+3110
+3200 REM Show help
+3210 PRINT "Available commands:"
+3220 PRINT "  N/S/E/W or NORTH/SOUTH/EAST/WEST - Move in that direction"
+3230 PRINT "  TAKE <item> - Pick up an item"
+3240 PRINT "  DROP <item> - Drop an item"
+3250 PRINT "  INVENTORY or INV - Show your inventory"
+3260 PRINT "  HELP - Show this help"
+3270 PRINT "  QUIT - End the game"
+3280 PRINT
+3290 RETURN
+3300
+3400 REM Get player command
+3410 PRINT "What do you want to do? ";
+3420 INPUT COMMAND$
+3430 COMMAND$ = UCASE$(LTRIM$(RTRIM$(COMMAND$)))
+3440 RETURN
