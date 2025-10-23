@@ -568,25 +568,44 @@ impl Parser {
     fn parse_print_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume PRINT
         let mut expressions = Vec::new();
-        let mut separator = PrintSeparator::None;
 
+        // Parse first expression
+        if let Some(ref token) = self.current_token {
+            if !matches!(
+                token,
+                Token::Colon | Token::EndOfFile | Token::Comma | Token::Semicolon
+            ) {
+                let expr = self.parse_expression()?;
+                expressions.push(expr);
+            }
+        }
+
+        // Parse remaining expressions separated by commas or semicolons
+        let mut separator = PrintSeparator::None;
         while let Some(ref token) = self.current_token {
             match token {
                 Token::Colon | Token::EndOfFile => break,
                 Token::Comma => {
                     separator = PrintSeparator::Comma;
                     self.advance();
-                    break;
+                    if let Some(ref token) = self.current_token {
+                        if !matches!(token, Token::Colon | Token::EndOfFile) {
+                            let expr = self.parse_expression()?;
+                            expressions.push(expr);
+                        }
+                    }
                 }
                 Token::Semicolon => {
                     separator = PrintSeparator::Semicolon;
                     self.advance();
-                    break;
+                    if let Some(ref token) = self.current_token {
+                        if !matches!(token, Token::Colon | Token::EndOfFile) {
+                            let expr = self.parse_expression()?;
+                            expressions.push(expr);
+                        }
+                    }
                 }
-                _ => {
-                    let expr = self.parse_expression()?;
-                    expressions.push(expr);
-                }
+                _ => break, // No more separators
             }
         }
 

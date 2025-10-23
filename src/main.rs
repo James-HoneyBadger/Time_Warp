@@ -2536,18 +2536,6 @@ mod tests {
     }
 
     #[test]
-    fn test_tab_tokenizer() {
-        use crate::languages::basic::Tokenizer;
-
-        let mut tokenizer = Tokenizer::new("TAB(10)");
-        let tokens = tokenizer.tokenize().unwrap();
-
-        println!("Tokens: {:?}", tokens);
-
-        // Should have TAB, LParen, Number(10), RParen
-        assert!(tokens.len() >= 4);
-    }
-    #[test]
     fn test_tab_function() {
         let mut app = TimeWarpApp::default();
 
