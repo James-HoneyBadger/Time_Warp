@@ -121,14 +121,6 @@ impl Tokenizer {
         }
     }
 
-    fn peek(&self) -> Option<char> {
-        if self.position + 1 >= self.input.len() {
-            None
-        } else {
-            Some(self.input[self.position + 1])
-        }
-    }
-
     fn skip_whitespace(&mut self) {
         while let Some(ch) = self.current_char {
             if ch.is_whitespace() {
@@ -1170,14 +1162,10 @@ pub enum InterpreterError {
     SyntaxError(String),
     TypeError(String),
     RuntimeError(String),
-    FileError(String),
     DivisionByZero,
     UndefinedVariable(String),
     UndefinedArray(String),
     IndexOutOfBounds(String),
-    InvalidFileMode(String),
-    FileNotOpen(u8),
-    ParseError(String),
 }
 
 #[derive(Clone)]
@@ -1198,17 +1186,7 @@ pub enum ExecutionResult {
 pub struct GraphicsCommand {
     pub command: String,
     pub value: f32,
-    pub x: Option<f32>,
-    pub y: Option<f32>,
     pub color: Option<u32>,
-}
-
-pub struct FileHandle {
-    pub file: Option<std::fs::File>,
-    pub mode: String,
-    pub filename: String,
-    pub line_buffer: Vec<String>,
-    pub current_line: usize,
 }
 
 pub struct BasicInterpreter {
