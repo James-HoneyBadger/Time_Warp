@@ -21,6 +21,7 @@ enum CommandResult {
 }
 
 #[derive(Clone, PartialEq)]
+#[allow(dead_code)]
 enum DebugState {
     Stopped,
     Running,
@@ -53,25 +54,39 @@ struct TimeWarpApp {
     turtle_pan: egui::Vec2,
 
     // Debug state
+    #[allow(dead_code)]
     debug_mode: bool,
+    #[allow(dead_code)]
     debug_state: DebugState,
+    #[allow(dead_code)]
     breakpoints: HashMap<String, Vec<u32>>, // filename -> line numbers
+    #[allow(dead_code)]
     current_debug_line: Option<u32>,
+    #[allow(dead_code)]
     debug_variables: HashMap<String, String>,
+    #[allow(dead_code)]
     debug_call_stack: Vec<String>,
 
     // Code completion
+    #[allow(dead_code)]
     show_completion: bool,
+    #[allow(dead_code)]
     completion_items: Vec<String>,
+    #[allow(dead_code)]
     completion_selected: usize,
+    #[allow(dead_code)]
     completion_query: String,
 
     // Syntax highlighting
+    #[allow(dead_code)]
     syntax_highlighting_enabled: bool,
 
     // Clipboard operations
+    #[allow(dead_code)]
     clipboard_content: String,
+    #[allow(dead_code)]
     selected_text: String,
+    #[allow(dead_code)]
     cursor_position: usize,
 }
 
@@ -815,6 +830,7 @@ impl TimeWarpApp {
 
 impl TimeWarpApp {
     // Code completion methods
+    #[allow(dead_code)]
     fn get_language_keywords(&self) -> Vec<&'static str> {
         match self.language.as_str() {
             "TW BASIC" => vec![
@@ -925,6 +941,7 @@ impl TimeWarpApp {
         }
     }
 
+    #[allow(dead_code)]
     fn get_completion_suggestions(&self, query: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
 
@@ -950,6 +967,7 @@ impl TimeWarpApp {
         suggestions
     }
 
+    #[allow(dead_code)]
     fn update_completion(&mut self, query: &str) {
         self.completion_query = query.to_string();
         self.completion_items = self.get_completion_suggestions(query);
@@ -957,6 +975,7 @@ impl TimeWarpApp {
         self.show_completion = !self.completion_items.is_empty();
     }
 
+    #[allow(dead_code)]
     fn apply_completion(&mut self, completion: &str) {
         // Simple implementation - just append to current code
         // In a real implementation, this would replace the current word
@@ -965,6 +984,7 @@ impl TimeWarpApp {
     }
 
     // Syntax highlighting methods
+    #[allow(dead_code)]
     fn highlight_syntax(&self, text: &str) -> Vec<(String, egui::Color32)> {
         if !self.syntax_highlighting_enabled {
             return vec![(text.to_string(), egui::Color32::BLACK)];

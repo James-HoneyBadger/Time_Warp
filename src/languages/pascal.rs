@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub enum PascalValue {
     Integer(i64),
     Real(f64),
@@ -10,12 +11,14 @@ pub enum PascalValue {
 }
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct PascalVariable {
     pub value: PascalValue,
     pub var_type: String,
 }
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct PascalProcedure {
     pub name: String,
     pub parameters: Vec<String>,
@@ -30,6 +33,7 @@ pub enum CommandResult {
     End,
 }
 
+#[allow(dead_code)]
 pub struct PascalInterpreter {
     variables: HashMap<String, PascalVariable>,
     procedures: HashMap<String, PascalProcedure>,
@@ -38,6 +42,7 @@ pub struct PascalInterpreter {
 }
 
 impl PascalInterpreter {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             variables: HashMap::new(),
@@ -47,6 +52,7 @@ impl PascalInterpreter {
         }
     }
 
+    #[allow(dead_code)]
     pub fn execute(&mut self, code: &str) -> String {
         // Parse program into lines
         self.program_lines.clear();
@@ -273,6 +279,7 @@ impl PascalInterpreter {
         self.handle_procedure_declaration(stmt)
     }
 
+    #[allow(dead_code)]
     fn handle_writeln(&mut self, stmt: &str) -> CommandResult {
         if let Some(open_paren) = stmt.find('(') {
             if let Some(close_paren) = stmt.find(')') {
@@ -323,6 +330,7 @@ impl PascalInterpreter {
         CommandResult::Continue
     }
 
+    #[allow(dead_code)]
     fn handle_write(&mut self, stmt: &str) -> CommandResult {
         self.handle_writeln(stmt) // Same as writeln but without newline
     }

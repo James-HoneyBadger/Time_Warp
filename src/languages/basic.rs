@@ -46,15 +46,6 @@ pub enum Token {
     Randomize,
     Len,
     Mid,
-    Left,
-    StringRight,
-    Chr,
-    Asc,
-    Val,
-    Str,
-    Open,
-    Close,
-    FileEof,
 
     // Operators
     Plus,
@@ -143,7 +134,6 @@ pub enum Statement {
         start: Expression,
         end: Expression,
         step: Option<Expression>,
-        statements: Vec<Statement>,
     },
     Next {
         variable: Option<String>,
@@ -186,9 +176,7 @@ pub enum Statement {
     GraphicsRight {
         angle: Expression,
     },
-    Rem {
-        comment: String,
-    },
+    Rem,
 }
 
 #[derive(Debug, Clone)]
@@ -318,6 +306,7 @@ impl Tokenizer {
                         "RANDOMIZE" => Token::Randomize,
                         "LEN" => Token::Len,
                         "MID" => Token::Mid,
+                        "MOD" => Token::Mod,
                         _ => Token::Identifier(ident),
                     };
                     tokens.push(token);
@@ -377,6 +366,18 @@ impl Tokenizer {
                     tokens.push(Token::Dollar);
                     self.position += 1;
                 }
+                ',' => {
+                    tokens.push(Token::Comma);
+                    self.position += 1;
+                }
+                ';' => {
+                    tokens.push(Token::Semicolon);
+                    self.position += 1;
+                }
+                '^' => {
+                    tokens.push(Token::Power);
+                    self.position += 1;
+                }
                 _ => {
                     return Err(InterpreterError::ParseError(format!(
                         "Unexpected character: {}",
@@ -410,14 +411,6 @@ impl Parser {
             self.current_token = None;
         } else {
             self.current_token = Some(self.tokens[self.position].clone());
-        }
-    }
-
-    fn peek(&self) -> Option<&Token> {
-        if self.position + 1 >= self.tokens.len() {
-            None
-        } else {
-            Some(&self.tokens[self.position + 1])
         }
     }
 
@@ -583,14 +576,13 @@ impl Parser {
 
         // For now, we'll collect statements until NEXT
         // This is a simplified version - a full implementation would need to handle nested structures
-        let statements = Vec::new(); // TODO: Parse statements until NEXT
+        // let statements = Vec::new(); // TODO: Parse statements until NEXT
 
         Ok(Statement::For {
             variable,
             start,
             end,
             step,
-            statements,
         })
     }
 
@@ -807,25 +799,14 @@ impl Parser {
 
     fn parse_rem_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume REM
-        let mut comment = String::new();
+                        // Skip to end of line
         while let Some(ref token) = self.current_token {
-            match token {
-                Token::EndOfFile => break,
-                Token::String(s) => {
-                    comment.push_str(s);
-                    self.advance();
-                }
-                Token::Identifier(id) => {
-                    comment.push_str(id);
-                    self.advance();
-                }
-                _ => {
-                    // For other tokens, just advance
-                    self.advance();
-                }
+            if let Token::EndOfFile = token {
+                break;
             }
+            self.advance();
         }
-        Ok(Statement::Rem { comment })
+        Ok(Statement::Rem)
     }
 
     fn parse_expression(&mut self) -> Result<Expression, InterpreterError> {
@@ -1087,18 +1068,15 @@ impl Parser {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum InterpreterError {
-    SyntaxError(String),
     ParseError(String),
     TypeError(String),
     RuntimeError(String),
-    DivisionByZero,
-    UndefinedVariable(String),
-    UndefinedArray(String),
-    IndexOutOfBounds(String),
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub enum ExecutionResult {
     Complete {
         output: String,
@@ -1113,6 +1091,7 @@ pub enum ExecutionResult {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct GraphicsCommand {
     pub command: String,
     pub value: f32,
@@ -1128,7 +1107,6 @@ pub struct BasicInterpreter {
     data: Vec<String>,
     for_loops: Vec<ForLoop>,
     gosub_stack: Vec<usize>,
-    screen_color: u8,
     text_color: u8,
     // files: HashMap<u8, FileHandle>,
     random_seed: u64,
@@ -1143,7 +1121,6 @@ enum Value {
 #[derive(Clone)]
 struct ForLoop {
     variable: String,
-    start: f64,
     end: f64,
     step: f64,
     line: usize,
@@ -1160,7 +1137,6 @@ impl BasicInterpreter {
             data: Vec::new(),
             for_loops: Vec::new(),
             gosub_stack: Vec::new(),
-            screen_color: 0,
             text_color: 7,
             random_seed: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -1579,7 +1555,6 @@ impl BasicInterpreter {
                 ref start,
                 ref end,
                 ref step,
-                statements: _,
             } => {
                 let start_val = self.evaluate_expression(start)?;
                 let end_val = self.evaluate_expression(end)?;
@@ -1593,7 +1568,6 @@ impl BasicInterpreter {
                         self.variables.insert(variable.clone(), Value::Number(s));
                         self.for_loops.push(ForLoop {
                             variable: variable.clone(),
-                            start: s,
                             end: e,
                             step: st,
                             line: self.current_line,
