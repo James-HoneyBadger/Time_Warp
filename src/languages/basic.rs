@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::f64::consts::PI;
+// use std::f64::consts::PI; // Commented out - not currently used
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -7,19 +7,77 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Keywords
-    Let, Print, If, Then, Else, End, Stop, Cls, Color, Input, Dim, Data, Read, Restore,
-    For, To, Step, Next, Goto, Gosub, Return, Rem, On, And, Or, Not,
-    Sin, Cos, Tan, Sqr, Abs, Int, Log, Exp, Atn, Rnd, Randomize,
-    Len, Mid, Left, StringRight, Chr, Asc, Val, Str,
-    Open, Close, FileEof,
+    Let,
+    Print,
+    If,
+    Then,
+    Else,
+    End,
+    Stop,
+    Cls,
+    Color,
+    Input,
+    Dim,
+    Data,
+    Read,
+    Restore,
+    For,
+    To,
+    Step,
+    Next,
+    Goto,
+    Gosub,
+    Return,
+    Rem,
+    On,
+    And,
+    Or,
+    Not,
+    Sin,
+    Cos,
+    Tan,
+    Sqr,
+    Abs,
+    Int,
+    Log,
+    Exp,
+    Atn,
+    Rnd,
+    Randomize,
+    Len,
+    Mid,
+    Left,
+    StringRight,
+    Chr,
+    Asc,
+    Val,
+    Str,
+    Open,
+    Close,
+    FileEof,
 
     // Operators
-    Plus, Minus, Multiply, Divide, Mod, Power,
-    Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual,
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Mod,
+    Power,
+    Equal,
+    NotEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
     Assign, // =
 
     // Punctuation
-    LParen, RParen, Comma, Semicolon, Colon, Dollar,
+    LParen,
+    RParen,
+    Comma,
+    Semicolon,
+    Colon,
+    Dollar,
 
     // Literals
     Number(f64),
@@ -27,11 +85,12 @@ pub enum Token {
     Identifier(String),
 
     // Graphics commands
-    GraphicsForward, GraphicsRight,
+    GraphicsForward,
+    GraphicsRight,
 
     // Special
     LineNumber(usize),
-    Eol, // End of line
+    Eol,       // End of line
     EndOfFile, // End of file
 }
 
@@ -45,7 +104,11 @@ pub struct Tokenizer {
 impl Tokenizer {
     pub fn new(input: &str) -> Self {
         let chars: Vec<char> = input.chars().collect();
-        let current_char = if chars.is_empty() { None } else { Some(chars[0]) };
+        let current_char = if chars.is_empty() {
+            None
+        } else {
+            Some(chars[0])
+        };
         Self {
             input: chars,
             position: 0,
@@ -272,7 +335,10 @@ impl Tokenizer {
                     self.advance();
                 }
                 _ => {
-                    return Err(InterpreterError::ParseError(format!("Unexpected character: {}", ch)));
+                    return Err(InterpreterError::ParseError(format!(
+                        "Unexpected character: {}",
+                        ch
+                    )));
                 }
             }
         }
@@ -409,7 +475,11 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
-        let current_token = if tokens.is_empty() { None } else { Some(tokens[0].clone()) };
+        let current_token = if tokens.is_empty() {
+            None
+        } else {
+            Some(tokens[0].clone())
+        };
         Self {
             tokens,
             position: 0,
@@ -440,10 +510,16 @@ impl Parser {
                 self.advance();
                 Ok(())
             } else {
-                Err(InterpreterError::ParseError(format!("Expected {:?}, found {:?}", expected, token)))
+                Err(InterpreterError::ParseError(format!(
+                    "Expected {:?}, found {:?}",
+                    expected, token
+                )))
             }
         } else {
-            Err(InterpreterError::ParseError(format!("Expected {:?}, found end of input", expected)))
+            Err(InterpreterError::ParseError(format!(
+                "Expected {:?}, found end of input",
+                expected
+            )))
         }
     }
 
@@ -489,8 +565,13 @@ impl Parser {
             Some(Token::Color) => self.parse_color_statement(),
             Some(Token::GraphicsForward) => self.parse_forward_statement(),
             Some(Token::Rem) => self.parse_rem_statement(),
-            Some(Token::Identifier(ref id)) if id.to_uppercase() == "RIGHT" => self.parse_right_statement(),
-            _ => Err(InterpreterError::ParseError(format!("Unexpected token in statement: {:?}", self.current_token))),
+            Some(Token::Identifier(ref id)) if id.to_uppercase() == "RIGHT" => {
+                self.parse_right_statement()
+            }
+            _ => Err(InterpreterError::ParseError(format!(
+                "Unexpected token in statement: {:?}",
+                self.current_token
+            ))),
         }
     }
 
@@ -540,7 +621,7 @@ impl Parser {
         self.advance(); // consume IF
         let condition = self.parse_expression()?;
         self.expect(&Token::Then)?;
-        
+
         let mut then_statements = Vec::new();
         while let Some(ref token) = self.current_token {
             match token {
@@ -575,7 +656,7 @@ impl Parser {
         let start = self.parse_expression()?;
         self.expect(&Token::To)?;
         let end = self.parse_expression()?;
-        
+
         let step = if let Some(Token::Step) = self.current_token {
             self.advance();
             Some(self.parse_expression()?)
@@ -613,7 +694,9 @@ impl Parser {
             self.advance();
             Ok(Statement::Goto { line_number })
         } else {
-            Err(InterpreterError::ParseError("Expected line number after GOTO".to_string()))
+            Err(InterpreterError::ParseError(
+                "Expected line number after GOTO".to_string(),
+            ))
         }
     }
 
@@ -624,7 +707,9 @@ impl Parser {
             self.advance();
             Ok(Statement::Gosub { line_number })
         } else {
-            Err(InterpreterError::ParseError("Expected line number after GOSUB".to_string()))
+            Err(InterpreterError::ParseError(
+                "Expected line number after GOSUB".to_string(),
+            ))
         }
     }
 
@@ -636,7 +721,7 @@ impl Parser {
     fn parse_on_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume ON
         let expression = self.parse_expression()?;
-        
+
         let is_gosub = if let Some(Token::Gosub) = self.current_token {
             self.advance();
             true
@@ -644,25 +729,29 @@ impl Parser {
             self.advance();
             false
         } else {
-            return Err(InterpreterError::ParseError("Expected GOTO or GOSUB after ON expression".to_string()));
+            return Err(InterpreterError::ParseError(
+                "Expected GOTO or GOSUB after ON expression".to_string(),
+            ));
         };
-        
+
         let mut line_numbers = Vec::new();
         loop {
             if let Some(Token::Number(line_num)) = self.current_token {
                 line_numbers.push(line_num as usize);
                 self.advance();
             } else {
-                return Err(InterpreterError::ParseError("Expected line number in ON statement".to_string()));
+                return Err(InterpreterError::ParseError(
+                    "Expected line number in ON statement".to_string(),
+                ));
             }
-            
+
             if let Some(Token::Comma) = self.current_token {
                 self.advance();
             } else {
                 break;
             }
         }
-        
+
         Ok(Statement::On {
             expression,
             line_numbers,
@@ -678,7 +767,7 @@ impl Parser {
         } else {
             None
         };
-        
+
         let mut variables = Vec::new();
         while let Some(Token::Identifier(_)) = self.current_token {
             let var = self.parse_identifier()?;
@@ -689,36 +778,36 @@ impl Parser {
                 break;
             }
         }
-        
+
         Ok(Statement::Input { prompt, variables })
     }
 
     fn parse_dim_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume DIM
         let mut arrays = Vec::new();
-        
+
         loop {
             let name = self.parse_identifier()?;
             self.expect(&Token::LParen)?;
             let size = self.parse_expression()?;
             self.expect(&Token::RParen)?;
-            
+
             arrays.push((name, size));
-            
+
             if let Some(Token::Comma) = self.current_token {
                 self.advance();
             } else {
                 break;
             }
         }
-        
+
         Ok(Statement::Dim { arrays })
     }
 
     fn parse_data_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume DATA
         let mut values = Vec::new();
-        
+
         while let Some(ref token) = self.current_token {
             match token {
                 Token::String(s) => {
@@ -739,25 +828,25 @@ impl Parser {
                 _ => break,
             }
         }
-        
+
         Ok(Statement::Data { values })
     }
 
     fn parse_read_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume READ
         let mut variables = Vec::new();
-        
+
         loop {
             let var = self.parse_identifier()?;
             variables.push(var);
-            
+
             if let Some(Token::Comma) = self.current_token {
                 self.advance();
             } else {
                 break;
             }
         }
-        
+
         Ok(Statement::Read { variables })
     }
 
@@ -989,19 +1078,19 @@ impl Parser {
             Some(Token::Identifier(ref id)) => {
                 let ident = id.clone();
                 self.advance();
-                
+
                 // Check if it's a function call
                 if let Some(Token::LParen) = self.current_token {
                     self.advance();
                     let mut arguments = Vec::new();
-                    
+
                     if let Some(Token::RParen) = self.current_token {
                         self.advance();
                     } else {
                         loop {
                             let arg = self.parse_expression()?;
                             arguments.push(arg);
-                            
+
                             if let Some(Token::Comma) = self.current_token {
                                 self.advance();
                             } else {
@@ -1010,7 +1099,7 @@ impl Parser {
                             }
                         }
                     }
-                    
+
                     Ok(Expression::FunctionCall {
                         name: ident,
                         arguments,
@@ -1034,7 +1123,10 @@ impl Parser {
                 self.expect(&Token::RParen)?;
                 Ok(expr)
             }
-            _ => Err(InterpreterError::ParseError(format!("Unexpected token in expression: {:?}", self.current_token))),
+            _ => Err(InterpreterError::ParseError(format!(
+                "Unexpected token in expression: {:?}",
+                self.current_token
+            ))),
         }
     }
 
@@ -1043,7 +1135,9 @@ impl Parser {
             self.advance();
             Ok(id)
         } else {
-            Err(InterpreterError::ParseError("Expected identifier".to_string()))
+            Err(InterpreterError::ParseError(
+                "Expected identifier".to_string(),
+            ))
         }
     }
 
@@ -1052,13 +1146,15 @@ impl Parser {
             self.advance();
             Ok(s)
         } else {
-            Err(InterpreterError::ParseError("Expected string literal".to_string()))
+            Err(InterpreterError::ParseError(
+                "Expected string literal".to_string(),
+            ))
         }
     }
 
     fn parse_statement_list(&mut self) -> Result<Vec<Statement>, InterpreterError> {
         let mut statements = Vec::new();
-        
+
         while let Some(ref token) = self.current_token {
             match token {
                 Token::Colon | Token::Eol | Token::EndOfFile => break,
@@ -1068,7 +1164,7 @@ impl Parser {
                 }
             }
         }
-        
+
         Ok(statements)
     }
 }
@@ -1090,8 +1186,15 @@ pub enum InterpreterError {
 
 #[derive(Clone)]
 pub enum ExecutionResult {
-    Complete { output: String, graphics_commands: Vec<GraphicsCommand> },
-    NeedInput { prompt: String, partial_output: String, partial_graphics: Vec<GraphicsCommand> },
+    Complete {
+        output: String,
+        graphics_commands: Vec<GraphicsCommand>,
+    },
+    NeedInput {
+        prompt: String,
+        partial_output: String,
+        partial_graphics: Vec<GraphicsCommand>,
+    },
     Error(InterpreterError),
 }
 
@@ -1156,7 +1259,10 @@ impl BasicInterpreter {
             screen_color: 0,
             text_color: 7,
             files: HashMap::new(),
-            random_seed: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            random_seed: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
         }
     }
 
@@ -1198,7 +1304,10 @@ impl BasicInterpreter {
                                 self.current_line = line_num;
                                 continue;
                             } else {
-                                return Err(InterpreterError::RuntimeError(format!("Line {} not found", line_num)));
+                                return Err(InterpreterError::RuntimeError(format!(
+                                    "Line {} not found",
+                                    line_num
+                                )));
                             }
                         }
                     } else if res == "CONTINUE_LOOP" {
@@ -1213,7 +1322,7 @@ impl BasicInterpreter {
             }
 
             // Check if we need input
-            if let Some((var, prompt)) = &self.pending_input {
+            if let Some((_var, prompt)) = &self.pending_input {
                 return Ok(ExecutionResult::NeedInput {
                     prompt: prompt.clone(),
                     partial_output: output,
@@ -1225,23 +1334,37 @@ impl BasicInterpreter {
         }
 
         // Finished
-        Ok(ExecutionResult::Complete { output, graphics_commands })
+        Ok(ExecutionResult::Complete {
+            output,
+            graphics_commands,
+        })
     }
 
-    fn execute_statement(&mut self, statement: &Statement, output: &mut String, graphics_commands: &mut Vec<GraphicsCommand>) -> Result<Option<String>, InterpreterError> {
+    fn execute_statement(
+        &mut self,
+        statement: &Statement,
+        output: &mut String,
+        graphics_commands: &mut Vec<GraphicsCommand>,
+    ) -> Result<Option<String>, InterpreterError> {
         match statement {
-            Statement::Let { variable, expression } => {
+            Statement::Let {
+                variable,
+                expression,
+            } => {
                 let value = self.evaluate_expression(expression)?;
                 self.variables.insert(variable.clone(), value);
                 Ok(None)
             }
-            Statement::Print { expressions, separator } => {
+            Statement::Print {
+                expressions,
+                separator,
+            } => {
                 let mut result = String::new();
                 for (i, expr) in expressions.iter().enumerate() {
                     if i > 0 {
                         match separator {
                             PrintSeparator::Comma => result.push('\t'),
-                            PrintSeparator::Semicolon => {}, // No separator
+                            PrintSeparator::Semicolon => {} // No separator
                             PrintSeparator::None => result.push(' '),
                         }
                     }
@@ -1253,7 +1376,11 @@ impl BasicInterpreter {
                 }
                 Ok(Some(result))
             }
-            Statement::If { condition, then_statements, else_statements } => {
+            Statement::If {
+                condition,
+                then_statements,
+                else_statements,
+            } => {
                 let condition_value = self.evaluate_expression(condition)?;
                 let condition_met = match condition_value {
                     Value::Number(n) => n != 0.0,
@@ -1279,20 +1406,32 @@ impl BasicInterpreter {
                 }
                 Ok(None)
             }
-            Statement::For { variable, start, end, step, statements } => {
+            Statement::For {
+                variable,
+                start,
+                end,
+                step,
+                statements: _statements,
+            } => {
                 let start_val = self.evaluate_expression(start)?;
                 let end_val = self.evaluate_expression(end)?;
-                let step_val = step.as_ref()
+                let step_val = step
+                    .as_ref()
                     .map(|s| self.evaluate_expression(s))
                     .unwrap_or(Ok(Value::Number(1.0)))?;
 
                 let (start_num, end_num, step_num) = match (start_val, end_val, step_val) {
                     (Value::Number(s), Value::Number(e), Value::Number(st)) => (s, e, st),
-                    _ => return Err(InterpreterError::TypeError("FOR loop requires numeric values".to_string())),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "FOR loop requires numeric values".to_string(),
+                        ))
+                    }
                 };
 
                 // Initialize loop variable
-                self.variables.insert(variable.clone(), Value::Number(start_num));
+                self.variables
+                    .insert(variable.clone(), Value::Number(start_num));
 
                 // Add to loop stack
                 self.for_loops.push(ForLoop {
@@ -1310,14 +1449,22 @@ impl BasicInterpreter {
                     // Check if variable matches (if specified)
                     if let Some(var_name) = variable {
                         if var_name != &loop_info.variable {
-                            return Err(InterpreterError::RuntimeError(format!("NEXT {} does not match FOR {}", var_name, loop_info.variable)));
+                            return Err(InterpreterError::RuntimeError(format!(
+                                "NEXT {} does not match FOR {}",
+                                var_name, loop_info.variable
+                            )));
                         }
                     }
 
                     // Get current value
                     let current_val = match self.variables.get(&loop_info.variable) {
                         Some(Value::Number(n)) => *n,
-                        _ => return Err(InterpreterError::RuntimeError(format!("Variable {} not found or not numeric", loop_info.variable))),
+                        _ => {
+                            return Err(InterpreterError::RuntimeError(format!(
+                                "Variable {} not found or not numeric",
+                                loop_info.variable
+                            )))
+                        }
                     };
 
                     // Calculate next value
@@ -1332,7 +1479,8 @@ impl BasicInterpreter {
 
                     if should_continue {
                         // Update variable and continue loop
-                        self.variables.insert(loop_info.variable.clone(), Value::Number(next_val));
+                        self.variables
+                            .insert(loop_info.variable.clone(), Value::Number(next_val));
                         self.current_line = loop_info.line; // Go back to FOR statement
                         return Ok(Some("CONTINUE_LOOP".to_string()));
                     } else {
@@ -1340,13 +1488,13 @@ impl BasicInterpreter {
                         self.for_loops.pop();
                     }
                 } else {
-                    return Err(InterpreterError::RuntimeError("NEXT without FOR".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "NEXT without FOR".to_string(),
+                    ));
                 }
                 Ok(None)
             }
-            Statement::Goto { line_number } => {
-                Ok(Some(format!("GOTO {}", line_number)))
-            }
+            Statement::Goto { line_number } => Ok(Some(format!("GOTO {}", line_number))),
             Statement::Gosub { line_number } => {
                 self.gosub_stack.push(self.current_line);
                 Ok(Some(format!("GOTO {}", line_number)))
@@ -1356,16 +1504,26 @@ impl BasicInterpreter {
                     self.current_line = return_line;
                     return Ok(Some("CONTINUE_LOOP".to_string()));
                 } else {
-                    return Err(InterpreterError::RuntimeError("RETURN without GOSUB".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "RETURN without GOSUB".to_string(),
+                    ));
                 }
             }
-            Statement::On { expression, line_numbers, is_gosub } => {
+            Statement::On {
+                expression,
+                line_numbers,
+                is_gosub,
+            } => {
                 let index_val = self.evaluate_expression(expression)?;
                 let index = match index_val {
                     Value::Number(n) => n as usize,
-                    _ => return Err(InterpreterError::TypeError("ON expression must evaluate to a number".to_string())),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "ON expression must evaluate to a number".to_string(),
+                        ))
+                    }
                 };
-                
+
                 if index == 0 || index > line_numbers.len() {
                     // Index out of range, continue to next statement
                     Ok(None)
@@ -1390,9 +1548,14 @@ impl BasicInterpreter {
                     match size_val {
                         Value::Number(size) => {
                             let size_usize = size as usize;
-                            self.arrays.insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
+                            self.arrays
+                                .insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
                         }
-                        _ => return Err(InterpreterError::TypeError("Array size must be numeric".to_string())),
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "Array size must be numeric".to_string(),
+                            ))
+                        }
                     }
                 }
                 Ok(None)
@@ -1409,10 +1572,13 @@ impl BasicInterpreter {
                         if let Ok(num) = data_value.parse::<f64>() {
                             self.variables.insert(var.clone(), Value::Number(num));
                         } else {
-                            self.variables.insert(var.clone(), Value::String(data_value.clone()));
+                            self.variables
+                                .insert(var.clone(), Value::String(data_value.clone()));
                         }
                     } else {
-                        return Err(InterpreterError::RuntimeError("READ without DATA".to_string()));
+                        return Err(InterpreterError::RuntimeError(
+                            "READ without DATA".to_string(),
+                        ));
                     }
                 }
                 Ok(None)
@@ -1421,12 +1587,8 @@ impl BasicInterpreter {
                 self.data_pointer = 0;
                 Ok(None)
             }
-            Statement::End => {
-                Ok(Some("Program ended.".to_string()))
-            }
-            Statement::Stop => {
-                Ok(Some("Program stopped.".to_string()))
-            }
+            Statement::End => Ok(Some("Program ended.".to_string())),
+            Statement::Stop => Ok(Some("Program stopped.".to_string())),
             Statement::Cls => {
                 graphics_commands.push(GraphicsCommand {
                     command: "CLS".to_string(),
@@ -1450,7 +1612,11 @@ impl BasicInterpreter {
                             color: Some(c as u32),
                         });
                     }
-                    _ => return Err(InterpreterError::TypeError("COLOR requires numeric value".to_string())),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "COLOR requires numeric value".to_string(),
+                        ))
+                    }
                 }
                 Ok(None)
             }
@@ -1466,7 +1632,11 @@ impl BasicInterpreter {
                             color: None,
                         });
                     }
-                    _ => return Err(InterpreterError::TypeError("FORWARD requires numeric distance".to_string())),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "FORWARD requires numeric distance".to_string(),
+                        ))
+                    }
                 }
                 Ok(None)
             }
@@ -1482,7 +1652,11 @@ impl BasicInterpreter {
                             color: None,
                         });
                     }
-                    _ => return Err(InterpreterError::TypeError("RIGHT requires numeric angle".to_string())),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "RIGHT requires numeric angle".to_string(),
+                        ))
+                    }
                 }
                 Ok(None)
             }
@@ -1497,13 +1671,15 @@ impl BasicInterpreter {
         match expression {
             Expression::Number(n) => Ok(Value::Number(*n)),
             Expression::String(s) => Ok(Value::String(s.clone())),
-            Expression::Variable(name) => {
-                match self.variables.get(name) {
-                    Some(value) => Ok(value.clone()),
-                    None => Err(InterpreterError::UndefinedVariable(name.clone())),
-                }
-            }
-            Expression::BinaryOp { left, operator, right } => {
+            Expression::Variable(name) => match self.variables.get(name) {
+                Some(value) => Ok(value.clone()),
+                None => Err(InterpreterError::UndefinedVariable(name.clone())),
+            },
+            Expression::BinaryOp {
+                left,
+                operator,
+                right,
+            } => {
                 let left_val = self.evaluate_expression(left)?;
                 let right_val = self.evaluate_expression(right)?;
 
@@ -1521,26 +1697,78 @@ impl BasicInterpreter {
                             }
                             BinaryOperator::Mod => l % r,
                             BinaryOperator::Power => l.powf(r),
-                            BinaryOperator::Equal => if l == r { 1.0 } else { 0.0 },
-                            BinaryOperator::NotEqual => if l != r { 1.0 } else { 0.0 },
-                            BinaryOperator::Less => if l < r { 1.0 } else { 0.0 },
-                            BinaryOperator::LessEqual => if l <= r { 1.0 } else { 0.0 },
-                            BinaryOperator::Greater => if l > r { 1.0 } else { 0.0 },
-                            BinaryOperator::GreaterEqual => if l >= r { 1.0 } else { 0.0 },
-                            BinaryOperator::And => if l != 0.0 && r != 0.0 { 1.0 } else { 0.0 },
-                            BinaryOperator::Or => if l != 0.0 || r != 0.0 { 1.0 } else { 0.0 },
+                            BinaryOperator::Equal => {
+                                if l == r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::NotEqual => {
+                                if l != r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::Less => {
+                                if l < r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::LessEqual => {
+                                if l <= r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::Greater => {
+                                if l > r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::GreaterEqual => {
+                                if l >= r {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::And => {
+                                if l != 0.0 && r != 0.0 {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
+                            BinaryOperator::Or => {
+                                if l != 0.0 || r != 0.0 {
+                                    1.0
+                                } else {
+                                    0.0
+                                }
+                            }
                         };
                         Ok(Value::Number(result))
                     }
-                    (Value::String(l), Value::String(r)) => {
-                        match operator {
-                            BinaryOperator::Plus => Ok(Value::String(l + &r)),
-                            BinaryOperator::Equal => Ok(Value::Number(if l == r { 1.0 } else { 0.0 })),
-                            BinaryOperator::NotEqual => Ok(Value::Number(if l != r { 1.0 } else { 0.0 })),
-                            _ => Err(InterpreterError::TypeError("Invalid operation on strings".to_string())),
+                    (Value::String(l), Value::String(r)) => match operator {
+                        BinaryOperator::Plus => Ok(Value::String(l + &r)),
+                        BinaryOperator::Equal => Ok(Value::Number(if l == r { 1.0 } else { 0.0 })),
+                        BinaryOperator::NotEqual => {
+                            Ok(Value::Number(if l != r { 1.0 } else { 0.0 }))
                         }
-                    }
-                    _ => Err(InterpreterError::TypeError("Type mismatch in binary operation".to_string())),
+                        _ => Err(InterpreterError::TypeError(
+                            "Invalid operation on strings".to_string(),
+                        )),
+                    },
+                    _ => Err(InterpreterError::TypeError(
+                        "Type mismatch in binary operation".to_string(),
+                    )),
                 }
             }
             Expression::FunctionCall { name, arguments } => {
@@ -1556,138 +1784,196 @@ impl BasicInterpreter {
                                 if idx_usize < array.len() {
                                     Ok(array[idx_usize].clone())
                                 } else {
-                                    Err(InterpreterError::IndexOutOfBounds(format!("Array {} index {} out of bounds", name, idx_usize)))
+                                    Err(InterpreterError::IndexOutOfBounds(format!(
+                                        "Array {} index {} out of bounds",
+                                        name, idx_usize
+                                    )))
                                 }
                             }
                             None => Err(InterpreterError::UndefinedArray(name.clone())),
                         }
                     }
-                    _ => Err(InterpreterError::TypeError("Array index must be numeric".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "Array index must be numeric".to_string(),
+                    )),
                 }
             }
         }
     }
 
-    fn evaluate_function_call(&mut self, name: &str, arguments: &[Expression]) -> Result<Value, InterpreterError> {
+    fn evaluate_function_call(
+        &mut self,
+        name: &str,
+        arguments: &[Expression],
+    ) -> Result<Value, InterpreterError> {
         match name.to_uppercase().as_str() {
             "SIN" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("SIN requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "SIN requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.sin())),
-                    _ => Err(InterpreterError::TypeError("SIN requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "SIN requires numeric argument".to_string(),
+                    )),
                 }
             }
             "COS" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("COS requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "COS requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.cos())),
-                    _ => Err(InterpreterError::TypeError("COS requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "COS requires numeric argument".to_string(),
+                    )),
                 }
             }
             "TAN" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("TAN requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "TAN requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.tan())),
-                    _ => Err(InterpreterError::TypeError("TAN requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "TAN requires numeric argument".to_string(),
+                    )),
                 }
             }
             "SQR" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("SQR requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "SQR requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.sqrt())),
-                    _ => Err(InterpreterError::TypeError("SQR requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "SQR requires numeric argument".to_string(),
+                    )),
                 }
             }
             "ABS" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("ABS requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "ABS requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.abs())),
-                    _ => Err(InterpreterError::TypeError("ABS requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "ABS requires numeric argument".to_string(),
+                    )),
                 }
             }
             "INT" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("INT requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "INT requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.floor())),
-                    _ => Err(InterpreterError::TypeError("INT requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "INT requires numeric argument".to_string(),
+                    )),
                 }
             }
             "LOG" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("LOG requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "LOG requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => {
                         if n <= 0.0 {
-                            return Err(InterpreterError::RuntimeError("LOG requires positive argument".to_string()));
+                            return Err(InterpreterError::RuntimeError(
+                                "LOG requires positive argument".to_string(),
+                            ));
                         }
                         Ok(Value::Number(n.ln()))
                     }
-                    _ => Err(InterpreterError::TypeError("LOG requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "LOG requires numeric argument".to_string(),
+                    )),
                 }
             }
             "EXP" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("EXP requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "EXP requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.exp())),
-                    _ => Err(InterpreterError::TypeError("EXP requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "EXP requires numeric argument".to_string(),
+                    )),
                 }
             }
             "ATN" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("ATN requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "ATN requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::Number(n) => Ok(Value::Number(n.atan())),
-                    _ => Err(InterpreterError::TypeError("ATN requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "ATN requires numeric argument".to_string(),
+                    )),
                 }
             }
             "RND" => {
                 if arguments.len() > 1 {
-                    return Err(InterpreterError::RuntimeError("RND takes at most 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "RND takes at most 1 argument".to_string(),
+                    ));
                 }
                 // Generate random number between 0 and 1
                 use std::time::{SystemTime, UNIX_EPOCH};
-                let seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos() as u64;
+                let seed = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos() as u64;
                 let random_val = (seed % 1000000) as f64 / 1000000.0;
                 Ok(Value::Number(random_val))
             }
             "LEN" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("LEN requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "LEN requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
                     Value::String(s) => Ok(Value::Number(s.len() as f64)),
-                    _ => Err(InterpreterError::TypeError("LEN requires string argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "LEN requires string argument".to_string(),
+                    )),
                 }
             }
             "CHR" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("CHR requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "CHR requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
@@ -1695,15 +1981,21 @@ impl BasicInterpreter {
                         if let Some(ch) = char::from_u32(n as u32) {
                             Ok(Value::String(ch.to_string()))
                         } else {
-                            Err(InterpreterError::RuntimeError("CHR argument out of range".to_string()))
+                            Err(InterpreterError::RuntimeError(
+                                "CHR argument out of range".to_string(),
+                            ))
                         }
                     }
-                    _ => Err(InterpreterError::TypeError("CHR requires numeric argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "CHR requires numeric argument".to_string(),
+                    )),
                 }
             }
             "ASC" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("ASC requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "ASC requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
@@ -1711,30 +2003,36 @@ impl BasicInterpreter {
                         if let Some(ch) = s.chars().next() {
                             Ok(Value::Number(ch as u32 as f64))
                         } else {
-                            Err(InterpreterError::RuntimeError("ASC requires non-empty string".to_string()))
+                            Err(InterpreterError::RuntimeError(
+                                "ASC requires non-empty string".to_string(),
+                            ))
                         }
                     }
-                    _ => Err(InterpreterError::TypeError("ASC requires string argument".to_string())),
+                    _ => Err(InterpreterError::TypeError(
+                        "ASC requires string argument".to_string(),
+                    )),
                 }
             }
             "VAL" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("VAL requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "VAL requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
-                    Value::String(s) => {
-                        match s.parse::<f64>() {
-                            Ok(n) => Ok(Value::Number(n)),
-                            Err(_) => Ok(Value::Number(0.0)),
-                        }
-                    }
+                    Value::String(s) => match s.parse::<f64>() {
+                        Ok(n) => Ok(Value::Number(n)),
+                        Err(_) => Ok(Value::Number(0.0)),
+                    },
                     Value::Number(n) => Ok(Value::Number(n)),
                 }
             }
             "STR" => {
                 if arguments.len() != 1 {
-                    return Err(InterpreterError::RuntimeError("STR requires 1 argument".to_string()));
+                    return Err(InterpreterError::RuntimeError(
+                        "STR requires 1 argument".to_string(),
+                    ));
                 }
                 let arg = self.evaluate_expression(&arguments[0])?;
                 match arg {
@@ -1742,7 +2040,10 @@ impl BasicInterpreter {
                     Value::String(s) => Ok(Value::String(s)),
                 }
             }
-            _ => Err(InterpreterError::RuntimeError(format!("Unknown function: {}", name))),
+            _ => Err(InterpreterError::RuntimeError(format!(
+                "Unknown function: {}",
+                name
+            ))),
         }
     }
 
@@ -1842,9 +2143,10 @@ impl BasicInterpreter {
                     if let Some(open_paren) = array_spec.find('(') {
                         let name = &array_spec[..open_paren];
                         if let Some(close_paren) = array_spec.find(')') {
-                            let dims_str = &array_spec[open_paren+1..close_paren];
+                            let dims_str = &array_spec[open_paren + 1..close_paren];
                             if let Ok(size) = dims_str.parse::<usize>() {
-                                self.arrays.insert(name.to_string(), vec![Value::Number(0.0); size + 1]);
+                                self.arrays
+                                    .insert(name.to_string(), vec![Value::Number(0.0); size + 1]);
                             }
                         }
                     }
@@ -1853,7 +2155,8 @@ impl BasicInterpreter {
             "DATA" => {
                 // Store data for READ
                 let data_items = parts[1..].join(" ");
-                self.data.extend(data_items.split(',').map(|s| s.trim().to_string()));
+                self.data
+                    .extend(data_items.split(',').map(|s| s.trim().to_string()));
             }
             "READ" => {
                 // Read from DATA
@@ -1864,7 +2167,8 @@ impl BasicInterpreter {
                         if let Ok(num) = data_value.parse::<f64>() {
                             self.variables.insert(part.to_string(), Value::Number(num));
                         } else {
-                            self.variables.insert(part.to_string(), Value::String(data_value.clone()));
+                            self.variables
+                                .insert(part.to_string(), Value::String(data_value.clone()));
                         }
                     }
                 }
@@ -1958,15 +2262,18 @@ impl BasicInterpreter {
                     let var = parts[1].to_string();
                     if let Ok(start) = parts[3].parse::<f64>() {
                         if let Ok(end) = parts[5].parse::<f64>() {
-                            let step = if parts.len() > 6 && parts[6].to_uppercase() == "STEP" && parts.len() > 7 {
+                            let step = if parts.len() > 6
+                                && parts[6].to_uppercase() == "STEP"
+                                && parts.len() > 7
+                            {
                                 parts[7].parse::<f64>().unwrap_or(1.0)
                             } else {
                                 1.0
                             };
-                            
+
                             // Set initial value
                             self.variables.insert(var.clone(), Value::Number(start));
-                            
+
                             // Push loop to stack
                             self.for_loops.push(ForLoop {
                                 variable: var,
@@ -1982,12 +2289,15 @@ impl BasicInterpreter {
             "NEXT" => {
                 // NEXT variable
                 if let Some(for_loop) = self.for_loops.last_mut() {
-                    if let Some(Value::Number(ref mut current_val)) = self.variables.get_mut(&for_loop.variable) {
+                    if let Some(Value::Number(ref mut current_val)) =
+                        self.variables.get_mut(&for_loop.variable)
+                    {
                         *current_val += for_loop.step;
-                        
-                        if (*current_val - for_loop.end).abs() < 0.0001 || 
-                           (for_loop.step > 0.0 && *current_val <= for_loop.end) ||
-                           (for_loop.step < 0.0 && *current_val >= for_loop.end) {
+
+                        if (*current_val - for_loop.end).abs() < 0.0001
+                            || (for_loop.step > 0.0 && *current_val <= for_loop.end)
+                            || (for_loop.step < 0.0 && *current_val >= for_loop.end)
+                        {
                             // Continue loop
                             self.current_line = for_loop.line;
                             return Ok(Some("CONTINUE_LOOP".to_string()));
@@ -2107,7 +2417,10 @@ impl BasicInterpreter {
             "RND" => {
                 // RND - random number between 0 and 1
                 // Simple linear congruential generator
-                self.random_seed = self.random_seed.wrapping_mul(1103515245).wrapping_add(12345);
+                self.random_seed = self
+                    .random_seed
+                    .wrapping_mul(1103515245)
+                    .wrapping_add(12345);
                 let random_val = (self.random_seed % 32768) as f64 / 32767.0;
                 return Ok(Some(random_val.to_string()));
             }
@@ -2119,7 +2432,10 @@ impl BasicInterpreter {
                     }
                 } else {
                     // Use current time if no seed provided
-                    self.random_seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+                    self.random_seed = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
                 }
             }
             "OPEN" => {
@@ -2128,7 +2444,7 @@ impl BasicInterpreter {
                     let filename = parts[1].trim_matches('"');
                     let mode = parts[3].to_uppercase();
                     let file_num_str = parts[5].trim_start_matches('#');
-                    
+
                     if let Ok(file_num) = file_num_str.parse::<u8>() {
                         match mode.as_str() {
                             "INPUT" => {
@@ -2140,35 +2456,46 @@ impl BasicInterpreter {
                                             line_buffer.push(line);
                                         }
                                     }
-                                    self.files.insert(file_num, FileHandle {
-                                        file: None, // File is consumed by BufReader
-                                        mode,
-                                        filename: filename.to_string(),
-                                        line_buffer,
-                                        current_line: 0,
-                                    });
+                                    self.files.insert(
+                                        file_num,
+                                        FileHandle {
+                                            file: None, // File is consumed by BufReader
+                                            mode,
+                                            filename: filename.to_string(),
+                                            line_buffer,
+                                            current_line: 0,
+                                        },
+                                    );
                                 }
                             }
                             "OUTPUT" => {
                                 if let Ok(file) = File::create(filename) {
-                                    self.files.insert(file_num, FileHandle {
-                                        file: Some(file),
-                                        mode,
-                                        filename: filename.to_string(),
-                                        line_buffer: Vec::new(),
-                                        current_line: 0,
-                                    });
+                                    self.files.insert(
+                                        file_num,
+                                        FileHandle {
+                                            file: Some(file),
+                                            mode,
+                                            filename: filename.to_string(),
+                                            line_buffer: Vec::new(),
+                                            current_line: 0,
+                                        },
+                                    );
                                 }
                             }
                             "APPEND" => {
-                                if let Ok(file) = OpenOptions::new().append(true).create(true).open(filename) {
-                                    self.files.insert(file_num, FileHandle {
-                                        file: Some(file),
-                                        mode,
-                                        filename: filename.to_string(),
-                                        line_buffer: Vec::new(),
-                                        current_line: 0,
-                                    });
+                                if let Ok(file) =
+                                    OpenOptions::new().append(true).create(true).open(filename)
+                                {
+                                    self.files.insert(
+                                        file_num,
+                                        FileHandle {
+                                            file: Some(file),
+                                            mode,
+                                            filename: filename.to_string(),
+                                            line_buffer: Vec::new(),
+                                            current_line: 0,
+                                        },
+                                    );
                                 }
                             }
                             _ => {}
@@ -2211,13 +2538,14 @@ impl BasicInterpreter {
                                 if file_handle.current_line < file_handle.line_buffer.len() {
                                     let line = &file_handle.line_buffer[file_handle.current_line];
                                     file_handle.current_line += 1;
-                                    
+
                                     let var = parts[2];
                                     // Try to parse as number first, then string
                                     if let Ok(num) = line.parse::<f64>() {
                                         self.variables.insert(var.to_string(), Value::Number(num));
                                     } else {
-                                        self.variables.insert(var.to_string(), Value::String(line.clone()));
+                                        self.variables
+                                            .insert(var.to_string(), Value::String(line.clone()));
                                     }
                                 }
                             }
@@ -2231,8 +2559,9 @@ impl BasicInterpreter {
                     if let Ok(file_num) = parts[1].parse::<u8>() {
                         if let Some(file_handle) = self.files.get(&file_num) {
                             if file_handle.mode == "INPUT" {
-                            let is_eof = file_handle.current_line >= file_handle.line_buffer.len();
-                            return Ok(Some(if is_eof { "-1" } else { "0" }.to_string()));
+                                let is_eof =
+                                    file_handle.current_line >= file_handle.line_buffer.len();
+                                return Ok(Some(if is_eof { "-1" } else { "0" }.to_string()));
                             }
                         }
                     }

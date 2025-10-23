@@ -28,7 +28,9 @@ impl Substitution {
     pub fn extend(&self, var: String, term: PrologTerm) -> Substitution {
         let mut new_bindings = self.bindings.clone();
         new_bindings.insert(var, term);
-        Substitution { bindings: new_bindings }
+        Substitution {
+            bindings: new_bindings,
+        }
     }
 
     pub fn apply(&self, term: &PrologTerm) -> PrologTerm {
@@ -104,7 +106,8 @@ impl PrologInterpreter {
             let head_str = &rule_str[..colon_pos].trim();
             let body_str = &rule_str[colon_pos + 2..].trim().trim_end_matches('.');
 
-            if let (Some(head), body_terms) = (self.parse_term(head_str), self.parse_body(body_str)) {
+            if let (Some(head), body_terms) = (self.parse_term(head_str), self.parse_body(body_str))
+            {
                 self.rules.push(PrologRule {
                     head,
                     body: body_terms,
@@ -118,7 +121,10 @@ impl PrologInterpreter {
             return Vec::new();
         }
 
-        body_str.split(',').filter_map(|s| self.parse_term(s.trim())).collect()
+        body_str
+            .split(',')
+            .filter_map(|s| self.parse_term(s.trim()))
+            .collect()
     }
 
     fn parse_term(&self, term_str: &str) -> Option<PrologTerm> {
@@ -164,7 +170,8 @@ impl PrologInterpreter {
                 }
                 // Show variable bindings
                 for (var, term) in &subst.bindings {
-                    self.output.push(format!("{} = {}", var, self.term_to_string(term)));
+                    self.output
+                        .push(format!("{} = {}", var, self.term_to_string(term)));
                 }
                 if i < solutions.len() - 1 {
                     self.output.push("".to_string());
@@ -173,7 +180,13 @@ impl PrologInterpreter {
         }
     }
 
-    fn resolve_query(&self, goal: &PrologTerm, subst: &Substitution, solutions: &mut Vec<Substitution>, depth: usize) {
+    fn resolve_query(
+        &self,
+        goal: &PrologTerm,
+        subst: &Substitution,
+        solutions: &mut Vec<Substitution>,
+        depth: usize,
+    ) {
         if depth > 100 {
             return; // Prevent infinite recursion
         }
@@ -191,7 +204,13 @@ impl PrologInterpreter {
         }
     }
 
-    fn resolve_goals(&self, goals: &[PrologTerm], subst: &Substitution, solutions: &mut Vec<Substitution>, depth: usize) {
+    fn resolve_goals(
+        &self,
+        goals: &[PrologTerm],
+        subst: &Substitution,
+        solutions: &mut Vec<Substitution>,
+        depth: usize,
+    ) {
         if goals.is_empty() {
             solutions.push(subst.clone());
             return;
@@ -209,7 +228,12 @@ impl PrologInterpreter {
         }
     }
 
-    fn unify(&self, term1: &PrologTerm, term2: &PrologTerm, subst: &Substitution) -> Option<Substitution> {
+    fn unify(
+        &self,
+        term1: &PrologTerm,
+        term2: &PrologTerm,
+        subst: &Substitution,
+    ) -> Option<Substitution> {
         let t1 = subst.apply(term1);
         let t2 = subst.apply(term2);
 
@@ -221,12 +245,8 @@ impl PrologInterpreter {
                     None
                 }
             }
-            (PrologTerm::Variable(v), _) => {
-                Some(subst.extend(v.clone(), t2.clone()))
-            }
-            (_, PrologTerm::Variable(v)) => {
-                Some(subst.extend(v.clone(), t1.clone()))
-            }
+            (PrologTerm::Variable(v), _) => Some(subst.extend(v.clone(), t2.clone())),
+            (_, PrologTerm::Variable(v)) => Some(subst.extend(v.clone(), t1.clone())),
             (PrologTerm::Compound(name1, args1), PrologTerm::Compound(name2, args2)) => {
                 if name1 == name2 && args1.len() == args2.len() {
                     let mut current_subst = subst.clone();
@@ -251,7 +271,8 @@ impl PrologInterpreter {
             PrologTerm::Atom(s) => s.clone(),
             PrologTerm::Variable(v) => v.clone(),
             PrologTerm::Compound(name, args) => {
-                let args_str: Vec<String> = args.iter().map(|arg| self.term_to_string(arg)).collect();
+                let args_str: Vec<String> =
+                    args.iter().map(|arg| self.term_to_string(arg)).collect();
                 format!("{}({})", name, args_str.join(", "))
             }
         }
