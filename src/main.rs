@@ -103,74 +103,53 @@ impl TimeWarpApp {
     }
 
     fn execute_tw_basic(&mut self, code: &str) -> String {
-        // Parse program lines with line numbers
-        self.program_lines.clear();
+        use crate::languages::basic::BasicInterpreter;
+
+        // Convert line-numbered BASIC to statements without line numbers
+        let mut statements = Vec::new();
         for line in code.lines() {
             let line = line.trim();
             if line.is_empty() {
                 continue;
             }
 
-            // Try to parse line number
+            // Try to parse line number and extract the statement
             if let Some((line_num_str, command)) = line.split_once(' ') {
-                if let Ok(line_num) = line_num_str.parse::<u32>() {
-                    self.program_lines
-                        .push((line_num, command.trim().to_string()));
+                if line_num_str.parse::<u32>().is_ok() {
+                    statements.push(command.trim().to_string());
                 } else {
-                    self.program_lines.push((0, line.to_string()));
+                    statements.push(line.to_string());
                 }
             } else {
-                self.program_lines.push((0, line.to_string()));
+                statements.push(line.to_string());
             }
         }
 
-        // Sort by line number
-        self.program_lines.sort_by_key(|(line_num, _)| *line_num);
+        // Join statements with newlines for the interpreter
+        let program_code = statements.join("\n");
 
-        // Execute the program
-        self.current_line = 0;
-        let mut output = String::new();
+        let mut interpreter = BasicInterpreter::new();
 
-        while self.current_line < self.program_lines.len() {
-            let command = self.program_lines[self.current_line].1.clone();
-            let result = self.execute_basic_command(&command);
-
-            match result {
-                CommandResult::Output(text) => {
-                    output.push_str(&text);
-                    output.push('\n');
-                }
-                CommandResult::Goto(line_num) => {
-                    if let Some(pos) = self
-                        .program_lines
-                        .iter()
-                        .position(|(ln, _)| *ln == line_num)
-                    {
-                        self.current_line = pos;
-                        continue;
-                    } else {
-                        output.push_str(&format!("Line {} not found\n", line_num));
-                        break;
-                    }
-                }
-                CommandResult::Input(var_name, prompt) => {
+        match interpreter.execute(&program_code) {
+            Ok(result) => match result {
+                crate::languages::basic::ExecutionResult::Complete { output, .. } => output,
+                crate::languages::basic::ExecutionResult::NeedInput {
+                    prompt,
+                    partial_output,
+                    ..
+                } => {
                     self.waiting_for_input = true;
-                    self.current_input_var = var_name;
                     self.input_prompt = prompt.clone();
-                    output.push_str(&prompt);
-                    break; // Wait for user input
+                    // For now, just return the partial output with the prompt
+                    format!("{}{}", partial_output, prompt)
                 }
-                CommandResult::Continue => {}
-                CommandResult::End => break,
+                crate::languages::basic::ExecutionResult::Error(err) => {
+                    format!("Error: {:?}", err)
+                }
+            },
+            Err(err) => {
+                format!("Error: {:?}", err)
             }
-
-            self.current_line += 1;
-        }
-
-        if output.is_empty() && !self.waiting_for_input {
-            "Program executed successfully".to_string()
-        } else {
-            output
         }
     }
 
@@ -1418,5 +1397,26 @@ mod tests {
         // Test text with undefined variables
         let result = app.process_pilot_text("Hello #UNKNOWN");
         assert_eq!(result, "Hello #UNKNOWN");
+    }
+
+    #[test]
+    fn test_basic_program_execution() {
+        let mut app = TimeWarpApp::default();
+        app.language = "TW BASIC".to_string();
+
+        // Test simple BASIC program execution
+        let basic_code = "10 PRINT \"Hello from Time_Warp!\"\n20 PRINT \"Testing output console...\"\n30 FOR I = 1 TO 3\n40 PRINT \"Count: \"; I\n50 NEXT I\n60 PRINT \"Test complete!\"";
+        let result = app.execute_tw_basic(basic_code);
+
+        // Debug: print the actual result
+        println!("Actual result: {:?}", result);
+
+        // Verify the output contains expected strings
+        assert!(result.contains("Hello from Time_Warp!"));
+        assert!(result.contains("Testing output console..."));
+        assert!(result.contains("Count: 1"));
+        assert!(result.contains("Count: 2"));
+        assert!(result.contains("Count: 3"));
+        assert!(result.contains("Test complete!"));
     }
 }
