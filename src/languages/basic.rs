@@ -54,7 +54,6 @@ pub enum Token {
     Randomize,
     Len,
     Mid,
-    Tab,
 
     // Operators
     Plus,
@@ -362,7 +361,6 @@ impl Tokenizer {
                         "RANDOMIZE" => Token::Randomize,
                         "LEN" => Token::Len,
                         "MID" => Token::Mid,
-                        "TAB" => Token::Tab,
                         "MOD" => Token::Mod,
                         _ => Token::Identifier(ident),
                     };
@@ -421,6 +419,14 @@ impl Tokenizer {
                 }
                 '$' => {
                     tokens.push(Token::Dollar);
+                    self.position += 1;
+                }
+                '(' => {
+                    tokens.push(Token::LParen);
+                    self.position += 1;
+                }
+                ')' => {
+                    tokens.push(Token::RParen);
                     self.position += 1;
                 }
                 ',' => {
@@ -1184,33 +1190,6 @@ impl Parser {
                 } else {
                     Ok(Expression::Variable(ident))
                 }
-            }
-            Some(Token::Tab) => {
-                self.advance();
-                // TAB must be followed by LParen for function call
-                self.expect(&Token::LParen)?;
-                let mut arguments = Vec::new();
-
-                if let Some(Token::RParen) = self.current_token {
-                    self.advance();
-                } else {
-                    loop {
-                        let arg = self.parse_expression()?;
-                        arguments.push(arg);
-
-                        if let Some(Token::Comma) = self.current_token {
-                            self.advance();
-                        } else {
-                            self.expect(&Token::RParen)?;
-                            break;
-                        }
-                    }
-                }
-
-                Ok(Expression::FunctionCall {
-                    name: "TAB".to_string(),
-                    arguments,
-                })
             }
             Some(Token::LParen) => {
                 self.advance();
