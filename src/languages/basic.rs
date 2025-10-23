@@ -54,6 +54,7 @@ pub enum Token {
     Randomize,
     Len,
     Mid,
+    Tab,
 
     // Operators
     Plus,
@@ -361,6 +362,7 @@ impl Tokenizer {
                         "RANDOMIZE" => Token::Randomize,
                         "LEN" => Token::Len,
                         "MID" => Token::Mid,
+                        "TAB" => Token::Tab,
                         "MOD" => Token::Mod,
                         _ => Token::Identifier(ident),
                     };
@@ -1183,6 +1185,33 @@ impl Parser {
                     Ok(Expression::Variable(ident))
                 }
             }
+            Some(Token::Tab) => {
+                self.advance();
+                // TAB must be followed by LParen for function call
+                self.expect(&Token::LParen)?;
+                let mut arguments = Vec::new();
+
+                if let Some(Token::RParen) = self.current_token {
+                    self.advance();
+                } else {
+                    loop {
+                        let arg = self.parse_expression()?;
+                        arguments.push(arg);
+
+                        if let Some(Token::Comma) = self.current_token {
+                            self.advance();
+                        } else {
+                            self.expect(&Token::RParen)?;
+                            break;
+                        }
+                    }
+                }
+
+                Ok(Expression::FunctionCall {
+                    name: "TAB".to_string(),
+                    arguments,
+                })
+            }
             Some(Token::LParen) => {
                 self.advance();
                 let expr = self.parse_expression()?;
@@ -1808,6 +1837,30 @@ impl BasicInterpreter {
                 } else {
                     Err(InterpreterError::RuntimeError(
                         "STR requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "TAB" => {
+                if arguments.len() == 1 {
+                    if let Value::Number(n) = arguments[0] {
+                        let column = n as usize;
+                        // TAB function returns spaces to reach the specified column
+                        // This is a simplified implementation - in real BASIC it would
+                        // position relative to current cursor position
+                        let spaces = if column > 0 {
+                            " ".repeat(column)
+                        } else {
+                            String::new()
+                        };
+                        Ok(Value::String(spaces))
+                    } else {
+                        Err(InterpreterError::TypeError(
+                            "TAB requires numeric argument".to_string(),
+                        ))
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "TAB requires 1 argument".to_string(),
                     ))
                 }
             }

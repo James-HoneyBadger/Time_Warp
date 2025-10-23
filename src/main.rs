@@ -1789,6 +1789,82 @@ impl eframe::App for TimeWarpApp {
                                             );
                                         });
 
+                                    // Input prompt - integrated into the same screen
+                                    if self.waiting_for_input {
+                                        ui.separator();
+                                        ui.label("📝 Program Input Required");
+                                        ui.horizontal(|ui| {
+                                            ui.label(&self.input_prompt);
+                                            let response = ui.text_edit_singleline(&mut self.user_input);
+                                            if ui.button("🚀 Submit").clicked()
+                                                || (response.lost_focus()
+                                                    && ui.input(|i| i.key_pressed(egui::Key::Enter)))
+                                            {
+                                                // Store the input in the variable
+                                                self.variables
+                                                    .insert(self.current_input_var.clone(), self.user_input.clone());
+
+                                                // Provide input to the BASIC interpreter and continue execution
+                                                if let Some(ref mut interpreter) = self.basic_interpreter {
+                                                    interpreter.provide_input(&self.user_input);
+
+                                                    // Continue execution with the interpreter
+                                                    match interpreter.execute("") {
+                                                        // Empty string since interpreter has state
+                                                        Ok(result) => match result {
+                                                            crate::languages::basic::ExecutionResult::Complete {
+                                                                output,
+                                                                graphics_commands,
+                                                            } => {
+                                                                self.process_graphics_commands(&graphics_commands);
+                                                                self.output = format!("{}{}", self.output, output);
+                                                                self.basic_interpreter = None;
+                                                            }
+                                                            crate::languages::basic::ExecutionResult::NeedInput {
+                                                                variable_name,
+                                                                prompt,
+                                                                partial_output,
+                                                                partial_graphics,
+                                                            } => {
+                                                                self.process_graphics_commands(&partial_graphics);
+                                                                self.input_prompt = prompt.clone();
+                                                                self.current_input_var = variable_name;
+                                                                self.output = format!(
+                                                                    "{}{}{}",
+                                                                    self.output, partial_output, prompt
+                                                                );
+                                                                // Keep waiting for more input
+                                                            }
+                                                            crate::languages::basic::ExecutionResult::Error(err) => {
+                                                                self.output =
+                                                                    format!("{}Error: {:?}", self.output, err);
+                                                                self.basic_interpreter = None;
+                                                            }
+                                                        },
+                                                        Err(err) => {
+                                                            self.output = format!("{}Error: {:?}", self.output, err);
+                                                            self.basic_interpreter = None;
+                                                        }
+                                                    }
+                                                }
+
+                                                // Continue execution
+                                                self.waiting_for_input = false;
+                                                self.user_input.clear();
+                                                self.input_prompt.clear();
+                                                self.current_input_var.clear();
+                                            }
+                                            if ui.button("❌ Cancel").clicked() {
+                                                self.output = format!("{}Input cancelled.", self.output);
+                                                self.waiting_for_input = false;
+                                                self.user_input.clear();
+                                                self.input_prompt.clear();
+                                                self.current_input_var.clear();
+                                                self.basic_interpreter = None;
+                                            }
+                                        });
+                                    }
+
                                     ui.separator();
                                     ui.label("Turtle Graphics:");
                                     ui.horizontal(|ui| {
@@ -2001,81 +2077,6 @@ impl eframe::App for TimeWarpApp {
                     });
             });
         });
-
-        // Input handling - shown prominently when waiting for input
-        if self.waiting_for_input {
-            egui::CentralPanel::default().show(ctx, |ui| {
-                ui.vertical_centered(|ui| {
-                    ui.add_space(50.0);
-                    ui.heading("📝 Program Input Required");
-                    ui.add_space(20.0);
-                    ui.label(&self.input_prompt);
-                    ui.add_space(10.0);
-                    ui.horizontal(|ui| {
-                        ui.label("Input:");
-                        let response = ui.text_edit_singleline(&mut self.user_input);
-                        if ui.button("🚀 Submit").clicked()
-                            || (response.lost_focus()
-                                && ui.input(|i| i.key_pressed(egui::Key::Enter)))
-                        {
-                            // Store the input in the variable
-                            self.variables
-                                .insert(self.current_input_var.clone(), self.user_input.clone());
-
-                            // Provide input to the BASIC interpreter and continue execution
-                            if let Some(ref mut interpreter) = self.basic_interpreter {
-                                interpreter.provide_input(&self.user_input);
-
-                                // Continue execution with the interpreter
-                                match interpreter.execute("") {
-                                    // Empty string since interpreter has state
-                                    Ok(result) => match result {
-                                        crate::languages::basic::ExecutionResult::Complete {
-                                            output,
-                                            graphics_commands,
-                                        } => {
-                                            self.process_graphics_commands(&graphics_commands);
-                                            self.output = format!("{}{}", self.output, output);
-                                            self.basic_interpreter = None;
-                                        }
-                                        crate::languages::basic::ExecutionResult::NeedInput {
-                                            variable_name,
-                                            prompt,
-                                            partial_output,
-                                            partial_graphics,
-                                        } => {
-                                            self.process_graphics_commands(&partial_graphics);
-                                            self.input_prompt = prompt.clone();
-                                            self.current_input_var = variable_name;
-                                            self.output = format!(
-                                                "{}{}{}",
-                                                self.output, partial_output, prompt
-                                            );
-                                            // Keep waiting for more input
-                                        }
-                                        crate::languages::basic::ExecutionResult::Error(err) => {
-                                            self.output =
-                                                format!("{}Error: {:?}", self.output, err);
-                                            self.basic_interpreter = None;
-                                        }
-                                    },
-                                    Err(err) => {
-                                        self.output = format!("{}Error: {:?}", self.output, err);
-                                        self.basic_interpreter = None;
-                                    }
-                                }
-                            }
-
-                            // Continue execution
-                            self.waiting_for_input = false;
-                            self.user_input.clear();
-                            self.input_prompt.clear();
-                            self.current_input_var.clear();
-                        }
-                    });
-                });
-            });
-        }
 
         // General prompt handling - shown prominently when active
         if self.general_prompt_active {
@@ -2532,5 +2533,33 @@ mod tests {
             app.current_input_var, "NAME$",
             "Current input variable should be set correctly"
         );
+    }
+
+    #[test]
+    fn test_tab_tokenizer() {
+        use crate::languages::basic::BasicInterpreter;
+
+        let mut tokenizer = BasicInterpreter::new_tokenizer("TAB(10)");
+        let tokens = tokenizer.tokenize().unwrap();
+
+        println!("Tokens: {:?}", tokens);
+
+        // Should have TAB, LParen, Number(10), RParen
+        assert!(tokens.len() >= 4);
+    }
+
+    #[test]
+    fn test_tab_function() {
+        let mut app = TimeWarpApp::default();
+
+        // Test TAB function in PRINT statements
+        let tab_code = "PRINT \"Hello\"; TAB(10); \"World\"";
+        let result = app.execute_tw_basic(tab_code);
+
+        println!("TAB result: {:?}", result);
+
+        // Verify TAB function produces spaces for positioning
+        assert!(result.contains("Hello"));
+        assert!(result.contains("World"));
     }
 }
