@@ -1,0 +1,15 @@
+10 PRINT "Testing PRINT command"
+20 WRITELN "Testing WRITELN command"
+30 LET A = 42
+40 PRINT "Variable A = "; A
+50 FORWARD 100
+60 RIGHT 90
+70 BACK 50
+80 LEFT 45
+90 PENUP
+100 PENDOWN
+110 FOR I = 1 TO 3
+120 PRINT "Loop iteration: "; I
+130 NEXT I
+140 IF A = 42 THEN PRINT "Condition true"
+150 END
