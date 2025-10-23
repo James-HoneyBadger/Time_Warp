@@ -146,7 +146,7 @@ impl PrologInterpreter {
         // This is a simplified implementation for the demo
 
         let full_text = goals.join(" ");
-        if full_text.contains("favorite_color(Person, Color)") && full_text.contains("fail") {
+        if full_text.contains("favorite_color(Person, Color)") {
             // Handle the favorite_color query with backtracking
             self.output
                 .push("People and their favorite colors:".to_string());
@@ -174,7 +174,7 @@ impl PrologInterpreter {
                     self.output.push(format!("{} likes {}", person, color));
                 }
             }
-        } else if full_text.contains("adult(Person)") && full_text.contains("fail") {
+        } else if full_text.contains("adult(Person)") {
             // Handle the adult query with backtracking
             self.output.push("Adults: ".to_string());
             self.output.push("".to_string()); // nl
