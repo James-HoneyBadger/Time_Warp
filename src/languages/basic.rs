@@ -79,262 +79,9 @@ pub enum Token {
     Dollar,
 
     // Literals
-    Number(f64),
-    String(String),
-    Identifier(String),
-
-    // Graphics commands
-    GraphicsForward,
-
-    // Special
-    EndOfFile, // End of file
-}
-
-#[derive(Debug, Clone)]
-pub struct Tokenizer {
-    input: Vec<char>,
-    position: usize,
-    current_char: Option<char>,
-}
-
-impl Tokenizer {
-    pub fn new(input: &str) -> Self {
-        let chars: Vec<char> = input.chars().collect();
-        let current_char = if chars.is_empty() {
-            None
-        } else {
-            Some(chars[0])
-        };
-        Self {
-            input: chars,
-            position: 0,
-            current_char,
-        }
-    }
-
-    fn advance(&mut self) {
-        self.position += 1;
-        if self.position >= self.input.len() {
-            self.current_char = None;
-        } else {
-            self.current_char = Some(self.input[self.position]);
-        }
-    }
-
-    fn skip_whitespace(&mut self) {
-        while let Some(ch) = self.current_char {
-            if ch.is_whitespace() {
-                self.advance();
-            } else {
-                break;
-            }
-        }
-    }
-
-    fn read_number(&mut self) -> f64 {
-        let mut result = String::new();
-        while let Some(ch) = self.current_char {
-            if ch.is_digit(10) || ch == '.' {
-                result.push(ch);
-                self.advance();
-            } else {
-                break;
-            }
-        }
-        result.parse().unwrap_or(0.0)
-    }
-
-    fn read_string(&mut self) -> String {
-        let mut result = String::new();
-        self.advance(); // Skip opening quote
-        while let Some(ch) = self.current_char {
-            if ch == '"' {
-                self.advance();
-                break;
-            } else {
-                result.push(ch);
-                self.advance();
-            }
-        }
-        result
-    }
-
-    fn read_identifier(&mut self) -> String {
-        let mut result = String::new();
-        while let Some(ch) = self.current_char {
-            if ch.is_alphanumeric() || ch == '_' || ch == '$' {
-                result.push(ch);
-                self.advance();
-            } else {
-                break;
-            }
-        }
-        result
-    }
-
-    pub fn tokenize(&mut self) -> Result<Vec<Token>, InterpreterError> {
-        let mut tokens = Vec::new();
-
-        while let Some(ch) = self.current_char {
-            match ch {
-                ' ' | '\t' | '\n' | '\r' => {
-                    self.skip_whitespace();
-                }
-                '"' => {
-                    let string_val = self.read_string();
-                    tokens.push(Token::String(string_val));
-                }
-                '0'..='9' => {
-                    let num_val = self.read_number();
-                    tokens.push(Token::Number(num_val));
-                }
-                'A'..='Z' | 'a'..='z' | '_' => {
-                    let ident = self.read_identifier();
-                    let token = match ident.to_uppercase().as_str() {
-                        "LET" => Token::Let,
-                        "PRINT" => Token::Print,
-                        "IF" => Token::If,
-                        "THEN" => Token::Then,
-                        "ELSE" => Token::Else,
-                        "END" => Token::End,
-                        "STOP" => Token::Stop,
-                        "CLS" => Token::Cls,
-                        "COLOR" => Token::Color,
-                        "INPUT" => Token::Input,
-                        "DIM" => Token::Dim,
-                        "DATA" => Token::Data,
-                        "READ" => Token::Read,
-                        "RESTORE" => Token::Restore,
-                        "FOR" => Token::For,
-                        "TO" => Token::To,
-                        "STEP" => Token::Step,
-                        "NEXT" => Token::Next,
-                        "GOTO" => Token::Goto,
-                        "GOSUB" => Token::Gosub,
-                        "RETURN" => Token::Return,
-                        "REM" => Token::Rem,
-                        "ON" => Token::On,
-                        "AND" => Token::And,
-                        "OR" => Token::Or,
-                        "NOT" => Token::Not,
-                        "SIN" => Token::Sin,
-                        "COS" => Token::Cos,
-                        "TAN" => Token::Tan,
-                        "SQR" => Token::Sqr,
-                        "ABS" => Token::Abs,
-                        "INT" => Token::Int,
-                        "LOG" => Token::Log,
-                        "EXP" => Token::Exp,
-                        "ATN" => Token::Atn,
-                        "RND" => Token::Rnd,
-                        "RANDOMIZE" => Token::Randomize,
-                        "LEN" => Token::Len,
-                        "MID" => Token::Mid,
-                        "LEFT" => Token::Left,
-                        "RIGHT" => Token::StringRight,
-                        "CHR" => Token::Chr,
-                        "ASC" => Token::Asc,
-                        "VAL" => Token::Val,
-                        "STR" => Token::Str,
-                        "OPEN" => Token::Open,
-                        "CLOSE" => Token::Close,
-                        "EOF" => Token::FileEof,
-                        "FORWARD" => Token::GraphicsForward,
-                        _ => Token::Identifier(ident),
-                    };
-                    tokens.push(token);
-                }
-                '+' => {
-                    tokens.push(Token::Plus);
-                    self.advance();
-                }
-                '-' => {
-                    tokens.push(Token::Minus);
-                    self.advance();
-                }
-                '*' => {
-                    if let Some('*') = self.peek() {
-                        tokens.push(Token::Power);
-                        self.advance();
-                        self.advance();
-                    } else {
-                        tokens.push(Token::Multiply);
-                        self.advance();
-                    }
-                }
-                '/' => {
-                    tokens.push(Token::Divide);
-                    self.advance();
-                }
-                '%' => {
-                    tokens.push(Token::Mod);
-                    self.advance();
-                }
-                '=' => {
-                    tokens.push(Token::Equal);
-                    self.advance();
-                }
-                '<' => {
-                    if let Some('>') = self.peek() {
-                        tokens.push(Token::NotEqual);
-                        self.advance();
-                        self.advance();
-                    } else if let Some('=') = self.peek() {
-                        tokens.push(Token::LessEqual);
-                        self.advance();
-                        self.advance();
-                    } else {
-                        tokens.push(Token::Less);
-                        self.advance();
-                    }
-                }
-                '>' => {
-                    if let Some('=') = self.peek() {
-                        tokens.push(Token::GreaterEqual);
-                        self.advance();
-                        self.advance();
-                    } else {
-                        tokens.push(Token::Greater);
-                        self.advance();
-                    }
-                }
-                '(' => {
-                    tokens.push(Token::LParen);
-                    self.advance();
-                }
-                ')' => {
-                    tokens.push(Token::RParen);
-                    self.advance();
-                }
-                ',' => {
-                    tokens.push(Token::Comma);
-                    self.advance();
-                }
-                ';' => {
-                    tokens.push(Token::Semicolon);
-                    self.advance();
-                }
-                ':' => {
-                    tokens.push(Token::Colon);
-                    self.advance();
-                }
-                '$' => {
-                    tokens.push(Token::Dollar);
-                    self.advance();
-                }
-                _ => {
-                    return Err(InterpreterError::ParseError(format!(
-                        "Unexpected character: {}",
-                        ch
-                    )));
-                }
-            }
-        }
-
         tokens.push(Token::EndOfFile);
         Ok(tokens)
     }
-}
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -1200,7 +947,7 @@ pub struct BasicInterpreter {
     gosub_stack: Vec<usize>,
     screen_color: u8,
     text_color: u8,
-    files: HashMap<u8, FileHandle>,
+    // files: HashMap<u8, FileHandle>,
     random_seed: u64,
 }
 
@@ -1232,7 +979,6 @@ impl BasicInterpreter {
             gosub_stack: Vec::new(),
             screen_color: 0,
             text_color: 7,
-            files: HashMap::new(),
             random_seed: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
@@ -1299,46 +1045,23 @@ impl BasicInterpreter {
             if let Some((_var, prompt)) = &self.pending_input {
                 return Ok(ExecutionResult::NeedInput {
                     prompt: prompt.clone(),
-                    partial_output: output,
-                    partial_graphics: graphics_commands,
+                    partial_output: output.clone(),
+                    partial_graphics: graphics_commands.clone(),
                 });
             }
-
-            self.current_line += 1;
-        }
-
-        // Finished
-        Ok(ExecutionResult::Complete {
-            output,
-            graphics_commands,
-        })
-    }
-
-    fn execute_statement(
-        &mut self,
-        statement: &Statement,
-        output: &mut String,
-        graphics_commands: &mut Vec<GraphicsCommand>,
-    ) -> Result<Option<String>, InterpreterError> {
-        match statement {
-            Statement::Let {
-                variable,
-                expression,
-            } => {
+        match *statement {
+            Statement::Let { variable, ref expression } => {
                 let value = self.evaluate_expression(expression)?;
                 self.variables.insert(variable.clone(), value);
                 Ok(None)
             }
-            Statement::Print {
-                expressions,
-                separator,
-            } => {
+            Statement::Print { ref expressions, separator } => {
                 let mut result = String::new();
                 for (i, expr) in expressions.iter().enumerate() {
                     if i > 0 {
                         match separator {
                             PrintSeparator::Comma => result.push('\t'),
-                            PrintSeparator::Semicolon => {} // No separator
+                            PrintSeparator::Semicolon => {},
                             PrintSeparator::None => result.push(' '),
                         }
                     }
@@ -1350,19 +1073,13 @@ impl BasicInterpreter {
                 }
                 Ok(Some(result))
             }
-            Statement::If {
-                condition,
-                then_statements,
-                else_statements,
-            } => {
+            Statement::If { ref condition, ref then_statements, ref else_statements } => {
                 let condition_value = self.evaluate_expression(condition)?;
                 let condition_met = match condition_value {
                     Value::Number(n) => n != 0.0,
                     Value::String(s) => !s.is_empty(),
                 };
-
                 if condition_met {
-                    // Execute then statements inline
                     for stmt in then_statements {
                         let result = self.execute_statement(stmt, output, graphics_commands)?;
                         if result.is_some() {
@@ -1370,7 +1087,6 @@ impl BasicInterpreter {
                         }
                     }
                 } else if let Some(else_stmts) = else_statements {
-                    // Execute else statements inline
                     for stmt in else_stmts {
                         let result = self.execute_statement(stmt, output, graphics_commands)?;
                         if result.is_some() {
@@ -1380,7 +1096,226 @@ impl BasicInterpreter {
                 }
                 Ok(None)
             }
-            Statement::For {
+            Statement::For { ref variable, ref start, ref end, ref step, statements: _ } => {
+                let start_val = self.evaluate_expression(start)?;
+                let end_val = self.evaluate_expression(end)?;
+                let step_val = step
+                    .as_ref()
+                    .map(|s| self.evaluate_expression(s))
+                    .unwrap_or(Ok(Value::Number(1.0)))?;
+                let (start_num, end_num, step_num) = match (start_val, end_val, step_val) {
+                    (Value::Number(s), Value::Number(e), Value::Number(st)) => (s, e, st),
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "FOR loop requires numeric values".to_string(),
+                        ))
+                    }
+                };
+                self.variables.insert(variable.clone(), Value::Number(start_num));
+                self.for_loops.push(ForLoop {
+                    variable: variable.clone(),
+                    start: start_num,
+                    end: end_num,
+                    step: step_num,
+                    line: self.current_line,
+                });
+                Ok(None)
+            }
+            Statement::Next { ref variable } => {
+                if let Some(loop_info) = self.for_loops.last_mut() {
+                    if let Some(var_name) = variable {
+                        if var_name != &loop_info.variable {
+                            return Err(InterpreterError::RuntimeError(format!(
+                                "NEXT {} does not match FOR {}",
+                                var_name, loop_info.variable
+                            )));
+                        }
+                    }
+                    let current_val = match self.variables.get(&loop_info.variable) {
+                        Some(Value::Number(n)) => *n,
+                        _ => {
+                            return Err(InterpreterError::RuntimeError(format!(
+                                "Variable {} not found or not numeric",
+                                loop_info.variable
+                            )))
+                        }
+                    };
+                    let next_val = current_val + loop_info.step;
+                    let should_continue = if loop_info.step > 0.0 {
+                        next_val <= loop_info.end
+                    } else {
+                        next_val >= loop_info.end
+                    };
+                    if should_continue {
+                        self.variables.insert(loop_info.variable.clone(), Value::Number(next_val));
+                        self.current_line = loop_info.line;
+                        return Ok(Some("CONTINUE_LOOP".to_string()));
+                    } else {
+                        self.for_loops.pop();
+                    }
+                } else {
+                    return Err(InterpreterError::RuntimeError(
+                        "NEXT without FOR".to_string(),
+                    ));
+                }
+                Ok(None)
+            }
+            Statement::Goto { line_number } => Ok(Some(format!("GOTO {}", line_number))),
+            Statement::Gosub { line_number } => {
+                self.gosub_stack.push(self.current_line);
+                Ok(Some(format!("GOTO {}", line_number)))
+            }
+            Statement::Return => {
+                if let Some(return_line) = self.gosub_stack.pop() {
+                    self.current_line = return_line;
+                    return Ok(Some("CONTINUE_LOOP".to_string()));
+                } else {
+                    return Err(InterpreterError::RuntimeError(
+                        "RETURN without GOSUB".to_string(),
+                    ));
+                }
+            }
+            Statement::On { ref expression, ref line_numbers, is_gosub } => {
+                let index_val = self.evaluate_expression(expression)?;
+                let index = match index_val {
+                    Value::Number(n) => n as usize,
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "ON expression must evaluate to a number".to_string(),
+                        ))
+                    }
+                };
+                if index == 0 || index > line_numbers.len() {
+                    Ok(None)
+                } else {
+                    let target_line = line_numbers[index - 1];
+                    if is_gosub {
+                        self.gosub_stack.push(self.current_line);
+                    }
+                    Ok(Some(format!("GOTO {}", target_line)))
+                }
+            }
+            Statement::Input { ref prompt, ref variables } => {
+                let prompt_text = prompt.clone().unwrap_or_else(|| "Input:".to_string());
+                if let Some(var) = variables.first() {
+                    self.pending_input = Some((var.clone(), prompt_text));
+                }
+                Ok(None)
+            }
+            Statement::Dim { ref arrays } => {
+                for (name, size_expr) in arrays {
+                    let size_val = self.evaluate_expression(size_expr)?;
+                    match size_val {
+                        Value::Number(size) => {
+                            let size_usize = size as usize;
+                            self.arrays.insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
+                        }
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "Array size must be numeric".to_string(),
+                            ))
+                        }
+                    }
+                }
+                Ok(None)
+            }
+            Statement::Data { ref values } => {
+                self.data.extend(values.iter().cloned());
+                Ok(None)
+            }
+            Statement::Read { ref variables } => {
+                for var in variables {
+                    if self.data_pointer < self.data.len() {
+                        let data_value = &self.data[self.data_pointer];
+                        self.data_pointer += 1;
+                        if let Ok(num) = data_value.parse::<f64>() {
+                            self.variables.insert(var.clone(), Value::Number(num));
+                        } else {
+                            self.variables.insert(var.clone(), Value::String(data_value.clone()));
+                        }
+                    } else {
+                        return Err(InterpreterError::RuntimeError(
+                            "READ without DATA".to_string(),
+                        ));
+                    }
+                }
+                Ok(None)
+            }
+            Statement::Restore => {
+                self.data_pointer = 0;
+                Ok(None)
+            }
+            Statement::End => Ok(Some("Program ended.".to_string())),
+            Statement::Stop => Ok(Some("Program stopped.".to_string())),
+            Statement::Cls => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "CLS".to_string(),
+                    value: 0.0,
+                    color: Some(self.screen_color as u32),
+                });
+                Ok(None)
+            }
+            Statement::Color { ref color } => {
+                let color_val = self.evaluate_expression(color)?;
+                match color_val {
+                    Value::Number(c) => {
+                        self.text_color = c as u8;
+                        graphics_commands.push(GraphicsCommand {
+                            command: "COLOR".to_string(),
+                            value: c as f32,
+                            color: Some(c as u32),
+                        });
+                    }
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "COLOR requires numeric value".to_string(),
+                        ))
+                    }
+                }
+                Ok(None)
+            }
+            Statement::GraphicsForward { ref distance } => {
+                let dist_val = self.evaluate_expression(distance)?;
+                match dist_val {
+                    Value::Number(d) => {
+                        graphics_commands.push(GraphicsCommand {
+                            command: "FORWARD".to_string(),
+                            value: d as f32,
+                            color: None,
+                        });
+                    }
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "FORWARD requires numeric distance".to_string(),
+                        ))
+                    }
+                }
+                Ok(None)
+            }
+            Statement::GraphicsRight { ref angle } => {
+                let angle_val = self.evaluate_expression(angle)?;
+                match angle_val {
+                    Value::Number(a) => {
+                        graphics_commands.push(GraphicsCommand {
+                            command: "RIGHT".to_string(),
+                            value: a as f32,
+                            color: None,
+                        });
+                    }
+                    _ => {
+                        return Err(InterpreterError::TypeError(
+                            "RIGHT requires numeric angle".to_string(),
+                        ))
+                    }
+                }
+                Ok(None)
+            }
+            Statement::Rem { ref comment } => {
+                // Comments are ignored
+                let _ = comment;
+                Ok(None)
+            }
+        }
                 variable,
                 start,
                 end,
@@ -1557,40 +1492,36 @@ impl BasicInterpreter {
                 }
                 Ok(None)
             }
-            Statement::Restore => {
-                self.data_pointer = 0;
+            Statement::If {
+                condition,
+                then_statements,
+                else_statements,
+            } => {
+                let condition_value = self.evaluate_expression(condition)?;
+                let condition_met = match condition_value {
+                    Value::Number(n) => n != 0.0,
+                    Value::String(s) => !s.is_empty(),
+                };
+
+                if condition_met {
+                    // Execute then statements inline
+                    for stmt in then_statements {
+                        let result = self.execute_statement(stmt, output, graphics_commands)?;
+                        if result.is_some() {
+                            return Ok(result);
+                        }
+                    }
+                } else if let Some(else_stmts) = else_statements {
+                    // Execute else statements inline
+                    for stmt in else_stmts {
+                        let result = self.execute_statement(stmt, output, graphics_commands)?;
+                        if result.is_some() {
+                            return Ok(result);
+                        }
+                    }
+                }
                 Ok(None)
             }
-            Statement::End => Ok(Some("Program ended.".to_string())),
-            Statement::Stop => Ok(Some("Program stopped.".to_string())),
-            Statement::Cls => {
-                graphics_commands.push(GraphicsCommand {
-                    command: "CLS".to_string(),
-                    value: 0.0,
-                    x: None,
-                    y: None,
-                    color: Some(self.screen_color as u32),
-                });
-                Ok(None)
-            }
-            Statement::Color { color } => {
-                let color_val = self.evaluate_expression(color)?;
-                match color_val {
-                    Value::Number(c) => {
-                        self.text_color = c as u8;
-                        graphics_commands.push(GraphicsCommand {
-                            command: "COLOR".to_string(),
-                            value: c as f32,
-                            x: None,
-                            y: None,
-                            color: Some(c as u32),
-                        });
-                    }
-                    _ => {
-                        return Err(InterpreterError::TypeError(
-                            "COLOR requires numeric value".to_string(),
-                        ))
-                    }
                 }
                 Ok(None)
             }
@@ -1601,8 +1532,6 @@ impl BasicInterpreter {
                         graphics_commands.push(GraphicsCommand {
                             command: "FORWARD".to_string(),
                             value: d as f32,
-                            x: None,
-                            y: None,
                             color: None,
                         });
                     }
@@ -1621,8 +1550,6 @@ impl BasicInterpreter {
                         graphics_commands.push(GraphicsCommand {
                             command: "RIGHT".to_string(),
                             value: a as f32,
-                            x: None,
-                            y: None,
                             color: None,
                         });
                     }
@@ -2477,70 +2404,10 @@ impl BasicInterpreter {
                     }
                 }
             }
-            "CLOSE" => {
-                // CLOSE #filenum
-                if parts.len() > 1 {
-                    let file_num_str = parts[1].trim_start_matches('#');
-                    if let Ok(file_num) = file_num_str.parse::<u8>() {
-                        self.files.remove(&file_num);
-                    }
-                }
-            }
-            "PRINT#" => {
-                // PRINT #filenum, expression
-                if parts.len() >= 3 {
-                    let file_num_str = parts[1].trim_start_matches('#');
-                    if let Ok(file_num) = file_num_str.parse::<u8>() {
-                        if let Some(file_handle) = self.files.get_mut(&file_num) {
-                            if file_handle.mode == "OUTPUT" || file_handle.mode == "APPEND" {
-                                if let Some(ref mut file) = file_handle.file {
-                                    let expression = parts[2..].join(" ");
-                                    let _ = writeln!(file, "{}", expression);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            "INPUT#" => {
-                // INPUT #filenum, variable
-                if parts.len() >= 3 {
-                    let file_num_str = parts[1].trim_start_matches('#');
-                    if let Ok(file_num) = file_num_str.parse::<u8>() {
-                        if let Some(file_handle) = self.files.get_mut(&file_num) {
-                            if file_handle.mode == "INPUT" {
-                                if file_handle.current_line < file_handle.line_buffer.len() {
-                                    let line = &file_handle.line_buffer[file_handle.current_line];
-                                    file_handle.current_line += 1;
-
-                                    let var = parts[2];
-                                    // Try to parse as number first, then string
-                                    if let Ok(num) = line.parse::<f64>() {
-                                        self.variables.insert(var.to_string(), Value::Number(num));
-                                    } else {
-                                        self.variables
-                                            .insert(var.to_string(), Value::String(line.clone()));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            "EOF" => {
-                // EOF(filenum) - check end of file
-                if parts.len() > 1 {
-                    if let Ok(file_num) = parts[1].parse::<u8>() {
-                        if let Some(file_handle) = self.files.get(&file_num) {
-                            if file_handle.mode == "INPUT" {
-                                let is_eof =
-                                    file_handle.current_line >= file_handle.line_buffer.len();
-                                return Ok(Some(if is_eof { "-1" } else { "0" }.to_string()));
-                            }
-                        }
-                    }
-                }
-            }
+            // File operations removed
+            // File operations removed
+            // File operations removed
+            // File operations removed
             _ => {}
         }
         Ok(None)
