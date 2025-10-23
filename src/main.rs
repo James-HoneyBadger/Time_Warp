@@ -20,6 +20,13 @@ enum CommandResult {
     End,
 }
 
+#[derive(Clone, PartialEq)]
+enum DebugState {
+    Stopped,
+    Running,
+    Paused,
+}
+
 struct TimeWarpApp {
     code: String,
     output: String,
@@ -44,6 +51,20 @@ struct TimeWarpApp {
     show_about: bool,
     turtle_zoom: f32,
     turtle_pan: egui::Vec2,
+
+    // Debug state
+    debug_mode: bool,
+    debug_state: DebugState,
+    breakpoints: HashMap<String, Vec<u32>>, // filename -> line numbers
+    current_debug_line: Option<u32>,
+    debug_variables: HashMap<String, String>,
+    debug_call_stack: Vec<String>,
+
+    // Code completion
+    show_completion: bool,
+    completion_items: Vec<String>,
+    completion_selected: usize,
+    completion_query: String,
 }
 
 impl Default for TimeWarpApp {
@@ -77,6 +98,20 @@ impl Default for TimeWarpApp {
             show_about: false,
             turtle_zoom: 1.0,
             turtle_pan: egui::vec2(0.0, 0.0),
+
+            // Debug defaults
+            debug_mode: false,
+            debug_state: DebugState::Stopped,
+            breakpoints: HashMap::new(),
+            current_debug_line: None,
+            debug_variables: HashMap::new(),
+            debug_call_stack: Vec::new(),
+
+            // Completion defaults
+            show_completion: false,
+            completion_items: Vec::new(),
+            completion_selected: 0,
+            completion_query: String::new(),
         }
     }
 }
@@ -727,6 +762,158 @@ impl TimeWarpApp {
     }
 }
 
+impl TimeWarpApp {
+    // Code completion methods
+    fn get_language_keywords(&self) -> Vec<&'static str> {
+        match self.language.as_str() {
+            "TW BASIC" => vec![
+                "PRINT",
+                "INPUT",
+                "LET",
+                "IF",
+                "THEN",
+                "ELSE",
+                "FOR",
+                "TO",
+                "STEP",
+                "NEXT",
+                "WHILE",
+                "WEND",
+                "GOTO",
+                "GOSUB",
+                "RETURN",
+                "END",
+                "CLS",
+                "LOCATE",
+                "COLOR",
+                "BEEP",
+                "SLEEP",
+                "RANDOMIZE",
+                "RND",
+                "INT",
+                "STR$",
+                "VAL",
+                "LEN",
+                "LEFT$",
+                "RIGHT$",
+                "MID$",
+                "CHR$",
+                "ASC",
+                "ABS",
+                "SIN",
+                "COS",
+                "TAN",
+                "LOG",
+                "EXP",
+                "SQR",
+                "AND",
+                "OR",
+                "NOT",
+                "MOD",
+                "DIM",
+                "READ",
+                "DATA",
+                "RESTORE",
+                "DEF",
+                "FN",
+                "REM",
+            ],
+            "TW Pascal" => vec![
+                "program",
+                "begin",
+                "end",
+                "var",
+                "const",
+                "type",
+                "procedure",
+                "function",
+                "if",
+                "then",
+                "else",
+                "for",
+                "to",
+                "downto",
+                "do",
+                "while",
+                "repeat",
+                "until",
+                "case",
+                "of",
+                "writeln",
+                "write",
+                "readln",
+                "read",
+                "integer",
+                "real",
+                "char",
+                "string",
+                "boolean",
+                "array",
+                "record",
+                "true",
+                "false",
+                "and",
+                "or",
+                "not",
+                "div",
+                "mod",
+                "nil",
+                "new",
+                "dispose",
+            ],
+            "TW Prolog" => vec![
+                ":-", "?-", "is", "not", "true", "false", "fail", "cut", "!", "write", "nl",
+                "read", "assert", "retract", "consult", "listing", "halt", "member", "append",
+                "length", "reverse", "sort", "findall", "bagof", "setof",
+            ],
+            "PILOT" => vec![
+                "T:", "A:", "J:", "Y:", "N:", "C:", "R:", "E:", "PAUSE", "COMPUTE", "MATCH", "USE",
+                "ACCEPT", "TYPE", "TN:", "TA:", "TJ:", "TY:", "TN:",
+            ],
+            _ => vec![],
+        }
+    }
+
+    fn get_completion_suggestions(&self, query: &str) -> Vec<String> {
+        let mut suggestions = Vec::new();
+
+        // Add language keywords
+        let keywords = self.get_language_keywords();
+        for keyword in keywords {
+            if keyword.to_lowercase().starts_with(&query.to_lowercase()) {
+                suggestions.push(keyword.to_string());
+            }
+        }
+
+        // Add variables (from debug_variables for now, could be extended)
+        for (var_name, _) in &self.debug_variables {
+            if var_name.to_lowercase().starts_with(&query.to_lowercase()) {
+                suggestions.push(var_name.clone());
+            }
+        }
+
+        // Sort and deduplicate
+        suggestions.sort();
+        suggestions.dedup();
+
+        suggestions
+    }
+
+    fn update_completion(&mut self, query: &str) {
+        self.completion_query = query.to_string();
+        self.completion_items = self.get_completion_suggestions(query);
+        self.completion_selected = 0;
+        self.show_completion = !self.completion_items.is_empty();
+    }
+
+    fn apply_completion(&mut self, completion: &str) {
+        // Simple implementation - just append to current code
+        // In a real implementation, this would replace the current word
+        self.code.push_str(completion);
+        self.show_completion = false;
+    }
+}
+
 impl eframe::App for TimeWarpApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.set_visuals(egui::Visuals::light());
@@ -970,13 +1157,78 @@ impl eframe::App for TimeWarpApp {
 
                                     self.code = lines.join("\n");
                                 } else {
-                                    // Without line numbers
-                                    ui.add(
-                                        egui::TextEdit::multiline(&mut self.code)
-                                            .font(egui::TextStyle::Monospace)
-                                            .desired_width(f32::INFINITY)
-                                            .desired_rows(20),
-                                    );
+                                    // Without line numbers - with completion support
+                                    let mut completion_to_apply = None;
+
+                                    let text_edit = egui::TextEdit::multiline(&mut self.code)
+                                        .font(egui::TextStyle::Monospace)
+                                        .desired_width(f32::INFINITY)
+                                        .desired_rows(20);
+
+                                    let response = ui.add(text_edit);
+
+                                    // Check for completion trigger (Ctrl+Space)
+                                    if response.has_focus()
+                                        && ui.input(|i| {
+                                            i.modifiers.ctrl && i.key_pressed(egui::Key::Space)
+                                        })
+                                    {
+                                        // Show all keywords for current language
+                                        self.update_completion("");
+                                    }
+
+                                    // Handle completion selection with arrow keys and Enter
+                                    if self.show_completion && !self.completion_items.is_empty() {
+                                        if ui.input(|i| i.key_pressed(egui::Key::ArrowDown)) {
+                                            self.completion_selected = (self.completion_selected
+                                                + 1)
+                                                % self.completion_items.len();
+                                        } else if ui.input(|i| i.key_pressed(egui::Key::ArrowUp)) {
+                                            self.completion_selected =
+                                                if self.completion_selected == 0 {
+                                                    self.completion_items.len() - 1
+                                                } else {
+                                                    self.completion_selected - 1
+                                                };
+                                        } else if ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+                                            if let Some(completion) =
+                                                self.completion_items.get(self.completion_selected)
+                                            {
+                                                completion_to_apply = Some(completion.clone());
+                                            }
+                                        } else if ui.input(|i| i.key_pressed(egui::Key::Escape)) {
+                                            self.show_completion = false;
+                                        }
+                                    }
+
+                                    // Show completion popup
+                                    if self.show_completion && !self.completion_items.is_empty() {
+                                        egui::Window::new("Completion")
+                                            .collapsible(false)
+                                            .resizable(false)
+                                            .show(ctx, |ui| {
+                                                egui::ScrollArea::vertical().show(ui, |ui| {
+                                                    for (i, item) in
+                                                        self.completion_items.iter().enumerate()
+                                                    {
+                                                        let is_selected =
+                                                            i == self.completion_selected;
+                                                        if ui
+                                                            .selectable_label(is_selected, item)
+                                                            .clicked()
+                                                        {
+                                                            completion_to_apply =
+                                                                Some(item.clone());
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                    }
+
+                                    // Apply completion after UI rendering
+                                    if let Some(completion) = completion_to_apply {
+                                        self.apply_completion(&completion);
+                                    }
                                 }
                             });
                         });
