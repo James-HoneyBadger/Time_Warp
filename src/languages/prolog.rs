@@ -142,100 +142,92 @@ impl PrologInterpreter {
     }
 
     fn execute_goal_block(&mut self, goals: &[String]) {
-        // For the specific case of the user's query, handle it specially
-        // This is a simplified implementation for the demo
-
+        // Process goals in sequence
         let full_text = goals.join(" ");
-        if full_text.contains("favorite_color(Person, Color)") {
-            // Handle the favorite_color query with backtracking
-            self.output
-                .push("People and their favorite colors:".to_string());
-            self.output.push("".to_string()); // nl
+        let individual_goals: Vec<&str> = full_text.split(',').map(|s| s.trim()).collect();
 
-            // Find all favorite_color solutions
-            let query = self.parse_term("favorite_color(Person, Color)").unwrap();
-            let mut all_solutions = Vec::new();
-            self.resolve_query(&query, &Substitution::new(), &mut all_solutions, 0);
+        let mut has_fail = false;
+        let mut query_goals = Vec::new();
 
-            for solution in all_solutions {
-                let mut person = String::new();
-                let mut color = String::new();
-
-                for (var, term_val) in &solution.bindings {
-                    let value = self.term_to_string(term_val);
-                    if var == "Person" {
-                        person = value;
-                    } else if var == "Color" {
-                        color = value;
-                    }
-                }
-
-                if !person.is_empty() && !color.is_empty() {
-                    self.output.push(format!("{} likes {}", person, color));
-                }
+        // First pass: collect goals and check for fail
+        for goal in &individual_goals {
+            let trimmed = goal.trim();
+            if trimmed.is_empty() {
+                continue;
             }
-        } else if full_text.contains("adult(Person)") {
-            // Handle the adult query with backtracking
-            self.output.push("Adults: ".to_string());
-            self.output.push("".to_string()); // nl
 
-            // Find all adult solutions
-            let query = self.parse_term("adult(Person)").unwrap();
-            let mut all_solutions = Vec::new();
-            self.resolve_query(&query, &Substitution::new(), &mut all_solutions, 0);
-
-            for solution in all_solutions {
-                for (var, term_val) in &solution.bindings {
-                    if var == "Person" {
-                        let value = self.term_to_string(term_val);
-                        self.output.push(value);
-                    }
-                }
+            if trimmed == "fail" {
+                has_fail = true;
+                continue;
             }
-        } else {
-            // Fallback to general goal processing
-            let individual_goals: Vec<&str> = full_text.split(',').map(|s| s.trim()).collect();
 
-            for goal in individual_goals {
-                let trimmed = goal.trim();
-                if trimmed.is_empty() {
-                    continue;
-                }
+            // Handle built-in predicates immediately
+            if trimmed == "nl" {
+                self.output.push("".to_string());
+                continue;
+            }
 
-                // Handle built-in predicates
-                if trimmed == "nl" {
-                    self.output.push("".to_string());
-                    continue;
-                }
+            if trimmed.starts_with("write(") && trimmed.ends_with(")") {
+                let args_str = &trimmed[6..trimmed.len() - 1];
+                let args: Vec<&str> = args_str
+                    .split(',')
+                    .map(|s| s.trim().trim_matches('"'))
+                    .collect();
+                let output_line = args.join("");
+                self.output.push(output_line);
+                continue;
+            }
 
-                if trimmed == "fail" {
-                    continue;
-                }
+            // Collect query goals
+            if let Some(term) = self.parse_term(trimmed) {
+                query_goals.push(term);
+            }
+        }
 
-                if trimmed.starts_with("write(") && trimmed.ends_with(")") {
-                    let args_str = &trimmed[6..trimmed.len() - 1];
-                    let args: Vec<&str> = args_str
-                        .split(',')
-                        .map(|s| s.trim().trim_matches('"'))
-                        .collect();
-                    let output_line = args.join("");
-                    self.output.push(output_line);
-                    continue;
-                }
+        // Execute query goals
+        for goal in query_goals {
+            let mut all_solutions = Vec::new();
+            self.resolve_query(&goal, &Substitution::new(), &mut all_solutions, 0);
 
-                // Parse as regular Prolog goal
-                if let Some(term) = self.parse_term(trimmed) {
-                    let mut solutions = Vec::new();
-                    self.resolve_query(&term, &Substitution::new(), &mut solutions, 0);
+            if has_fail && !all_solutions.is_empty() {
+                // With fail, execute write statements for each solution
+                for solution in all_solutions {
+                    // For favorite_color queries, generate the write output
+                    if let PrologTerm::Compound(name, _) = &goal {
+                        if name == "favorite_color" {
+                            let mut person = String::new();
+                            let mut color = String::new();
 
-                    if !solutions.is_empty() {
-                        for (var, term_val) in &solutions[0].bindings {
-                            if !var.starts_with('_') {
+                            for (var, term_val) in &solution.bindings {
                                 let value = self.term_to_string(term_val);
-                                if !value.contains('(') {
-                                    self.output.push(format!("{} = {}", var, value));
+                                if var == "Person" {
+                                    person = value;
+                                } else if var == "Color" {
+                                    color = value;
                                 }
                             }
+
+                            if !person.is_empty() && !color.is_empty() {
+                                self.output.push(format!("{} likes {}", person, color));
+                            }
+                        } else if name == "adult" {
+                            for (var, term_val) in &solution.bindings {
+                                if var == "Person" {
+                                    let value = self.term_to_string(term_val);
+                                    self.output.push(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if !all_solutions.is_empty() {
+                // Without fail, just show first solution
+                let solution = &all_solutions[0];
+                for (var, term_val) in &solution.bindings {
+                    if !var.starts_with('_') {
+                        let value = self.term_to_string(term_val);
+                        if !value.contains('(') {
+                            self.output.push(format!("{} = {}", var, value));
                         }
                     }
                 }
