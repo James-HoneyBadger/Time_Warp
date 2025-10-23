@@ -21,7 +21,6 @@ enum CommandResult {
 }
 
 #[derive(Clone, PartialEq)]
-#[allow(dead_code)]
 enum DebugState {
     Stopped,
     Running,
@@ -32,7 +31,7 @@ struct TimeWarpApp {
     code: String,
     output: String,
     language: String,
-    active_tab: usize, // 0 = Editor, 1 = Output & Turtle
+    active_tab: usize, // 0 = Editor, 1 = Output & Turtle, 2 = Debug
     last_file_path: Option<String>,
     show_line_numbers: bool,
     find_text: String,
@@ -54,27 +53,17 @@ struct TimeWarpApp {
     turtle_pan: egui::Vec2,
 
     // Debug state
-    #[allow(dead_code)]
     debug_mode: bool,
-    #[allow(dead_code)]
     debug_state: DebugState,
-    #[allow(dead_code)]
     breakpoints: HashMap<String, Vec<u32>>, // filename -> line numbers
-    #[allow(dead_code)]
     current_debug_line: Option<u32>,
-    #[allow(dead_code)]
     debug_variables: HashMap<String, String>,
-    #[allow(dead_code)]
     debug_call_stack: Vec<String>,
 
     // Code completion
-    #[allow(dead_code)]
     show_completion: bool,
-    #[allow(dead_code)]
     completion_items: Vec<String>,
-    #[allow(dead_code)]
     completion_selected: usize,
-    #[allow(dead_code)]
     completion_query: String,
 
     // Syntax highlighting
@@ -829,8 +818,94 @@ impl TimeWarpApp {
 }
 
 impl TimeWarpApp {
+    // Debug methods
+    fn start_debug_session(&mut self) {
+        self.debug_state = DebugState::Running;
+        self.debug_variables.clear();
+        self.debug_call_stack.clear();
+        self.current_debug_line = Some(1);
+        self.output = "Debug session started.\n".to_string();
+    }
+
+    fn stop_debug_session(&mut self) {
+        self.debug_state = DebugState::Stopped;
+        self.current_debug_line = None;
+        self.output = "Debug session stopped.\n".to_string();
+    }
+
+    fn step_debug(&mut self) {
+        if let Some(current_line) = self.current_debug_line {
+            self.current_debug_line = Some(current_line + 1);
+            // In a full implementation, this would execute one line of code
+            self.output = format!("Stepped to line {}\n", current_line + 1);
+        }
+    }
+
+    fn toggle_breakpoint(&mut self, line_number: u32) {
+        let filename = self
+            .last_file_path
+            .as_ref()
+            .and_then(|p| std::path::Path::new(p).file_name())
+            .and_then(|n| n.to_str())
+            .unwrap_or("untitled");
+
+        let breakpoints = self
+            .breakpoints
+            .entry(filename.to_string())
+            .or_insert(Vec::new());
+
+        if let Some(pos) = breakpoints.iter().position(|&x| x == line_number) {
+            breakpoints.remove(pos);
+        } else {
+            breakpoints.push(line_number);
+            breakpoints.sort();
+        }
+    }
+
+    fn render_debug_editor(&mut self, ui: &mut egui::Ui) {
+        let filename = self.last_file_path.as_ref()
+            .and_then(|p| std::path::Path::new(p).file_name())
+            .and_then(|n| n.to_str())
+            .unwrap_or("untitled");
+
+        let breakpoints = self.breakpoints.get(filename).cloned().unwrap_or_default();
+        let lines: Vec<String> = self.code.lines().map(|s| s.to_string()).collect();
+
+        ui.horizontal(|ui| {
+            // Line numbers column
+            ui.vertical(|ui| {
+                for (i, _) in lines.iter().enumerate() {
+                    let line_num = i + 1;
+                    let has_breakpoint = breakpoints.contains(&(line_num as u32));
+
+                    let button = egui::Button::new(format!("{:3}", line_num))
+                        .fill(if has_breakpoint {
+                            egui::Color32::RED
+                        } else {
+                            egui::Color32::TRANSPARENT
+                        })
+                        .stroke(egui::Stroke::NONE)
+                        .min_size(egui::vec2(40.0, 18.0));
+
+                    if ui.add(button).clicked() {
+                        self.toggle_breakpoint(line_num as u32);
+                    }
+                }
+            });
+
+            ui.separator();
+
+            // Code editor
+            ui.add(
+                egui::TextEdit::multiline(&mut self.code)
+                    .font(egui::TextStyle::Monospace)
+                    .desired_width(f32::INFINITY)
+                    .desired_rows(20),
+            );
+        });
+    }
+
     // Code completion methods
-    #[allow(dead_code)]
     fn get_language_keywords(&self) -> Vec<&'static str> {
         match self.language.as_str() {
             "TW BASIC" => vec![
@@ -941,7 +1016,6 @@ impl TimeWarpApp {
         }
     }
 
-    #[allow(dead_code)]
     fn get_completion_suggestions(&self, query: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
 
@@ -967,7 +1041,6 @@ impl TimeWarpApp {
         suggestions
     }
 
-    #[allow(dead_code)]
     fn update_completion(&mut self, query: &str) {
         self.completion_query = query.to_string();
         self.completion_items = self.get_completion_suggestions(query);
@@ -1457,6 +1530,30 @@ impl eframe::App for TimeWarpApp {
                                 self.active_tab = 1;
                             }
 
+                            if ui
+                                .add(
+                                    egui::Button::new("🐛 Debug")
+                                        .fill(if self.active_tab == 2 {
+                                            ui.style().visuals.selection.bg_fill
+                                        } else {
+                                            egui::Color32::TRANSPARENT
+                                        })
+                                        .stroke(if self.active_tab == 2 {
+                                            egui::Stroke::new(
+                                                2.0,
+                                                ui.style().visuals.selection.stroke.color,
+                                            )
+                                        } else {
+                                            egui::Stroke::NONE
+                                        })
+                                        .rounding(egui::Rounding::same(4.0))
+                                        .min_size(egui::vec2(100.0, tab_height)),
+                                )
+                                .clicked()
+                            {
+                                self.active_tab = 2;
+                            }
+
                             ui.with_layout(
                                 egui::Layout::right_to_left(egui::Align::Center),
                                 |ui| {
@@ -1484,6 +1581,7 @@ impl eframe::App for TimeWarpApp {
                                 ui.vertical(|ui| {
                                     ui.horizontal(|ui| {
                                         ui.checkbox(&mut self.show_line_numbers, "Line numbers");
+                                        ui.checkbox(&mut self.debug_mode, "Debug mode");
                                         ui.separator();
                                         if ui.button("🔍 Find/Replace").clicked() {
                                             self.show_find_replace = !self.show_find_replace;
@@ -1506,12 +1604,81 @@ impl eframe::App for TimeWarpApp {
                                     }
 
                                     egui::ScrollArea::vertical().show(ui, |ui| {
-                                        ui.add(
-                                            egui::TextEdit::multiline(&mut self.code)
+                                        if self.show_line_numbers && self.debug_mode {
+                                            // Custom editor with line numbers and breakpoints
+                                            self.render_debug_editor(ui);
+                                        } else {
+                                            // Handle completion input before creating TextEdit to avoid borrowing conflicts
+                                            let input = ui.input(|i| i.clone());
+                                            let should_trigger_completion = input.modifiers.ctrl && input.key_pressed(egui::Key::Space);
+                                            let should_hide_completion = input.key_pressed(egui::Key::Escape);
+                                            let should_select_down = self.show_completion && input.key_pressed(egui::Key::ArrowDown);
+                                            let should_select_up = self.show_completion && input.key_pressed(egui::Key::ArrowUp);
+                                            let should_insert_completion = self.show_completion && input.key_pressed(egui::Key::Enter);
+
+                                            // Handle completion actions that modify self
+                                            if should_trigger_completion {
+                                                let cursor_pos = self.code.len();
+                                                let before_cursor = &self.code[..cursor_pos];
+                                                let words: Vec<&str> = before_cursor.split_whitespace().collect();
+                                                let current_word = words.last().copied().unwrap_or("");
+                                                self.update_completion(current_word);
+                                            } else if should_hide_completion {
+                                                self.show_completion = false;
+                                            } else if should_select_down {
+                                                if self.completion_selected < self.completion_items.len().saturating_sub(1) {
+                                                    self.completion_selected += 1;
+                                                }
+                                            } else if should_select_up {
+                                                if self.completion_selected > 0 {
+                                                    self.completion_selected = self.completion_selected.saturating_sub(1);
+                                                }
+                                            } else if should_insert_completion {
+                                                if let Some(selected) = self.completion_items.get(self.completion_selected) {
+                                                    let cursor_pos = self.code.len();
+                                                    let before_cursor = &self.code[..cursor_pos];
+                                                    let words: Vec<&str> = before_cursor.split_whitespace().collect();
+                                                    let current_word = words.last().copied().unwrap_or("");
+                                                    let start_pos = cursor_pos - current_word.len();
+                                                    self.code.replace_range(start_pos..cursor_pos, selected);
+                                                    self.show_completion = false;
+                                                }
+                                            }
+
+                                            // Regular code editor
+                                            let text_edit = egui::TextEdit::multiline(&mut self.code)
                                                 .font(egui::TextStyle::Monospace)
                                                 .desired_width(f32::INFINITY)
-                                                .desired_rows(20),
-                                        );
+                                                .desired_rows(20);
+
+                                            ui.add(text_edit);
+
+                                            // Show completion popup
+                                            if self.show_completion && !self.completion_items.is_empty() {
+                                                egui::Window::new("Code Completion")
+                                                    .collapsible(false)
+                                                    .resizable(false)
+                                                    .show(ui.ctx(), |ui| {
+                                                        egui::ScrollArea::vertical().show(ui, |ui| {
+                                                            for (i, item) in self.completion_items.iter().enumerate() {
+                                                                let mut button = egui::Button::new(item);
+                                                                if i == self.completion_selected {
+                                                                    button = button.fill(egui::Color32::from_rgb(100, 150, 200));
+                                                                }
+                                                                if ui.add(button).clicked() {
+                                                                    let cursor_pos = self.code.len();
+                                                                    let before_cursor = &self.code[..cursor_pos];
+                                                                    let words: Vec<&str> = before_cursor.split_whitespace().collect();
+                                                                    let current_word = words.last().copied().unwrap_or("");
+                                                                    let start_pos = cursor_pos - current_word.len();
+                                                                    self.code.replace_range(start_pos..cursor_pos, item);
+                                                                    self.show_completion = false;
+                                                                }
+                                                            }
+                                                        });
+                                                    });
+                                            }
+                                        }
                                     });
                                 });
                             }
@@ -1665,6 +1832,88 @@ impl eframe::App for TimeWarpApp {
                                         self.turtle_state.color,
                                         egui::Stroke::new(1.0, egui::Color32::BLACK),
                                     ));
+                                });
+                            }
+                            2 => {
+                                // Debug Tab
+                                ui.vertical(|ui| {
+                                    ui.horizontal(|ui| {
+                                        ui.checkbox(&mut self.debug_mode, "Enable Debug Mode");
+                                        ui.separator();
+                                        ui.label("Debug State:");
+                                        match self.debug_state {
+                                            DebugState::Stopped => ui.colored_label(egui::Color32::GRAY, "⏹️ Stopped"),
+                                            DebugState::Running => ui.colored_label(egui::Color32::GREEN, "▶️ Running"),
+                                            DebugState::Paused => ui.colored_label(egui::Color32::YELLOW, "⏸️ Paused"),
+                                        }
+                                    });
+
+                                    ui.separator();
+
+                                    // Debug Controls
+                                    ui.horizontal(|ui| {
+                                        if ui.button("▶️ Start Debug").clicked() && self.debug_mode {
+                                            self.start_debug_session();
+                                        }
+                                        if ui.button("⏸️ Pause").clicked() && self.debug_mode {
+                                            self.debug_state = DebugState::Paused;
+                                        }
+                                        if ui.button("⏹️ Stop").clicked() && self.debug_mode {
+                                            self.stop_debug_session();
+                                        }
+                                        if ui.button("⏭️ Step").clicked() && self.debug_mode && self.debug_state == DebugState::Paused {
+                                            self.step_debug();
+                                        }
+                                    });
+
+                                    ui.separator();
+
+                                    // Breakpoints
+                                    ui.collapsing("Breakpoints", |ui| {
+                                        ui.label("Click on line numbers in the editor to toggle breakpoints");
+                                        let filename = self.last_file_path.as_ref()
+                                            .and_then(|p| std::path::Path::new(p).file_name())
+                                            .and_then(|n| n.to_str())
+                                            .unwrap_or("untitled");
+
+                                        if let Some(breakpoints) = self.breakpoints.get(filename) {
+                                            ui.label(format!("Breakpoints in {}: {:?}", filename, breakpoints));
+                                        } else {
+                                            ui.label(format!("No breakpoints in {}", filename));
+                                        }
+
+                                        if ui.button("Clear All Breakpoints").clicked() {
+                                            self.breakpoints.clear();
+                                        }
+                                    });
+
+                                    // Variables
+                                    ui.collapsing("Variables", |ui| {
+                                        if self.debug_variables.is_empty() {
+                                            ui.label("No variables to display");
+                                        } else {
+                                            for (name, value) in &self.debug_variables {
+                                                ui.label(format!("{} = {}", name, value));
+                                            }
+                                        }
+                                    });
+
+                                    // Call Stack
+                                    ui.collapsing("Call Stack", |ui| {
+                                        if self.debug_call_stack.is_empty() {
+                                            ui.label("Call stack is empty");
+                                        } else {
+                                            for (i, frame) in self.debug_call_stack.iter().enumerate() {
+                                                ui.label(format!("{}: {}", i, frame));
+                                            }
+                                        }
+                                    });
+
+                                    // Current Line
+                                    if let Some(line) = self.current_debug_line {
+                                        ui.separator();
+                                        ui.label(format!("Current Debug Line: {}", line));
+                                    }
                                 });
                             }
                             _ => {}
