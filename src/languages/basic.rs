@@ -299,7 +299,8 @@ impl Tokenizer {
                     let start = self.position;
                     while self.position < self.input.len()
                         && (self.input.as_bytes()[self.position].is_ascii_alphanumeric()
-                            || self.input.as_bytes()[self.position] == b'_')
+                            || self.input.as_bytes()[self.position] == b'_'
+                            || self.input.as_bytes()[self.position] == b'$')
                     {
                         self.position += 1;
                     }
@@ -835,6 +836,13 @@ impl Parser {
             None
         };
 
+        // Handle optional semicolon or comma separator after prompt
+        if prompt.is_some() {
+            if let Some(Token::Semicolon) | Some(Token::Comma) = self.current_token {
+                self.advance();
+            }
+        }
+
         let mut variables = Vec::new();
         while let Some(Token::Identifier(_)) = self.current_token {
             let var = self.parse_identifier()?;
@@ -1243,6 +1251,7 @@ pub enum ExecutionResult {
         graphics_commands: Vec<GraphicsCommand>,
     },
     NeedInput {
+        variable_name: String,
         prompt: String,
         partial_output: String,
         partial_graphics: Vec<GraphicsCommand>,
@@ -2306,8 +2315,9 @@ impl BasicInterpreter {
             }
 
             // Check if we need input
-            if let Some((_var, prompt)) = &self.pending_input {
+            if let Some((var, prompt)) = &self.pending_input {
                 return Ok(ExecutionResult::NeedInput {
+                    variable_name: var.clone(),
                     prompt: prompt.clone(),
                     partial_output: output.clone(),
                     partial_graphics: graphics_commands.clone(),

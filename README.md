@@ -4,12 +4,9 @@ A modern, educational programming environment built in Rust using the egui frame
 
 ## Features
 
-- **Multi-Language Support**: Execute code in three unified educational programming languages:
-  - **TW BASIC**: Unified GW BASIC + PILOT + Logo with interactive input and turtle graphics
-  - **TW Pascal**: Turbo Pascal-style structured programming
-  - **TW Prolog**: Turbo Prolog-style logic programming
-
-- **Interactive Input**: Support for user input in all languages via the unified Output & Graphics canvas
+- **TW BASIC Support**: Execute code in TW BASIC - a unified educational programming language combining GW BASIC, PILOT, and Logo features
+- **Interactive Input**: Support for user input via the unified Output & Graphics canvas
+- **General Prompt System**: Programmatic user input with callback-based API for plugins and extensions
 - **Turtle Graphics**: Visual programming with Logo-style turtle graphics integrated into the output canvas
 - **Code Editor**: Full-featured editor with:
   - Line numbers
@@ -51,52 +48,12 @@ Example:
 ```
 LET X = 42
 PRINT "Hello, TW BASIC!"
-T: What is your name?
-A: NAME$
+INPUT "What is your name? "; NAME$
 PRINT "Hello, "; NAME$
 
 FORWARD 100
 RIGHT 90
 FORWARD 50
-```
-
-### TW Pascal
-Turbo Pascal-style structured programming with procedures, functions, and control structures.
-
-Example:
-```
-program Hello;
-var
-  name: string;
-begin
-  writeln('What is your name?');
-  readln(name);
-  writeln('Hello, ', name);
-end.
-```
-
-### TW Prolog
-Turbo Prolog-style logic programming with domains, predicates, facts, and rules.
-
-Example:
-```
-domains
-  person = symbol
-  color = symbol
-
-predicates
-  person(person)
-  likes(person, color)
-
-clauses
-  person(john).
-  person(mary).
-  likes(john, blue).
-  likes(mary, red).
-
-goal
-  likes(Person, Color),
-  write(Person, " likes ", Color), nl.
 ```
 
 ## Project Structure
@@ -106,13 +63,9 @@ Time_Warp/
 ├── Cargo.toml              # Rust project configuration
 ├── src/
 │   └── main.rs            # Main IDE implementation
-├── examples/              # Sample programs for all languages
+├── examples/              # Sample TW BASIC programs
 │   ├── tw_basic_sample.twb
-│   ├── tw_basic_game.twb
-│   ├── tw_pascal_sample.twp
-│   ├── tw_pascal_advanced.twp
-│   ├── tw_prolog_sample.tpr
-│   └── tw_prolog_advanced.tpr
+│   └── tw_basic_game.twb
 ├── docs/
 │   └── SAMPLE_PROGRAMS_README.md  # Detailed examples guide
 ├── .github/
@@ -122,11 +75,35 @@ Time_Warp/
 
 ## Sample Programs
 
-See `docs/SAMPLE_PROGRAMS_README.md` for comprehensive examples demonstrating all language features. Sample programs are available in the `examples/` directory:
+See `docs/SAMPLE_PROGRAMS_README.md` for comprehensive examples demonstrating TW BASIC features. Sample programs are available in the `examples/` directory:
 
-- **TW BASIC**: `examples/tw_basic_sample.twb`, `examples/tw_basic_game.twb`
-- **TW Pascal**: `examples/tw_pascal_sample.twp`, `examples/tw_pascal_advanced.twp`
-- **TW Prolog**: `examples/tw_prolog_sample.tpr`, `examples/tw_prolog_advanced.tpr`
+**Example Files:**
+- **TW BASIC**: `examples/tw_basic_sample.twb`, `examples/tw_basic_game.twb`, `examples/prompt_demo.twb`
+
+## Prompt API
+
+The IDE provides a general-purpose prompt system for programmatic user interaction:
+
+```rust
+// Example usage in Rust code
+app.prompt_user("Enter your name:", |name| {
+    println!("Hello, {}!", name);
+    // Process the input here
+});
+```
+
+**Features:**
+- Modal dialog with custom message
+- Callback-based response handling
+- Submit on Enter key or button click
+- Cancel option to abort input
+- Status bar shows "💬 Awaiting Response" during prompts
+
+**Use Cases:**
+- Configuration input
+- File name/path entry
+- Interactive debugging
+- Plugin/extension user interaction
 
 ## Architecture
 
@@ -135,12 +112,10 @@ The IDE is built using:
 - **eframe**: App framework for egui
 - **rfd**: Native file dialogs
 
-The interpreter is implemented as a native Rust module with separate execution logic for each supported language, featuring a unified interactive canvas for text output, user input, and turtle graphics.
+The interpreter is implemented as a native Rust module with execution logic for TW BASIC, featuring a unified interactive canvas for text output, user input, and turtle graphics.
 
 ## File Extensions
 - `.twb` - TW BASIC programs
-- `.twp` - TW Pascal programs
-- `.tpr` - TW Prolog programs
 
 ## Contributing
 

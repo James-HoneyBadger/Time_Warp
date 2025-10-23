@@ -1,0 +1,2 @@
+10 input "Name? "; $name
+20 print "Hello "; $name

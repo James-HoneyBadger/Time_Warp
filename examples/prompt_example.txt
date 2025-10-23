@@ -1,0 +1,43 @@
+// Example of how to use the prompt function in Time_Warp IDE
+//
+// The prompt_user method allows you to get user input asynchronously.
+// It takes a message string and a callback function that receives the user's input.
+//
+// Example usage in Rust code:
+//
+// ```rust
+// // In your plugin or extension code:
+// app.prompt_user("What is your name?", |name| {
+//     println!("Hello, {}!", name);
+//     // Process the name here
+// });
+//
+// app.prompt_user("Enter a number:", |input| {
+//     match input.parse::<i32>() {
+//         Ok(num) => println!("You entered: {}", num),
+//         Err(_) => println!("Invalid number: {}", input),
+//     }
+// });
+//
+// // For file operations:
+// app.prompt_user("Enter filename:", |filename| {
+//     // Save or load file with the given name
+//     save_file(&filename, &content);
+// });
+// ```
+//
+// The prompt will show a modal window with the message and an input field.
+// When the user clicks Submit or presses Enter, the callback is called with their input.
+// If they click Cancel or close the window, the callback is not called.
+//
+// This is useful for:
+// - Getting configuration values
+// - Asking for file names or paths
+// - Interactive debugging
+// - Plugin/extension user interaction
+//
+// To test the prompt functionality:
+// 1. Run the Time_Warp IDE
+// 2. Go to Help → Test Prompt
+// 3. Enter some text and click Submit
+// 4. Check the console output for the entered text

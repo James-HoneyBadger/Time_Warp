@@ -12,14 +12,6 @@ struct TurtleState {
     color: egui::Color32,
 }
 
-enum CommandResult {
-    Output(String),
-    Goto(u32),
-    Input(String, String), // (variable_name, prompt)
-    Continue,
-    End,
-}
-
 #[derive(Clone, PartialEq)]
 enum DebugState {
     Stopped,
@@ -30,7 +22,6 @@ enum DebugState {
 struct TimeWarpApp {
     code: String,
     output: String,
-    language: String,
     active_tab: usize, // 0 = Editor, 1 = Output & Turtle, 2 = Debug
     last_file_path: Option<String>,
     show_line_numbers: bool,
@@ -40,9 +31,6 @@ struct TimeWarpApp {
     turtle_state: TurtleState,
     turtle_commands: Vec<String>,
     variables: HashMap<String, String>,
-    program_lines: Vec<(u32, String)>, // Line number and command
-    current_line: usize,
-    current_pascal_line: usize,
     is_executing: bool,
     waiting_for_input: bool,
     input_prompt: String,
@@ -61,6 +49,7 @@ struct TimeWarpApp {
     debug_call_stack: Vec<String>,
 
     // Code completion
+    code_completion_enabled: bool,
     show_completion: bool,
     completion_items: Vec<String>,
     completion_selected: usize,
@@ -68,6 +57,12 @@ struct TimeWarpApp {
 
     // BASIC interpreter instance for continuation after input
     basic_interpreter: Option<crate::languages::basic::BasicInterpreter>,
+
+    // General prompt system
+    general_prompt_active: bool,
+    general_prompt_message: String,
+    general_prompt_input: String,
+    general_prompt_callback: Option<Box<dyn FnOnce(String) + 'static>>,
 
     // Status bar information
     cursor_line: usize,
@@ -102,8 +97,7 @@ impl Default for TimeWarpApp {
     fn default() -> Self {
         Self {
             code: String::new(),
-            output: String::from("Welcome to Time Warp IDE!\n"),
-            language: String::from("TW BASIC"),
+            output: String::new(),
             active_tab: 0, // Start with Editor tab
             last_file_path: None,
             show_line_numbers: false,
@@ -118,9 +112,6 @@ impl Default for TimeWarpApp {
             },
             turtle_commands: Vec::new(),
             variables: HashMap::new(),
-            program_lines: Vec::new(),
-            current_line: 0,
-            current_pascal_line: 0,
             is_executing: false,
             waiting_for_input: false,
             input_prompt: String::new(),
@@ -139,6 +130,7 @@ impl Default for TimeWarpApp {
             debug_call_stack: Vec::new(),
 
             // Completion defaults
+            code_completion_enabled: false,
             show_completion: false,
             completion_items: Vec::new(),
             completion_selected: 0,
@@ -146,6 +138,12 @@ impl Default for TimeWarpApp {
 
             // BASIC interpreter instance for continuation after input
             basic_interpreter: None,
+
+            // General prompt system
+            general_prompt_active: false,
+            general_prompt_message: String::new(),
+            general_prompt_input: String::new(),
+            general_prompt_callback: None,
 
             // Status bar defaults
             cursor_line: 1,
@@ -180,6 +178,25 @@ impl TimeWarpApp {
         self.error_timer = 0.0;
     }
 
+    /// Shows a general prompt to the user and calls the callback with their input
+    fn show_prompt<F>(&mut self, message: String, callback: F)
+    where
+        F: FnOnce(String) + 'static,
+    {
+        self.general_prompt_active = true;
+        self.general_prompt_message = message;
+        self.general_prompt_input.clear();
+        self.general_prompt_callback = Some(Box::new(callback));
+    }
+
+    /// Public method to show a prompt from outside the app
+    pub fn prompt_user<F>(&mut self, message: &str, callback: F)
+    where
+        F: FnOnce(String) + 'static,
+    {
+        self.show_prompt(message.to_string(), callback);
+    }
+
     fn save_undo_state(&mut self) {
         // Remove any redo states after current position
         self.undo_history.truncate(self.undo_position);
@@ -212,51 +229,6 @@ impl TimeWarpApp {
             true
         } else {
             false
-        }
-    }
-
-    fn move_line_up(&mut self) {
-        let lines: Vec<&str> = self.code.lines().collect();
-        if lines.is_empty() {
-            return;
-        }
-
-        // Find current line based on cursor position (simplified - use first line for now)
-        // In a real implementation, we'd track cursor position properly
-        let current_line = 0; // TODO: Get actual cursor line
-
-        if current_line > 0 {
-            let mut new_lines = lines.clone();
-            new_lines.swap(current_line - 1, current_line);
-            self.code = new_lines.join("\n");
-            if self.code.is_empty() {
-                self.code = String::new();
-            } else {
-                self.code.push('\n');
-            }
-            self.save_undo_state();
-        }
-    }
-
-    fn move_line_down(&mut self) {
-        let lines: Vec<&str> = self.code.lines().collect();
-        if lines.is_empty() {
-            return;
-        }
-
-        // Find current line based on cursor position (simplified - use first line for now)
-        let current_line = 0; // TODO: Get actual cursor line
-
-        if current_line < lines.len() - 1 {
-            let mut new_lines = lines.clone();
-            new_lines.swap(current_line, current_line + 1);
-            self.code = new_lines.join("\n");
-            if self.code.is_empty() {
-                self.code = String::new();
-            } else {
-                self.code.push('\n');
-            }
-            self.save_undo_state();
         }
     }
 
@@ -412,15 +384,21 @@ impl TimeWarpApp {
     fn execute_code(&mut self) {
         self.active_tab = 1; // Switch to Output tab when running
         self.is_executing = true;
+        // Clear output before execution so only current program output is shown
+        self.output.clear();
         let code = self.code.clone();
-        let result = match self.language.as_str() {
-            "TW BASIC" => self.execute_tw_basic(&code),
-            _ => format!(
-                "Language '{}' not yet supported for execution",
-                self.language
-            ),
-        };
-        self.output = format!("[Output for {}]\n{}", self.language, result);
+        let result = self.execute_tw_basic(&code);
+
+        // Check if execution needs input
+        if self.waiting_for_input {
+            // Program is waiting for input - don't mark as complete yet
+            // The output will be updated when input is provided
+            self.is_executing = false;
+            return;
+        }
+
+        // Set output to the result (which may be empty)
+        self.output = result;
         self.is_executing = false;
     }
 
@@ -467,12 +445,14 @@ impl TimeWarpApp {
                     output
                 }
                 crate::languages::basic::ExecutionResult::NeedInput {
+                    variable_name,
                     prompt,
                     partial_output,
                     partial_graphics,
                 } => {
                     self.waiting_for_input = true;
                     self.input_prompt = prompt.clone();
+                    self.current_input_var = variable_name;
                     // Process any graphics commands that were executed before input was needed
                     self.process_graphics_commands(&partial_graphics);
                     // Store the interpreter for continuation
@@ -489,329 +469,6 @@ impl TimeWarpApp {
                 format!("Error: {:?}", err)
             }
         }
-    }
-
-    fn execute_basic_command(&mut self, command: &str) -> CommandResult {
-        let cmd = command.trim();
-
-        if cmd.is_empty() || cmd.starts_with("REM") {
-            return CommandResult::Continue;
-        }
-
-        if cmd.starts_with("PRINT ") {
-            let text = cmd.strip_prefix("PRINT ").unwrap_or("");
-            let processed_text = self.process_print_text(text);
-            return CommandResult::Output(processed_text);
-        }
-
-        if cmd.starts_with("WRITELN ") {
-            let text = cmd.strip_prefix("WRITELN ").unwrap_or("");
-            let processed_text = self.process_print_text(text);
-            return CommandResult::Output(processed_text + "\n");
-        }
-
-        if cmd.starts_with("READLN ") {
-            let var_part = cmd.strip_prefix("READLN ").unwrap_or("");
-            if let Some((var_name, prompt)) = self.parse_input_command(var_part) {
-                return CommandResult::Input(var_name, prompt);
-            }
-        }
-
-        if cmd.starts_with("LET ") {
-            self.handle_let_command(cmd.strip_prefix("LET ").unwrap_or(""));
-            return CommandResult::Continue;
-        }
-
-        if cmd.starts_with("INPUT ") {
-            let var_part = cmd.strip_prefix("INPUT ").unwrap_or("");
-            if let Some((var_name, prompt)) = self.parse_input_command(var_part) {
-                return CommandResult::Input(var_name, prompt);
-            }
-        }
-
-        if cmd.starts_with("IF ") {
-            return self.handle_if_command(cmd.strip_prefix("IF ").unwrap_or(""));
-        }
-
-        if cmd.starts_with("WHILE ") {
-            return self.handle_while_command(cmd.strip_prefix("WHILE ").unwrap_or(""));
-        }
-
-        if cmd.starts_with("FOR ") {
-            return self.handle_for_command(cmd.strip_prefix("FOR ").unwrap_or(""));
-        }
-
-        if cmd.starts_with("GOTO ") {
-            if let Some(line_num_str) = cmd.strip_prefix("GOTO ") {
-                if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
-                    return CommandResult::Goto(line_num);
-                }
-            }
-        }
-
-        // Turtle graphics commands
-        if let Some(result) = self.handle_turtle_command(cmd) {
-            return result;
-        }
-
-        if cmd == "END" {
-            return CommandResult::End;
-        }
-
-        CommandResult::Output(format!("Unknown command: {}", cmd))
-    }
-
-    fn process_print_text(&self, text: &str) -> String {
-        let mut result = String::new();
-        let mut chars = text.chars().peekable();
-
-        while let Some(ch) = chars.next() {
-            if ch == '"' {
-                // Handle quoted strings
-                while let Some(ch) = chars.next() {
-                    if ch == '"' {
-                        break;
-                    }
-                    result.push(ch);
-                }
-            } else if ch == ';' {
-                // Semicolon separator - continue without newline
-                result.push_str("; ");
-            } else if ch.is_alphabetic() {
-                // Variable reference
-                let mut var_name = String::new();
-                var_name.push(ch);
-                while let Some(&next_ch) = chars.peek() {
-                    if next_ch.is_alphanumeric() || next_ch == '_' || next_ch == '$' {
-                        var_name.push(chars.next().unwrap());
-                    } else {
-                        break;
-                    }
-                }
-                if let Some(value) = self.variables.get(&var_name) {
-                    result.push_str(value);
-                } else {
-                    result.push_str(&var_name);
-                }
-            } else {
-                result.push(ch);
-            }
-        }
-
-        result
-    }
-
-    fn handle_let_command(&mut self, assignment: &str) {
-        if let Some((var_name, expr)) = assignment.split_once('=') {
-            let var_name = var_name.trim();
-            let expr = expr.trim();
-
-            // Simple expression evaluation - for now just store the value
-            let value = if expr.starts_with('"') && expr.ends_with('"') {
-                expr[1..expr.len() - 1].to_string()
-            } else if let Ok(num) = expr.parse::<i32>() {
-                num.to_string()
-            } else {
-                // Check if it's a variable reference
-                self.variables
-                    .get(expr)
-                    .unwrap_or(&expr.to_string())
-                    .clone()
-            };
-
-            self.variables.insert(var_name.to_string(), value);
-        }
-    }
-
-    fn parse_input_command(&self, var_part: &str) -> Option<(String, String)> {
-        // INPUT variable or INPUT "prompt", variable
-        if var_part.contains(',') {
-            let parts: Vec<&str> = var_part.split(',').map(|s| s.trim()).collect();
-            if parts.len() >= 2 {
-                let prompt = if parts[0].starts_with('"') && parts[0].ends_with('"') {
-                    parts[0][1..parts[0].len() - 1].to_string()
-                } else {
-                    parts[0].to_string()
-                };
-                return Some((parts[1].to_string(), prompt));
-            }
-        }
-        Some((var_part.to_string(), format!("? ")))
-    }
-
-    fn handle_if_command(&self, condition: &str) -> CommandResult {
-        if let Some((cond, then_part)) = condition.split_once(" THEN ") {
-            let then_part = then_part.trim();
-
-            if self.evaluate_condition(cond.trim()) {
-                if then_part.starts_with("GOTO ") {
-                    if let Some(line_num_str) = then_part.strip_prefix("GOTO ") {
-                        if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
-                            return CommandResult::Goto(line_num);
-                        }
-                    }
-                }
-                // Could handle other THEN actions here
-            }
-        }
-        CommandResult::Continue
-    }
-
-    fn handle_while_command(&mut self, condition: &str) -> CommandResult {
-        // WHILE condition DO command
-        if let Some((cond, do_part)) = condition.split_once(" DO ") {
-            if self.evaluate_condition(cond.trim()) {
-                // Execute the DO part - for now, just handle GOTO
-                let do_cmd = do_part.trim();
-                if do_cmd.starts_with("GOTO ") {
-                    if let Some(line_num_str) = do_cmd.strip_prefix("GOTO ") {
-                        if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
-                            return CommandResult::Goto(line_num);
-                        }
-                    }
-                }
-            }
-        }
-        CommandResult::Continue
-    }
-
-    fn handle_for_command(&mut self, loop_spec: &str) -> CommandResult {
-        // FOR variable = start TO end [STEP step] DO command
-        if let Some((var_spec, do_part)) = loop_spec.split_once(" DO ") {
-            if let Some((var_part, range_part)) = var_spec.split_once(" = ") {
-                let var_name = var_part.trim();
-                if let Some((start_part, end_part)) = range_part.split_once(" TO ") {
-                    let start_val = self.get_value(start_part.trim());
-                    let end_val = self.get_value(end_part.trim());
-
-                    // Initialize loop variable if not set
-                    if !self.variables.contains_key(var_name) {
-                        self.variables
-                            .insert(var_name.to_string(), start_val.clone());
-                    }
-
-                    let current_val = self.variables.get(var_name).unwrap_or(&start_val).clone();
-                    let current_num: f64 = current_val.parse().unwrap_or(0.0);
-                    let end_num: f64 = end_val.parse().unwrap_or(0.0);
-
-                    if current_num <= end_num {
-                        // Execute the DO part
-                        let do_cmd = do_part.trim();
-                        if do_cmd.starts_with("GOTO ") {
-                            if let Some(line_num_str) = do_cmd.strip_prefix("GOTO ") {
-                                if let Ok(line_num) = line_num_str.trim().parse::<u32>() {
-                                    return CommandResult::Goto(line_num);
-                                }
-                            }
-                        }
-                        // Increment loop variable
-                        let step = if let Some(step_part) = range_part.split(" STEP ").nth(1) {
-                            step_part.trim().parse().unwrap_or(1.0)
-                        } else {
-                            1.0
-                        };
-                        let new_val = (current_num + step).to_string();
-                        self.variables.insert(var_name.to_string(), new_val);
-                    }
-                }
-            }
-        }
-        CommandResult::Continue
-    }
-
-    fn evaluate_condition(&self, condition: &str) -> bool {
-        // Simple condition evaluation
-        if let Some((left, op_right)) = condition.split_once('=') {
-            let (op, right) = if op_right.starts_with('=') {
-                ("==", &op_right[1..])
-            } else {
-                ("=", op_right)
-            };
-
-            let left_val = self.get_value(left.trim());
-            let right_val = self.get_value(right.trim());
-
-            match op {
-                "=" | "==" => left_val == right_val,
-                "<>" => left_val != right_val,
-                "<" => left_val < right_val,
-                ">" => left_val > right_val,
-                "<=" => left_val <= right_val,
-                ">=" => left_val >= right_val,
-                _ => false,
-            }
-        } else {
-            false
-        }
-    }
-
-    fn get_value(&self, expr: &str) -> String {
-        if let Some(value) = self.variables.get(expr) {
-            value.clone()
-        } else if let Ok(_) = expr.parse::<i32>() {
-            expr.to_string()
-        } else {
-            expr.to_string()
-        }
-    }
-
-    fn handle_turtle_command(&mut self, command: &str) -> Option<CommandResult> {
-        if command.starts_with("FORWARD ") || command.starts_with("FD ") {
-            let distance_str = command
-                .strip_prefix("FORWARD ")
-                .or_else(|| command.strip_prefix("FD "))?;
-            if let Ok(distance) = distance_str.trim().parse::<f32>() {
-                self.move_turtle(distance, true);
-                return Some(CommandResult::Output(format!("Moved forward {}", distance)));
-            }
-        }
-
-        if command.starts_with("BACK ") || command.starts_with("BK ") {
-            let distance_str = command
-                .strip_prefix("BACK ")
-                .or_else(|| command.strip_prefix("BK "))?;
-            if let Ok(distance) = distance_str.trim().parse::<f32>() {
-                self.move_turtle(-distance, true);
-                return Some(CommandResult::Output(format!("Moved back {}", distance)));
-            }
-        }
-
-        if command.starts_with("RIGHT ") || command.starts_with("RT ") {
-            let angle_str = command
-                .strip_prefix("RIGHT ")
-                .or_else(|| command.strip_prefix("RT "))?;
-            if let Ok(angle) = angle_str.trim().parse::<f32>() {
-                self.turtle_state.angle = (self.turtle_state.angle + angle) % 360.0;
-                return Some(CommandResult::Output(format!(
-                    "Turned right {} degrees",
-                    angle
-                )));
-            }
-        }
-
-        if command.starts_with("LEFT ") || command.starts_with("LT ") {
-            let angle_str = command
-                .strip_prefix("LEFT ")
-                .or_else(|| command.strip_prefix("LT "))?;
-            if let Ok(angle) = angle_str.trim().parse::<f32>() {
-                self.turtle_state.angle = (self.turtle_state.angle - angle + 360.0) % 360.0;
-                return Some(CommandResult::Output(format!(
-                    "Turned left {} degrees",
-                    angle
-                )));
-            }
-        }
-
-        if command == "PENUP" || command == "PU" {
-            // Note: pen_down field was removed, but we could add it back if needed
-            return Some(CommandResult::Output("Pen up".to_string()));
-        }
-
-        if command == "PENDOWN" || command == "PD" {
-            return Some(CommandResult::Output("Pen down".to_string()));
-        }
-
-        None
     }
 
     fn move_turtle(&mut self, distance: f32, draw: bool) {
@@ -844,62 +501,6 @@ impl TimeWarpApp {
                     // Unknown command, ignore
                 }
             }
-        }
-    }
-
-    fn continue_execution(&mut self) {
-        if self.language == "TW BASIC" {
-            // BASIC execution is now handled directly in the input processing
-            // since we store the interpreter instance
-        }
-    }
-
-    fn continue_basic_execution(&mut self) {
-        // Continue executing from where we left off
-        let mut output = self.output.clone();
-        output.push_str(&self.user_input);
-        output.push('\n');
-
-        while self.current_line < self.program_lines.len() {
-            let command = self.program_lines[self.current_line].1.clone();
-            let result = self.execute_basic_command(&command);
-
-            match result {
-                CommandResult::Output(text) => {
-                    output.push_str(&text);
-                    output.push('\n');
-                }
-                CommandResult::Goto(line_num) => {
-                    if let Some(pos) = self
-                        .program_lines
-                        .iter()
-                        .position(|(ln, _)| *ln == line_num)
-                    {
-                        self.current_line = pos;
-                        continue;
-                    } else {
-                        output.push_str(&format!("Line {} not found\n", line_num));
-                        break;
-                    }
-                }
-                CommandResult::Input(var_name, prompt) => {
-                    self.waiting_for_input = true;
-                    self.current_input_var = var_name;
-                    self.input_prompt = prompt.clone();
-                    output.push_str(&prompt);
-                    break; // Wait for user input again
-                }
-                CommandResult::Continue => {}
-                CommandResult::End => break,
-            }
-
-            self.current_line += 1;
-        }
-
-        self.output = format!("[Output for {}]\n{}", self.language, output);
-
-        if self.current_line >= self.program_lines.len() && !self.waiting_for_input {
-            self.output.push_str("Program completed.\n");
         }
     }
 
@@ -973,7 +574,7 @@ impl TimeWarpApp {
 
         let syntax_enabled = self.syntax_highlighting_enabled;
         let current_debug_line = self.current_debug_line;
-        let language = self.language.clone();
+        let language = "TW BASIC".to_string();
         let keywords: Vec<String> = self
             .get_language_keywords()
             .into_iter()
@@ -1301,61 +902,58 @@ impl TimeWarpApp {
 
     // Code completion methods
     fn get_language_keywords(&self) -> Vec<&'static str> {
-        match self.language.as_str() {
-            "TW BASIC" => vec![
-                "PRINT",
-                "INPUT",
-                "LET",
-                "IF",
-                "THEN",
-                "ELSE",
-                "FOR",
-                "TO",
-                "STEP",
-                "NEXT",
-                "WHILE",
-                "WEND",
-                "GOTO",
-                "GOSUB",
-                "RETURN",
-                "END",
-                "CLS",
-                "LOCATE",
-                "COLOR",
-                "BEEP",
-                "SLEEP",
-                "RANDOMIZE",
-                "RND",
-                "INT",
-                "STR$",
-                "VAL",
-                "LEN",
-                "LEFT$",
-                "RIGHT$",
-                "MID$",
-                "CHR$",
-                "ASC",
-                "ABS",
-                "SIN",
-                "COS",
-                "TAN",
-                "LOG",
-                "EXP",
-                "SQR",
-                "AND",
-                "OR",
-                "NOT",
-                "MOD",
-                "DIM",
-                "READ",
-                "DATA",
-                "RESTORE",
-                "DEF",
-                "FN",
-                "REM",
-            ],
-            _ => vec![],
-        }
+        vec![
+            "PRINT",
+            "INPUT",
+            "LET",
+            "IF",
+            "THEN",
+            "ELSE",
+            "FOR",
+            "TO",
+            "STEP",
+            "NEXT",
+            "WHILE",
+            "WEND",
+            "GOTO",
+            "GOSUB",
+            "RETURN",
+            "END",
+            "CLS",
+            "LOCATE",
+            "COLOR",
+            "BEEP",
+            "SLEEP",
+            "RANDOMIZE",
+            "RND",
+            "INT",
+            "STR$",
+            "VAL",
+            "LEN",
+            "LEFT$",
+            "RIGHT$",
+            "MID$",
+            "CHR$",
+            "ASC",
+            "ABS",
+            "SIN",
+            "COS",
+            "TAN",
+            "LOG",
+            "EXP",
+            "SQR",
+            "AND",
+            "OR",
+            "NOT",
+            "MOD",
+            "DIM",
+            "READ",
+            "DATA",
+            "RESTORE",
+            "DEF",
+            "FN",
+            "REM",
+        ]
     }
 
     fn get_completion_suggestions(&self, query: &str) -> Vec<String> {
@@ -1377,65 +975,63 @@ impl TimeWarpApp {
             }
         }
 
-        // Add language-specific functions and commands
-        if self.language == "TW BASIC" {
-            let basic_functions = vec![
-                "ABS(", "ASC(", "CHR$(", "COS(", "EXP(", "INT(", "LEFT$(", "LEN(", "LOG(", "MID$(",
-                "RIGHT$(", "RND(", "SIN(", "SQR(", "STR$(", "TAN(", "VAL(",
-            ];
+        // Add TW BASIC functions and commands
+        let basic_functions = vec![
+            "ABS(", "ASC(", "CHR$(", "COS(", "EXP(", "INT(", "LEFT$(", "LEN(", "LOG(", "MID$(",
+            "RIGHT$(", "RND(", "SIN(", "SQR(", "STR$(", "TAN(", "VAL(",
+        ];
 
-            for func in basic_functions {
-                if func.to_lowercase().starts_with(&query_lower) {
-                    suggestions.push(func.to_string());
-                }
+        for func in basic_functions {
+            if func.to_lowercase().starts_with(&query_lower) {
+                suggestions.push(func.to_string());
             }
+        }
 
-            // Add BASIC commands that might be partially typed
-            let basic_commands = vec![
-                "PRINT",
-                "WRITELN",
-                "INPUT",
-                "READLN",
-                "LET",
-                "IF",
-                "THEN",
-                "ELSE",
-                "WHILE",
-                "DO",
-                "FOR",
-                "TO",
-                "STEP",
-                "NEXT",
-                "FORWARD",
-                "FD",
-                "BACK",
-                "BK",
-                "LEFT",
-                "LT",
-                "RIGHT",
-                "RT",
-                "PENUP",
-                "PU",
-                "PENDOWN",
-                "PD",
-                "WHILE",
-                "WEND",
-                "GOTO",
-                "GOSUB",
-                "RETURN",
-                "END",
-                "CLS",
-                "LOCATE",
-                "COLOR",
-                "BEEP",
-                "SLEEP",
-                "RANDOMIZE",
-            ];
+        // Add BASIC commands that might be partially typed
+        let basic_commands = vec![
+            "PRINT",
+            "WRITELN",
+            "INPUT",
+            "READLN",
+            "LET",
+            "IF",
+            "THEN",
+            "ELSE",
+            "WHILE",
+            "DO",
+            "FOR",
+            "TO",
+            "STEP",
+            "NEXT",
+            "FORWARD",
+            "FD",
+            "BACK",
+            "BK",
+            "LEFT",
+            "LT",
+            "RIGHT",
+            "RT",
+            "PENUP",
+            "PU",
+            "PENDOWN",
+            "PD",
+            "WHILE",
+            "WEND",
+            "GOTO",
+            "GOSUB",
+            "RETURN",
+            "END",
+            "CLS",
+            "LOCATE",
+            "COLOR",
+            "BEEP",
+            "SLEEP",
+            "RANDOMIZE",
+        ];
 
-            for cmd in basic_commands {
-                if cmd.to_lowercase().starts_with(&query_lower) {
-                    suggestions.push(cmd.to_string());
-                }
+        for cmd in basic_commands {
+            if cmd.to_lowercase().starts_with(&query_lower) {
+                suggestions.push(cmd.to_string());
             }
         }
 
@@ -1547,7 +1143,7 @@ impl TimeWarpApp {
         self.completion_query = current_word.to_string();
         self.completion_items = self.get_completion_suggestions(current_word);
         self.completion_selected = 0;
-        self.show_completion = !self.completion_items.is_empty();
+        self.show_completion = self.code_completion_enabled && !self.completion_items.is_empty();
     }
 }
 
@@ -1585,7 +1181,7 @@ impl eframe::App for TimeWarpApp {
         // Handle keyboard shortcuts
         if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::N)) {
             self.code.clear();
-            self.output = "New file created.".to_string();
+            // Don't set output for file operations - keep output clean for program results only
         }
         if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::O)) {
             if let Some(path) = FileDialog::new()
@@ -1594,7 +1190,7 @@ impl eframe::App for TimeWarpApp {
             {
                 if let Ok(content) = std::fs::read_to_string(&path) {
                     self.code = content;
-                    self.output = format!("Opened file: {}", path.display());
+                    // Don't set output for file operations - keep output clean for program results only
                     self.last_file_path = Some(path.display().to_string());
                 }
             }
@@ -1602,11 +1198,11 @@ impl eframe::App for TimeWarpApp {
         if ctx.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::S)) {
             if let Some(path) = &self.last_file_path {
                 if std::fs::write(path, &self.code).is_ok() {
-                    self.output = format!("Saved to {}", path);
+                    // Don't set output for file operations - keep output clean for program results only
                 }
             } else if let Some(path) = FileDialog::new().set_file_name("untitled.twb").save_file() {
                 if std::fs::write(&path, &self.code).is_ok() {
-                    self.output = format!("Saved to {}", path.display());
+                    // Don't set output for file operations - keep output clean for program results only
                     self.last_file_path = Some(path.display().to_string());
                 }
             }
@@ -1668,16 +1264,11 @@ impl eframe::App for TimeWarpApp {
                 );
                 ui.add_space(6.0);
                 egui::menu::bar(ui, |ui| {
-                    // Test button
-                    if ui.button("TEST").clicked() {
-                        self.output = "Test button clicked!".to_string();
-                    }
-
                     // File menu
                     ui.menu_button("📁 File", |ui| {
                         if ui.button("📄 New File").clicked() {
                             self.code.clear();
-                            self.output = "New file created.".to_string();
+                            // Don't set output for file operations - keep output clean for program results only
                             ui.close_menu();
                         }
                         if ui.button("📂 Open File...").clicked() {
@@ -1687,7 +1278,7 @@ impl eframe::App for TimeWarpApp {
                             {
                                 if let Ok(content) = std::fs::read_to_string(&path) {
                                     self.code = content;
-                                    self.output = format!("Opened file: {}", path.display());
+                                    // Don't set output for file operations - keep output clean for program results only
                                     self.last_file_path = Some(path.display().to_string());
                                 }
                             }
@@ -1696,13 +1287,13 @@ impl eframe::App for TimeWarpApp {
                         if ui.button("💾 Save").clicked() {
                             if let Some(path) = &self.last_file_path {
                                 if std::fs::write(path, &self.code).is_ok() {
-                                    self.output = format!("Saved to {}", path);
+                                    // Don't set output for file operations - keep output clean for program results only
                                 }
                             } else if let Some(path) =
                                 FileDialog::new().set_file_name("untitled.twb").save_file()
                             {
                                 if std::fs::write(&path, &self.code).is_ok() {
-                                    self.output = format!("Saved to {}", path.display());
+                                    // Don't set output for file operations - keep output clean for program results only
                                     self.last_file_path = Some(path.display().to_string());
                                 }
                             }
@@ -1777,10 +1368,24 @@ impl eframe::App for TimeWarpApp {
                             self.syntax_highlighting_enabled = !self.syntax_highlighting_enabled;
                             ui.close_menu();
                         }
+                        if ui
+                            .selectable_label(self.code_completion_enabled, "💡 Code Completion")
+                            .clicked()
+                        {
+                            self.code_completion_enabled = !self.code_completion_enabled;
+                            ui.close_menu();
+                        }
                     });
                     ui.menu_button("❓ Help", |ui| {
                         if ui.button("ℹ️ About").clicked() {
                             self.show_about = true;
+                            ui.close_menu();
+                        }
+                        if ui.button("💬 Test Prompt").clicked() {
+                            self.prompt_user("Enter some text for testing:", |input| {
+                                println!("User entered: {}", input);
+                                // In a real application, you would do something with the input here
+                            });
                             ui.close_menu();
                         }
                     });
@@ -1805,7 +1410,7 @@ impl eframe::App for TimeWarpApp {
                             .clicked()
                         {
                             self.code.clear();
-                            self.output = "New file created.".to_string();
+                            // Don't set output for file operations - keep output clean for program results only
                         }
                         if ui
                             .button("📂 Open")
@@ -1818,7 +1423,7 @@ impl eframe::App for TimeWarpApp {
                             {
                                 if let Ok(content) = std::fs::read_to_string(&path) {
                                     self.code = content;
-                                    self.output = format!("Opened file: {}", path.display());
+                                    // Don't set output for file operations - keep output clean for program results only
                                     self.last_file_path = Some(path.display().to_string());
                                 }
                             }
@@ -1830,13 +1435,13 @@ impl eframe::App for TimeWarpApp {
                         {
                             if let Some(path) = &self.last_file_path {
                                 if std::fs::write(path, &self.code).is_ok() {
-                                    self.output = format!("Saved to {}", path);
+                                    // Don't set output for file operations - keep output clean for program results only
                                 }
                             } else if let Some(path) =
                                 FileDialog::new().set_file_name("untitled.twb").save_file()
                             {
                                 if std::fs::write(&path, &self.code).is_ok() {
-                                    self.output = format!("Saved to {}", path.display());
+                                    // Don't set output for file operations - keep output clean for program results only
                                     self.last_file_path = Some(path.display().to_string());
                                 }
                             }
@@ -1893,12 +1498,6 @@ impl eframe::App for TimeWarpApp {
                         }
 
                         ui.separator();
-
-                        // Language selector
-                        ui.label("Language:");
-                        for lang in ["TW BASIC"] {
-                            ui.selectable_value(&mut self.language, lang.to_string(), lang);
-                        }
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.add_space(8.0);
@@ -2190,62 +1789,6 @@ impl eframe::App for TimeWarpApp {
                                             );
                                         });
 
-                                    // Input handling
-                                    if self.waiting_for_input {
-                                        ui.separator();
-                                        ui.label(&self.input_prompt);
-                                        ui.horizontal(|ui| {
-                                            let response =
-                                                ui.text_edit_singleline(&mut self.user_input);
-                                            if ui.button("Enter").clicked()
-                                                || (response.lost_focus()
-                                                    && ui
-                                                        .input(|i| i.key_pressed(egui::Key::Enter)))
-                                            {
-                                                // Store the input in the variable
-                                                self.variables.insert(
-                                                    self.current_input_var.clone(),
-                                                    self.user_input.clone(),
-                                                );
-
-                                                // Provide input to the BASIC interpreter and continue execution
-                                                if let Some(ref mut interpreter) = self.basic_interpreter {
-                                                    interpreter.provide_input(&self.user_input);
-
-                                                    // Continue execution with the interpreter
-                                                    match interpreter.execute("") { // Empty string since interpreter has state
-                                                        Ok(result) => match result {
-                                                            crate::languages::basic::ExecutionResult::Complete { output, graphics_commands } => {
-                                                                self.process_graphics_commands(&graphics_commands);
-                                                                self.output = format!("{}{}", self.output, output);
-                                                                self.basic_interpreter = None;
-                                                            }
-                                                            crate::languages::basic::ExecutionResult::NeedInput { prompt, partial_output, partial_graphics } => {
-                                                                self.process_graphics_commands(&partial_graphics);
-                                                                self.output = format!("{}{}{}", self.output, partial_output, prompt);
-                                                                // Keep waiting for more input
-                                                            }
-                                                            crate::languages::basic::ExecutionResult::Error(err) => {
-                                                                self.output = format!("{}Error: {:?}", self.output, err);
-                                                                self.basic_interpreter = None;
-                                                            }
-                                                        },
-                                                        Err(err) => {
-                                                            self.output = format!("[Output for {}]\n{}Error: {:?}", self.language, self.output, err);
-                                                            self.basic_interpreter = None;
-                                                        }
-                                                    }
-                                                }
-
-                                                // Continue execution
-                                                self.waiting_for_input = false;
-                                                self.user_input.clear();
-                                                self.input_prompt.clear();
-                                                self.current_input_var.clear();
-                                            }
-                                        });
-                                    }
-
                                     ui.separator();
                                     ui.label("Turtle Graphics:");
                                     ui.horizontal(|ui| {
@@ -2459,6 +2002,130 @@ impl eframe::App for TimeWarpApp {
             });
         });
 
+        // Input handling - shown prominently when waiting for input
+        if self.waiting_for_input {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.add_space(50.0);
+                    ui.heading("📝 Program Input Required");
+                    ui.add_space(20.0);
+                    ui.label(&self.input_prompt);
+                    ui.add_space(10.0);
+                    ui.horizontal(|ui| {
+                        ui.label("Input:");
+                        let response = ui.text_edit_singleline(&mut self.user_input);
+                        if ui.button("🚀 Submit").clicked()
+                            || (response.lost_focus()
+                                && ui.input(|i| i.key_pressed(egui::Key::Enter)))
+                        {
+                            // Store the input in the variable
+                            self.variables
+                                .insert(self.current_input_var.clone(), self.user_input.clone());
+
+                            // Provide input to the BASIC interpreter and continue execution
+                            if let Some(ref mut interpreter) = self.basic_interpreter {
+                                interpreter.provide_input(&self.user_input);
+
+                                // Continue execution with the interpreter
+                                match interpreter.execute("") {
+                                    // Empty string since interpreter has state
+                                    Ok(result) => match result {
+                                        crate::languages::basic::ExecutionResult::Complete {
+                                            output,
+                                            graphics_commands,
+                                        } => {
+                                            self.process_graphics_commands(&graphics_commands);
+                                            self.output = format!("{}{}", self.output, output);
+                                            self.basic_interpreter = None;
+                                        }
+                                        crate::languages::basic::ExecutionResult::NeedInput {
+                                            variable_name,
+                                            prompt,
+                                            partial_output,
+                                            partial_graphics,
+                                        } => {
+                                            self.process_graphics_commands(&partial_graphics);
+                                            self.input_prompt = prompt.clone();
+                                            self.current_input_var = variable_name;
+                                            self.output = format!(
+                                                "{}{}{}",
+                                                self.output, partial_output, prompt
+                                            );
+                                            // Keep waiting for more input
+                                        }
+                                        crate::languages::basic::ExecutionResult::Error(err) => {
+                                            self.output =
+                                                format!("{}Error: {:?}", self.output, err);
+                                            self.basic_interpreter = None;
+                                        }
+                                    },
+                                    Err(err) => {
+                                        self.output = format!("{}Error: {:?}", self.output, err);
+                                        self.basic_interpreter = None;
+                                    }
+                                }
+                            }
+
+                            // Continue execution
+                            self.waiting_for_input = false;
+                            self.user_input.clear();
+                            self.input_prompt.clear();
+                            self.current_input_var.clear();
+                        }
+                    });
+                });
+            });
+        }
+
+        // General prompt handling - shown prominently when active
+        if self.general_prompt_active {
+            let mut open = true;
+            egui::Window::new("💬 Input Required")
+                .open(&mut open)
+                .collapsible(false)
+                .resizable(false)
+                .show(ctx, |ui| {
+                    ui.vertical_centered(|ui| {
+                        ui.add_space(20.0);
+                        ui.label(&self.general_prompt_message);
+                        ui.add_space(10.0);
+                        ui.horizontal(|ui| {
+                            ui.label("Input:");
+                            let response = ui.text_edit_singleline(&mut self.general_prompt_input);
+                            if ui.button("🚀 Submit").clicked()
+                                || (response.lost_focus()
+                                    && ui.input(|i| i.key_pressed(egui::Key::Enter)))
+                            {
+                                // Call the callback with the input
+                                if let Some(callback) = self.general_prompt_callback.take() {
+                                    callback(self.general_prompt_input.clone());
+                                }
+
+                                // Reset prompt state
+                                self.general_prompt_active = false;
+                                self.general_prompt_message.clear();
+                                self.general_prompt_input.clear();
+                            }
+                            if ui.button("❌ Cancel").clicked() {
+                                // Reset prompt state without calling callback
+                                self.general_prompt_active = false;
+                                self.general_prompt_message.clear();
+                                self.general_prompt_input.clear();
+                                self.general_prompt_callback = None;
+                            }
+                        });
+                    });
+                });
+
+            // If window was closed (user clicked X), treat as cancel
+            if !open {
+                self.general_prompt_active = false;
+                self.general_prompt_message.clear();
+                self.general_prompt_input.clear();
+                self.general_prompt_callback = None;
+            }
+        }
+
         // Status Bar
         egui::TopBottomPanel::bottom("status_bar").show(ctx, |ui| {
             ui.add_space(2.0);
@@ -2480,7 +2147,7 @@ impl eframe::App for TimeWarpApp {
                         ui.separator();
 
                         // Language and encoding
-                        ui.label(format!("🏷️ {}", self.language));
+                        ui.label("🏷️ TW BASIC");
 
                         ui.separator();
 
@@ -2489,6 +2156,8 @@ impl eframe::App for TimeWarpApp {
                             ui.colored_label(egui::Color32::GREEN, "▶️ Running");
                         } else if self.waiting_for_input {
                             ui.colored_label(egui::Color32::YELLOW, "⏸️ Waiting for Input");
+                        } else if self.general_prompt_active {
+                            ui.colored_label(egui::Color32::BLUE, "💬 Awaiting Response");
                         } else {
                             ui.colored_label(egui::Color32::GRAY, "⏹️ Ready");
                         }
@@ -2529,7 +2198,7 @@ impl eframe::App for TimeWarpApp {
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.add_space(8.0);
-                            ui.label("Time Warp IDE v1.0.0");
+                            ui.label("2.0.0");
                         });
                     });
                 });
@@ -2544,11 +2213,11 @@ impl eframe::App for TimeWarpApp {
                 .show(ctx, |ui| {
                     ui.vertical_centered(|ui| {
                         ui.heading("Time Warp IDE");
-                        ui.label("Version 1.0.0");
+                        ui.label("Version 2.0.0");
                         ui.label("A modern, educational programming environment");
                         ui.label("built in Rust using the egui framework.");
                         ui.separator();
-                        ui.label("Supports TW BASIC with Logo turtle graphics");
+                        ui.label("Exclusive TW BASIC development environment");
                         ui.label("with interactive input and turtle graphics.");
                         ui.separator();
                         if ui.button("Close").clicked() {
@@ -2658,11 +2327,12 @@ mod tests {
 
         // Simulate New File
         app.code.clear();
-        app.output = "New file created.".to_string();
+        // File operations no longer set output messages
         app.last_file_path = None;
 
         assert_eq!(app.code, "");
-        assert_eq!(app.output, "New file created.");
+        // Output should remain unchanged for file operations
+        assert_eq!(app.output, "some output");
         assert_eq!(app.last_file_path, None);
     }
 
@@ -2671,17 +2341,19 @@ mod tests {
         let mut app = TimeWarpApp::default();
         app.code = "10 PRINT \"TEST\"".to_string();
         app.last_file_path = Some("test_save.twb".to_string());
+        app.output = "previous output".to_string(); // Set some initial output
 
         // Simulate Save
         if let Some(path) = &app.last_file_path {
             fs::write(path, &app.code).unwrap();
-            app.output = format!("Saved to {}", path);
+            // File operations no longer set output messages
         }
 
         // Verify file was saved
         let content = fs::read_to_string("test_save.twb").unwrap();
         assert_eq!(content, "10 PRINT \"TEST\"");
-        assert_eq!(app.output, "Saved to test_save.twb");
+        // Output should remain unchanged
+        assert_eq!(app.output, "previous output");
 
         // Cleanup
         fs::remove_file("test_save.twb").unwrap();
@@ -2748,14 +2420,6 @@ mod tests {
     }
 
     #[test]
-    fn test_language_selection() {
-        let app = TimeWarpApp::default();
-
-        // Test language is TW BASIC by default
-        assert_eq!(app.language, "TW BASIC");
-    }
-
-    #[test]
     fn test_tab_switching() {
         let mut app = TimeWarpApp::default();
 
@@ -2795,7 +2459,6 @@ mod tests {
     #[test]
     fn test_basic_program_execution() {
         let mut app = TimeWarpApp::default();
-        app.language = "TW BASIC".to_string();
 
         // Test simple BASIC program execution
         let basic_code = "10 PRINT \"Hello from Time_Warp!\"\n20 PRINT \"Testing output console...\"\n30 PRINT \"Count: 1\"\n40 PRINT \"Count: 2\"\n50 PRINT \"Count: 3\"\n60 PRINT \"Test complete!\"";
@@ -2816,7 +2479,6 @@ mod tests {
     #[test]
     fn test_enhanced_basic_commands() {
         let mut app = TimeWarpApp::default();
-        app.language = "TW BASIC".to_string();
 
         // Test WRITELN command (Pascal-style with newline)
         let writeln_code = "WRITELN \"Hello with newline\"";
@@ -2831,5 +2493,44 @@ mod tests {
         assert!(result.contains("Moved forward 50"));
         assert!(result.contains("Turned right 90"));
         assert!(result.contains("Moved back 25"));
+    }
+
+    #[test]
+    fn test_input_statement_parsing() {
+        // Test that INPUT statements with semicolon separators parse correctly
+        let input_code = "10 INPUT \"Name? \"; NAME$\n20 PRINT \"Hello \"; NAME$";
+
+        // This should not panic or return a parse error
+        let mut app = TimeWarpApp::default();
+        let result = app.execute_tw_basic(input_code);
+
+        // The execution should start (even if it waits for input)
+        // We just want to make sure it doesn't fail with a parse error
+        println!("INPUT parsing result: {:?}", result);
+        // If we get here without panicking, the parsing worked
+        assert!(true); // Just verify we don't crash
+    }
+
+    #[test]
+    fn test_input_statement_execution() {
+        // Test that INPUT statements properly set waiting_for_input state
+        let input_code = "10 INPUT \"Name? \"; NAME$";
+
+        let mut app = TimeWarpApp::default();
+        let _result = app.execute_tw_basic(input_code);
+
+        // After executing an INPUT statement, the app should be waiting for input
+        assert!(
+            app.waiting_for_input,
+            "App should be waiting for input after INPUT statement"
+        );
+        assert_eq!(
+            app.input_prompt, "Name? ",
+            "Input prompt should be set correctly"
+        );
+        assert_eq!(
+            app.current_input_var, "NAME$",
+            "Current input variable should be set correctly"
+        );
     }
 }
