@@ -65,6 +65,9 @@ struct TimeWarpApp {
     completion_items: Vec<String>,
     completion_selected: usize,
     completion_query: String,
+
+    // Syntax highlighting
+    syntax_highlighting_enabled: bool,
 }
 
 impl Default for TimeWarpApp {
@@ -112,6 +115,9 @@ impl Default for TimeWarpApp {
             completion_items: Vec::new(),
             completion_selected: 0,
             completion_query: String::new(),
+
+            // Syntax highlighting defaults
+            syntax_highlighting_enabled: true,
         }
     }
 }
@@ -911,6 +917,57 @@ impl TimeWarpApp {
         // In a real implementation, this would replace the current word
         self.code.push_str(completion);
         self.show_completion = false;
+    }
+
+    // Syntax highlighting methods
+    fn highlight_syntax(&self, text: &str) -> Vec<(String, egui::Color32)> {
+        if !self.syntax_highlighting_enabled {
+            return vec![(text.to_string(), egui::Color32::BLACK)];
+        }
+
+        let mut highlighted = Vec::new();
+        let mut current_pos = 0;
+
+        // Simple syntax highlighting - split by whitespace and check for keywords
+        let keywords = self.get_language_keywords();
+        let keyword_set: std::collections::HashSet<&str> = keywords.into_iter().collect();
+
+        for word in text.split_whitespace() {
+            // Find the word in the original text
+            if let Some(start) = text[current_pos..].find(word) {
+                let actual_start = current_pos + start;
+                let actual_end = actual_start + word.len();
+
+                // Add any text before this word
+                if actual_start > current_pos {
+                    highlighted.push((
+                        text[current_pos..actual_start].to_string(),
+                        egui::Color32::BLACK,
+                    ));
+                }
+
+                // Color the word
+                let color = if keyword_set.contains(word.to_uppercase().as_str()) {
+                    egui::Color32::BLUE // Keywords in blue
+                } else if word.parse::<f64>().is_ok() {
+                    egui::Color32::GREEN // Numbers in green
+                } else if word.starts_with('"') && word.ends_with('"') {
+                    egui::Color32::RED // Strings in red
+                } else {
+                    egui::Color32::BLACK // Default black
+                };
+
+                highlighted.push((word.to_string(), color));
+                current_pos = actual_end;
+            }
+        }
+
+        // Add any remaining text
+        if current_pos < text.len() {
+            highlighted.push((text[current_pos..].to_string(), egui::Color32::BLACK));
+        }
+
+        highlighted
     }
 }
 
