@@ -79,12 +79,6 @@ struct TimeWarpApp {
     error_message: Option<String>,
     error_timer: f64,
 
-    // Menu state
-    show_file_menu: bool,
-    show_edit_menu: bool,
-    show_view_menu: bool,
-    show_help_menu: bool,
-
     // Syntax highlighting
     #[allow(dead_code)]
     syntax_highlighting_enabled: bool,
@@ -156,12 +150,6 @@ impl Default for TimeWarpApp {
             // Error notification defaults
             error_message: None,
             error_timer: 0.0,
-
-            // Menu state defaults
-            show_file_menu: false,
-            show_edit_menu: false,
-            show_view_menu: false,
-            show_help_menu: false,
 
             // Syntax highlighting defaults
             syntax_highlighting_enabled: true,
@@ -915,70 +903,203 @@ impl TimeWarpApp {
         }
     }
 
-    fn toggle_breakpoint(&mut self, line_number: u32) {
-        let filename = self
-            .last_file_path
-            .as_ref()
+    fn render_debug_editor(&mut self, ui: &mut egui::Ui) {
+        let filename = self.last_file_path.as_ref()
             .and_then(|p| std::path::Path::new(p).file_name())
             .and_then(|n| n.to_str())
             .unwrap_or("untitled");
 
-        let breakpoints = self
-            .breakpoints
-            .entry(filename.to_string())
-            .or_insert(Vec::new());
+        let syntax_enabled = self.syntax_highlighting_enabled;
+        let current_debug_line = self.current_debug_line;
+        let language = self.language.clone();
+        let keywords: Vec<String> = self.get_language_keywords().into_iter().map(|s| s.to_string()).collect();
 
-        if let Some(pos) = breakpoints.iter().position(|&x| x == line_number) {
-            breakpoints.remove(pos);
-        } else {
-            breakpoints.push(line_number);
-            breakpoints.sort();
-        }
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            ui.set_width(ui.available_width());
+
+            let lines: Vec<String> = self.code.lines().map(|s| s.to_string()).collect();
+            let breakpoints = self.breakpoints.entry(filename.to_string()).or_insert_with(Vec::new);
+
+            for (line_idx, line) in lines.iter().enumerate() {
+                ui.horizontal(|ui| {
+                    // Breakpoint column
+                    let line_number = (line_idx + 1) as u32;
+                    let has_breakpoint = breakpoints.contains(&line_number);
+
+                    let breakpoint_button = egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
+                        .frame(false)
+                        .small();
+
+                    if ui.add(breakpoint_button).on_hover_text(if has_breakpoint {
+                        "Click to remove breakpoint"
+                    } else {
+                        "Click to add breakpoint"
+                    }).clicked() {
+                        if has_breakpoint {
+                            breakpoints.retain(|&x| x != line_number);
+                        } else {
+                            breakpoints.push(line_number);
+                            breakpoints.sort();
+                        }
+                    }
+
+                    // Line number
+                    ui.label(egui::RichText::new(format!("{:4}", line_number))
+                        .color(egui::Color32::from_rgb(100, 100, 100))
+                        .font(egui::FontId::monospace(12.0)));
+
+                    // Current debug line indicator
+                    if Some(line_number) == current_debug_line {
+                        ui.label(egui::RichText::new("▶")
+                            .color(egui::Color32::YELLOW));
+                    } else {
+                        ui.add_space(12.0);
+                    }
+
+                    // Line content with syntax highlighting
+                    if syntax_enabled {
+                        // Simple syntax highlighting for debug view
+                        let highlighted = Self::highlight_line_static(&line, &keywords, &language);
+                        for (text, color) in highlighted {
+                            ui.label(egui::RichText::new(text)
+                                .color(color)
+                                .font(egui::FontId::monospace(12.0)));
+                        }
+                    } else {
+                        ui.label(egui::RichText::new(line)
+                            .font(egui::FontId::monospace(12.0)));
+                    }
+                });
+            }
+
+            // Handle empty last line
+            if self.code.ends_with('\n') || self.code.is_empty() {
+                ui.horizontal(|ui| {
+                    let line_number = (lines.len() + 1) as u32;
+                    let has_breakpoint = breakpoints.contains(&line_number);
+
+                    let breakpoint_button = egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
+                        .frame(false)
+                        .small();
+
+                    if ui.add(breakpoint_button).on_hover_text(if has_breakpoint {
+                        "Click to remove breakpoint"
+                    } else {
+                        "Click to add breakpoint"
+                    }).clicked() {
+                        if has_breakpoint {
+                            breakpoints.retain(|&x| x != line_number);
+                        } else {
+                            breakpoints.push(line_number);
+                            breakpoints.sort();
+                        }
+                    }
+
+                    ui.label(egui::RichText::new(format!("{:4}", line_number))
+                        .color(egui::Color32::from_rgb(100, 100, 100))
+                        .font(egui::FontId::monospace(12.0)));
+                    ui.add_space(12.0);
+                });
+            }
+        });
     }
 
-    fn render_debug_editor(&mut self, ui: &mut egui::Ui) {
-        let filename = self
-            .last_file_path
-            .as_ref()
-            .and_then(|p| std::path::Path::new(p).file_name())
-            .and_then(|n| n.to_str())
-            .unwrap_or("untitled");
+    fn highlight_line_static(line: &str, keywords: &[String], language: &str) -> Vec<(String, egui::Color32)> {
+        if line.trim().is_empty() {
+            return vec![(line.to_string(), egui::Color32::BLACK)];
+        }
 
-        let breakpoints = self.breakpoints.get(filename).cloned().unwrap_or_default();
-        let lines: Vec<String> = self.code.lines().map(|s| s.to_string()).collect();
+        let mut highlighted = Vec::new();
+        let chars: Vec<char> = line.chars().collect();
+        let mut i = 0;
 
-        ui.horizontal(|ui| {
-            // Line numbers column
-            ui.vertical(|ui| {
-                for (i, _) in lines.iter().enumerate() {
-                    let line_num = i + 1;
-                    let has_breakpoint = breakpoints.contains(&(line_num as u32));
+        // Create keyword set from provided keywords
+        let keyword_set: std::collections::HashSet<String> = keywords.iter().map(|k| k.to_uppercase()).collect();
 
-                    let button = egui::Button::new(format!("{:3}", line_num))
-                        .fill(if has_breakpoint {
-                            egui::Color32::RED
-                        } else {
-                            egui::Color32::TRANSPARENT
-                        })
-                        .stroke(egui::Stroke::NONE)
-                        .min_size(egui::vec2(40.0, 18.0));
+        while i < chars.len() {
+            // Check for comments first
+            if Self::is_comment_start_static(&line[i..], language) {
+                highlighted.push((line[i..].to_string(), egui::Color32::from_rgb(0, 128, 0)));
+                break;
+            }
 
-                    if ui.add(button).clicked() {
-                        self.toggle_breakpoint(line_num as u32);
+            // Check for strings
+            if chars[i] == '"' {
+                let mut end = i + 1;
+                while end < chars.len() && chars[end] != '"' {
+                    end += 1;
+                }
+                if end < chars.len() {
+                    end += 1;
+                }
+
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(163, 21, 21)));
+                i = end;
+                continue;
+            }
+
+            // Check for numbers
+            if chars[i].is_ascii_digit() {
+                let mut end = i + 1;
+                while end < chars.len() && (chars[end].is_ascii_digit() || chars[end] == '.') {
+                    end += 1;
+                }
+
+                if i > 0 {
+                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                }
+                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(0, 128, 128)));
+                i = end;
+                continue;
+            }
+
+            // Check for keywords
+            let remaining = &line[i..];
+            let mut found_keyword = false;
+            for keyword in &keyword_set {
+                if remaining.to_uppercase().starts_with(keyword) {
+                    let keyword_len = keyword.len();
+                    let next_char = if i + keyword_len < chars.len() {
+                        chars[i + keyword_len]
+                    } else {
+                        ' '
+                    };
+
+                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ';' || next_char == ':' {
+                        if i > 0 {
+                            highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
+                        }
+                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255)));
+                        i += keyword_len;
+                        found_keyword = true;
+                        break;
                     }
                 }
-            });
+            }
 
-            ui.separator();
+            if !found_keyword {
+                i += 1;
+            }
+        }
 
-            // Code editor
-            ui.add(
-                egui::TextEdit::multiline(&mut self.code)
-                    .font(egui::TextStyle::Monospace)
-                    .desired_width(f32::INFINITY)
-                    .desired_rows(20),
-            );
-        });
+        if i < line.len() {
+            highlighted.push((line[i..].to_string(), egui::Color32::BLACK));
+        }
+
+        highlighted
+    }
+
+    fn is_comment_start_static(text: &str, language: &str) -> bool {
+        match language {
+            "TW BASIC" => text.starts_with("REM ") || text.starts_with("'"),
+            "TW Pascal" => text.starts_with("//") || text.starts_with("(*") || text.starts_with("{"),
+            "TW Prolog" => text.starts_with("%"),
+            "PILOT" => text.starts_with("#"),
+            _ => text.starts_with("//") || text.starts_with("#"),
+        }
     }
 
     // Code completion methods
@@ -1094,25 +1215,56 @@ impl TimeWarpApp {
 
     fn get_completion_suggestions(&self, query: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
+        let query_lower = query.to_lowercase();
 
         // Add language keywords
         let keywords = self.get_language_keywords();
         for keyword in keywords {
-            if keyword.to_lowercase().starts_with(&query.to_lowercase()) {
+            if keyword.to_lowercase().starts_with(&query_lower) {
                 suggestions.push(keyword.to_string());
             }
         }
 
-        // Add variables (from debug_variables for now, could be extended)
+        // Add variables from debug session
         for (var_name, _) in &self.debug_variables {
-            if var_name.to_lowercase().starts_with(&query.to_lowercase()) {
+            if var_name.to_lowercase().starts_with(&query_lower) {
                 suggestions.push(var_name.clone());
+            }
+        }
+
+        // Add language-specific functions and commands
+        if self.language == "TW BASIC" {
+            let basic_functions = vec![
+                "ABS(", "ASC(", "CHR$(", "COS(", "EXP(", "INT(", "LEFT$(", "LEN(",
+                "LOG(", "MID$(", "RIGHT$(", "RND(", "SIN(", "SQR(", "STR$(", "TAN(", "VAL(",
+            ];
+
+            for func in basic_functions {
+                if func.to_lowercase().starts_with(&query_lower) {
+                    suggestions.push(func.to_string());
+                }
+            }
+
+            // Add BASIC commands that might be partially typed
+            let basic_commands = vec![
+                "PRINT", "INPUT", "LET", "IF", "THEN", "ELSE", "FOR", "TO", "STEP", "NEXT",
+                "WHILE", "WEND", "GOTO", "GOSUB", "RETURN", "END", "CLS", "LOCATE", "COLOR",
+                "BEEP", "SLEEP", "RANDOMIZE"
+            ];
+
+            for cmd in basic_commands {
+                if cmd.to_lowercase().starts_with(&query_lower) {
+                    suggestions.push(cmd.to_string());
+                }
             }
         }
 
         // Sort and deduplicate
         suggestions.sort();
         suggestions.dedup();
+
+        // Limit to top 10 suggestions
+        suggestions.truncate(10);
 
         suggestions
     }
@@ -1142,162 +1294,29 @@ impl TimeWarpApp {
     }
 
     fn trigger_completion(&mut self) {
-        // Get current word at cursor (simplified - would need proper cursor position)
-        let words: Vec<&str> = self.code.split_whitespace().collect();
-        let current_word = words.last().copied().unwrap_or("").to_string();
-        self.completion_query = current_word.clone();
-        self.completion_items = self.get_completion_suggestions(&current_word);
-        self.completion_selected = 0;
-        self.show_completion = !self.completion_items.is_empty();
-    }
+        // Get current word at cursor position (more accurate implementation)
+        let cursor_pos = self.code.len(); // Simplified - in a real implementation we'd track actual cursor
+        let before_cursor = &self.code[..cursor_pos];
 
-    // Syntax highlighting methods
-    #[allow(dead_code)]
-    fn highlight_syntax(&self, text: &str) -> Vec<(String, egui::Color32)> {
-        if !self.syntax_highlighting_enabled {
-            return vec![(text.to_string(), egui::Color32::BLACK)];
-        }
-
-        let mut highlighted = Vec::new();
-        let lines: Vec<&str> = text.lines().collect();
-
-        for line in lines {
-            let line_highlighted = self.highlight_line(line);
-            highlighted.extend(line_highlighted);
-            // Add newline back
-            highlighted.push(("\n".to_string(), egui::Color32::BLACK));
-        }
-
-        // Remove the last newline if the original text didn't end with one
-        if !text.ends_with('\n') && !highlighted.is_empty() {
-            highlighted.pop();
-        }
-
-        highlighted
-    }
-
-    fn highlight_line(&self, line: &str) -> Vec<(String, egui::Color32)> {
-        if line.trim().is_empty() {
-            return vec![(line.to_string(), egui::Color32::BLACK)];
-        }
-
-        let mut highlighted = Vec::new();
-        let chars: Vec<char> = line.chars().collect();
-        let mut i = 0;
-
-        // Get keywords for current language
-        let keywords = self.get_language_keywords();
-        let keyword_set: std::collections::HashSet<String> = keywords.into_iter().map(|k| k.to_uppercase()).collect();
-
-        while i < chars.len() {
-            // Check for comments first (REM for BASIC, // for others, etc.)
-            if self.is_comment_start(&line[i..]) {
-                // Comment - rest of line is comment
-                highlighted.push((line[i..].to_string(), egui::Color32::from_rgb(0, 128, 0))); // Green
+        // Find the current word being typed
+        let mut word_start = cursor_pos;
+        for (i, ch) in before_cursor.char_indices().rev() {
+            if ch.is_whitespace() || ch == '(' || ch == ')' || ch == ',' || ch == ';' || ch == ':' || ch == '=' {
                 break;
             }
-
-            // Check for strings
-            if chars[i] == '"' {
-                // Find end of string
-                let mut end = i + 1;
-                while end < chars.len() && chars[end] != '"' {
-                    // Handle escaped quotes
-                    if chars[end] == '\\' && end + 1 < chars.len() {
-                        end += 1; // Skip escaped character
-                    }
-                    end += 1;
-                }
-                if end < chars.len() {
-                    end += 1; // Include closing quote
-                }
-
-                // Add text before string
-                if i > 0 {
-                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
-                }
-
-                // Add string
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(163, 21, 21))); // Red
-                i = end;
-                continue;
-            }
-
-            // Check for numbers (integers and floats)
-            if chars[i].is_ascii_digit() || (chars[i] == '-' && i + 1 < chars.len() && chars[i + 1].is_ascii_digit()) {
-                let mut end = i + 1;
-                let mut has_dot = false;
-                while end < chars.len() {
-                    if chars[end].is_ascii_digit() {
-                        end += 1;
-                    } else if chars[end] == '.' && !has_dot {
-                        has_dot = true;
-                        end += 1;
-                    } else {
-                        break;
-                    }
-                }
-
-                // Add text before number
-                if i > 0 {
-                    highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
-                }
-
-                // Add number
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(0, 128, 128))); // Teal
-                i = end;
-                continue;
-            }
-
-            // Check for keywords
-            let remaining = &line[i..];
-            let mut found_keyword = false;
-            for keyword in &keyword_set {
-                if remaining.to_uppercase().starts_with(keyword) {
-                    let keyword_len = keyword.len();
-                    // Check if it's a complete word (followed by space, punctuation, or end)
-                    let next_char = if i + keyword_len < chars.len() {
-                        chars[i + keyword_len]
-                    } else {
-                        ' '
-                    };
-
-                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ':' || next_char == ';' {
-                        // Add text before keyword
-                        if i > 0 {
-                            highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
-                        }
-
-                        // Add keyword
-                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255))); // Blue
-                        i += keyword_len;
-                        found_keyword = true;
-                        break;
-                    }
-                }
-            }
-
-            if !found_keyword {
-                i += 1;
-            }
+            word_start = i;
         }
 
-        // Add any remaining text
-        if i < line.len() {
-            highlighted.push((line[i..].to_string(), egui::Color32::BLACK));
-        }
+        let current_word = if word_start < cursor_pos {
+            &before_cursor[word_start..cursor_pos]
+        } else {
+            ""
+        };
 
-        highlighted
-    }
-
-    fn is_comment_start(&self, text: &str) -> bool {
-        match self.language.as_str() {
-            "TW BASIC" => text.to_uppercase().starts_with("REM "),
-            "TW Pascal" => text.starts_with("//") || text.starts_with("(*"),
-            "TW Prolog" => text.starts_with("%"),
-            "PILOT" => text.starts_with("#"),
-            _ => false,
-        }
+        self.completion_query = current_word.to_string();
+        self.completion_items = self.get_completion_suggestions(current_word);
+        self.completion_selected = 0;
+        self.show_completion = !self.completion_items.is_empty();
     }
 }
 
