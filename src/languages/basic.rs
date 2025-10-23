@@ -79,9 +79,10 @@ pub enum Token {
     Dollar,
 
     // Literals
-        tokens.push(Token::EndOfFile);
-        Ok(tokens)
-    }
+    Number(f64),
+    String(String),
+    Identifier(String),
+}
 
 #[derive(Debug, Clone)]
 pub enum Expression {
@@ -1049,19 +1050,321 @@ impl BasicInterpreter {
                     partial_graphics: graphics_commands.clone(),
                 });
             }
+            match *statement {
+                Statement::Let {
+                    variable,
+                    ref expression,
+                } => {
+                    let value = self.evaluate_expression(expression)?;
+                    self.variables.insert(variable.clone(), value);
+                    Ok(None)
+                }
+                Statement::Print {
+                    ref expressions,
+                    separator,
+                } => {
+                    let mut result = String::new();
+                    for (i, expr) in expressions.iter().enumerate() {
+                        if i > 0 {
+                            match separator {
+                                PrintSeparator::Comma => result.push('\t'),
+                                PrintSeparator::Semicolon => {}
+                                PrintSeparator::None => result.push(' '),
+                            }
+                        }
+                        let value = self.evaluate_expression(expr)?;
+                        match value {
+                            Value::Number(n) => result.push_str(&n.to_string()),
+                            Value::String(s) => result.push_str(&s),
+                        }
+                    }
+                    Ok(Some(result))
+                }
+                Statement::If {
+                    ref condition,
+                    ref then_statements,
+                    ref else_statements,
+                } => {
+                    let condition_value = self.evaluate_expression(condition)?;
+                    let condition_met = match condition_value {
+                        Value::Number(n) => n != 0.0,
+                        Value::String(s) => !s.is_empty(),
+                    };
+                    if condition_met {
+                        for stmt in then_statements {
+                            let result = self.execute_statement(stmt, output, graphics_commands)?;
+                            if result.is_some() {
+                                return Ok(result);
+                            }
+                        }
+                    } else if let Some(else_stmts) = else_statements {
+                        for stmt in else_stmts {
+                            let result = self.execute_statement(stmt, output, graphics_commands)?;
+                            if result.is_some() {
+                                return Ok(result);
+                            }
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::For {
+                    ref variable,
+                    ref start,
+                    ref end,
+                    ref step,
+                    statements: _,
+                } => {
+                    let start_val = self.evaluate_expression(start)?;
+                    let end_val = self.evaluate_expression(end)?;
+                    let step_val = step
+                        .as_ref()
+                        .map(|s| self.evaluate_expression(s))
+                        .unwrap_or(Ok(Value::Number(1.0)))?;
+                    let (start_num, end_num, step_num) = match (start_val, end_val, step_val) {
+                        (Value::Number(s), Value::Number(e), Value::Number(st)) => (s, e, st),
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "FOR loop requires numeric values".to_string(),
+                            ))
+                        }
+                    };
+                    self.variables
+                        .insert(variable.clone(), Value::Number(start_num));
+                    self.for_loops.push(ForLoop {
+                        variable: variable.clone(),
+                        start: start_num,
+                        end: end_num,
+                        step: step_num,
+                        line: self.current_line,
+                    });
+                    Ok(None)
+                }
+                Statement::Next { ref variable } => {
+                    if let Some(loop_info) = self.for_loops.last_mut() {
+                        if let Some(var_name) = variable {
+                            if var_name != &loop_info.variable {
+                                return Err(InterpreterError::RuntimeError(format!(
+                                    "NEXT {} does not match FOR {}",
+                                    var_name, loop_info.variable
+                                )));
+                            }
+                        }
+                        let current_val = match self.variables.get(&loop_info.variable) {
+                            Some(Value::Number(n)) => *n,
+                            _ => {
+                                return Err(InterpreterError::RuntimeError(format!(
+                                    "Variable {} not found or not numeric",
+                                    loop_info.variable
+                                )))
+                            }
+                        };
+                        let next_val = current_val + loop_info.step;
+                        let should_continue = if loop_info.step > 0.0 {
+                            next_val <= loop_info.end
+                        } else {
+                            next_val >= loop_info.end
+                        };
+                        if should_continue {
+                            self.variables
+                                .insert(loop_info.variable.clone(), Value::Number(next_val));
+                            self.current_line = loop_info.line;
+                            return Ok(Some("CONTINUE_LOOP".to_string()));
+                        } else {
+                            self.for_loops.pop();
+                        }
+                    } else {
+                        return Err(InterpreterError::RuntimeError(
+                            "NEXT without FOR".to_string(),
+                        ));
+                    }
+                    Ok(None)
+                }
+                Statement::Goto { line_number } => Ok(Some(format!("GOTO {}", line_number))),
+                Statement::Gosub { line_number } => {
+                    self.gosub_stack.push(self.current_line);
+                    Ok(Some(format!("GOTO {}", line_number)))
+                }
+                Statement::Return => {
+                    if let Some(return_line) = self.gosub_stack.pop() {
+                        self.current_line = return_line;
+                        return Ok(Some("CONTINUE_LOOP".to_string()));
+                    } else {
+                        return Err(InterpreterError::RuntimeError(
+                            "RETURN without GOSUB".to_string(),
+                        ));
+                    }
+                }
+                Statement::On {
+                    ref expression,
+                    ref line_numbers,
+                    is_gosub,
+                } => {
+                    let index_val = self.evaluate_expression(expression)?;
+                    let index = match index_val {
+                        Value::Number(n) => n as usize,
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "ON expression must evaluate to a number".to_string(),
+                            ))
+                        }
+                    };
+
+                    if index == 0 || index > line_numbers.len() {
+                        Ok(None)
+                    } else {
+                        let target_line = line_numbers[index - 1];
+                        if is_gosub {
+                            self.gosub_stack.push(self.current_line);
+                        }
+                        Ok(Some(format!("GOTO {}", target_line)))
+                    }
+                }
+                Statement::Input {
+                    ref prompt,
+                    ref variables,
+                } => {
+                    let prompt_text = prompt.clone().unwrap_or_else(|| "Input:".to_string());
+                    if let Some(var) = variables.first() {
+                        self.pending_input = Some((var.clone(), prompt_text));
+                    }
+                    Ok(None)
+                }
+                Statement::Dim { ref arrays } => {
+                    for (name, size_expr) in arrays {
+                        let size_val = self.evaluate_expression(size_expr)?;
+                        match size_val {
+                            Value::Number(size) => {
+                                let size_usize = size as usize;
+                                self.arrays
+                                    .insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
+                            }
+                            _ => {
+                                return Err(InterpreterError::TypeError(
+                                    "Array size must be numeric".to_string(),
+                                ))
+                            }
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::Data { ref values } => {
+                    self.data.extend(values.iter().cloned());
+                    Ok(None)
+                }
+                Statement::Read { ref variables } => {
+                    for var in variables {
+                        if self.data_pointer < self.data.len() {
+                            let data_value = &self.data[self.data_pointer];
+                            self.data_pointer += 1;
+                            if let Ok(num) = data_value.parse::<f64>() {
+                                self.variables.insert(var.clone(), Value::Number(num));
+                            } else {
+                                self.variables
+                                    .insert(var.clone(), Value::String(data_value.clone()));
+                            }
+                        } else {
+                            return Err(InterpreterError::RuntimeError(
+                                "READ without DATA".to_string(),
+                            ));
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::Restore => {
+                    self.data_pointer = 0;
+                    Ok(None)
+                }
+                Statement::End => Ok(Some("Program ended.".to_string())),
+                Statement::Stop => Ok(Some("Program stopped.".to_string())),
+                Statement::Cls => {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "CLS".to_string(),
+                        value: 0.0,
+                        color: Some(self.screen_color as u32),
+                    });
+                    Ok(None)
+                }
+                Statement::Color { ref color } => {
+                    let color_val = self.evaluate_expression(color)?;
+                    match color_val {
+                        Value::Number(c) => {
+                            self.text_color = c as u8;
+                            graphics_commands.push(GraphicsCommand {
+                                command: "COLOR".to_string(),
+                                value: c as f32,
+                                color: Some(c as u32),
+                            });
+                        }
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "COLOR requires numeric value".to_string(),
+                            ))
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::GraphicsForward { ref distance } => {
+                    let dist_val = self.evaluate_expression(distance)?;
+                    match dist_val {
+                        Value::Number(d) => {
+                            graphics_commands.push(GraphicsCommand {
+                                command: "FORWARD".to_string(),
+                                value: d as f32,
+                                color: None,
+                            });
+                        }
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "FORWARD requires numeric distance".to_string(),
+                            ))
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::GraphicsRight { ref angle } => {
+                    let angle_val = self.evaluate_expression(angle)?;
+                    match angle_val {
+                        Value::Number(a) => {
+                            graphics_commands.push(GraphicsCommand {
+                                command: "RIGHT".to_string(),
+                                value: a as f32,
+                                color: None,
+                            });
+                        }
+                        _ => {
+                            return Err(InterpreterError::TypeError(
+                                "RIGHT requires numeric angle".to_string(),
+                            ))
+                        }
+                    }
+                    Ok(None)
+                }
+                Statement::Rem { ref comment } => {
+                    // Comments are ignored
+                    let _ = comment;
+                    Ok(None)
+                }
+            }
+        }
         match *statement {
-            Statement::Let { variable, ref expression } => {
+            Statement::Let {
+                variable,
+                ref expression,
+            } => {
                 let value = self.evaluate_expression(expression)?;
                 self.variables.insert(variable.clone(), value);
                 Ok(None)
             }
-            Statement::Print { ref expressions, separator } => {
+            Statement::Print {
+                ref expressions,
+                separator,
+            } => {
                 let mut result = String::new();
                 for (i, expr) in expressions.iter().enumerate() {
                     if i > 0 {
                         match separator {
                             PrintSeparator::Comma => result.push('\t'),
-                            PrintSeparator::Semicolon => {},
+                            PrintSeparator::Semicolon => {}
                             PrintSeparator::None => result.push(' '),
                         }
                     }
@@ -1073,7 +1376,11 @@ impl BasicInterpreter {
                 }
                 Ok(Some(result))
             }
-            Statement::If { ref condition, ref then_statements, ref else_statements } => {
+            Statement::If {
+                ref condition,
+                ref then_statements,
+                ref else_statements,
+            } => {
                 let condition_value = self.evaluate_expression(condition)?;
                 let condition_met = match condition_value {
                     Value::Number(n) => n != 0.0,
@@ -1096,7 +1403,13 @@ impl BasicInterpreter {
                 }
                 Ok(None)
             }
-            Statement::For { ref variable, ref start, ref end, ref step, statements: _ } => {
+            Statement::For {
+                ref variable,
+                ref start,
+                ref end,
+                ref step,
+                statements: _,
+            } => {
                 let start_val = self.evaluate_expression(start)?;
                 let end_val = self.evaluate_expression(end)?;
                 let step_val = step
@@ -1111,7 +1424,8 @@ impl BasicInterpreter {
                         ))
                     }
                 };
-                self.variables.insert(variable.clone(), Value::Number(start_num));
+                self.variables
+                    .insert(variable.clone(), Value::Number(start_num));
                 self.for_loops.push(ForLoop {
                     variable: variable.clone(),
                     start: start_num,
@@ -1147,7 +1461,8 @@ impl BasicInterpreter {
                         next_val >= loop_info.end
                     };
                     if should_continue {
-                        self.variables.insert(loop_info.variable.clone(), Value::Number(next_val));
+                        self.variables
+                            .insert(loop_info.variable.clone(), Value::Number(next_val));
                         self.current_line = loop_info.line;
                         return Ok(Some("CONTINUE_LOOP".to_string()));
                     } else {
@@ -1175,7 +1490,11 @@ impl BasicInterpreter {
                     ));
                 }
             }
-            Statement::On { ref expression, ref line_numbers, is_gosub } => {
+            Statement::On {
+                ref expression,
+                ref line_numbers,
+                is_gosub,
+            } => {
                 let index_val = self.evaluate_expression(expression)?;
                 let index = match index_val {
                     Value::Number(n) => n as usize,
@@ -1185,6 +1504,7 @@ impl BasicInterpreter {
                         ))
                     }
                 };
+
                 if index == 0 || index > line_numbers.len() {
                     Ok(None)
                 } else {
@@ -1195,7 +1515,10 @@ impl BasicInterpreter {
                     Ok(Some(format!("GOTO {}", target_line)))
                 }
             }
-            Statement::Input { ref prompt, ref variables } => {
+            Statement::Input {
+                ref prompt,
+                ref variables,
+            } => {
                 let prompt_text = prompt.clone().unwrap_or_else(|| "Input:".to_string());
                 if let Some(var) = variables.first() {
                     self.pending_input = Some((var.clone(), prompt_text));
@@ -1208,7 +1531,8 @@ impl BasicInterpreter {
                     match size_val {
                         Value::Number(size) => {
                             let size_usize = size as usize;
-                            self.arrays.insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
+                            self.arrays
+                                .insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
                         }
                         _ => {
                             return Err(InterpreterError::TypeError(
@@ -1231,7 +1555,8 @@ impl BasicInterpreter {
                         if let Ok(num) = data_value.parse::<f64>() {
                             self.variables.insert(var.clone(), Value::Number(num));
                         } else {
-                            self.variables.insert(var.clone(), Value::String(data_value.clone()));
+                            self.variables
+                                .insert(var.clone(), Value::String(data_value.clone()));
                         }
                     } else {
                         return Err(InterpreterError::RuntimeError(
@@ -1313,256 +1638,6 @@ impl BasicInterpreter {
             Statement::Rem { ref comment } => {
                 // Comments are ignored
                 let _ = comment;
-                Ok(None)
-            }
-        }
-                variable,
-                start,
-                end,
-                step,
-                statements: _statements,
-            } => {
-                let start_val = self.evaluate_expression(start)?;
-                let end_val = self.evaluate_expression(end)?;
-                let step_val = step
-                    .as_ref()
-                    .map(|s| self.evaluate_expression(s))
-                    .unwrap_or(Ok(Value::Number(1.0)))?;
-
-                let (start_num, end_num, step_num) = match (start_val, end_val, step_val) {
-                    (Value::Number(s), Value::Number(e), Value::Number(st)) => (s, e, st),
-                    _ => {
-                        return Err(InterpreterError::TypeError(
-                            "FOR loop requires numeric values".to_string(),
-                        ))
-                    }
-                };
-
-                // Initialize loop variable
-                self.variables
-                    .insert(variable.clone(), Value::Number(start_num));
-
-                // Add to loop stack
-                self.for_loops.push(ForLoop {
-                    variable: variable.clone(),
-                    start: start_num,
-                    end: end_num,
-                    step: step_num,
-                    line: self.current_line,
-                });
-
-                Ok(None)
-            }
-            Statement::Next { variable } => {
-                if let Some(loop_info) = self.for_loops.last_mut() {
-                    // Check if variable matches (if specified)
-                    if let Some(var_name) = variable {
-                        if var_name != &loop_info.variable {
-                            return Err(InterpreterError::RuntimeError(format!(
-                                "NEXT {} does not match FOR {}",
-                                var_name, loop_info.variable
-                            )));
-                        }
-                    }
-
-                    // Get current value
-                    let current_val = match self.variables.get(&loop_info.variable) {
-                        Some(Value::Number(n)) => *n,
-                        _ => {
-                            return Err(InterpreterError::RuntimeError(format!(
-                                "Variable {} not found or not numeric",
-                                loop_info.variable
-                            )))
-                        }
-                    };
-
-                    // Calculate next value
-                    let next_val = current_val + loop_info.step;
-
-                    // Check if loop should continue
-                    let should_continue = if loop_info.step > 0.0 {
-                        next_val <= loop_info.end
-                    } else {
-                        next_val >= loop_info.end
-                    };
-
-                    if should_continue {
-                        // Update variable and continue loop
-                        self.variables
-                            .insert(loop_info.variable.clone(), Value::Number(next_val));
-                        self.current_line = loop_info.line; // Go back to FOR statement
-                        return Ok(Some("CONTINUE_LOOP".to_string()));
-                    } else {
-                        // Loop finished, remove from stack
-                        self.for_loops.pop();
-                    }
-                } else {
-                    return Err(InterpreterError::RuntimeError(
-                        "NEXT without FOR".to_string(),
-                    ));
-                }
-                Ok(None)
-            }
-            Statement::Goto { line_number } => Ok(Some(format!("GOTO {}", line_number))),
-            Statement::Gosub { line_number } => {
-                self.gosub_stack.push(self.current_line);
-                Ok(Some(format!("GOTO {}", line_number)))
-            }
-            Statement::Return => {
-                if let Some(return_line) = self.gosub_stack.pop() {
-                    self.current_line = return_line;
-                    return Ok(Some("CONTINUE_LOOP".to_string()));
-                } else {
-                    return Err(InterpreterError::RuntimeError(
-                        "RETURN without GOSUB".to_string(),
-                    ));
-                }
-            }
-            Statement::On {
-                expression,
-                line_numbers,
-                is_gosub,
-            } => {
-                let index_val = self.evaluate_expression(expression)?;
-                let index = match index_val {
-                    Value::Number(n) => n as usize,
-                    _ => {
-                        return Err(InterpreterError::TypeError(
-                            "ON expression must evaluate to a number".to_string(),
-                        ))
-                    }
-                };
-
-                if index == 0 || index > line_numbers.len() {
-                    // Index out of range, continue to next statement
-                    Ok(None)
-                } else {
-                    let target_line = line_numbers[index - 1]; // 1-based indexing
-                    if *is_gosub {
-                        self.gosub_stack.push(self.current_line);
-                    }
-                    Ok(Some(format!("GOTO {}", target_line)))
-                }
-            }
-            Statement::Input { prompt, variables } => {
-                let prompt_text = prompt.clone().unwrap_or_else(|| "Input:".to_string());
-                if let Some(var) = variables.first() {
-                    self.pending_input = Some((var.clone(), prompt_text));
-                }
-                Ok(None)
-            }
-            Statement::Dim { arrays } => {
-                for (name, size_expr) in arrays {
-                    let size_val = self.evaluate_expression(size_expr)?;
-                    match size_val {
-                        Value::Number(size) => {
-                            let size_usize = size as usize;
-                            self.arrays
-                                .insert(name.clone(), vec![Value::Number(0.0); size_usize + 1]);
-                        }
-                        _ => {
-                            return Err(InterpreterError::TypeError(
-                                "Array size must be numeric".to_string(),
-                            ))
-                        }
-                    }
-                }
-                Ok(None)
-            }
-            Statement::Data { values } => {
-                self.data.extend(values.iter().cloned());
-                Ok(None)
-            }
-            Statement::Read { variables } => {
-                for var in variables {
-                    if self.data_pointer < self.data.len() {
-                        let data_value = &self.data[self.data_pointer];
-                        self.data_pointer += 1;
-                        if let Ok(num) = data_value.parse::<f64>() {
-                            self.variables.insert(var.clone(), Value::Number(num));
-                        } else {
-                            self.variables
-                                .insert(var.clone(), Value::String(data_value.clone()));
-                        }
-                    } else {
-                        return Err(InterpreterError::RuntimeError(
-                            "READ without DATA".to_string(),
-                        ));
-                    }
-                }
-                Ok(None)
-            }
-            Statement::If {
-                condition,
-                then_statements,
-                else_statements,
-            } => {
-                let condition_value = self.evaluate_expression(condition)?;
-                let condition_met = match condition_value {
-                    Value::Number(n) => n != 0.0,
-                    Value::String(s) => !s.is_empty(),
-                };
-
-                if condition_met {
-                    // Execute then statements inline
-                    for stmt in then_statements {
-                        let result = self.execute_statement(stmt, output, graphics_commands)?;
-                        if result.is_some() {
-                            return Ok(result);
-                        }
-                    }
-                } else if let Some(else_stmts) = else_statements {
-                    // Execute else statements inline
-                    for stmt in else_stmts {
-                        let result = self.execute_statement(stmt, output, graphics_commands)?;
-                        if result.is_some() {
-                            return Ok(result);
-                        }
-                    }
-                }
-                Ok(None)
-            }
-                }
-                Ok(None)
-            }
-            Statement::GraphicsForward { distance } => {
-                let dist_val = self.evaluate_expression(distance)?;
-                match dist_val {
-                    Value::Number(d) => {
-                        graphics_commands.push(GraphicsCommand {
-                            command: "FORWARD".to_string(),
-                            value: d as f32,
-                            color: None,
-                        });
-                    }
-                    _ => {
-                        return Err(InterpreterError::TypeError(
-                            "FORWARD requires numeric distance".to_string(),
-                        ))
-                    }
-                }
-                Ok(None)
-            }
-            Statement::GraphicsRight { angle } => {
-                let angle_val = self.evaluate_expression(angle)?;
-                match angle_val {
-                    Value::Number(a) => {
-                        graphics_commands.push(GraphicsCommand {
-                            command: "RIGHT".to_string(),
-                            value: a as f32,
-                            color: None,
-                        });
-                    }
-                    _ => {
-                        return Err(InterpreterError::TypeError(
-                            "RIGHT requires numeric angle".to_string(),
-                        ))
-                    }
-                }
-                Ok(None)
-            }
-            Statement::Rem { .. } => {
-                // Comments are ignored
                 Ok(None)
             }
         }

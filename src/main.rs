@@ -1,8 +1,7 @@
 use eframe::egui;
-use rfd::FileDialog;
-use std::collections::HashMap;
 
 mod languages;
+mod ui;
 
 #[derive(Clone)]
 struct TurtleState {
@@ -1182,7 +1181,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Time Warp IDE",
         options,
-        Box::new(|_cc| Box::new(TimeWarpApp::default())),
+        Box::new(|_cc| Box::new(ui::TimeWarpApp::default())),
     )
 }
 
@@ -1194,7 +1193,7 @@ mod tests {
     #[test]
     fn test_file_operations() {
         // Test New File functionality
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         app.code = "some code".to_string();
         app.output = "some output".to_string();
         app.last_file_path = Some("test.txt".to_string());
@@ -1211,7 +1210,7 @@ mod tests {
 
     #[test]
     fn test_save_operations() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         app.code = "10 PRINT \"TEST\"".to_string();
         app.last_file_path = Some("test_save.twb".to_string());
 
@@ -1232,7 +1231,7 @@ mod tests {
 
     #[test]
     fn test_view_operations() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test Show Line Numbers toggle
         assert_eq!(app.show_line_numbers, false);
@@ -1244,7 +1243,7 @@ mod tests {
 
     #[test]
     fn test_edit_operations() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         app.code = "old text".to_string();
 
         // Test Find/Replace
@@ -1261,7 +1260,7 @@ mod tests {
 
     #[test]
     fn test_help_operations() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test About dialog
         assert_eq!(app.show_about, false);
@@ -1273,7 +1272,7 @@ mod tests {
 
     #[test]
     fn test_menu_state_changes() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test all menu state changes
         assert_eq!(app.show_find_replace, false);
@@ -1292,7 +1291,7 @@ mod tests {
 
     #[test]
     fn test_language_selection() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test language changes
         assert_eq!(app.language, "TW BASIC");
@@ -1304,7 +1303,7 @@ mod tests {
 
     #[test]
     fn test_tab_switching() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test tab switching
         assert_eq!(app.active_tab, 0);
@@ -1316,7 +1315,7 @@ mod tests {
 
     #[test]
     fn test_keyboard_shortcuts() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         let ctx = egui::Context::default();
 
         // Test Ctrl+N (New File)
@@ -1341,7 +1340,7 @@ mod tests {
 
     #[test]
     fn test_pilot_execution() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         app.language = "PILOT".to_string();
 
         // Test basic PILOT T: command
@@ -1362,7 +1361,7 @@ mod tests {
 
     #[test]
     fn test_pilot_input_parsing() {
-        let app = TimeWarpApp::default();
+        let app = ui::TimeWarpApp::default();
 
         // Test simple variable input
         let result = app.parse_pilot_input_command("#NAME");
@@ -1378,7 +1377,7 @@ mod tests {
 
     #[test]
     fn test_pilot_text_processing() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
 
         // Test text without variables
         let result = app.process_pilot_text("Hello World");
@@ -1401,7 +1400,7 @@ mod tests {
 
     #[test]
     fn test_basic_program_execution() {
-        let mut app = TimeWarpApp::default();
+        let mut app = ui::TimeWarpApp::default();
         app.language = "TW BASIC".to_string();
 
         // Test simple BASIC program execution
