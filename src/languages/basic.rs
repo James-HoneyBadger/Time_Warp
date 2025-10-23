@@ -1786,8 +1786,27 @@ impl BasicInterpreter {
         }
     }
 
+    pub fn provide_input(&mut self, input: &str) {
+        if let Some((var_name, _)) = self.pending_input.take() {
+            // Parse the input and set the variable
+            let variables: Vec<&str> = var_name.split(',').map(|s| s.trim()).collect();
+            let input_values: Vec<&str> = input.split(',').map(|s| s.trim()).collect();
+
+            for (i, var) in variables.iter().enumerate() {
+                if let Some(input_val) = input_values.get(i) {
+                    // Try to parse as number, otherwise treat as string
+                    if let Ok(num) = input_val.parse::<f64>() {
+                        self.variables.insert(var.to_string(), Value::Number(num));
+                    } else {
+                        self.variables
+                            .insert(var.to_string(), Value::String(input_val.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
     pub fn execute(&mut self, code: &str) -> Result<ExecutionResult, InterpreterError> {
-        self.current_line = 0;
         self.pending_input = None;
         self.data_pointer = 0;
         self.data.clear();

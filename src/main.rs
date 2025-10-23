@@ -66,6 +66,9 @@ struct TimeWarpApp {
     completion_selected: usize,
     completion_query: String,
 
+    // BASIC interpreter instance for continuation after input
+    basic_interpreter: Option<crate::languages::basic::BasicInterpreter>,
+
     // Syntax highlighting
     #[allow(dead_code)]
     syntax_highlighting_enabled: bool,
@@ -125,6 +128,9 @@ impl Default for TimeWarpApp {
             completion_selected: 0,
             completion_query: String::new(),
 
+            // BASIC interpreter instance for continuation after input
+            basic_interpreter: None,
+
             // Syntax highlighting defaults
             syntax_highlighting_enabled: true,
 
@@ -151,9 +157,7 @@ impl TimeWarpApp {
                 self.language
             ),
         };
-        if self.is_executing && !self.waiting_for_input {
-            self.output = format!("[Output for {}]\n{}", self.language, result);
-        }
+        self.output = format!("[Output for {}]\n{}", self.language, result);
         self.is_executing = false;
     }
 
@@ -187,18 +191,31 @@ impl TimeWarpApp {
 
         match interpreter.execute(&program_code) {
             Ok(result) => match result {
-                crate::languages::basic::ExecutionResult::Complete { output, .. } => output,
+                crate::languages::basic::ExecutionResult::Complete {
+                    output,
+                    graphics_commands,
+                } => {
+                    // Process graphics commands
+                    self.process_graphics_commands(&graphics_commands);
+                    self.basic_interpreter = None; // Clear stored interpreter
+                    output
+                }
                 crate::languages::basic::ExecutionResult::NeedInput {
                     prompt,
                     partial_output,
-                    ..
+                    partial_graphics,
                 } => {
                     self.waiting_for_input = true;
                     self.input_prompt = prompt.clone();
+                    // Process any graphics commands that were executed before input was needed
+                    self.process_graphics_commands(&partial_graphics);
+                    // Store the interpreter for continuation
+                    self.basic_interpreter = Some(interpreter);
                     // For now, just return the partial output with the prompt
                     format!("{}{}", partial_output, prompt)
                 }
                 crate::languages::basic::ExecutionResult::Error(err) => {
+                    self.basic_interpreter = None; // Clear on error
                     format!("Error: {:?}", err)
                 }
             },
@@ -639,9 +656,26 @@ impl TimeWarpApp {
         self.turtle_state.y = new_y;
     }
 
+    fn process_graphics_commands(&mut self, commands: &[crate::languages::basic::GraphicsCommand]) {
+        for cmd in commands {
+            match cmd.command.as_str() {
+                "FORWARD" => {
+                    self.move_turtle(cmd.value, true);
+                }
+                "RIGHT" => {
+                    self.turtle_state.angle = (self.turtle_state.angle + cmd.value) % 360.0;
+                }
+                _ => {
+                    // Unknown command, ignore
+                }
+            }
+        }
+    }
+
     fn continue_execution(&mut self) {
         if self.language == "TW BASIC" {
-            self.continue_basic_execution();
+            // BASIC execution is now handled directly in the input processing
+            // since we store the interpreter instance
         } else if self.language == "TW Pascal" {
             self.continue_pascal_execution();
         } else if self.language == "PILOT" {
@@ -1723,14 +1757,40 @@ impl eframe::App for TimeWarpApp {
                                                     self.user_input.clone(),
                                                 );
 
+                                                // Provide input to the BASIC interpreter and continue execution
+                                                if let Some(ref mut interpreter) = self.basic_interpreter {
+                                                    interpreter.provide_input(&self.user_input);
+                                                    
+                                                    // Continue execution with the interpreter
+                                                    match interpreter.execute("") { // Empty string since interpreter has state
+                                                        Ok(result) => match result {
+                                                            crate::languages::basic::ExecutionResult::Complete { output, graphics_commands } => {
+                                                                self.process_graphics_commands(&graphics_commands);
+                                                                self.output = format!("[Output for {}]\n{}{}", self.language, self.output, output);
+                                                                self.basic_interpreter = None;
+                                                            }
+                                                            crate::languages::basic::ExecutionResult::NeedInput { prompt, partial_output, partial_graphics } => {
+                                                                self.process_graphics_commands(&partial_graphics);
+                                                                self.output = format!("[Output for {}]\n{}{}{}", self.language, self.output, partial_output, prompt);
+                                                                // Keep waiting for more input
+                                                            }
+                                                            crate::languages::basic::ExecutionResult::Error(err) => {
+                                                                self.output = format!("[Output for {}]\n{}Error: {:?}", self.language, self.output, err);
+                                                                self.basic_interpreter = None;
+                                                            }
+                                                        },
+                                                        Err(err) => {
+                                                            self.output = format!("[Output for {}]\n{}Error: {:?}", self.language, self.output, err);
+                                                            self.basic_interpreter = None;
+                                                        }
+                                                    }
+                                                }
+
                                                 // Continue execution
                                                 self.waiting_for_input = false;
                                                 self.user_input.clear();
                                                 self.input_prompt.clear();
                                                 self.current_input_var.clear();
-
-                                                // Continue program execution
-                                                self.continue_execution();
                                             }
                                         });
                                     }
