@@ -1,0 +1,235 @@
+use eframe::egui;
+use rfd::FileDialog;
+use std::collections::HashMap;
+use crate::{TurtleState, ProgramLines};
+use crate::interpreter::Interpreter;
+
+impl eframe::App for TimeWarpApp {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.set_visuals(egui::Visuals::light());
+
+        egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
+            egui::menu::bar(ui, |ui| {
+                ui.menu_button("�� File", |ui| {
+                    if ui.button("📄 New File").clicked() {
+                        self.code.clear();
+                        self.output = "New file created.".to_string();
+                        ui.close_menu();
+                    }
+                    if ui.button("📂 Open File...").clicked() {
+                        if let Some(path) = FileDialog::new()
+                            .add_filter("Text", &["txt", "twb", "twp", "tpr"])
+                            .pick_file() {
+                            if let Ok(content) = std::fs::read_to_string(&path) {
+                                self.code = content;
+                                self.output = format!("Opened file: {}", path.display());
+                                self.last_file_path = Some(path.display().to_string());
+                            }
+                        }
+                        ui.close_menu();
+                    }
+                    if ui.button("💾 Save").clicked() {
+                        if let Some(path) = &self.last_file_path {
+                            if std::fs::write(path, &self.code).is_ok() {
+                                self.output = format!("Saved to {}", path);
+                            }
+                        } else if let Some(path) = FileDialog::new()
+                            .set_file_name("untitled.twb")
+                            .save_file() {
+                            if std::fs::write(&path, &self.code).is_ok() {
+                                self.output = format!("Saved to {}", path.display());
+                                self.last_file_path = Some(path.display().to_string());
+                            }
+                        }
+                        ui.close_menu();
+                    }
+                });
+            });
+        });
+
+        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.heading("Time Warp IDE");
+                ui.separator();
+                ui.label("Language:");
+                for lang in ["TW BASIC", "TW Pascal", "TW Prolog"] {
+                    ui.selectable_value(&mut self.language, lang.to_string(), lang);
+                }
+                ui.separator();
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.button("Run ▶").clicked() {
+                        self.active_tab = 1; // Switch to Output tab when running
+                        self.execute_code();
+                    }
+                });
+            });
+        });
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.add_space(8.0);
+            egui::Frame::group(ui.style()).show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    if ui.selectable_label(self.active_tab == 0, "📝 Code Editor").clicked() {
+                        self.active_tab = 0;
+                    }
+                    if ui.selectable_label(self.active_tab == 1, "🖥️ Output & Graphics").clicked() {
+                        self.active_tab = 1;
+                    }
+                });
+
+                ui.separator();
+
+                match self.active_tab {
+                    0 => {
+                        // Code Editor Tab
+                        ui.vertical(|ui| {
+                            ui.horizontal(|ui| {
+                                ui.checkbox(&mut self.show_line_numbers, "Line numbers");
+                                ui.separator();
+                                if ui.button("🔍 Find/Replace").clicked() {
+                                    self.show_find_replace = !self.show_find_replace;
+                                }
+                            });
+
+                            if self.show_find_replace {
+                                ui.horizontal(|ui| {
+                                    ui.label("Find:");
+                                    ui.text_edit_singleline(&mut self.find_text);
+                                    ui.label("Replace:");
+                                    ui.text_edit_singleline(&mut self.replace_text);
+                                    if ui.button("Replace All").clicked() {
+                                        self.code = self.code.replace(&self.find_text, &self.replace_text);
+                                    }
+                                });
+                                ui.separator();
+                            }
+
+                            egui::ScrollArea::vertical().show(ui, |ui| {
+                                if self.show_line_numbers {
+                                    // With line numbers
+                                    let mut lines: Vec<String> = self.code.lines().map(|s| s.to_string()).collect();
+                                    if lines.is_empty() {
+                                        lines.push(String::new());
+                                    }
+
+                                    for (i, line) in lines.iter_mut().enumerate() {
+                                        ui.horizontal(|ui| {
+                                            ui.label(format!("{:4}: ", i + 1));
+                                            ui.text_edit_singleline(line);
+                                        });
+                                    }
+
+                                    self.code = lines.join("\n");
+                                } else {
+                                    // Without line numbers
+                                    ui.add(
+                                        egui::TextEdit::multiline(&mut self.code)
+                                            .font(egui::TextStyle::Monospace)
+                                            .desired_width(f32::INFINITY)
+                                            .desired_rows(20)
+                                    );
+                                }
+                            });
+                        });
+                    }
+                    1 => {
+                        // Output & Graphics Tab
+                        ui.vertical(|ui| {
+                            ui.label("Output:");
+                            egui::ScrollArea::vertical()
+                                .max_height(200.0)
+                                .show(ui, |ui| {
+                                    ui.add(
+                                        egui::TextEdit::multiline(&mut self.output)
+                                            .font(egui::TextStyle::Monospace)
+                                            .desired_width(f32::INFINITY)
+                                    );
+                                });
+
+                            // Input handling
+                            if self.waiting_for_input {
+                                ui.separator();
+                                ui.label(&self.input_prompt);
+                                ui.horizontal(|ui| {
+                                    let response = ui.text_edit_singleline(&mut self.user_input);
+                                    if ui.button("Enter").clicked() || (response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter))) {
+                                        // Store the input in the variable
+                                        self.variables.insert(self.current_input_var.clone(), self.user_input.clone());
+                                        
+                                        // Continue execution
+                                        self.waiting_for_input = false;
+                                        self.user_input.clear();
+                                        self.input_prompt.clear();
+                                        self.current_input_var.clear();
+                                        
+                                        // Continue program execution
+                                        self.continue_execution();
+                                    }
+                                });
+                            }
+                            ui.label("Turtle Graphics:");
+                            ui.add_space(4.0);
+
+                            // Simple canvas for turtle graphics
+                            let canvas_size = egui::vec2(400.0, 300.0);
+                            let (rect, _response) = ui.allocate_exact_size(canvas_size, egui::Sense::hover());
+
+                            ui.painter().rect_filled(rect, 0.0, egui::Color32::WHITE);
+                            ui.painter().rect_stroke(rect, 0.0, egui::Stroke::new(1.0, egui::Color32::BLACK));
+
+                            // Draw turtle lines
+                            for command in &self.interpreter.turtle_commands {
+                                if command.starts_with("LINE ") {
+                                    let parts: Vec<&str> = command.split_whitespace().collect();
+                                    if parts.len() >= 5 {
+                                        if let (Ok(x1), Ok(y1), Ok(x2), Ok(y2)) = (
+                                            parts[1].parse::<f32>(),
+                                            parts[2].parse::<f32>(),
+                                            parts[3].parse::<f32>(),
+                                            parts[4].parse::<f32>(),
+                                        ) {
+                                            let center = rect.center();
+                                            let start = egui::pos2(center.x + x1, center.y + y1);
+                                            let end = egui::pos2(center.x + x2, center.y + y2);
+                                            ui.painter().line_segment([start, end], egui::Stroke::new(2.0, egui::Color32::BLACK));
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Draw turtle
+                            let center = rect.center();
+                            let turtle_x = center.x + self.interpreter.turtle_state.x;
+                            let turtle_y = center.y + self.interpreter.turtle_state.y;
+
+                            // Draw a simple triangle for the turtle
+                            let size = 8.0;
+                            let angle_rad = self.interpreter.turtle_state.angle.to_radians();
+                            let points = [
+                                egui::pos2(
+                                    turtle_x + size * angle_rad.cos(),
+                                    turtle_y + size * angle_rad.sin()
+                                ),
+                                egui::pos2(
+                                    turtle_x + size * (angle_rad + 2.0944).cos(),
+                                    turtle_y + size * (angle_rad + 2.0944).sin()
+                                ),
+                                egui::pos2(
+                                    turtle_x + size * (angle_rad - 2.0944).cos(),
+                                    turtle_y + size * (angle_rad - 2.0944).sin()
+                                ),
+                            ];
+
+                            ui.painter().add(egui::Shape::convex_polygon(
+                                points.to_vec(),
+                                self.interpreter.turtle_state.color,
+                                egui::Stroke::new(1.0, egui::Color32::BLACK)
+                            ));
+                        });
+                    }
+                    _ => {}
+                }
+            });
+        });
+    }
+}

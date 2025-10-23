@@ -1,0 +1,7 @@
+REM Quick test of new features
+10 LET S$ = "HELLO"
+20 PRINT "String: "; S$
+30 PRINT "Length: "; LEN(S$)
+40 PRINT "LOG(10): "; LOG(10)
+50 PRINT "RND: "; RND
+60 END

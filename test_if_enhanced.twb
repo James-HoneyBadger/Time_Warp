@@ -1,0 +1,6 @@
+10 LET X = 5
+20 LET Y = 10
+30 IF X < Y AND X > 0 THEN PRINT "X is between 0 and Y"
+40 IF X <> 3 THEN PRINT "X is not 3"
+50 IF X >= 5 OR Y <= 8 THEN PRINT "Condition met"
+60 END

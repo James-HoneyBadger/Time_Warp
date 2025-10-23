@@ -1,0 +1,13 @@
+10 LET CHOICE = 1
+20 ON CHOICE GOSUB 100, 200, 300
+25 PRINT "Back from subroutine"
+30 END
+
+100 PRINT "Subroutine 1"
+110 RETURN
+
+200 PRINT "Subroutine 2"
+210 RETURN
+
+300 PRINT "Subroutine 3"
+310 RETURN

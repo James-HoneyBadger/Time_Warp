@@ -1,0 +1,8 @@
+10 LET CHOICE = 2
+20 ON CHOICE GOTO 30, 40, 50
+30 PRINT "You chose option 1"
+35 END
+40 PRINT "You chose option 2"
+45 END
+50 PRINT "You chose option 3"
+55 END

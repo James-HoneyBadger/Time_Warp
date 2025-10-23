@@ -1,0 +1,62 @@
+REM GW BASIC Test Program
+REM Demonstrates comprehensive GW BASIC features
+
+10 PRINT "GW BASIC Comprehensive Test Program"
+20 LET A = 10
+30 PRINT "A = "; A
+40 LET B = SIN(1.57)
+50 PRINT "SIN(1.57) = "; B
+60 LET C = SQR(16)
+70 PRINT "SQR(16) = "; C
+80 IF A = 10 THEN 100
+90 PRINT "This should not print"
+100 PRINT "IF test passed"
+110 DIM ARR(5)
+120 ARR(0) = 42
+130 PRINT "Array element ARR(0) = "; ARR(0)
+140 DATA 1, 2, 3, 4, 5
+150 READ X, Y, Z
+160 PRINT "Data read: X="; X; " Y="; Y; " Z="; Z
+170 COLOR 2
+180 PRINT "Color changed to green"
+190 FOR I = 1 TO 3
+200 PRINT "Loop iteration: "; I
+210 NEXT I
+220 PRINT "Loop finished"
+230 GOSUB 260
+240 PRINT "Returned from subroutine"
+250 GOTO 280
+260 PRINT "Inside subroutine"
+270 RETURN
+280 REM String functions test
+290 LET S$ = "HELLO WORLD"
+300 PRINT "Original string: "; S$
+310 PRINT "Length: "; LEN(S$)
+320 PRINT "Left 5: "; LEFT$(S$, 5)
+330 PRINT "Right 5: "; RIGHT$(S$, 5)
+340 PRINT "Mid 7,5: "; MID$(S$, 7, 5)
+350 PRINT "CHR$(65): "; CHR$(65)
+360 PRINT "ASC of 'A': "; ASC("A")
+370 PRINT "VAL of '123': "; VAL("123")
+380 PRINT "STR$ of 456: "; STR$(456)
+390 REM Math functions test
+400 PRINT "LOG(2.718): "; LOG(2.718)
+410 PRINT "EXP(1): "; EXP(1)
+420 PRINT "ATN(1): "; ATN(1)
+430 RANDOMIZE 12345
+440 PRINT "Random 1: "; RND
+450 PRINT "Random 2: "; RND
+460 REM File I/O test
+470 OPEN "test.txt" FOR OUTPUT AS #1
+480 PRINT #1, "Hello from GW BASIC!"
+490 PRINT #1, "Line 2 of test file"
+500 CLOSE #1
+510 OPEN "test.txt" FOR INPUT AS #1
+520 INPUT #1, LINE1$
+530 INPUT #1, LINE2$
+540 PRINT "Read from file: "; LINE1$
+550 PRINT "Read from file: "; LINE2$
+560 PRINT "EOF check: "; EOF(1)
+570 CLOSE #1
+580 PRINT "File I/O test completed"
+590 END

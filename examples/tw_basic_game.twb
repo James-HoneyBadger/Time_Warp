@@ -1,0 +1,10 @@
+10 REM Number Guessing Game
+20 PRINT "I'm thinking of a number between 1 and 100"
+30 LET SECRET = 42
+40 PRINT "Guess the number:"
+50 INPUT GUESS
+60 IF GUESS = SECRET THEN GOTO 100
+70 IF GUESS < SECRET THEN PRINT "Too low!"
+80 IF GUESS > SECRET THEN PRINT "Too high!"
+90 GOTO 40
+100 PRINT "Correct! You win!"

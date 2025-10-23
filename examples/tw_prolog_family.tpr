@@ -1,0 +1,28 @@
+% Turbo Prolog Sample Program
+% Facts about family relationships
+
+parent(john, mary).
+parent(john, mike).
+parent(susan, mary).
+parent(susan, mike).
+parent(mary, tom).
+parent(mary, lisa).
+
+male(john).
+male(mike).
+male(tom).
+female(susan).
+female(mary).
+female(lisa).
+
+% Rules
+father(X, Y) :- parent(X, Y), male(X).
+mother(X, Y) :- parent(X, Y), female(X).
+grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
+
+% Queries
+?- father(john, mary).
+?- mother(susan, Who).
+?- grandparent(Who, tom).
+?- sibling(mary, mike).
