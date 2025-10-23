@@ -1260,28 +1260,24 @@ impl eframe::App for TimeWarpApp {
                 }
                 
                 // File menu
-                if ui.button("📁 File").clicked() {
-                    self.show_file_menu = !self.show_file_menu;
-                }
-                egui::popup::popup_below_widget(ui, egui::Id::new("file_menu"), &ui.button("📁 File").rect, |ui| {
-                    if self.show_file_menu {
-                        if ui.button("📄 New File").clicked() {
-                            self.code.clear();
-                            self.output = "New file created.".to_string();
-                            self.show_file_menu = false;
-                        }
-                        if ui.button("📂 Open File...").clicked() {
-                            if let Some(path) = FileDialog::new()
-                                .add_filter("Text", &["txt", "twb", "twp", "tpr"])
-                                .pick_file()
-                            {
-                                if let Ok(content) = std::fs::read_to_string(&path) {
-                                    self.code = content;
-                                    self.output = format!("Opened file: {}", path.display());
-                                    self.last_file_path = Some(path.display().to_string());
-                                }
+                ui.menu_button("📁 File", |ui| {
+                    if ui.button("📄 New File").clicked() {
+                        self.code.clear();
+                        self.output = "New file created.".to_string();
+                        ui.close_menu();
+                    }
+                    if ui.button("📂 Open File...").clicked() {
+                        if let Some(path) = FileDialog::new()
+                            .add_filter("Text", &["txt", "twb", "twp", "tpr"])
+                            .pick_file()
+                        {
+                            if let Ok(content) = std::fs::read_to_string(&path) {
+                                self.code = content;
+                                self.output = format!("Opened file: {}", path.display());
+                                self.last_file_path = Some(path.display().to_string());
                             }
-                            self.show_file_menu = false;
+                        }
+                        ui.close_menu();
                     }
                     if ui.button("💾 Save").clicked() {
                         if let Some(path) = &self.last_file_path {
@@ -1375,8 +1371,7 @@ impl eframe::App for TimeWarpApp {
             ui.add_space(4.0);
         });
 
-        // Enhanced Toolbar - temporarily disabled for menu testing
-        /*
+        // Enhanced Toolbar
         egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
             ui.add_space(2.0);
             egui::Frame::none()
@@ -1495,7 +1490,6 @@ impl eframe::App for TimeWarpApp {
                 });
             ui.add_space(2.0);
         });
-        */
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
