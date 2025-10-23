@@ -69,6 +69,12 @@ struct TimeWarpApp {
     // BASIC interpreter instance for continuation after input
     basic_interpreter: Option<crate::languages::basic::BasicInterpreter>,
 
+    // Status bar information
+    cursor_line: usize,
+    cursor_column: usize,
+    total_lines: usize,
+    execution_timeout_ms: u64,
+
     // Menu state
     show_file_menu: bool,
     show_edit_menu: bool,
@@ -137,6 +143,12 @@ impl Default for TimeWarpApp {
             // BASIC interpreter instance for continuation after input
             basic_interpreter: None,
 
+            // Status bar defaults
+            cursor_line: 1,
+            cursor_column: 1,
+            total_lines: 1,
+            execution_timeout_ms: 5000, // 5 seconds default timeout
+
             // Menu state defaults
             show_file_menu: false,
             show_edit_menu: false,
@@ -200,6 +212,9 @@ impl TimeWarpApp {
         let program_code = statements.join(" : ");
 
         let mut interpreter = BasicInterpreter::new();
+        // Set execution timeout based on instruction limit
+        // Rough estimate: 1000 instructions per second
+        interpreter.max_instructions = (self.execution_timeout_ms * 1000) as usize;
 
         match interpreter.execute(&program_code) {
             Ok(result) => match result {
@@ -1721,7 +1736,16 @@ impl eframe::App for TimeWarpApp {
                                                 .desired_width(f32::INFINITY)
                                                 .desired_rows(20);
 
-                                            ui.add(text_edit);
+                                            let response = ui.add(text_edit);
+
+                                            // Update cursor position tracking
+                                            if let Some(cursor_range) = response.cursor_range {
+                                                let cursor_pos = cursor_range.primary.ccursor.index;
+                                                let lines: Vec<&str> = self.code[..cursor_pos].split('\n').collect();
+                                                self.cursor_line = lines.len();
+                                                self.cursor_column = lines.last().map(|l| l.chars().count()).unwrap_or(0) + 1;
+                                                self.total_lines = self.code.lines().count().max(1);
+                                            }
 
                                             // Show completion popup
                                             if self.show_completion && !self.completion_items.is_empty() {
@@ -2031,7 +2055,8 @@ impl eframe::App for TimeWarpApp {
                         // File and cursor information
                         let line_count = self.code.lines().count();
                         let char_count = self.code.chars().count();
-                        ui.label(format!("📏 Lines: {} | Chars: {}", line_count, char_count));
+                        ui.label(format!("📏 Lines: {} | Chars: {} | Ln {}, Col {}", 
+                            line_count, char_count, self.cursor_line, self.cursor_column));
 
                         ui.separator();
 

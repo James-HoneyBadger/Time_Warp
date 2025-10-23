@@ -1110,6 +1110,8 @@ pub struct BasicInterpreter {
     text_color: u8,
     // files: HashMap<u8, FileHandle>,
     random_seed: u64,
+    instruction_count: usize,
+    pub max_instructions: usize,
 }
 
 #[derive(Clone)]
@@ -1142,6 +1144,8 @@ impl BasicInterpreter {
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_secs(),
+            instruction_count: 0,
+            max_instructions: 10000, // Default limit to prevent infinite loops
         }
     }
 
@@ -1812,6 +1816,7 @@ impl BasicInterpreter {
         self.data.clear();
         self.for_loops.clear();
         self.gosub_stack.clear();
+        self.instruction_count = 0; // Reset instruction counter
 
         // Tokenize the input
         let mut tokenizer = Tokenizer::new(code);
@@ -1830,6 +1835,15 @@ impl BasicInterpreter {
         let mut graphics_commands = Vec::new();
 
         while self.current_line < program.statements.len() {
+            // Check for instruction limit to prevent infinite loops
+            self.instruction_count += 1;
+            if self.instruction_count > self.max_instructions {
+                return Err(InterpreterError::RuntimeError(format!(
+                    "Execution timeout: exceeded {} instructions",
+                    self.max_instructions
+                )));
+            }
+
             let statement = &program.statements[self.current_line];
 
             let result = self.execute_statement(statement, &mut output, &mut graphics_commands)?;
