@@ -183,11 +183,11 @@ impl TimeWarpApp {
     fn save_undo_state(&mut self) {
         // Remove any redo states after current position
         self.undo_history.truncate(self.undo_position);
-        
+
         // Add current state to history
         self.undo_history.push(self.code.clone());
         self.undo_position = self.undo_history.len();
-        
+
         // Limit history size
         if self.undo_history.len() > self.max_undo_steps {
             self.undo_history.remove(0);
@@ -263,39 +263,103 @@ impl TimeWarpApp {
     fn render_syntax_highlighted_text(&self, ui: &mut egui::Ui, text: &str) {
         // Basic syntax highlighting for BASIC keywords
         let keywords = [
-            "PRINT", "WRITELN", "INPUT", "READLN", "LET", "IF", "THEN", "ELSE", "END", "STOP",
-            "FOR", "TO", "STEP", "NEXT", "WHILE", "WEND", "GOTO", "GOSUB", "RETURN", "REM",
-            "CLS", "COLOR", "LOCATE", "BEEP", "SLEEP", "RANDOMIZE", "DIM", "DATA", "READ", "RESTORE",
-            "FORWARD", "FD", "BACK", "BK", "LEFT", "LT", "RIGHT", "RT", "PENUP", "PU", "PENDOWN", "PD",
-            "AND", "OR", "NOT", "SIN", "COS", "TAN", "SQR", "ABS", "INT", "LOG", "EXP", "ATN", "RND"
+            "PRINT",
+            "WRITELN",
+            "INPUT",
+            "READLN",
+            "LET",
+            "IF",
+            "THEN",
+            "ELSE",
+            "END",
+            "STOP",
+            "FOR",
+            "TO",
+            "STEP",
+            "NEXT",
+            "WHILE",
+            "WEND",
+            "GOTO",
+            "GOSUB",
+            "RETURN",
+            "REM",
+            "CLS",
+            "COLOR",
+            "LOCATE",
+            "BEEP",
+            "SLEEP",
+            "RANDOMIZE",
+            "DIM",
+            "DATA",
+            "READ",
+            "RESTORE",
+            "FORWARD",
+            "FD",
+            "BACK",
+            "BK",
+            "LEFT",
+            "LT",
+            "RIGHT",
+            "RT",
+            "PENUP",
+            "PU",
+            "PENDOWN",
+            "PD",
+            "AND",
+            "OR",
+            "NOT",
+            "SIN",
+            "COS",
+            "TAN",
+            "SQR",
+            "ABS",
+            "INT",
+            "LOG",
+            "EXP",
+            "ATN",
+            "RND",
         ];
 
         let lines: Vec<&str> = text.lines().collect();
-        
+
         for (line_num, line) in lines.iter().enumerate() {
             // Show line number
             ui.horizontal(|ui| {
-                ui.label(egui::RichText::new(format!("{:3}: ", line_num + 1)).weak().monospace());
-                
+                ui.label(
+                    egui::RichText::new(format!("{:3}: ", line_num + 1))
+                        .weak()
+                        .monospace(),
+                );
+
                 // Split line into tokens and highlight
                 let mut remaining = *line;
                 let mut first = true;
-                
+
                 while !remaining.is_empty() {
                     let mut found_keyword = false;
-                    
+
                     // Check for keywords at start of remaining text
                     for keyword in &keywords {
-                        if remaining.to_uppercase().starts_with(&keyword.to_uppercase()) {
+                        if remaining
+                            .to_uppercase()
+                            .starts_with(&keyword.to_uppercase())
+                        {
                             let keyword_len = keyword.len();
-                            if remaining.len() == keyword_len || 
-                               !remaining.chars().nth(keyword_len).unwrap_or(' ').is_alphanumeric() {
+                            if remaining.len() == keyword_len
+                                || !remaining
+                                    .chars()
+                                    .nth(keyword_len)
+                                    .unwrap_or(' ')
+                                    .is_alphanumeric()
+                            {
                                 if !first {
                                     ui.add_space(4.0);
                                 }
-                                ui.label(egui::RichText::new(&remaining[..keyword_len])
-                                    .color(egui::Color32::from_rgb(86, 156, 214)) // Blue for keywords
-                                    .monospace());
+                                ui.label(
+                                    egui::RichText::new(&remaining[..keyword_len])
+                                        .color(egui::Color32::from_rgb(86, 156, 214)) // Blue for keywords
+                                        .monospace(),
+                                );
                                 remaining = &remaining[keyword_len..];
                                 found_keyword = true;
                                 first = false;
@@ -303,31 +367,37 @@ impl TimeWarpApp {
                             }
                         }
                     }
-                    
+
                     if !found_keyword {
                         // Find next space or end
                         let space_pos = remaining.find(' ').unwrap_or(remaining.len());
                         let token = &remaining[..space_pos];
-                        
+
                         if !first {
                             ui.add_space(4.0);
                         }
-                        
+
                         // Check if it's a number
                         if token.parse::<f64>().is_ok() {
-                            ui.label(egui::RichText::new(token)
-                                .color(egui::Color32::from_rgb(181, 206, 168)) // Green for numbers
-                                .monospace());
+                            ui.label(
+                                egui::RichText::new(token)
+                                    .color(egui::Color32::from_rgb(181, 206, 168)) // Green for numbers
+                                    .monospace(),
+                            );
                         } else if token.starts_with('"') && token.ends_with('"') {
-                            ui.label(egui::RichText::new(token)
-                                .color(egui::Color32::from_rgb(206, 145, 120)) // Orange for strings
-                                .monospace());
+                            ui.label(
+                                egui::RichText::new(token)
+                                    .color(egui::Color32::from_rgb(206, 145, 120)) // Orange for strings
+                                    .monospace(),
+                            );
                         } else {
-                            ui.label(egui::RichText::new(token)
-                                .color(egui::Color32::WHITE) // White for identifiers/comments
-                                .monospace());
+                            ui.label(
+                                egui::RichText::new(token)
+                                    .color(egui::Color32::WHITE) // White for identifiers/comments
+                                    .monospace(),
+                            );
                         }
-                        
+
                         remaining = &remaining[space_pos..];
                         if space_pos < remaining.len() {
                             remaining = &remaining[1..]; // Skip space
@@ -569,10 +639,6 @@ impl TimeWarpApp {
         Some((var_part.to_string(), format!("? ")))
     }
 
-
-
-
-
     fn handle_if_command(&self, condition: &str) -> CommandResult {
         if let Some((cond, then_part)) = condition.split_once(" THEN ") {
             let then_part = then_part.trim();
@@ -617,16 +683,17 @@ impl TimeWarpApp {
                 if let Some((start_part, end_part)) = range_part.split_once(" TO ") {
                     let start_val = self.get_value(start_part.trim());
                     let end_val = self.get_value(end_part.trim());
-                    
+
                     // Initialize loop variable if not set
                     if !self.variables.contains_key(var_name) {
-                        self.variables.insert(var_name.to_string(), start_val.clone());
+                        self.variables
+                            .insert(var_name.to_string(), start_val.clone());
                     }
-                    
+
                     let current_val = self.variables.get(var_name).unwrap_or(&start_val).clone();
                     let current_num: f64 = current_val.parse().unwrap_or(0.0);
                     let end_num: f64 = end_val.parse().unwrap_or(0.0);
-                    
+
                     if current_num <= end_num {
                         // Execute the DO part
                         let do_cmd = do_part.trim();
@@ -836,12 +903,6 @@ impl TimeWarpApp {
         }
     }
 
-
-
-
-
-
-
     // Clipboard operations
     fn copy_text(&mut self, ctx: &egui::Context) {
         // For now, copy the entire code content
@@ -903,7 +964,9 @@ impl TimeWarpApp {
     }
 
     fn render_debug_editor(&mut self, ui: &mut egui::Ui) {
-        let filename = self.last_file_path.as_ref()
+        let filename = self
+            .last_file_path
+            .as_ref()
             .and_then(|p| std::path::Path::new(p).file_name())
             .and_then(|n| n.to_str())
             .unwrap_or("untitled");
@@ -911,13 +974,20 @@ impl TimeWarpApp {
         let syntax_enabled = self.syntax_highlighting_enabled;
         let current_debug_line = self.current_debug_line;
         let language = self.language.clone();
-        let keywords: Vec<String> = self.get_language_keywords().into_iter().map(|s| s.to_string()).collect();
+        let keywords: Vec<String> = self
+            .get_language_keywords()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
 
         egui::ScrollArea::vertical().show(ui, |ui| {
             ui.set_width(ui.available_width());
 
             let lines: Vec<String> = self.code.lines().map(|s| s.to_string()).collect();
-            let breakpoints = self.breakpoints.entry(filename.to_string()).or_insert_with(Vec::new);
+            let breakpoints = self
+                .breakpoints
+                .entry(filename.to_string())
+                .or_insert_with(Vec::new);
 
             for (line_idx, line) in lines.iter().enumerate() {
                 ui.horizontal(|ui| {
@@ -925,15 +995,20 @@ impl TimeWarpApp {
                     let line_number = (line_idx + 1) as u32;
                     let has_breakpoint = breakpoints.contains(&line_number);
 
-                    let breakpoint_button = egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
-                        .frame(false)
-                        .small();
+                    let breakpoint_button =
+                        egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
+                            .frame(false)
+                            .small();
 
-                    if ui.add(breakpoint_button).on_hover_text(if has_breakpoint {
-                        "Click to remove breakpoint"
-                    } else {
-                        "Click to add breakpoint"
-                    }).clicked() {
+                    if ui
+                        .add(breakpoint_button)
+                        .on_hover_text(if has_breakpoint {
+                            "Click to remove breakpoint"
+                        } else {
+                            "Click to add breakpoint"
+                        })
+                        .clicked()
+                    {
                         if has_breakpoint {
                             breakpoints.retain(|&x| x != line_number);
                         } else {
@@ -943,14 +1018,15 @@ impl TimeWarpApp {
                     }
 
                     // Line number
-                    ui.label(egui::RichText::new(format!("{:4}", line_number))
-                        .color(egui::Color32::from_rgb(100, 100, 100))
-                        .font(egui::FontId::monospace(12.0)));
+                    ui.label(
+                        egui::RichText::new(format!("{:4}", line_number))
+                            .color(egui::Color32::from_rgb(100, 100, 100))
+                            .font(egui::FontId::monospace(12.0)),
+                    );
 
                     // Current debug line indicator
                     if Some(line_number) == current_debug_line {
-                        ui.label(egui::RichText::new("▶")
-                            .color(egui::Color32::YELLOW));
+                        ui.label(egui::RichText::new("▶").color(egui::Color32::YELLOW));
                     } else {
                         ui.add_space(12.0);
                     }
@@ -960,13 +1036,14 @@ impl TimeWarpApp {
                         // Simple syntax highlighting for debug view
                         let highlighted = Self::highlight_line_static(&line, &keywords, &language);
                         for (text, color) in highlighted {
-                            ui.label(egui::RichText::new(text)
-                                .color(color)
-                                .font(egui::FontId::monospace(12.0)));
+                            ui.label(
+                                egui::RichText::new(text)
+                                    .color(color)
+                                    .font(egui::FontId::monospace(12.0)),
+                            );
                         }
                     } else {
-                        ui.label(egui::RichText::new(line)
-                            .font(egui::FontId::monospace(12.0)));
+                        ui.label(egui::RichText::new(line).font(egui::FontId::monospace(12.0)));
                     }
                 });
             }
@@ -977,15 +1054,20 @@ impl TimeWarpApp {
                     let line_number = (lines.len() + 1) as u32;
                     let has_breakpoint = breakpoints.contains(&line_number);
 
-                    let breakpoint_button = egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
-                        .frame(false)
-                        .small();
+                    let breakpoint_button =
+                        egui::Button::new(if has_breakpoint { "🔴" } else { "⚪" })
+                            .frame(false)
+                            .small();
 
-                    if ui.add(breakpoint_button).on_hover_text(if has_breakpoint {
-                        "Click to remove breakpoint"
-                    } else {
-                        "Click to add breakpoint"
-                    }).clicked() {
+                    if ui
+                        .add(breakpoint_button)
+                        .on_hover_text(if has_breakpoint {
+                            "Click to remove breakpoint"
+                        } else {
+                            "Click to add breakpoint"
+                        })
+                        .clicked()
+                    {
                         if has_breakpoint {
                             breakpoints.retain(|&x| x != line_number);
                         } else {
@@ -994,16 +1076,22 @@ impl TimeWarpApp {
                         }
                     }
 
-                    ui.label(egui::RichText::new(format!("{:4}", line_number))
-                        .color(egui::Color32::from_rgb(100, 100, 100))
-                        .font(egui::FontId::monospace(12.0)));
+                    ui.label(
+                        egui::RichText::new(format!("{:4}", line_number))
+                            .color(egui::Color32::from_rgb(100, 100, 100))
+                            .font(egui::FontId::monospace(12.0)),
+                    );
                     ui.add_space(12.0);
                 });
             }
         });
     }
 
-    fn highlight_line_static(line: &str, keywords: &[String], language: &str) -> Vec<(String, egui::Color32)> {
+    fn highlight_line_static(
+        line: &str,
+        keywords: &[String],
+        language: &str,
+    ) -> Vec<(String, egui::Color32)> {
         if line.trim().is_empty() {
             return vec![(line.to_string(), egui::Color32::BLACK)];
         }
@@ -1013,7 +1101,8 @@ impl TimeWarpApp {
         let mut i = 0;
 
         // Create keyword set from provided keywords
-        let keyword_set: std::collections::HashSet<String> = keywords.iter().map(|k| k.to_uppercase()).collect();
+        let keyword_set: std::collections::HashSet<String> =
+            keywords.iter().map(|k| k.to_uppercase()).collect();
 
         while i < chars.len() {
             // Check for comments first
@@ -1035,7 +1124,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(163, 21, 21)));
+                highlighted.push((
+                    line[i..end].to_string(),
+                    egui::Color32::from_rgb(163, 21, 21),
+                ));
                 i = end;
                 continue;
             }
@@ -1050,7 +1142,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(0, 128, 128)));
+                highlighted.push((
+                    line[i..end].to_string(),
+                    egui::Color32::from_rgb(0, 128, 128),
+                ));
                 i = end;
                 continue;
             }
@@ -1066,7 +1161,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(128, 64, 0))); // Orange-brown for operators
+                highlighted.push((
+                    line[i..end].to_string(),
+                    egui::Color32::from_rgb(128, 64, 0),
+                )); // Orange-brown for operators
                 i = end;
                 continue;
             }
@@ -1076,7 +1174,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..i+1].to_string(), egui::Color32::from_rgb(128, 0, 128))); // Purple for brackets
+                highlighted.push((
+                    line[i..i + 1].to_string(),
+                    egui::Color32::from_rgb(128, 0, 128),
+                )); // Purple for brackets
                 i += 1;
                 continue;
             }
@@ -1093,11 +1194,20 @@ impl TimeWarpApp {
                         ' '
                     };
 
-                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ';' || next_char == ':' {
+                    if next_char.is_whitespace()
+                        || next_char == '('
+                        || next_char == ')'
+                        || next_char == ','
+                        || next_char == ';'
+                        || next_char == ':'
+                    {
                         if i > 0 {
                             highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                         }
-                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255)));
+                        highlighted.push((
+                            line[i..i + keyword_len].to_string(),
+                            egui::Color32::from_rgb(0, 0, 255),
+                        ));
                         i += keyword_len;
                         _found_keyword = true;
                         break;
@@ -1116,7 +1226,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..end].to_string(), egui::Color32::from_rgb(128, 64, 0))); // Orange-brown for operators
+                highlighted.push((
+                    line[i..end].to_string(),
+                    egui::Color32::from_rgb(128, 64, 0),
+                )); // Orange-brown for operators
                 i = end;
                 continue;
             }
@@ -1126,7 +1239,10 @@ impl TimeWarpApp {
                 if i > 0 {
                     highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                 }
-                highlighted.push((line[i..i+1].to_string(), egui::Color32::from_rgb(128, 0, 128))); // Purple for brackets
+                highlighted.push((
+                    line[i..i + 1].to_string(),
+                    egui::Color32::from_rgb(128, 0, 128),
+                )); // Purple for brackets
                 i += 1;
                 continue;
             }
@@ -1143,11 +1259,20 @@ impl TimeWarpApp {
                         ' '
                     };
 
-                    if next_char.is_whitespace() || next_char == '(' || next_char == ')' || next_char == ',' || next_char == ';' || next_char == ':' {
+                    if next_char.is_whitespace()
+                        || next_char == '('
+                        || next_char == ')'
+                        || next_char == ','
+                        || next_char == ';'
+                        || next_char == ':'
+                    {
                         if i > 0 {
                             highlighted.push((line[..i].to_string(), egui::Color32::BLACK));
                         }
-                        highlighted.push((line[i..i + keyword_len].to_string(), egui::Color32::from_rgb(0, 0, 255)));
+                        highlighted.push((
+                            line[i..i + keyword_len].to_string(),
+                            egui::Color32::from_rgb(0, 0, 255),
+                        ));
                         i += keyword_len;
                         _found_keyword = true;
                         break;
@@ -1255,8 +1380,8 @@ impl TimeWarpApp {
         // Add language-specific functions and commands
         if self.language == "TW BASIC" {
             let basic_functions = vec![
-                "ABS(", "ASC(", "CHR$(", "COS(", "EXP(", "INT(", "LEFT$(", "LEN(",
-                "LOG(", "MID$(", "RIGHT$(", "RND(", "SIN(", "SQR(", "STR$(", "TAN(", "VAL(",
+                "ABS(", "ASC(", "CHR$(", "COS(", "EXP(", "INT(", "LEFT$(", "LEN(", "LOG(", "MID$(",
+                "RIGHT$(", "RND(", "SIN(", "SQR(", "STR$(", "TAN(", "VAL(",
             ];
 
             for func in basic_functions {
@@ -1267,10 +1392,44 @@ impl TimeWarpApp {
 
             // Add BASIC commands that might be partially typed
             let basic_commands = vec![
-                "PRINT", "WRITELN", "INPUT", "READLN", "LET", "IF", "THEN", "ELSE", "WHILE", "DO", "FOR", "TO", "STEP", "NEXT",
-                "FORWARD", "FD", "BACK", "BK", "LEFT", "LT", "RIGHT", "RT", "PENUP", "PU", "PENDOWN", "PD",
-                "WHILE", "WEND", "GOTO", "GOSUB", "RETURN", "END", "CLS", "LOCATE", "COLOR",
-                "BEEP", "SLEEP", "RANDOMIZE"
+                "PRINT",
+                "WRITELN",
+                "INPUT",
+                "READLN",
+                "LET",
+                "IF",
+                "THEN",
+                "ELSE",
+                "WHILE",
+                "DO",
+                "FOR",
+                "TO",
+                "STEP",
+                "NEXT",
+                "FORWARD",
+                "FD",
+                "BACK",
+                "BK",
+                "LEFT",
+                "LT",
+                "RIGHT",
+                "RT",
+                "PENUP",
+                "PU",
+                "PENDOWN",
+                "PD",
+                "WHILE",
+                "WEND",
+                "GOTO",
+                "GOSUB",
+                "RETURN",
+                "END",
+                "CLS",
+                "LOCATE",
+                "COLOR",
+                "BEEP",
+                "SLEEP",
+                "RANDOMIZE",
             ];
 
             for cmd in basic_commands {
@@ -1304,7 +1463,7 @@ impl TimeWarpApp {
             egui::TextEdit::multiline(&mut self.code)
                 .font(egui::TextStyle::Monospace)
                 .desired_width(f32::INFINITY)
-                .desired_rows(20)
+                .desired_rows(20),
         );
 
         // Check if code changed and save undo state
@@ -1322,16 +1481,20 @@ impl TimeWarpApp {
         if ui.input(|i| i.modifiers.ctrl && i.key_pressed(egui::Key::Z) && !i.modifiers.shift) {
             self.undo();
         }
-        if ui.input(|i| (i.modifiers.ctrl && i.key_pressed(egui::Key::Y)) || 
-                     (i.modifiers.ctrl && i.modifiers.shift && i.key_pressed(egui::Key::Z))) {
+        if ui.input(|i| {
+            (i.modifiers.ctrl && i.key_pressed(egui::Key::Y))
+                || (i.modifiers.ctrl && i.modifiers.shift && i.key_pressed(egui::Key::Z))
+        }) {
             self.redo();
         }
 
         // Auto-completion triggers
-        if let Some(text) = ui.input(|i| i.events.iter().find_map(|e| match e {
-            egui::Event::Text(text) => Some(text.clone()),
-            _ => None,
-        })) {
+        if let Some(text) = ui.input(|i| {
+            i.events.iter().find_map(|e| match e {
+                egui::Event::Text(text) => Some(text.clone()),
+                _ => None,
+            })
+        }) {
             // Trigger completion after typing certain characters
             if text.chars().any(|c| c == '.' || c == '(' || c == ' ') {
                 // Small delay to avoid triggering on every keystroke
@@ -1342,8 +1505,12 @@ impl TimeWarpApp {
         // Render syntax highlighted preview below the editor
         if !self.code.is_empty() && self.active_tab == 0 {
             ui.separator();
-            ui.label(egui::RichText::new("Syntax Highlighted Preview:").small().weak());
-            
+            ui.label(
+                egui::RichText::new("Syntax Highlighted Preview:")
+                    .small()
+                    .weak(),
+            );
+
             egui::ScrollArea::vertical().show(ui, |ui| {
                 self.render_syntax_highlighted_text(ui, &self.code);
             });
@@ -1358,7 +1525,14 @@ impl TimeWarpApp {
         // Find the current word being typed
         let mut word_start = cursor_pos;
         for (i, ch) in before_cursor.char_indices().rev() {
-            if ch.is_whitespace() || ch == '(' || ch == ')' || ch == ',' || ch == ';' || ch == ':' || ch == '=' {
+            if ch.is_whitespace()
+                || ch == '('
+                || ch == ')'
+                || ch == ','
+                || ch == ';'
+                || ch == ':'
+                || ch == '='
+            {
                 break;
             }
             word_start = i;
@@ -1487,130 +1661,132 @@ impl eframe::App for TimeWarpApp {
         egui::TopBottomPanel::top("menu_bar")
             .min_height(40.0)
             .show(ctx, |ui| {
-            ui.painter().rect_filled(
-                ui.available_rect_before_wrap(),
-                0.0,
-                egui::Color32::from_rgb(220, 220, 220),
-            );
-            ui.add_space(6.0);
-            egui::menu::bar(ui, |ui| {
-                // Test button
-                if ui.button("TEST").clicked() {
-                    self.output = "Test button clicked!".to_string();
-                }
-                
-                // File menu
-                ui.menu_button("📁 File", |ui| {
-                    if ui.button("📄 New File").clicked() {
-                        self.code.clear();
-                        self.output = "New file created.".to_string();
-                        ui.close_menu();
+                ui.painter().rect_filled(
+                    ui.available_rect_before_wrap(),
+                    0.0,
+                    egui::Color32::from_rgb(220, 220, 220),
+                );
+                ui.add_space(6.0);
+                egui::menu::bar(ui, |ui| {
+                    // Test button
+                    if ui.button("TEST").clicked() {
+                        self.output = "Test button clicked!".to_string();
                     }
-                    if ui.button("📂 Open File...").clicked() {
-                        if let Some(path) = FileDialog::new()
-                            .add_filter("Text", &["txt", "twb", "twp", "tpr"])
-                            .pick_file()
-                        {
-                            if let Ok(content) = std::fs::read_to_string(&path) {
-                                self.code = content;
-                                self.output = format!("Opened file: {}", path.display());
-                                self.last_file_path = Some(path.display().to_string());
-                            }
+
+                    // File menu
+                    ui.menu_button("📁 File", |ui| {
+                        if ui.button("📄 New File").clicked() {
+                            self.code.clear();
+                            self.output = "New file created.".to_string();
+                            ui.close_menu();
                         }
-                        ui.close_menu();
-                    }
-                    if ui.button("💾 Save").clicked() {
-                        if let Some(path) = &self.last_file_path {
-                            if std::fs::write(path, &self.code).is_ok() {
-                                self.output = format!("Saved to {}", path);
+                        if ui.button("📂 Open File...").clicked() {
+                            if let Some(path) = FileDialog::new()
+                                .add_filter("Text", &["txt", "twb", "twp", "tpr"])
+                                .pick_file()
+                            {
+                                if let Ok(content) = std::fs::read_to_string(&path) {
+                                    self.code = content;
+                                    self.output = format!("Opened file: {}", path.display());
+                                    self.last_file_path = Some(path.display().to_string());
+                                }
                             }
-                        } else if let Some(path) =
-                            FileDialog::new().set_file_name("untitled.twb").save_file()
-                        {
-                            if std::fs::write(&path, &self.code).is_ok() {
-                                self.output = format!("Saved to {}", path.display());
-                                self.last_file_path = Some(path.display().to_string());
-                            }
+                            ui.close_menu();
                         }
-                        ui.close_menu();
-                    }
-                    if ui.button("💾 Save As...").clicked() {
-                        if let Some(path) =
-                            FileDialog::new().set_file_name("untitled.twb").save_file()
-                        {
-                            if std::fs::write(&path, &self.code).is_ok() {
-                                self.output = format!("Saved to {}", path.display());
-                                self.last_file_path = Some(path.display().to_string());
+                        if ui.button("💾 Save").clicked() {
+                            if let Some(path) = &self.last_file_path {
+                                if std::fs::write(path, &self.code).is_ok() {
+                                    self.output = format!("Saved to {}", path);
+                                }
+                            } else if let Some(path) =
+                                FileDialog::new().set_file_name("untitled.twb").save_file()
+                            {
+                                if std::fs::write(&path, &self.code).is_ok() {
+                                    self.output = format!("Saved to {}", path.display());
+                                    self.last_file_path = Some(path.display().to_string());
+                                }
                             }
+                            ui.close_menu();
                         }
-                        ui.close_menu();
-                    }
+                        if ui.button("💾 Save As...").clicked() {
+                            if let Some(path) =
+                                FileDialog::new().set_file_name("untitled.twb").save_file()
+                            {
+                                if std::fs::write(&path, &self.code).is_ok() {
+                                    self.output = format!("Saved to {}", path.display());
+                                    self.last_file_path = Some(path.display().to_string());
+                                }
+                            }
+                            ui.close_menu();
+                        }
+                    });
+                    ui.menu_button("✏️ Edit", |ui| {
+                        if ui.button("🔍 Find...").clicked() {
+                            self.show_find_replace = true;
+                            ui.close_menu();
+                        }
+                        if ui.button("🔄 Replace...").clicked() {
+                            self.show_find_replace = true;
+                            ui.close_menu();
+                        }
+                        ui.separator();
+                        if ui.button("↶ Undo").clicked() {
+                            self.undo();
+                            ui.close_menu();
+                        }
+                        if ui.button("↷ Redo").clicked() {
+                            self.redo();
+                            ui.close_menu();
+                        }
+                        ui.separator();
+                        if ui.button("📋 Copy").clicked() {
+                            self.copy_text(ctx);
+                            ui.close_menu();
+                        }
+                        if ui.button("✂️ Cut").clicked() {
+                            self.cut_text(ctx);
+                            ui.close_menu();
+                        }
+                        if ui.button("📄 Paste").clicked() {
+                            self.paste_text(ctx);
+                            ui.close_menu();
+                        }
+                        if ui.button("↕️ Move Line").clicked() {
+                            // For now, just show a message - full implementation needs cursor tracking
+                            self.show_error(
+                                "Move line functionality not yet implemented".to_string(),
+                            );
+                            ui.close_menu();
+                        }
+                    });
+                    ui.menu_button("👁️ View", |ui| {
+                        if ui
+                            .selectable_label(self.show_line_numbers, "📏 Show Line Numbers")
+                            .clicked()
+                        {
+                            self.show_line_numbers = !self.show_line_numbers;
+                            ui.close_menu();
+                        }
+                        if ui
+                            .selectable_label(
+                                self.syntax_highlighting_enabled,
+                                "🎨 Syntax Highlighting",
+                            )
+                            .clicked()
+                        {
+                            self.syntax_highlighting_enabled = !self.syntax_highlighting_enabled;
+                            ui.close_menu();
+                        }
+                    });
+                    ui.menu_button("❓ Help", |ui| {
+                        if ui.button("ℹ️ About").clicked() {
+                            self.show_about = true;
+                            ui.close_menu();
+                        }
+                    });
                 });
-                ui.menu_button("✏️ Edit", |ui| {
-                    if ui.button("🔍 Find...").clicked() {
-                        self.show_find_replace = true;
-                        ui.close_menu();
-                    }
-                    if ui.button("🔄 Replace...").clicked() {
-                        self.show_find_replace = true;
-                        ui.close_menu();
-                    }
-                    ui.separator();
-                    if ui.button("↶ Undo").clicked() {
-                        self.undo();
-                        ui.close_menu();
-                    }
-                    if ui.button("↷ Redo").clicked() {
-                        self.redo();
-                        ui.close_menu();
-                    }
-                    ui.separator();
-                    if ui.button("📋 Copy").clicked() {
-                        self.copy_text(ctx);
-                        ui.close_menu();
-                    }
-                    if ui.button("✂️ Cut").clicked() {
-                        self.cut_text(ctx);
-                        ui.close_menu();
-                    }
-                    if ui.button("📄 Paste").clicked() {
-                        self.paste_text(ctx);
-                        ui.close_menu();
-                    }
-                    if ui.button("↕️ Move Line").clicked() {
-                        // For now, just show a message - full implementation needs cursor tracking
-                        self.show_error("Move line functionality not yet implemented".to_string());
-                        ui.close_menu();
-                    }
-                });
-                ui.menu_button("👁️ View", |ui| {
-                    if ui
-                        .selectable_label(self.show_line_numbers, "📏 Show Line Numbers")
-                        .clicked()
-                    {
-                        self.show_line_numbers = !self.show_line_numbers;
-                        ui.close_menu();
-                    }
-                    if ui
-                        .selectable_label(
-                            self.syntax_highlighting_enabled,
-                            "🎨 Syntax Highlighting",
-                        )
-                        .clicked()
-                    {
-                        self.syntax_highlighting_enabled = !self.syntax_highlighting_enabled;
-                        ui.close_menu();
-                    }
-                });
-                ui.menu_button("❓ Help", |ui| {
-                    if ui.button("ℹ️ About").clicked() {
-                        self.show_about = true;
-                        ui.close_menu();
-                    }
-                });
+                ui.add_space(6.0);
             });
-            ui.add_space(6.0);
-        });
 
         // Enhanced Toolbar
         egui::TopBottomPanel::top("toolbar").show(ctx, |ui| {
@@ -2035,7 +2211,7 @@ impl eframe::App for TimeWarpApp {
                                                 // Provide input to the BASIC interpreter and continue execution
                                                 if let Some(ref mut interpreter) = self.basic_interpreter {
                                                     interpreter.provide_input(&self.user_input);
-                                                    
+
                                                     // Continue execution with the interpreter
                                                     match interpreter.execute("") { // Empty string since interpreter has state
                                                         Ok(result) => match result {
@@ -2296,8 +2472,10 @@ impl eframe::App for TimeWarpApp {
                         // File and cursor information
                         let line_count = self.code.lines().count();
                         let char_count = self.code.chars().count();
-                        ui.label(format!("📏 Lines: {} | Chars: {} | Ln {}, Col {}", 
-                            line_count, char_count, self.cursor_line, self.cursor_column));
+                        ui.label(format!(
+                            "📏 Lines: {} | Chars: {} | Ln {}, Col {}",
+                            line_count, char_count, self.cursor_line, self.cursor_column
+                        ));
 
                         ui.separator();
 
@@ -2325,9 +2503,15 @@ impl eframe::App for TimeWarpApp {
                         // Debug mode status
                         if self.debug_mode {
                             match self.debug_state {
-                                DebugState::Running => { ui.colored_label(egui::Color32::GREEN, "🐛 Debug: Running"); },
-                                DebugState::Paused => { ui.colored_label(egui::Color32::YELLOW, "🐛 Debug: Paused"); },
-                                DebugState::Stopped => { ui.colored_label(egui::Color32::RED, "🐛 Debug: Stopped"); },
+                                DebugState::Running => {
+                                    ui.colored_label(egui::Color32::GREEN, "🐛 Debug: Running");
+                                }
+                                DebugState::Paused => {
+                                    ui.colored_label(egui::Color32::YELLOW, "🐛 Debug: Paused");
+                                }
+                                DebugState::Stopped => {
+                                    ui.colored_label(egui::Color32::RED, "🐛 Debug: Stopped");
+                                }
                             }
                         } else {
                             ui.colored_label(egui::Color32::GRAY, "🐛 Debug: Off (F9 to toggle)");
@@ -2407,15 +2591,26 @@ impl eframe::App for TimeWarpApp {
                                     ui.add_space(8.0);
                                     ui.vertical(|ui| {
                                         ui.add_space(8.0);
-                                        ui.label(egui::RichText::new("Error").color(egui::Color32::WHITE).size(14.0));
-                                        ui.label(egui::RichText::new(error_msg).color(egui::Color32::from_rgb(255, 235, 235)).size(12.0));
+                                        ui.label(
+                                            egui::RichText::new("Error")
+                                                .color(egui::Color32::WHITE)
+                                                .size(14.0),
+                                        );
+                                        ui.label(
+                                            egui::RichText::new(error_msg)
+                                                .color(egui::Color32::from_rgb(255, 235, 235))
+                                                .size(12.0),
+                                        );
                                     });
-                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                        ui.add_space(8.0);
-                                        if ui.button("✕").clicked() {
-                                            dismiss_clicked = true;
-                                        }
-                                    });
+                                    ui.with_layout(
+                                        egui::Layout::right_to_left(egui::Align::Center),
+                                        |ui| {
+                                            ui.add_space(8.0);
+                                            if ui.button("✕").clicked() {
+                                                dismiss_clicked = true;
+                                            }
+                                        },
+                                    );
                                 });
                             });
                     });
@@ -2554,7 +2749,7 @@ mod tests {
 
     #[test]
     fn test_language_selection() {
-        let mut app = TimeWarpApp::default();
+        let app = TimeWarpApp::default();
 
         // Test language is TW BASIC by default
         assert_eq!(app.language, "TW BASIC");
@@ -2596,12 +2791,6 @@ mod tests {
         assert_eq!(app.output, "New file created.");
         assert_eq!(app.last_file_path, None);
     }
-
-
-
-
-
-
 
     #[test]
     fn test_basic_program_execution() {
