@@ -258,6 +258,7 @@ impl Interpreter {
             }
             Statement::Clear => {
                 self.context.variables.clear();
+                self.context.type_declarations.clear();
                 output.push_str("Variables cleared\n");
                 Ok(None)
             }
@@ -987,7 +988,7 @@ impl Interpreter {
 
         match (value, target_type) {
             // Legacy Number type support
-            (Value::Number(n), VariableType::Integer) => Ok(Value::Integer(n.round() as i32)),
+            (Value::Number(n), VariableType::Integer) => Ok(Value::Integer(*n as i32)),
             (Value::Number(n), VariableType::Single) => Ok(Value::Single(*n as f32)),
             (Value::Number(n), VariableType::Double) => Ok(Value::Double(*n)),
             (Value::Number(n), VariableType::String) => Ok(Value::String(n.to_string())),
@@ -999,8 +1000,8 @@ impl Interpreter {
             (Value::String(s), VariableType::String) => Ok(Value::String(s.clone())),
 
             // Convert to Integer
-            (Value::Single(s), VariableType::Integer) => Ok(Value::Integer(s.round() as i32)),
-            (Value::Double(d), VariableType::Integer) => Ok(Value::Integer(d.round() as i32)),
+            (Value::Single(s), VariableType::Integer) => Ok(Value::Integer(*s as i32)),
+            (Value::Double(d), VariableType::Integer) => Ok(Value::Integer(*d as i32)),
 
             // Convert to Single
             (Value::Integer(i), VariableType::Single) => Ok(Value::Single(*i as f32)),

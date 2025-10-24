@@ -527,18 +527,52 @@ impl Parser {
                     arguments: vec![],
                 })
             }
-            Some(Token::Time) => {
-                self.advance();
-                Ok(Expression::FunctionCall {
-                    name: "TIME".to_string(),
-                    arguments: vec![],
-                })
-            }
             Some(Token::Timer) => {
                 self.advance();
                 Ok(Expression::FunctionCall {
                     name: "TIMER".to_string(),
                     arguments: vec![],
+                })
+            }
+            Some(Token::Tab) => {
+                self.advance();
+                self.consume_token(Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.consume_token(Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "TAB".to_string(),
+                    arguments: vec![arg],
+                })
+            }
+            Some(Token::Spc) => {
+                self.advance();
+                self.consume_token(Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.consume_token(Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "SPC".to_string(),
+                    arguments: vec![arg],
+                })
+            }
+            Some(Token::Fn) => {
+                self.advance();
+                let func_name = self.parse_identifier()?;
+                self.consume_token(Token::LParen)?;
+                let mut arguments = Vec::new();
+                if let Some(Token::RParen) = self.current_token() {
+                    self.advance();
+                } else {
+                    loop {
+                        arguments.push(self.parse_expression()?);
+                        if !self.match_token(&[Token::Comma]) {
+                            self.consume_token(Token::RParen)?;
+                            break;
+                        }
+                    }
+                }
+                Ok(Expression::FunctionCall {
+                    name: format!("FN{}", func_name),
+                    arguments,
                 })
             }
             Some(Token::Int) => {
@@ -703,7 +737,17 @@ impl Parser {
     fn parse_range_list(&mut self) -> Result<Vec<String>, InterpreterError> {
         let mut ranges = Vec::new();
         loop {
-            let range = self.parse_identifier()?;
+            // Parse the start of the range (should be a single letter identifier)
+            let start = self.parse_identifier()?;
+
+            // Check if this is a range (start-end)
+            let range = if self.match_token(&[Token::Minus]) {
+                let end = self.parse_identifier()?;
+                format!("{}-{}", start, end)
+            } else {
+                start
+            };
+
             ranges.push(range);
             if !self.match_token(&[Token::Comma]) {
                 break;
@@ -714,6 +758,7 @@ impl Parser {
 
     fn parse_select_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.consume_token(Token::Select)?;
+        self.consume_token(Token::Case)?;
         let expression = self.parse_expression()?;
         self.consume_token(Token::Eol)?;
 
