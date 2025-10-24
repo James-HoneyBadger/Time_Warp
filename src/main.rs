@@ -2610,4 +2610,64 @@ mod tests {
         // Should contain the variable value
         assert!(result.contains("0"));
     }
+
+    #[test]
+    fn test_print_no_space() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINTX (no space) - this should cause a parse error
+        let print_code = "PRINTX";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT no space result: {:?}", result);
+
+        // This should contain a parse error
+        assert!(result.contains("ParseError"));
+    }
+
+    #[test]
+    fn test_print_lowercase() {
+        let mut app = TimeWarpApp::default();
+
+        // Test print x (lowercase) - should work since tokenizer uppercases
+        let print_code = "print x";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT lowercase result: {:?}", result);
+
+        // Should not crash with parse error
+        assert!(!result.contains("ParseError"));
+        // Should contain the variable value
+        assert!(result.contains("0"));
+    }
+
+    #[test]
+    fn test_let_and_print() {
+        let mut app = TimeWarpApp::default();
+
+        // Test LET X = 5 : PRINT X
+        let code = "LET X = 5 : PRINT X";
+        let result = app.execute_tw_basic(code);
+
+        println!("LET and PRINT result: {:?}", result);
+
+        // Should not crash with parse error
+        assert!(!result.contains("ParseError"));
+        // Should contain 5
+        assert!(result.contains("5"));
+    }
+
+    #[test]
+    fn test_print_multiple_vars_no_comma() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT X Y (without comma) - should cause parse error
+        let print_code = "PRINT X Y";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT multiple vars no comma result: {:?}", result);
+
+        // This might cause a parse error
+        // Let's see what happens
+    }
 }
