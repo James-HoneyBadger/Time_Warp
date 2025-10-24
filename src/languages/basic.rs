@@ -16,6 +16,7 @@ pub enum Token {
     End,
     Stop,
     Cls,
+    Clear,
     Color,
     Forward,
     Back,
@@ -32,6 +33,11 @@ pub enum Token {
     Restore,
     Def,
     Fn,
+    DefInt,
+    DefStr,
+    DefSng,
+    DefDbl,
+    DefLng,
     For,
     To,
     Step,
@@ -279,9 +285,25 @@ pub enum Statement {
         parameter: String,
         expression: Expression,
     },
+    DefInt {
+        range: String,
+    },
+    DefStr {
+        range: String,
+    },
+    DefSng {
+        range: String,
+    },
+    DefDbl {
+        range: String,
+    },
+    DefLng {
+        range: String,
+    },
     End,
     Stop,
     Cls,
+    Clear,
     Color {
         color: Expression,
     },
@@ -488,7 +510,8 @@ impl Tokenizer {
                 '0'..='9' => {
                     let start = self.position;
                     while self.position < self.input.len()
-                        && self.input.as_bytes()[self.position].is_ascii_digit()
+                        && (self.input.as_bytes()[self.position].is_ascii_digit()
+                            || self.input.as_bytes()[self.position] == b'.')
                     {
                         self.position += 1;
                     }
@@ -541,6 +564,7 @@ impl Tokenizer {
                         "END" => Token::End,
                         "STOP" => Token::Stop,
                         "CLS" => Token::Cls,
+                        "CLEAR" => Token::Clear,
                         "COLOR" => Token::Color,
                         "FORWARD" => Token::Forward,
                         "FD" => Token::Forward,
@@ -563,6 +587,11 @@ impl Tokenizer {
                         "RESTORE" => Token::Restore,
                         "DEF" => Token::Def,
                         "FN" => Token::Fn,
+                        "DEFINT" => Token::DefInt,
+                        "DEFSTR" => Token::DefStr,
+                        "DEFSNG" => Token::DefSng,
+                        "DEFDBL" => Token::DefDbl,
+                        "DEFLNG" => Token::DefLng,
                         "FOR" => Token::For,
                         "TO" => Token::To,
                         "STEP" => Token::Step,
@@ -759,6 +788,15 @@ impl Parser {
         }
     }
 
+    fn peek_token(&self) -> Option<&Token> {
+        let next_pos = self.position + 1;
+        if next_pos >= self.tokens.len() {
+            None
+        } else {
+            Some(&self.tokens[next_pos])
+        }
+    }
+
     fn expect(&mut self, expected: &Token) -> Result<(), InterpreterError> {
         if let Some(ref token) = self.current_token {
             if token == expected {
@@ -819,11 +857,18 @@ impl Parser {
             Some(Token::Input) => self.parse_input_statement(),
             Some(Token::Dim) => self.parse_dim_statement(),
             Some(Token::Data) => self.parse_data_statement(),
+            Some(Token::Def) => self.parse_def_statement(),
+            Some(Token::DefInt) => self.parse_defint_statement(),
+            Some(Token::DefStr) => self.parse_defstr_statement(),
+            Some(Token::DefSng) => self.parse_defsng_statement(),
+            Some(Token::DefDbl) => self.parse_defdbl_statement(),
+            Some(Token::DefLng) => self.parse_deflng_statement(),
             Some(Token::Read) => self.parse_read_statement(),
             Some(Token::Restore) => self.parse_restore_statement(),
             Some(Token::End) => self.parse_end_statement(),
             Some(Token::Stop) => self.parse_stop_statement(),
             Some(Token::Cls) => self.parse_cls_statement(),
+            Some(Token::Clear) => self.parse_clear_statement(),
             Some(Token::Color) => self.parse_color_statement(),
             Some(Token::Forward) => self.parse_turtle_forward_statement(),
             Some(Token::Back) => self.parse_turtle_back_statement(),
@@ -886,6 +931,10 @@ impl Parser {
             _ => {
                 match self.current_token {
                     Some(Token::Identifier(ref id)) => {
+                        // Check if this is an implicit LET statement (variable = expression)
+                        if let Some(Token::Equal) = self.peek_token() {
+                            return self.parse_implicit_let_statement();
+                        }
                         // Check for common mistakes
                         let suggestion = if id.to_uppercase().starts_with("PRINT") && id.len() > 5 {
                             "Did you mean 'PRINT <expression>'? PRINT requires a space after the keyword."
@@ -1250,6 +1299,125 @@ impl Parser {
         Ok(Statement::Data { values })
     }
 
+    fn parse_def_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEF
+        self.expect(&Token::Fn)?;
+        let func_name = self.parse_identifier()?;
+        self.expect(&Token::LParen)?;
+        let parameter = self.parse_identifier()?;
+        self.expect(&Token::RParen)?;
+        self.expect(&Token::Equal)?;
+        let expression = self.parse_expression()?;
+
+        Ok(Statement::Def {
+            name: func_name,
+            parameter,
+            expression,
+        })
+    }
+
+    fn parse_defint_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFINT
+        let range = self.parse_letter_range()?;
+        Ok(Statement::DefInt { range })
+    }
+
+    fn parse_defstr_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFSTR
+        let range = self.parse_letter_range()?;
+        Ok(Statement::DefStr { range })
+    }
+
+    fn parse_defsng_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFSNG
+        let range = self.parse_letter_range()?;
+        Ok(Statement::DefSng { range })
+    }
+
+    fn parse_defdbl_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFDBL
+        let range = self.parse_letter_range()?;
+        Ok(Statement::DefDbl { range })
+    }
+
+    fn parse_deflng_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFLNG
+        let range = self.parse_letter_range()?;
+        Ok(Statement::DefLng { range })
+    }
+
+    fn parse_letter_range(&mut self) -> Result<String, InterpreterError> {
+        let mut range = String::new();
+
+        // Parse first letter
+        if let Some(Token::Identifier(ref id)) = self.current_token {
+            if id.len() == 1 && id.chars().next().unwrap().is_ascii_alphabetic() {
+                range.push_str(id);
+                self.advance();
+            } else {
+                return Err(InterpreterError::ParseError(
+                    "Expected letter in type declaration".to_string(),
+                ));
+            }
+        } else {
+            return Err(InterpreterError::ParseError(
+                "Expected letter in type declaration".to_string(),
+            ));
+        }
+
+        // Check for range (letter-letter) or comma-separated list
+        if let Some(Token::Minus) = self.current_token {
+            self.advance(); // consume -
+            if let Some(Token::Identifier(ref id)) = self.current_token {
+                if id.len() == 1 && id.chars().next().unwrap().is_ascii_alphabetic() {
+                    range.push('-');
+                    range.push_str(id);
+                    self.advance();
+                } else {
+                    return Err(InterpreterError::ParseError(
+                        "Expected letter after - in type declaration".to_string(),
+                    ));
+                }
+            } else {
+                return Err(InterpreterError::ParseError(
+                    "Expected letter after - in type declaration".to_string(),
+                ));
+            }
+        }
+
+        // Handle comma-separated letters
+        while let Some(Token::Comma) = self.current_token {
+            self.advance(); // consume ,
+            if let Some(Token::Identifier(ref id)) = self.current_token {
+                if id.len() == 1 && id.chars().next().unwrap().is_ascii_alphabetic() {
+                    range.push(',');
+                    range.push_str(id);
+                    self.advance();
+                } else {
+                    return Err(InterpreterError::ParseError(
+                        "Expected letter after comma in type declaration".to_string(),
+                    ));
+                }
+            } else {
+                return Err(InterpreterError::ParseError(
+                    "Expected letter after comma in type declaration".to_string(),
+                ));
+            }
+        }
+
+        Ok(range)
+    }
+
+    fn parse_implicit_let_statement(&mut self) -> Result<Statement, InterpreterError> {
+        let var_name = self.parse_identifier()?;
+        self.expect(&Token::Equal)?;
+        let expression = self.parse_expression()?;
+        Ok(Statement::Let {
+            variable: var_name,
+            expression,
+        })
+    }
+
     fn parse_read_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume READ
         let mut variables = Vec::new();
@@ -1291,6 +1459,11 @@ impl Parser {
     fn parse_cls_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume CLS
         Ok(Statement::Cls)
+    }
+
+    fn parse_clear_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume CLEAR
+        Ok(Statement::Clear)
     }
 
     fn parse_color_statement(&mut self) -> Result<Statement, InterpreterError> {
@@ -1987,6 +2160,19 @@ impl Parser {
                     Ok(Expression::Variable(ident))
                 }
             }
+            Some(Token::Fn) => {
+                // Parse user-defined function call: FN name(arg)
+                self.advance(); // consume FN
+                let func_name = self.parse_identifier()?;
+                self.expect(&Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.expect(&Token::RParen)?;
+
+                Ok(Expression::FunctionCall {
+                    name: "FN".to_string(),
+                    arguments: vec![Expression::String(func_name), arg],
+                })
+            }
             Some(Token::LParen) => {
                 self.advance();
                 let expr = self.parse_expression()?;
@@ -2093,6 +2279,12 @@ pub struct BasicInterpreter {
     select_value: Option<Value>,      // Current SELECT CASE value
     array_base: usize,                // Array base (0 or 1)
     print_position: usize,            // Current print position for comma tabulation
+    // Type defaults for variables (GW-BASIC style)
+    int_defaults: Vec<char>, // Letters defaulting to integer (%)
+    str_defaults: Vec<char>, // Letters defaulting to string ($)
+    sng_defaults: Vec<char>, // Letters defaulting to single (!)
+    dbl_defaults: Vec<char>, // Letters defaulting to double (#)
+    lng_defaults: Vec<char>, // Letters defaulting to long (&)
 }
 
 #[derive(Clone)]
@@ -2141,7 +2333,65 @@ impl BasicInterpreter {
             select_value: None,
             array_base: 0,
             print_position: 0,
+            // Initialize type defaults (empty by default - all variables are single precision)
+            int_defaults: Vec::new(),
+            str_defaults: Vec::new(),
+            sng_defaults: Vec::new(),
+            dbl_defaults: Vec::new(),
+            lng_defaults: Vec::new(),
         }
+    }
+
+    fn set_type_defaults(range: &str, defaults: &mut Vec<char>) {
+        // Clear existing defaults for this type
+        defaults.clear();
+
+        // Parse the range string (e.g., "A-Z", "A,C,E", "A-Z,C")
+        for part in range.split(',') {
+            let part = part.trim();
+            if part.contains('-') {
+                // Handle range like "A-Z"
+                let bounds: Vec<&str> = part.split('-').collect();
+                if bounds.len() == 2 {
+                    let start = bounds[0].chars().next().unwrap_or('A');
+                    let end = bounds[1].chars().next().unwrap_or('A');
+                    for c in start..=end {
+                        if c.is_ascii_alphabetic() {
+                            defaults.push(c.to_ascii_uppercase());
+                        }
+                    }
+                }
+            } else {
+                // Handle single letter like "A"
+                if let Some(c) = part.chars().next() {
+                    if c.is_ascii_alphabetic() {
+                        defaults.push(c.to_ascii_uppercase());
+                    }
+                }
+            }
+        }
+    }
+
+    fn apply_type_defaults(&self, variable: &str, value: Value) -> Value {
+        // Only apply type defaults to numeric values assigned to variables without type suffixes
+        if let Value::Number(n) = value {
+            if let Some(first_char) = variable.chars().next() {
+                let upper_char = first_char.to_ascii_uppercase();
+
+                // Check type defaults in order of precedence: INT, LNG, SNG, DBL, STR
+                if self.int_defaults.contains(&upper_char) {
+                    return Value::Number(n.trunc()); // Truncate to integer
+                } else if self.lng_defaults.contains(&upper_char) {
+                    return Value::Number(n.trunc()); // Long integers are also truncated
+                } else if self.sng_defaults.contains(&upper_char) {
+                    return Value::Number(n); // Single precision - keep as is
+                } else if self.dbl_defaults.contains(&upper_char) {
+                    return Value::Number(n); // Double precision - keep as is
+                }
+                // Default is single precision, so return as is
+            }
+        }
+        value
     }
 
     fn evaluate_expression(&mut self, expression: &Expression) -> Result<Value, InterpreterError> {
@@ -2323,7 +2573,8 @@ impl BasicInterpreter {
             if arguments.len() == 2 {
                 if let (Value::String(func_name), arg_value) = (&arguments[0], &arguments[1]) {
                     if let Some(func_def) = self.functions.get(func_name) {
-                        // Create a temporary variable for the parameter
+                        let func_def = func_def.clone(); // Clone to avoid borrowing issues
+                                                         // Create a temporary variable for the parameter
                         let old_value = self
                             .variables
                             .insert(func_def.parameter.clone(), arg_value.clone());
@@ -2729,7 +2980,9 @@ impl BasicInterpreter {
                 ref variable,
                 ref expression,
             } => {
-                let value = self.evaluate_expression(expression)?;
+                let mut value = self.evaluate_expression(expression)?;
+                // Apply type coercion based on GW-BASIC type defaults
+                value = self.apply_type_defaults(variable, value);
                 self.variables.insert(variable.clone(), value);
                 Ok(None)
             }
@@ -3130,6 +3383,26 @@ impl BasicInterpreter {
                     value: 0.0,
                     color: None,
                 });
+                Ok(None)
+            }
+            Statement::Clear => {
+                // Clear all variables, arrays, functions, and type defaults
+                self.variables.clear();
+                self.arrays.clear();
+                self.functions.clear();
+                self.data_pointer = 0;
+                self.data.clear();
+                self.for_loops.clear();
+                self.gosub_stack.clear();
+                self.print_position = 0;
+                // Reset type defaults to single precision
+                self.int_defaults.clear();
+                self.str_defaults.clear();
+                self.sng_defaults.clear();
+                self.dbl_defaults.clear();
+                self.lng_defaults.clear();
+                self.current_output
+                    .push_str("Variables, arrays, functions, and type defaults cleared\n");
                 Ok(None)
             }
             Statement::Color { ref color } => {
@@ -3615,6 +3888,31 @@ impl BasicInterpreter {
                         expression: expression.clone(),
                     },
                 );
+                Ok(None)
+            }
+
+            Statement::DefInt { ref range } => {
+                BasicInterpreter::set_type_defaults(range, &mut self.int_defaults);
+                Ok(None)
+            }
+
+            Statement::DefStr { ref range } => {
+                BasicInterpreter::set_type_defaults(range, &mut self.str_defaults);
+                Ok(None)
+            }
+
+            Statement::DefSng { ref range } => {
+                BasicInterpreter::set_type_defaults(range, &mut self.sng_defaults);
+                Ok(None)
+            }
+
+            Statement::DefDbl { ref range } => {
+                BasicInterpreter::set_type_defaults(range, &mut self.dbl_defaults);
+                Ok(None)
+            }
+
+            Statement::DefLng { ref range } => {
+                BasicInterpreter::set_type_defaults(range, &mut self.lng_defaults);
                 Ok(None)
             }
 

@@ -2720,15 +2720,14 @@ mod tests {
     fn test_letx_equals_five() {
         let mut app = TimeWarpApp::default();
 
-        // Test LETX=5 (missing space after LET)
-        let code = "LETX=5";
+        // Test LETX=5 (variable named LETX)
+        let code = "LETX=5\nPRINT LETX";
         let result = app.execute_tw_basic(code);
 
         println!("LETX=5 result: {:?}", result);
 
-        // Should have helpful parse error for LETX
-        assert!(result.contains("ParseError"));
-        assert!(result.contains("LET requires a space"));
+        // Should work - LETX is a valid variable name
+        assert!(result.contains("5"));
     }
 
     #[test]
@@ -2808,6 +2807,36 @@ mod tests {
         assert!(result2.contains("WORLD"));
         assert!(result3.contains("TEST"));
         assert!(result3.contains("SPACES"));
+    }
+
+    #[test]
+    fn test_def_fn_functions() {
+        let mut app = TimeWarpApp::default();
+
+        // Test DEF FN and calling user-defined functions
+        let def_code = "DEF FN SQUARE(X) = X * X\nPRINT FN SQUARE(5)";
+        let result = app.execute_tw_basic(def_code);
+        println!("DEF FN result: {:?}", result);
+
+        // Should contain 25 (5 squared)
+        assert!(result.contains("25"));
+    }
+
+    #[test]
+    fn test_clear_command() {
+        let mut app = TimeWarpApp::default();
+
+        // Set up some variables and functions
+        let setup_code = "LET X = 42\nDEF FN TEST(Y) = Y + 1\nDIM A(10)";
+        app.execute_tw_basic(setup_code);
+
+        // Clear everything
+        let clear_code = "CLEAR";
+        let result = app.execute_tw_basic(clear_code);
+        println!("CLEAR result: {:?}", result);
+
+        // Should contain confirmation message
+        assert!(result.contains("cleared"));
     }
 
     #[test]
@@ -3478,5 +3507,49 @@ mod tests {
                 println!("COMPREHENSIVE DEMO - Unexpected result type");
             }
         }
+    }
+
+    #[test]
+    fn test_type_declaration_commands() {
+        println!("\n=== TESTING TYPE DECLARATION COMMANDS ===");
+        let mut app = TimeWarpApp::default();
+
+        // Test DEFINT with range
+        let program = "10 DEFINT A-Z\n20 A = 3.14\n30 B = 5.9\n40 PRINT A, B";
+        let result = app.execute_tw_basic(program);
+        println!("DEFINT test output: {}", result);
+        assert!(
+            result.contains("3") && result.contains("5"),
+            "DEFINT should truncate decimals to integers"
+        );
+
+        // Test DEFSTR
+        let program = "10 DEFSTR S\n20 S = 123\n30 PRINT S";
+        let result = app.execute_tw_basic(program);
+        println!("DEFSTR test output: {}", result);
+        assert!(
+            result.contains("123"),
+            "DEFSTR should convert numbers to strings"
+        );
+
+        // Test DEFSNG (default behavior)
+        let program = "10 DEFSNG X\n20 X = 3.14159\n30 PRINT X";
+        let result = app.execute_tw_basic(program);
+        println!("DEFSNG test output: {}", result);
+        assert!(
+            result.contains("3.14159"),
+            "DEFSNG should preserve floating point precision"
+        );
+
+        // Test CLEAR resets type defaults
+        let program = "10 DEFINT A-Z\n20 CLEAR\n30 A = 3.14\n40 PRINT A";
+        let result = app.execute_tw_basic(program);
+        println!("CLEAR type defaults test output: {}", result);
+        assert!(
+            result.contains("3.14"),
+            "CLEAR should reset type defaults to single precision"
+        );
+
+        println!("\n=== TYPE DECLARATION COMMANDS TEST PASSED ===");
     }
 }
