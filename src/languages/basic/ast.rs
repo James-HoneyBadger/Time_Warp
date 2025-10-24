@@ -15,6 +15,7 @@ pub enum Token {
     // Keywords
     Let,
     Print,
+    Input,
     If,
     Then,
     Else,
@@ -114,7 +115,7 @@ pub enum Expression {
     },
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -132,7 +133,7 @@ pub enum BinaryOperator {
     Or,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UnaryOperator {
     Negate,
     Not,
@@ -147,6 +148,10 @@ pub enum Statement {
     Print {
         expressions: Vec<Expression>,
         separators: Vec<PrintSeparator>,
+    },
+    Input {
+        prompt: Option<String>,
+        variable: String,
     },
     If {
         condition: Expression,
@@ -216,6 +221,7 @@ pub struct ExecutionContext {
     pub data_pointer: usize,
     pub random_seed: u64,
     pub array_base: usize,
+    pub input_variable: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -234,9 +240,11 @@ pub enum ExecutionResult {
         output: String,
         graphics_commands: Vec<GraphicsCommand>,
     },
-    WaitingForInput {
-        prompt: String,
+    NeedInput {
         variable: String,
+        prompt: String,
+        partial_output: String,
+        partial_graphics: Vec<GraphicsCommand>,
     },
     Error(String),
 }
@@ -244,7 +252,7 @@ pub enum ExecutionResult {
 #[derive(Debug, Clone)]
 pub struct GraphicsCommand {
     pub command: String,
-    pub args: Vec<String>,
+    pub value: f32,
 }
 
 /// Error types
@@ -258,4 +266,3 @@ pub enum InterpreterError {
     DivisionByZero,
     IndexOutOfBounds,
 }
-<parameter name="filePath">/Users/daddy/TW/src/languages/basic/ast.rs

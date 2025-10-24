@@ -7,3 +7,4 @@ edition = "2021"
 eframe = "0.24"
 egui = "0.24"
 rfd = "0.14"
+chrono = { version = "0.4", features = ["serde"] }

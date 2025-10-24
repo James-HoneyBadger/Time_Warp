@@ -342,3 +342,71 @@ fn main() {
     let result2 = app2.execute_tw_basic(game_code);
     println!("Output:\n{}", result2);
 }
+
+#[cfg(test)]
+mod modular_basic_tests {
+    use time_warp_ide::languages::basic::Interpreter;
+
+    #[test]
+    fn test_simple_print() {
+        let mut interpreter = Interpreter::new();
+        let program = r#"
+        10 PRINT "Hello, World!"
+        20 PRINT 42
+        30 END
+        "#;
+
+        let result = interpreter.execute(program);
+        assert!(result.is_ok());
+
+        match result.unwrap() {
+            time_warp_ide::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            } => {
+                assert!(output.contains("Hello, World!"));
+                assert!(output.contains("42"));
+                assert_eq!(graphics_commands.len(), 0);
+            }
+            _ => panic!("Expected Complete result"),
+        }
+    }
+
+    #[test]
+    fn test_arithmetic() {
+        let mut interpreter = Interpreter::new();
+        let program = r#"
+        10 LET X = 10 + 5 * 2
+        20 PRINT X
+        "#;
+
+        let result = interpreter.execute(program);
+        assert!(result.is_ok());
+
+        match result.unwrap() {
+            time_warp_ide::languages::basic::ExecutionResult::Complete { output, .. } => {
+                assert!(output.contains("20")); // 10 + (5 * 2) = 20
+            }
+            _ => panic!("Expected Complete result"),
+        }
+    }
+
+    #[test]
+    fn test_int_function() {
+        let mut interpreter = Interpreter::new();
+        let program = r#"
+        10 PRINT INT(3.7)
+        20 PRINT INT(RND(1) * 100)
+        "#;
+
+        let result = interpreter.execute(program);
+        assert!(result.is_ok());
+
+        match result.unwrap() {
+            time_warp_ide::languages::basic::ExecutionResult::Complete { output, .. } => {
+                assert!(output.contains("3")); // INT(3.7) = 3
+            }
+            _ => panic!("Expected Complete result"),
+        }
+    }
+}

@@ -56,7 +56,7 @@ struct TimeWarpApp {
     completion_query: String,
 
     // BASIC interpreter instance for continuation after input
-    basic_interpreter: Option<crate::languages::basic::BasicInterpreter>,
+    basic_interpreter: Option<crate::languages::basic::Interpreter>,
 
     // General prompt system
     general_prompt_active: bool,
@@ -403,7 +403,7 @@ impl TimeWarpApp {
     }
 
     fn execute_tw_basic(&mut self, code: &str) -> String {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         // Convert line-numbered BASIC to statements without line numbers
         let mut statements = Vec::new();
@@ -428,7 +428,7 @@ impl TimeWarpApp {
         // Join statements with colons for the interpreter (BASIC statement separator)
         let program_code = statements.join(" : ");
 
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         // Set execution timeout based on instruction limit
         // Rough estimate: 1000 instructions per second
         interpreter.max_instructions = (self.execution_timeout_ms * 1000) as usize;
@@ -445,14 +445,14 @@ impl TimeWarpApp {
                     output
                 }
                 crate::languages::basic::ExecutionResult::NeedInput {
-                    variable_name,
+                    variable,
                     prompt,
                     partial_output,
                     partial_graphics,
                 } => {
                     self.waiting_for_input = true;
                     self.input_prompt = prompt.clone();
-                    self.current_input_var = variable_name;
+                    self.current_input_var = variable;
                     // Process any graphics commands that were executed before input was needed
                     self.process_graphics_commands(&partial_graphics);
                     // Store the interpreter for continuation
@@ -1812,14 +1812,14 @@ impl eframe::App for TimeWarpApp {
                                                                 self.basic_interpreter = None;
                                                             }
                                                             crate::languages::basic::ExecutionResult::NeedInput {
-                                                                variable_name,
+                                                                variable,
                                                                 prompt,
                                                                 partial_output,
                                                                 partial_graphics,
                                                             } => {
                                                                 self.process_graphics_commands(&partial_graphics);
                                                                 self.input_prompt = prompt.clone();
-                                                                self.current_input_var = variable_name;
+                                                                self.current_input_var = variable;
                                                                 self.output = format!(
                                                                     "{}{}{}",
                                                                     self.output, partial_output, prompt
@@ -2913,13 +2913,13 @@ mod tests {
 
     #[test]
     fn test_file_io_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING FILE I/O COMMANDS ===");
 
         // Test OPEN command
         println!("\n--- Testing OPEN command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("OPEN \"test.txt\" FOR OUTPUT AS #1");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2931,7 +2931,7 @@ mod tests {
 
         // Test CLOSE command
         println!("\n--- Testing CLOSE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("CLOSE #1");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2942,7 +2942,7 @@ mod tests {
 
         // Test PRINT# command
         println!("\n--- Testing PRINT# command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("PRINT #1, \"Hello World\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2953,7 +2953,7 @@ mod tests {
 
         // Test INPUT# command
         println!("\n--- Testing INPUT# command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("INPUT #1, A$");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2964,7 +2964,7 @@ mod tests {
 
         // Test KILL command
         println!("\n--- Testing KILL command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("KILL \"test.txt\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2975,7 +2975,7 @@ mod tests {
 
         // Test NAME command
         println!("\n--- Testing NAME command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("NAME \"old.txt\" AS \"new.txt\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -2986,7 +2986,7 @@ mod tests {
 
         // Test FILES command
         println!("\n--- Testing FILES command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("FILES");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3000,13 +3000,13 @@ mod tests {
 
     #[test]
     fn test_graphics_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING GRAPHICS COMMANDS ===");
 
         // Test LINE command
         println!("\n--- Testing LINE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("LINE (10, 10)-(100, 100)");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3022,7 +3022,7 @@ mod tests {
 
         // Test CIRCLE command
         println!("\n--- Testing CIRCLE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("CIRCLE (200, 200), 50");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3038,7 +3038,7 @@ mod tests {
 
         // Test PSET command
         println!("\n--- Testing PSET command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("PSET (150, 150)");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3053,7 +3053,7 @@ mod tests {
 
         // Test PRESET command
         println!("\n--- Testing PRESET command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("PRESET (150, 150)");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3068,7 +3068,7 @@ mod tests {
 
         // Test PAINT command
         println!("\n--- Testing PAINT command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("PAINT (100, 100)");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3083,7 +3083,7 @@ mod tests {
 
         // Test DRAW command
         println!("\n--- Testing DRAW command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("DRAW \"U10 D10 L10 R10\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3101,13 +3101,13 @@ mod tests {
 
     #[test]
     fn test_sound_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING SOUND COMMANDS ===");
 
         // Test BEEP command
         println!("\n--- Testing BEEP command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("BEEP");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3123,7 +3123,7 @@ mod tests {
 
         // Test SOUND command
         println!("\n--- Testing SOUND command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("SOUND 440, 1000");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3142,13 +3142,13 @@ mod tests {
 
     #[test]
     fn test_screen_control_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING SCREEN CONTROL COMMANDS ===");
 
         // Test LOCATE command
         println!("\n--- Testing LOCATE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("LOCATE 10, 20");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3164,7 +3164,7 @@ mod tests {
 
         // Test SCREEN command
         println!("\n--- Testing SCREEN command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("SCREEN 1");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3180,7 +3180,7 @@ mod tests {
 
         // Test WIDTH command
         println!("\n--- Testing WIDTH command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("WIDTH 80");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3196,7 +3196,7 @@ mod tests {
 
         // Test COLOR command
         println!("\n--- Testing COLOR command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("COLOR 1, 2");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3212,7 +3212,7 @@ mod tests {
 
         // Test PALETTE command
         println!("\n--- Testing PALETTE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("PALETTE 0, 65535");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete {
@@ -3230,13 +3230,13 @@ mod tests {
 
     #[test]
     fn test_error_handling_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING ERROR HANDLING COMMANDS ===");
 
         // Test ON ERROR command
         println!("\n--- Testing ON ERROR command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("ON ERROR GOTO 100");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3247,7 +3247,7 @@ mod tests {
 
         // Test RESUME command
         println!("\n--- Testing RESUME command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("RESUME");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3258,7 +3258,7 @@ mod tests {
 
         // Test RESUME with line number
         println!("\n--- Testing RESUME NEXT command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("RESUME NEXT");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3272,13 +3272,13 @@ mod tests {
 
     #[test]
     fn test_control_flow_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING CONTROL FLOW COMMANDS ===");
 
         // Test WHILE/WEND loop
         println!("\n--- Testing WHILE/WEND loop ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let program = r#"
         LET X = 1
         WHILE X <= 3
@@ -3301,7 +3301,7 @@ mod tests {
 
         // Test SELECT CASE
         println!("\n--- Testing SELECT CASE ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let program = r#"
         LET GRADE = 85
         SELECT CASE GRADE
@@ -3329,13 +3329,13 @@ mod tests {
 
     #[test]
     fn test_system_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING SYSTEM COMMANDS ===");
 
         // Test SYSTEM command
         println!("\n--- Testing SYSTEM command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("SYSTEM");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3346,7 +3346,7 @@ mod tests {
 
         // Test CHDIR command
         println!("\n--- Testing CHDIR command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("CHDIR \"/tmp\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3357,7 +3357,7 @@ mod tests {
 
         // Test MKDIR command
         println!("\n--- Testing MKDIR command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("MKDIR \"testdir\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3368,7 +3368,7 @@ mod tests {
 
         // Test RMDIR command
         println!("\n--- Testing RMDIR command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute("RMDIR \"testdir\"");
         match result {
             Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
@@ -3382,13 +3382,13 @@ mod tests {
 
     #[test]
     fn test_array_commands() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING ARRAY COMMANDS ===");
 
         // Test OPTION BASE
         println!("\n--- Testing OPTION BASE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let program = r#"
         OPTION BASE 1
         DIM A(5)
@@ -3406,7 +3406,7 @@ mod tests {
 
         // Test ERASE command
         println!("\n--- Testing ERASE command ---");
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let program = r#"
         DIM B(10)
         LET B(0) = 42
@@ -3426,7 +3426,7 @@ mod tests {
 
     #[test]
     fn test_comprehensive_gw_basic_program() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("=== TESTING COMPREHENSIVE GW BASIC PROGRAM ===");
 
@@ -3440,7 +3440,7 @@ mod tests {
         END SELECT
         "#;
 
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute(program);
 
         match result {
@@ -3469,7 +3469,7 @@ mod tests {
 
     #[test]
     fn test_comprehensive_demo_program() {
-        use crate::languages::basic::BasicInterpreter;
+        use crate::languages::basic::Interpreter;
 
         println!("\n=== TESTING COMPREHENSIVE DEMO PROGRAM ===");
 
@@ -3481,7 +3481,7 @@ mod tests {
 50 PRINT "Program completed successfully!"
 "#;
 
-        let mut interpreter = BasicInterpreter::new();
+        let mut interpreter = Interpreter::new();
         let result = interpreter.execute(program);
 
         match result {

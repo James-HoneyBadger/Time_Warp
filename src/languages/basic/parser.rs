@@ -1,6 +1,6 @@
 use crate::languages::basic::ast::{
-    Token, Expression, Statement, BinaryOperator, UnaryOperator,
-    PrintSeparator, Program, FunctionDefinition, InterpreterError
+    BinaryOperator, Expression, FunctionDefinition, InterpreterError, PrintSeparator, Program,
+    Statement, Token, UnaryOperator,
 };
 
 /// Recursive descent parser for BASIC
@@ -35,7 +35,7 @@ impl Parser {
             // Expect end of line or end of file
             if !self.match_token(&[Token::Eol]) && !self.is_at_end() {
                 return Err(InterpreterError::ParseError(
-                    "Expected end of line".to_string()
+                    "Expected end of line".to_string(),
                 ));
             }
         }
@@ -50,6 +50,7 @@ impl Parser {
         match self.current_token() {
             Some(Token::Let) => self.parse_let_statement(),
             Some(Token::Print) => self.parse_print_statement(),
+            Some(Token::Input) => self.parse_input_statement(),
             Some(Token::If) => self.parse_if_statement(),
             Some(Token::For) => self.parse_for_statement(),
             Some(Token::Next) => self.parse_next_statement(),
@@ -74,7 +75,10 @@ impl Parser {
         let variable = self.parse_identifier()?;
         self.consume_token(Token::Equal)?;
         let expression = self.parse_expression()?;
-        Ok(Statement::Let { variable, expression })
+        Ok(Statement::Let {
+            variable,
+            expression,
+        })
     }
 
     fn parse_print_statement(&mut self) -> Result<Statement, InterpreterError> {
@@ -95,7 +99,37 @@ impl Parser {
             }
         }
 
-        Ok(Statement::Print { expressions, separators })
+        Ok(Statement::Print {
+            expressions,
+            separators,
+        })
+    }
+
+    fn parse_input_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Input)?;
+
+        // Check for optional prompt string
+        let prompt = if self.check(&[Token::String("".to_string())]) {
+            let token = self.current_token().cloned();
+            self.advance();
+            if let Some(Token::String(s)) = token {
+                Some(s)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        // Optional semicolon or comma separator
+        if prompt.is_some() {
+            self.match_token(&[Token::Comma, Token::Semicolon]);
+        }
+
+        // Parse variable name
+        let variable = self.parse_identifier()?;
+
+        Ok(Statement::Input { prompt, variable })
     }
 
     fn parse_if_statement(&mut self) -> Result<Statement, InterpreterError> {
@@ -181,7 +215,7 @@ impl Parser {
 
     fn parse_rem_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.consume_token(Token::Rem)?;
-        let comment = if let Some(Token::String(s)) = self.current_token() {
+        let comment = if let Some(Token::String(s)) = self.current_token().cloned() {
             self.advance();
             s.clone()
         } else {
@@ -237,7 +271,11 @@ impl Parser {
         self.consume_token(Token::Equal)?;
         let body = self.parse_expression()?;
 
-        Ok(Statement::Def { name, parameters, body })
+        Ok(Statement::Def {
+            name,
+            parameters,
+            body,
+        })
     }
 
     fn parse_assignment_or_call(&mut self) -> Result<Statement, InterpreterError> {
@@ -245,7 +283,10 @@ impl Parser {
 
         if self.match_token(&[Token::Equal]) {
             let expression = self.parse_expression()?;
-            Ok(Statement::Let { variable: identifier, expression })
+            Ok(Statement::Let {
+                variable: identifier,
+                expression,
+            })
         } else if self.match_token(&[Token::LParen]) {
             // Function call as statement
             let mut arguments = Vec::new();
@@ -264,7 +305,10 @@ impl Parser {
 
             // For now, treat function calls as statements that do nothing
             // In a real BASIC, this might be a subroutine call
-            Ok(Statement::Rem(format!("Function call: {}({:?})", identifier, arguments)))
+            Ok(Statement::Rem(format!(
+                "Function call: {}({:?})",
+                identifier, arguments
+            )))
         } else {
             Err(InterpreterError::ParseError(format!(
                 "Expected '=' or '(' after identifier '{}'",
@@ -327,8 +371,12 @@ impl Parser {
         let mut expr = self.parse_term()?;
 
         while self.match_token(&[
-            Token::Equal, Token::NotEqual, Token::Less,
-            Token::LessEqual, Token::Greater, Token::GreaterEqual
+            Token::Equal,
+            Token::NotEqual,
+            Token::Less,
+            Token::LessEqual,
+            Token::Greater,
+            Token::GreaterEqual,
         ]) {
             let operator = match self.previous_token() {
                 Some(Token::Equal) => BinaryOperator::Equal,
@@ -414,25 +462,26 @@ impl Parser {
                 _ => unreachable!(),
             };
             let operand = self.parse_unary()?;
-            Ok(Expression::UnaryOp { operator, operand: Box::new(operand) })
+            Ok(Expression::UnaryOp {
+                operator,
+                operand: Box::new(operand),
+            })
         } else {
             self.parse_primary()
         }
     }
 
     fn parse_primary(&mut self) -> Result<Expression, InterpreterError> {
-        match self.current_token() {
+        match self.current_token().cloned() {
             Some(Token::Number(n)) => {
                 self.advance();
-                Ok(Expression::Number(*n))
+                Ok(Expression::Number(n))
             }
             Some(Token::String(s)) => {
-                let string_val = s.clone();
                 self.advance();
-                Ok(Expression::String(string_val))
+                Ok(Expression::String(s))
             }
-            Some(Token::Identifier(id)) => {
-                let ident = id.clone();
+            Some(Token::Identifier(ident)) => {
                 self.advance();
 
                 if self.match_token(&[Token::LParen]) {
@@ -508,7 +557,7 @@ impl Parser {
 
     fn match_token(&mut self, tokens: &[Token]) -> bool {
         for token in tokens {
-            if self.check(&[*token]) {
+            if self.check(&[token.clone()]) {
                 self.advance();
                 return true;
             }
