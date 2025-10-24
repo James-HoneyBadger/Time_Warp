@@ -3597,6 +3597,17 @@ mod tests {
         println!("ENVIRON$ numeric test output: {}", result);
         // Should return the first environment variable in KEY=VALUE format
 
+        // Test INT(RND(1)*100) expression
+        let program = "PRINT INT(RND(1)*100)";
+        let result = app.execute_tw_basic(program);
+        println!("INT(RND(1)*100) test output: {}", result);
+        // Should return an integer between 0 and 99
+        let num_result: f64 = result.trim().parse().expect("Should parse as number");
+        assert!(
+            num_result >= 0.0 && num_result < 100.0,
+            "INT(RND(1)*100) should return 0-99"
+        );
+
         println!("\n=== SYSTEM FUNCTIONS TEST PASSED ===");
     }
 }

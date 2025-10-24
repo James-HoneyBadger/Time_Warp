@@ -2158,6 +2158,42 @@ impl Parser {
                     arguments: vec![arg],
                 })
             }
+            Some(Token::Int) => {
+                self.advance();
+                self.expect(&Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.expect(&Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "INT".to_string(),
+                    arguments: vec![arg],
+                })
+            }
+            Some(Token::Rnd) => {
+                self.advance();
+                // RND can be called with or without parentheses
+                if let Some(Token::LParen) = self.current_token {
+                    self.advance();
+                    if let Some(Token::RParen) = self.current_token {
+                        self.advance();
+                        Ok(Expression::FunctionCall {
+                            name: "RND".to_string(),
+                            arguments: Vec::new(),
+                        })
+                    } else {
+                        let arg = self.parse_expression()?;
+                        self.expect(&Token::RParen)?;
+                        Ok(Expression::FunctionCall {
+                            name: "RND".to_string(),
+                            arguments: vec![arg],
+                        })
+                    }
+                } else {
+                    Ok(Expression::FunctionCall {
+                        name: "RND".to_string(),
+                        arguments: Vec::new(),
+                    })
+                }
+            }
             Some(Token::Identifier(ref id)) => {
                 let ident = id.clone();
                 self.advance();
@@ -2165,10 +2201,36 @@ impl Parser {
                 // Check if it's a function call (with or without parentheses)
                 let is_function = matches!(
                     ident.to_uppercase().as_str(),
-                    "DATE$" | "TIME$" | "TIMER" | "ENVIRON$" |
-                    "SIN" | "COS" | "TAN" | "SQR" | "ABS" | "INT" | "LOG" | "EXP" | "ATN" | "RND" | "RANDOMIZE" |
-                    "LEN" | "MID$" | "LEFT$" | "RIGHT$" | "CHR$" | "ASC" | "VAL" | "STR$" | "INSTR" | "FIX" | "CINT" | "CSNG" | "CDBL" |
-                    "TAB" | "SPC"
+                    "DATE$"
+                        | "TIME$"
+                        | "TIMER"
+                        | "ENVIRON$"
+                        | "SIN"
+                        | "COS"
+                        | "TAN"
+                        | "SQR"
+                        | "ABS"
+                        | "INT"
+                        | "LOG"
+                        | "EXP"
+                        | "ATN"
+                        | "RND"
+                        | "RANDOMIZE"
+                        | "LEN"
+                        | "MID$"
+                        | "LEFT$"
+                        | "RIGHT$"
+                        | "CHR$"
+                        | "ASC"
+                        | "VAL"
+                        | "STR$"
+                        | "INSTR"
+                        | "FIX"
+                        | "CINT"
+                        | "CSNG"
+                        | "CDBL"
+                        | "TAB"
+                        | "SPC"
                 );
 
                 if is_function {
@@ -2806,15 +2868,16 @@ impl BasicInterpreter {
                 }
             }
             "RND" => {
-                if arguments.is_empty() {
+                if arguments.is_empty() || arguments.len() == 1 {
                     // Simple random number between 0 and 1
+                    // In GW-BASIC, RND(1) is equivalent to RND()
                     let random_val =
                         (self.random_seed as f64 * 9301.0 + 49297.0) % 233280.0 / 233280.0;
                     self.random_seed = (self.random_seed * 9301 + 49297) % 233280;
                     Ok(Value::Number(random_val))
                 } else {
                     Err(InterpreterError::RuntimeError(
-                        "RND takes no arguments".to_string(),
+                        "RND takes 0 or 1 arguments".to_string(),
                     ))
                 }
             }
