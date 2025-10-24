@@ -51,6 +51,7 @@ pub enum Token {
     Def,
     Fn,
     Clear,
+    Cls,
     Writeln,
     Printx,
     Defint,
@@ -228,6 +229,7 @@ pub enum Statement {
         body: Expression,
     },
     Clear,
+    Cls,
     Writeln {
         expression: Expression,
     },

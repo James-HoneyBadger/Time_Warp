@@ -218,6 +218,7 @@ impl Tokenizer {
             "DEF" => Token::Def,
             "FN" => Token::Fn,
             "CLEAR" => Token::Clear,
+            "CLS" => Token::Cls,
             "WRITELN" => Token::Writeln,
             "PRINTX" => Token::Printx,
             "DEFINT" => Token::Defint,

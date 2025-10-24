@@ -85,6 +85,7 @@ impl Parser {
             Some(Token::Dim) => self.parse_dim_statement(),
             Some(Token::Def) => self.parse_def_statement(),
             Some(Token::Clear) => self.parse_clear_statement(),
+            Some(Token::Cls) => self.parse_cls_statement(),
             Some(Token::Writeln) => self.parse_writeln_statement(),
             Some(Token::Printx) => self.parse_printx_statement(),
             Some(Token::Defint) => self.parse_defint_statement(),
@@ -101,7 +102,17 @@ impl Parser {
             Some(Token::Home) => self.parse_home_statement(),
             Some(Token::Setxy) => self.parse_setxy_statement(),
             Some(Token::Turn) => self.parse_turn_statement(),
-            Some(Token::Identifier(_)) => self.parse_assignment_or_call(),
+            Some(Token::Identifier(_)) => {
+                // Check for common mistake: PRINTX instead of PRINT X
+                if let Some(Token::Identifier(id)) = self.current_token() {
+                    if id.to_uppercase().starts_with("PRINT") && id.to_uppercase() != "PRINT" {
+                        return Err(InterpreterError::ParseError(
+                            "PRINT requires a space!".to_string(),
+                        ));
+                    }
+                }
+                self.parse_assignment_or_call()
+            }
             _ => Err(InterpreterError::ParseError(format!(
                 "Unexpected token in statement: {:?}",
                 self.current_token()
@@ -204,14 +215,12 @@ impl Parser {
             None
         };
 
-        let body = self.parse_statement_list()?;
-
         Ok(Statement::For {
             variable,
             start,
             end,
             step,
-            body,
+            body: vec![], // Empty body - GW-BASIC style
         })
     }
 
@@ -698,6 +707,11 @@ impl Parser {
         Ok(Statement::Clear)
     }
 
+    fn parse_cls_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Cls)?;
+        Ok(Statement::Cls)
+    }
+
     fn parse_writeln_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.consume_token(Token::Writeln)?;
         let expression = self.parse_expression()?;
@@ -763,38 +777,51 @@ impl Parser {
         self.consume_token(Token::Eol)?;
 
         let mut cases = Vec::new();
-        while !self.check(&[Token::End]) {
-            if self.match_token(&[Token::Case]) {
-                let value = if self.check(&[Token::Else]) {
-                    self.consume_token(Token::Else)?;
-                    None
-                } else {
-                    // CASE value or CASE min TO max or CASE IS operator value
-                    let expr1 = self.parse_expression()?;
-                    if self.match_token(&[Token::To]) {
-                        let expr2 = self.parse_expression()?;
-                        Some(CaseValue::Range(expr1, expr2))
-                    } else if self.match_token(&[Token::Is]) {
-                        let operator = self.parse_comparison_operator()?;
-                        let expr2 = self.parse_expression()?;
-                        Some(CaseValue::Is(operator, expr2))
-                    } else {
-                        Some(CaseValue::Single(expr1))
-                    }
-                };
+        loop {
+            // Skip empty lines
+            while self.match_token(&[Token::Eol]) {}
 
-                let mut statements = Vec::new();
-                while !self.check(&[Token::Case, Token::End, Token::Eol]) {
-                    statements.push(self.parse_statement()?);
-                    if !self.match_token(&[Token::Colon]) {
-                        break;
-                    }
-                }
-
-                cases.push(SelectCase { value, statements });
-            } else {
+            if self.check(&[Token::End]) {
                 break;
             }
+
+            self.consume_token(Token::Case)?;
+
+            let value = if self.check(&[Token::Else]) {
+                self.consume_token(Token::Else)?;
+                None
+            } else {
+                // CASE value or CASE min TO max or CASE IS operator value
+                let expr1 = self.parse_expression()?;
+                if self.match_token(&[Token::To]) {
+                    let expr2 = self.parse_expression()?;
+                    Some(CaseValue::Range(expr1, expr2))
+                } else if self.match_token(&[Token::Is]) {
+                    let operator = self.parse_comparison_operator()?;
+                    let expr2 = self.parse_expression()?;
+                    Some(CaseValue::Is(operator, expr2))
+                } else {
+                    Some(CaseValue::Single(expr1))
+                }
+            };
+
+            let mut statements = Vec::new();
+            loop {
+                // Skip empty lines
+                while self.match_token(&[Token::Eol]) {}
+
+                if self.check(&[Token::Case, Token::End, Token::Eof]) {
+                    break;
+                }
+
+                statements.push(self.parse_statement()?);
+
+                if !self.match_token(&[Token::Colon]) {
+                    break;
+                }
+            }
+
+            cases.push(SelectCase { value, statements });
         }
 
         self.consume_token(Token::End)?;

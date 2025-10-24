@@ -425,8 +425,8 @@ impl TimeWarpApp {
             }
         }
 
-        // Join statements with colons for the interpreter (BASIC statement separator)
-        let program_code = statements.join(" : ");
+        // Join statements with newlines for the interpreter (BASIC statement separator)
+        let program_code = statements.join("\n");
 
         let mut interpreter = Interpreter::new();
         // Set execution timeout based on instruction limit

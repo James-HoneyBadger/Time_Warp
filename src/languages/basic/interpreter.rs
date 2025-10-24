@@ -27,18 +27,23 @@ impl Interpreter {
     }
 
     pub fn execute(&mut self, code: &str) -> Result<ExecutionResult, InterpreterError> {
-        // Reset state
-        self.reset();
+        if code.is_empty() && self.program.is_some() {
+            // Continue execution without resetting
+            self.execute_program()
+        } else {
+            // Reset state
+            self.reset();
 
-        // Tokenize and parse
-        let mut tokenizer = crate::languages::basic::tokenizer::Tokenizer::new(code);
-        let tokens = tokenizer.tokenize()?;
+            // Tokenize and parse
+            let mut tokenizer = crate::languages::basic::tokenizer::Tokenizer::new(code);
+            let tokens = tokenizer.tokenize()?;
 
-        let mut parser = crate::languages::basic::parser::Parser::new(tokens);
-        let program = parser.parse_program()?;
+            let mut parser = crate::languages::basic::parser::Parser::new(tokens);
+            let program = parser.parse_program()?;
 
-        self.program = Some(program);
-        self.execute_program()
+            self.program = Some(program);
+            self.execute_program()
+        }
     }
 
     fn reset(&mut self) {
@@ -96,6 +101,18 @@ impl Interpreter {
                     } else if special_result == "CONTINUE_LOOP" {
                         // NEXT statement handled the line adjustment
                         continue;
+                    } else if special_result.starts_with("INPUT ") {
+                        let prompt = special_result[6..].to_string();
+                        return Ok(ExecutionResult::NeedInput {
+                            variable: self
+                                .context
+                                .input_variable
+                                .clone()
+                                .unwrap_or("".to_string()),
+                            prompt,
+                            partial_output: output,
+                            partial_graphics: graphics_commands,
+                        });
                     }
                 }
                 None => {}
@@ -147,10 +164,8 @@ impl Interpreter {
                         }
                     }
                 }
-                // If no expressions or last separator was not None, add newline
-                if expressions.is_empty()
-                    || (!separators.is_empty() && separators.last() != Some(&PrintSeparator::None))
-                {
+                // Add newline if there are fewer separators than expressions
+                if separators.len() < expressions.len() {
                     output.push('\n');
                 }
                 Ok(None)
@@ -248,7 +263,7 @@ impl Interpreter {
                 body,
             } => {
                 self.context.functions.insert(
-                    name.clone(),
+                    format!("FN{}", name),
                     FunctionDefinition {
                         parameters: parameters.clone(),
                         body: body.clone(),
@@ -260,6 +275,12 @@ impl Interpreter {
                 self.context.variables.clear();
                 self.context.type_declarations.clear();
                 output.push_str("Variables cleared\n");
+                Ok(None)
+            }
+            Statement::Cls => {
+                // Clear screen - in text mode, this might just be a visual command
+                // For now, just output a message
+                output.push_str("Screen cleared\n");
                 Ok(None)
             }
             Statement::Writeln { expression } => {
@@ -339,7 +360,7 @@ impl Interpreter {
                     command: "FORWARD".to_string(),
                     value: dist_num as f32,
                 });
-                output.push_str(&format!("Moved forward by {}\n", dist_num));
+                output.push_str(&format!("Moved forward {}\n", dist_num));
                 Ok(None)
             }
             Statement::Back { distance } => {
@@ -349,7 +370,7 @@ impl Interpreter {
                     command: "BACK".to_string(),
                     value: dist_num as f32,
                 });
-                output.push_str(&format!("Moved back by {}\n", dist_num));
+                output.push_str(&format!("Moved back {}\n", dist_num));
                 Ok(None)
             }
             Statement::TurnLeft { angle } => {
@@ -369,7 +390,7 @@ impl Interpreter {
                     command: "RIGHT".to_string(),
                     value: ang_num as f32,
                 });
-                output.push_str(&format!("Turned right by {} degrees\n", ang_num));
+                output.push_str(&format!("Turned right {}\n", ang_num));
                 Ok(None)
             }
             Statement::Penup => {
@@ -476,9 +497,9 @@ impl Interpreter {
             };
 
             if should_continue {
-                // Continue loop - find the body start from the for loop
+                // Continue loop - jump to the body start
                 if let Some(for_loop) = self.context.for_loops.last() {
-                    self.current_line = for_loop.body_start - 1; // Will be incremented after return
+                    self.current_line = for_loop.body_start;
                     Ok(Some("CONTINUE_LOOP".to_string()))
                 } else {
                     Err(InterpreterError::RuntimeError(
@@ -926,7 +947,83 @@ impl Interpreter {
             } else {
                 0
             }),
+            (Value::Integer(l), Value::Integer(r)) => Ok(l.cmp(r) as i32),
+            (Value::Single(l), Value::Single(r)) => Ok(if l < r {
+                -1
+            } else if l > r {
+                1
+            } else {
+                0
+            }),
+            (Value::Double(l), Value::Double(r)) => Ok(if l < r {
+                -1
+            } else if l > r {
+                1
+            } else {
+                0
+            }),
             (Value::String(l), Value::String(r)) => Ok(l.cmp(r) as i32),
+            // Cross-type comparisons
+            (Value::Number(l), Value::Integer(r)) => {
+                let cmp = if l < &(*r as f64) {
+                    -1
+                } else if l > &(*r as f64) {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
+            (Value::Integer(l), Value::Number(r)) => {
+                let cmp = if (*l as f64) < *r {
+                    -1
+                } else if (*l as f64) > *r {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
+            (Value::Number(l), Value::Single(r)) => {
+                let cmp = if l < &(*r as f64) {
+                    -1
+                } else if l > &(*r as f64) {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
+            (Value::Single(l), Value::Number(r)) => {
+                let cmp = if (*l as f64) < *r {
+                    -1
+                } else if (*l as f64) > *r {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
+            (Value::Integer(l), Value::Single(r)) => {
+                let cmp = if (*l as f32) < *r {
+                    -1
+                } else if (*l as f32) > *r {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
+            (Value::Single(l), Value::Integer(r)) => {
+                let cmp = if l < &(*r as f32) {
+                    -1
+                } else if l > &(*r as f32) {
+                    1
+                } else {
+                    0
+                };
+                Ok(cmp)
+            }
             _ => Err(InterpreterError::TypeError(
                 "Cannot compare different types".to_string(),
             )),
