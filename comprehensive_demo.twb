@@ -1,0 +1,310 @@
+10 REM ===================================================
+20 REM COMPREHENSIVE TW BASIC DEMONSTRATION PROGRAM
+30 REM This program demonstrates ALL TW BASIC functionality
+40 REM ===================================================
+50
+60 REM Initialize program
+70 CLS
+80 PRINT "TW BASIC Comprehensive Demonstration Program"
+90 PRINT "=============================================="
+100 PRINT
+110
+120 REM ===================================================
+130 REM VARIABLE DECLARATIONS AND BASIC OPERATIONS
+140 REM ===================================================
+150 LET SCORE = 0
+160 LET LIVES = 3
+170 LET PLAYER_NAME$ = "Player"
+180 LET PI = 3.14159
+190 LET GRAVITY = 9.81
+200
+210 REM ===================================================
+220 REM ARRAY OPERATIONS
+230 REM ===================================================
+240 OPTION BASE 1
+250 DIM SCORES(10)
+260 DIM NAMES$(5)
+270 DIM MATRIX(3, 3)
+280
+290 REM Initialize arrays
+300 FOR I = 1 TO 10
+310   SCORES(I) = I * 100
+320 NEXT I
+330
+340 FOR I = 1 TO 5
+350   NAMES$(I) = "Player" + STR$(I)
+360 NEXT I
+370
+380 REM Initialize matrix
+390 FOR I = 1 TO 3
+400   FOR J = 1 TO 3
+410     MATRIX(I, J) = I * J
+420   NEXT J
+430 NEXT I
+440
+450 REM ===================================================
+460 REM SCREEN CONTROL AND GRAPHICS SETUP
+470 REM ===================================================
+480 SCREEN 1
+490 WIDTH 80
+500 COLOR 15, 0
+510 LOCATE 1, 1
+520
+530 REM ===================================================
+540 REM GRAPHICS DEMONSTRATION
+550 REM ===================================================
+560 REM Draw coordinate system
+570 LINE (0, 0)-(639, 479), 7
+580 LINE (320, 0)-(320, 479), 7
+590 LINE (0, 240)-(639, 240), 7
+600
+610 REM Draw shapes
+620 CIRCLE (160, 120), 50, 2
+630 CIRCLE (480, 120), 75, 4
+640 CIRCLE (320, 360), 100, 6
+650
+660 REM Draw lines and points
+670 LINE (50, 50)-(150, 100), 1
+680 LINE (500, 50)-(600, 100), 3
+690 PSET (320, 240), 14
+700 PRESET (320, 240)
+710
+720 REM ===================================================
+730 REM SOUND DEMONSTRATION
+740 REM ===================================================
+750 BEEP
+760 SOUND 440, 18.2  REM A note for 1 second
+770 SOUND 523, 18.2  REM C note for 1 second
+780 SOUND 659, 18.2  REM E note for 1 second
+790
+800 REM ===================================================
+810 REM STRING OPERATIONS AND FORMATTING
+820 REM ===================================================
+830 LET GREETING$ = "Welcome to TW BASIC!"
+840 LET UPPER$ = "HELLO WORLD"
+850 LET LOWER$ = "hello world"
+860 LET NUMBER$ = STR$(42.5)
+870 LET BACK_TO_NUM = VAL("123.45")
+880
+890 REM ===================================================
+900 REM CONTROL FLOW DEMONSTRATION
+910 REM ===================================================
+920
+930 REM FOR/NEXT loops
+940 PRINT "FOR/NEXT Loop Demonstration:"
+950 FOR COUNTER = 1 TO 5
+960   PRINT "Iteration:"; COUNTER
+970 NEXT COUNTER
+980 PRINT
+990
+1000 REM WHILE/WEND loop
+1010 PRINT "WHILE/WEND Loop Demonstration:"
+1020 LET COUNT = 1
+1030 WHILE COUNT <= 3
+1040   PRINT "While iteration:"; COUNT
+1050   COUNT = COUNT + 1
+1060 WEND
+1070 PRINT
+1080
+1090 REM IF/THEN/ELSE conditional
+1100 PRINT "IF/THEN/ELSE Demonstration:"
+1110 LET TEST_VALUE = 5
+1120 IF TEST_VALUE > 10 THEN
+1130   PRINT "Value is greater than 10"
+1140 ELSE
+1150   PRINT "Value is not greater than 10"
+1160 END IF
+1170 PRINT
+1180
+1190 REM SELECT CASE demonstration
+1200 PRINT "SELECT CASE Demonstration:"
+1210 LET GRADE = 85
+1220 SELECT CASE GRADE
+1230   CASE 90 TO 100
+1240     PRINT "Grade: A"
+1250   CASE 80 TO 89
+1260     PRINT "Grade: B"
+1270   CASE 70 TO 79
+1280     PRINT "Grade: C"
+1290   CASE 60 TO 69
+1300     PRINT "Grade: D"
+1310   CASE ELSE
+1320     PRINT "Grade: F"
+1330 END SELECT
+1340 PRINT
+1350
+1360 REM ===================================================
+1370 REM MATHEMATICAL OPERATIONS
+1380 REM ===================================================
+1390 PRINT "Mathematical Operations:"
+1400 LET A = 10
+1410 LET B = 3
+1420 PRINT "A + B ="; A + B
+1430 PRINT "A - B ="; A - B
+1440 PRINT "A * B ="; A * B
+1450 PRINT "A / B ="; A / B
+1460 PRINT "A MOD B ="; A MOD B
+1470 PRINT "A ^ B ="; A ^ B
+1480 PRINT "SQRT(16) ="; SQR(16)
+1490 PRINT "SIN(PI/2) ="; SIN(PI/2)
+1500 PRINT "COS(0) ="; COS(0)
+1510 PRINT "TAN(PI/4) ="; TAN(PI/4)
+1520 PRINT "LOG(10) ="; LOG(10)
+1530 PRINT "EXP(1) ="; EXP(1)
+1540 PRINT "ABS(-5) ="; ABS(-5)
+1550 PRINT "INT(3.7) ="; INT(3.7)
+1560 PRINT
+1570
+1580 REM ===================================================
+1590 REM FILE I/O OPERATIONS
+1600 REM ===================================================
+1610 PRINT "File I/O Demonstration:"
+1620
+1630 REM Write to file
+1640 OPEN "demo.dat" FOR OUTPUT AS #1
+1650 PRINT #1, "TW BASIC Demo File"
+1660 PRINT #1, "Score:"; SCORE
+1670 PRINT #1, "Lives:"; LIVES
+1680 PRINT #1, "Player:"; PLAYER_NAME$
+1690 CLOSE #1
+1700
+1710 REM Read from file
+1720 OPEN "demo.dat" FOR INPUT AS #1
+1730 INPUT #1, FILE_LINE1$
+1740 INPUT #1, FILE_LINE2$
+1750 INPUT #1, FILE_LINE3$
+1760 INPUT #1, FILE_LINE4$
+1770 CLOSE #1
+1780
+1790 PRINT "File contents read back:"
+1800 PRINT FILE_LINE1$
+1810 PRINT FILE_LINE2$
+1820 PRINT FILE_LINE3$
+1830 PRINT FILE_LINE4$
+1840 PRINT
+1850
+1860 REM ===================================================
+1870 REM ERROR HANDLING DEMONSTRATION
+1880 REM ===================================================
+1890 PRINT "Error Handling Demonstration:"
+1900 ON ERROR GOTO 2000
+1910
+1920 REM This will cause an error (division by zero)
+1930 LET RESULT = 10 / 0
+1940 PRINT "This line should not execute"
+1950
+1960 REM Error handler
+1970 2000 PRINT "Error occurred! Error number:"; ERR
+1980 PRINT "Error message:"; ERROR$
+1990 RESUME NEXT
+2000 PRINT "Continuing after error handling..."
+2010 PRINT
+2020
+2030 REM ===================================================
+2040 REM USER INPUT DEMONSTRATION
+2050 REM ===================================================
+2060 PRINT "User Input Demonstration:"
+2070 INPUT "Enter your name: ", USER_NAME$
+2080 INPUT "Enter your age: ", USER_AGE
+2090 INPUT "Enter a number between 1-10: ", USER_NUMBER
+2100
+2110 PRINT "Hello,"; USER_NAME$; "! You are"; USER_AGE; "years old."
+2120 PRINT "You chose number:"; USER_NUMBER
+2130 PRINT
+2140
+2150 REM ===================================================
+2160 REM ADVANCED ARRAY OPERATIONS
+2170 REM ===================================================
+2180 PRINT "Advanced Array Operations:"
+2190 PRINT "High Scores:"
+2200 FOR I = 1 TO 10
+2210   PRINT "Score"; I; ":"; SCORES(I)
+2220 NEXT I
+2230 PRINT
+2240
+2250 PRINT "Player Names:"
+2260 FOR I = 1 TO 5
+2270   PRINT NAMES$(I)
+2280 NEXT I
+2290 PRINT
+2300
+2310 PRINT "3x3 Matrix:"
+2320 FOR I = 1 TO 3
+2330   FOR J = 1 TO 3
+2340     PRINT MATRIX(I, J);
+2350   NEXT J
+2360   PRINT
+2370 NEXT I
+2380 PRINT
+2390
+2400 REM ===================================================
+2410 REM SYSTEM OPERATIONS
+2420 REM ===================================================
+2430 PRINT "System Operations Demonstration:"
+2440 PRINT "Current working directory operations would go here"
+2450 PRINT "(CHDIR, MKDIR, RMDIR are placeholder implementations)"
+2460 PRINT
+2470
+2480 REM ===================================================
+2490 REM FINAL DEMONSTRATION - SIMPLE GAME LOOP
+2500 REM ===================================================
+2510 PRINT "Simple Game Loop Demonstration:"
+2520 LET GAME_RUNNING = 1
+2530 LET TURNS = 0
+2540
+2550 WHILE GAME_RUNNING = 1
+2560   TURNS = TURNS + 1
+2570   PRINT "Turn"; TURNS; "- Score:"; SCORE; "Lives:"; LIVES
+2580
+2590   REM Simulate game logic
+2600   SCORE = SCORE + 10
+2611
+2620   REM Random event
+2630   LET RANDOM_EVENT = INT(RND * 3) + 1
+2640   SELECT CASE RANDOM_EVENT
+2650     CASE 1
+2660       PRINT "Bonus points!"
+2670       SCORE = SCORE + 50
+2680       SOUND 800, 9.1  REM High beep
+2690     CASE 2
+2700       PRINT "Lost a life!"
+2710       LIVES = LIVES - 1
+2720       SOUND 200, 18.2  REM Low beep
+2730     CASE 3
+2740       PRINT "Nothing happened"
+2750   END SELECT
+2760
+2770   REM Check game over condition
+2780   IF LIVES <= 0 OR TURNS >= 5 THEN
+2790     GAME_RUNNING = 0
+2800   END IF
+2810
+2820   REM Small delay
+2830   FOR DELAY = 1 TO 1000
+2840   NEXT DELAY
+2850
+2860 WEND
+2870
+2880 REM ===================================================
+2890 REM PROGRAM COMPLETION
+2900 REM ===================================================
+2910 PRINT
+2920 PRINT "Program completed successfully!"
+2930 PRINT "Final Score:"; SCORE
+2940 PRINT "Final Lives:"; LIVES
+2950 PRINT "Total Turns:"; TURNS
+2960 PRINT
+2970
+2980 REM Clean up arrays
+2990 ERASE SCORES
+3000 ERASE NAMES$
+3010 ERASE MATRIX
+3020
+3030 PRINT "Arrays erased. Program ending."
+3040 PRINT "Press any key to exit..."
+3050
+3060 REM Wait for user input before exit
+3070 INPUT "", DUMMY$
+3080
+3090 REM Exit program
+3100 SYSTEM

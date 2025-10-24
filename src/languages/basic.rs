@@ -12,6 +12,7 @@ pub enum Token {
     If,
     Then,
     Else,
+    Is,
     End,
     Stop,
     Cls,
@@ -29,6 +30,8 @@ pub enum Token {
     Data,
     Read,
     Restore,
+    Def,
+    Fn,
     For,
     To,
     Step,
@@ -54,6 +57,78 @@ pub enum Token {
     Randomize,
     Len,
     Mid,
+    LeftStr,
+    RightStr,
+    Chr,
+    Asc,
+    Val,
+    Str,
+    Instr,
+    Fix,
+    Cint,
+    Csng,
+    Cdbl,
+    Tab,
+    Spc,
+
+    // File I/O
+    Open,
+    Close,
+    PrintHash,
+    InputHash,
+    Eof,
+    Lof,
+    Seek,
+    Get,
+    Put,
+
+    // Graphics
+    Line,
+    Circle,
+    Pset,
+    Preset,
+    Paint,
+    Draw,
+
+    // Sound
+    Beep,
+    Sound,
+
+    // Screen Control
+    Locate,
+    Screen,
+    Width,
+    ColorBg,
+    Palette,
+
+    // Error Handling
+    OnError,
+    Resume,
+    Erl,
+    Err,
+
+    // Control Flow
+    While,
+    Wend,
+    Select,
+    Case,
+    Default,
+    Error,
+    As,
+
+    // System
+    System,
+    Files,
+    Kill,
+    Name,
+    Chdir,
+    Mkdir,
+    Rmdir,
+
+    // Array
+    Erase,
+    Option,
+    Base,
 
     // Operators
     Plus,
@@ -106,6 +181,8 @@ pub enum Expression {
         name: String,
         index: Box<Expression>,
     },
+    Tab(Box<Expression>),
+    Spc(Box<Expression>),
 }
 
 #[derive(Debug, Clone)]
@@ -130,6 +207,13 @@ pub enum BinaryOperator {
 pub enum UnaryOperator {
     Not,
     Minus,
+}
+
+#[derive(Debug, Clone)]
+pub enum CaseCondition {
+    Value(Expression),
+    Range { start: Expression, end: Expression },
+    Is { operator: String, value: Expression },
 }
 
 #[derive(Debug, Clone)]
@@ -190,6 +274,11 @@ pub enum Statement {
         variables: Vec<String>,
     },
     Restore,
+    Def {
+        name: String,
+        parameter: String,
+        expression: Expression,
+    },
     End,
     Stop,
     Cls,
@@ -217,6 +306,141 @@ pub enum Statement {
         angle: Expression,
     },
     Rem,
+
+    // File I/O
+    Open {
+        file_number: Expression,
+        file_name: Expression,
+        mode: String,
+    },
+    Close {
+        file_numbers: Vec<Expression>,
+    },
+    PrintHash {
+        file_number: Expression,
+        expressions: Vec<Expression>,
+        separator: PrintSeparator,
+    },
+    InputHash {
+        file_number: Expression,
+        variables: Vec<String>,
+    },
+
+    // Graphics
+    Line {
+        x1: Expression,
+        y1: Expression,
+        x2: Expression,
+        y2: Expression,
+        color: Option<Expression>,
+        style: Option<String>,
+    },
+    Circle {
+        x: Expression,
+        y: Expression,
+        radius: Expression,
+        color: Option<Expression>,
+        start_angle: Option<Expression>,
+        end_angle: Option<Expression>,
+    },
+    Pset {
+        x: Expression,
+        y: Expression,
+        color: Option<Expression>,
+    },
+    Preset {
+        x: Expression,
+        y: Expression,
+        color: Option<Expression>,
+    },
+    Paint {
+        x: Expression,
+        y: Expression,
+        paint_color: Option<Expression>,
+        border_color: Option<Expression>,
+    },
+    Draw {
+        commands: Expression,
+    },
+
+    // Sound
+    Beep,
+    Sound {
+        frequency: Expression,
+        duration: Expression,
+    },
+
+    // Screen Control
+    Locate {
+        row: Expression,
+        column: Expression,
+    },
+    Screen {
+        mode: Expression,
+    },
+    Width {
+        width: Expression,
+    },
+    ColorBg {
+        foreground: Option<Expression>,
+        background: Option<Expression>,
+    },
+    Palette {
+        attribute: Expression,
+        color: Expression,
+    },
+
+    // Error Handling
+    OnError {
+        line_number: Option<usize>,
+    },
+    Resume {
+        line_number: Option<usize>,
+    },
+
+    // Control Flow
+    While {
+        condition: Expression,
+    },
+    Wend,
+    Select {
+        expression: Expression,
+    },
+    Case {
+        conditions: Vec<CaseCondition>,
+    },
+    Default,
+    EndSelect,
+
+    // System
+    System,
+    Files {
+        pattern: Option<Expression>,
+    },
+    Kill {
+        file_name: Expression,
+    },
+    Name {
+        old_name: Expression,
+        new_name: Expression,
+    },
+    Chdir {
+        path: Expression,
+    },
+    Mkdir {
+        path: Expression,
+    },
+    Rmdir {
+        path: Expression,
+    },
+
+    // Array
+    Erase {
+        arrays: Vec<String>,
+    },
+    OptionBase {
+        base: Expression,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -312,6 +536,7 @@ impl Tokenizer {
                         "READLN" => Token::Readln,
                         "IF" => Token::If,
                         "THEN" => Token::Then,
+                        "IS" => Token::Is,
                         "ELSE" => Token::Else,
                         "END" => Token::End,
                         "STOP" => Token::Stop,
@@ -336,6 +561,8 @@ impl Tokenizer {
                         "DATA" => Token::Data,
                         "READ" => Token::Read,
                         "RESTORE" => Token::Restore,
+                        "DEF" => Token::Def,
+                        "FN" => Token::Fn,
                         "FOR" => Token::For,
                         "TO" => Token::To,
                         "STEP" => Token::Step,
@@ -361,6 +588,61 @@ impl Tokenizer {
                         "RANDOMIZE" => Token::Randomize,
                         "LEN" => Token::Len,
                         "MID" => Token::Mid,
+                        "LEFT" => Token::LeftStr,
+                        "RIGHT" => Token::RightStr,
+                        "CHR" => Token::Chr,
+                        "ASC" => Token::Asc,
+                        "VAL" => Token::Val,
+                        "STR" => Token::Str,
+                        "INSTR" => Token::Instr,
+                        "FIX" => Token::Fix,
+                        "CINT" => Token::Cint,
+                        "CSNG" => Token::Csng,
+                        "CDBL" => Token::Cdbl,
+                        "TAB" => Token::Tab,
+                        "SPC" => Token::Spc,
+                        "OPEN" => Token::Open,
+                        "CLOSE" => Token::Close,
+                        "PRINT#" => Token::PrintHash,
+                        "INPUT#" => Token::InputHash,
+                        "EOF" => Token::Eof,
+                        "LOF" => Token::Lof,
+                        "SEEK" => Token::Seek,
+                        "GET" => Token::Get,
+                        "PUT" => Token::Put,
+                        "LINE" => Token::Line,
+                        "CIRCLE" => Token::Circle,
+                        "PSET" => Token::Pset,
+                        "PRESET" => Token::Preset,
+                        "PAINT" => Token::Paint,
+                        "DRAW" => Token::Draw,
+                        "BEEP" => Token::Beep,
+                        "SOUND" => Token::Sound,
+                        "LOCATE" => Token::Locate,
+                        "SCREEN" => Token::Screen,
+                        "WIDTH" => Token::Width,
+                        "PALETTE" => Token::Palette,
+                        "ONERROR" => Token::OnError,
+                        "RESUME" => Token::Resume,
+                        "ERL" => Token::Erl,
+                        "ERR" => Token::Err,
+                        "WHILE" => Token::While,
+                        "WEND" => Token::Wend,
+                        "SELECT" => Token::Select,
+                        "CASE" => Token::Case,
+                        "DEFAULT" => Token::Default,
+                        "ERROR" => Token::Error,
+                        "AS" => Token::As,
+                        "SYSTEM" => Token::System,
+                        "FILES" => Token::Files,
+                        "KILL" => Token::Kill,
+                        "NAME" => Token::Name,
+                        "CHDIR" => Token::Chdir,
+                        "MKDIR" => Token::Mkdir,
+                        "RMDIR" => Token::Rmdir,
+                        "ERASE" => Token::Erase,
+                        "OPTION" => Token::Option,
+                        "BASE" => Token::Base,
                         "MOD" => Token::Mod,
                         _ => Token::Identifier(ident),
                     };
@@ -517,6 +799,11 @@ impl Parser {
     }
 
     fn parse_statement(&mut self) -> Result<Statement, InterpreterError> {
+        // Handle optional line number at the beginning of the statement
+        if let Some(Token::Number(_)) = self.current_token {
+            self.advance(); // Skip the line number
+        }
+
         match self.current_token {
             Some(Token::Let) => self.parse_let_statement(),
             Some(Token::Print) => self.parse_print_statement(),
@@ -547,10 +834,79 @@ impl Parser {
             Some(Token::GraphicsForward) => self.parse_forward_statement(),
             Some(Token::GraphicsRight) => self.parse_right_statement(),
             Some(Token::Rem) => self.parse_rem_statement(),
-            _ => Err(InterpreterError::ParseError(format!(
-                "Unexpected token in statement: {:?}",
-                self.current_token
-            ))),
+
+            // File I/O
+            Some(Token::Open) => self.parse_open_statement(),
+            Some(Token::Close) => self.parse_close_statement(),
+            Some(Token::PrintHash) => self.parse_print_hash_statement(),
+            Some(Token::InputHash) => self.parse_input_hash_statement(),
+
+            // Graphics
+            Some(Token::Line) => self.parse_line_statement(),
+            Some(Token::Circle) => self.parse_circle_statement(),
+            Some(Token::Pset) => self.parse_pset_statement(),
+            Some(Token::Preset) => self.parse_preset_statement(),
+            Some(Token::Paint) => self.parse_paint_statement(),
+            Some(Token::Draw) => self.parse_draw_statement(),
+
+            // Sound
+            Some(Token::Beep) => self.parse_beep_statement(),
+            Some(Token::Sound) => self.parse_sound_statement(),
+
+            // Screen Control
+            Some(Token::Locate) => self.parse_locate_statement(),
+            Some(Token::Screen) => self.parse_screen_statement(),
+            Some(Token::Width) => self.parse_width_statement(),
+            Some(Token::Palette) => self.parse_palette_statement(),
+
+            // Error Handling
+            Some(Token::OnError) => self.parse_on_error_statement(),
+            Some(Token::Resume) => self.parse_resume_statement(),
+
+            // Control Flow
+            Some(Token::While) => self.parse_while_statement(),
+            Some(Token::Wend) => self.parse_wend_statement(),
+            Some(Token::Select) => self.parse_select_statement(),
+            Some(Token::Case) => self.parse_case_statement(),
+            Some(Token::Default) => self.parse_default_statement(),
+
+            // System
+            Some(Token::System) => self.parse_system_statement(),
+            Some(Token::Files) => self.parse_files_statement(),
+            Some(Token::Kill) => self.parse_kill_statement(),
+            Some(Token::Name) => self.parse_name_statement(),
+            Some(Token::Chdir) => self.parse_chdir_statement(),
+            Some(Token::Mkdir) => self.parse_mkdir_statement(),
+            Some(Token::Rmdir) => self.parse_rmdir_statement(),
+
+            // Array
+            Some(Token::Erase) => self.parse_erase_statement(),
+            Some(Token::Option) => self.parse_option_statement(),
+
+            _ => {
+                match self.current_token {
+                    Some(Token::Identifier(ref id)) => {
+                        // Check for common mistakes
+                        let suggestion = if id.to_uppercase().starts_with("PRINT") && id.len() > 5 {
+                            "Did you mean 'PRINT <expression>'? PRINT requires a space after the keyword."
+                        } else if id.to_uppercase().starts_with("LET") && id.len() > 3 {
+                            "Did you mean 'LET <variable> = <expression>'? LET requires a space after the keyword."
+                        } else if id.to_uppercase().starts_with("IF") && id.len() > 2 {
+                            "Did you mean 'IF <condition> THEN <statement>'? IF requires spaces."
+                        } else {
+                            "Unknown statement. Check your syntax and ensure keywords are properly separated."
+                        };
+                        Err(InterpreterError::ParseError(format!(
+                            "Unknown statement '{}'. {}",
+                            id, suggestion
+                        )))
+                    }
+                    _ => Err(InterpreterError::ParseError(format!(
+                        "Unexpected token in statement: {:?}",
+                        self.current_token
+                    ))),
+                }
+            }
         }
     }
 
@@ -567,47 +923,7 @@ impl Parser {
 
     fn parse_print_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume PRINT
-        let mut expressions = Vec::new();
-
-        // Parse first expression
-        if let Some(ref token) = self.current_token {
-            if !matches!(
-                token,
-                Token::Colon | Token::EndOfFile | Token::Comma | Token::Semicolon
-            ) {
-                let expr = self.parse_expression()?;
-                expressions.push(expr);
-            }
-        }
-
-        // Parse remaining expressions separated by commas or semicolons
-        let mut separator = PrintSeparator::None;
-        while let Some(ref token) = self.current_token {
-            match token {
-                Token::Colon | Token::EndOfFile => break,
-                Token::Comma => {
-                    separator = PrintSeparator::Comma;
-                    self.advance();
-                    if let Some(ref token) = self.current_token {
-                        if !matches!(token, Token::Colon | Token::EndOfFile) {
-                            let expr = self.parse_expression()?;
-                            expressions.push(expr);
-                        }
-                    }
-                }
-                Token::Semicolon => {
-                    separator = PrintSeparator::Semicolon;
-                    self.advance();
-                    if let Some(ref token) = self.current_token {
-                        if !matches!(token, Token::Colon | Token::EndOfFile) {
-                            let expr = self.parse_expression()?;
-                            expressions.push(expr);
-                        }
-                    }
-                }
-                _ => break, // No more separators
-            }
-        }
+        let (expressions, separator) = self.parse_print_expressions()?;
 
         Ok(Statement::Print {
             expressions,
@@ -959,7 +1275,12 @@ impl Parser {
 
     fn parse_end_statement(&mut self) -> Result<Statement, InterpreterError> {
         self.advance(); // consume END
-        Ok(Statement::End)
+        if let Some(Token::Select) = self.current_token {
+            self.advance(); // consume SELECT
+            Ok(Statement::EndSelect)
+        } else {
+            Ok(Statement::End)
+        }
     }
 
     fn parse_stop_statement(&mut self) -> Result<Statement, InterpreterError> {
@@ -1002,8 +1323,464 @@ impl Parser {
         Ok(Statement::Rem)
     }
 
+    // File I/O
+    fn parse_open_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume OPEN
+        let file_name = self.parse_expression()?;
+        self.expect(&Token::For)?;
+        self.expect(&Token::Input)?;
+        // TODO: Parse full OPEN syntax
+        Ok(Statement::Open {
+            file_number: Expression::Number(1.0), // Default file number
+            file_name,
+            mode: "I".to_string(), // Input mode
+        })
+    }
+
+    fn parse_close_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume CLOSE
+        let mut file_numbers = Vec::new();
+        if let Some(Token::Number(n)) = self.current_token {
+            file_numbers.push(Expression::Number(n));
+            self.advance();
+        }
+        Ok(Statement::Close { file_numbers })
+    }
+
+    fn parse_print_hash_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PRINT#
+        let file_number = self.parse_expression()?;
+        let (expressions, separator) = self.parse_print_expressions()?;
+        Ok(Statement::PrintHash {
+            file_number,
+            expressions,
+            separator,
+        })
+    }
+
+    fn parse_input_hash_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume INPUT#
+        let file_number = self.parse_expression()?;
+        let mut variables = Vec::new();
+        while let Some(Token::Identifier(ref var)) = self.current_token {
+            variables.push(var.clone());
+            self.advance();
+            if let Some(Token::Comma) = self.current_token {
+                self.advance();
+            } else {
+                break;
+            }
+        }
+        Ok(Statement::InputHash {
+            file_number,
+            variables,
+        })
+    }
+
+    // Graphics
+    fn parse_line_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume LINE
+        self.expect(&Token::LParen)?;
+        let x1 = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y1 = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        self.expect(&Token::Minus)?;
+        self.expect(&Token::LParen)?;
+        let x2 = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y2 = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        let color = if let Some(Token::Comma) = self.current_token {
+            self.advance();
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+        Ok(Statement::Line {
+            x1,
+            y1,
+            x2,
+            y2,
+            color,
+            style: None,
+        })
+    }
+
+    fn parse_circle_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume CIRCLE
+        self.expect(&Token::LParen)?;
+        let x = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        self.expect(&Token::Comma)?;
+        let radius = self.parse_expression()?;
+        let color = if let Some(Token::Comma) = self.current_token {
+            self.advance();
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+        Ok(Statement::Circle {
+            x,
+            y,
+            radius,
+            color,
+            start_angle: None,
+            end_angle: None,
+        })
+    }
+
+    fn parse_pset_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PSET
+        self.expect(&Token::LParen)?;
+        let x = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        let color = if let Some(Token::Comma) = self.current_token {
+            self.advance();
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+        Ok(Statement::Pset { x, y, color })
+    }
+
+    fn parse_preset_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PRESET
+        self.expect(&Token::LParen)?;
+        let x = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        let color = if let Some(Token::Comma) = self.current_token {
+            self.advance();
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+        Ok(Statement::Preset { x, y, color })
+    }
+
+    fn parse_paint_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PAINT
+        self.expect(&Token::LParen)?;
+        let x = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let y = self.parse_expression()?;
+        self.expect(&Token::RParen)?;
+        Ok(Statement::Paint {
+            x,
+            y,
+            paint_color: None,
+            border_color: None,
+        })
+    }
+
+    fn parse_draw_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DRAW
+        let commands = self.parse_expression()?;
+        Ok(Statement::Draw { commands })
+    }
+
+    // Sound
+    fn parse_beep_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume BEEP
+        Ok(Statement::Beep)
+    }
+
+    fn parse_sound_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume SOUND
+        let frequency = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let duration = self.parse_expression()?;
+        Ok(Statement::Sound {
+            frequency,
+            duration,
+        })
+    }
+
+    // Screen Control
+    fn parse_locate_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume LOCATE
+        let row = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let column = self.parse_expression()?;
+        Ok(Statement::Locate { row, column })
+    }
+
+    fn parse_screen_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume SCREEN
+        let mode = self.parse_expression()?;
+        Ok(Statement::Screen { mode })
+    }
+
+    fn parse_width_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume WIDTH
+        let width = self.parse_expression()?;
+        Ok(Statement::Width { width })
+    }
+
+    fn parse_palette_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume PALETTE
+        let attribute = self.parse_expression()?;
+        self.expect(&Token::Comma)?;
+        let color = self.parse_expression()?;
+        Ok(Statement::Palette { attribute, color })
+    }
+
+    // Error Handling
+    fn parse_on_error_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume ON
+        self.expect(&Token::Error)?;
+        let line_number = if let Some(Token::Goto) = self.current_token {
+            self.advance();
+            Some(self.parse_line_number()?)
+        } else {
+            None
+        };
+        Ok(Statement::OnError { line_number })
+    }
+
+    fn parse_resume_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume RESUME
+        let line_number = if let Some(Token::Number(_)) = self.current_token {
+            Some(self.parse_line_number()?)
+        } else {
+            None
+        };
+        Ok(Statement::Resume { line_number })
+    }
+
+    // Control Flow
+    fn parse_while_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume WHILE
+        let condition = self.parse_expression()?;
+        Ok(Statement::While { condition })
+    }
+
+    fn parse_wend_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume WEND
+        Ok(Statement::Wend)
+    }
+
+    fn parse_select_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume SELECT
+        self.expect(&Token::Case)?;
+        let expression = self.parse_expression()?;
+        Ok(Statement::Select { expression })
+    }
+
+    fn parse_case_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume CASE
+        let mut conditions = Vec::new();
+
+        // Check for "IS" condition
+        if let Some(Token::Is) = self.current_token {
+            self.advance(); // consume IS
+            let operator = match self.current_token {
+                Some(Token::Equal) => "=",
+                Some(Token::Greater) => ">",
+                Some(Token::Less) => "<",
+                Some(Token::GreaterEqual) => ">=",
+                Some(Token::LessEqual) => "<=",
+                Some(Token::NotEqual) => "<>",
+                _ => {
+                    return Err(InterpreterError::ParseError(
+                        "Expected comparison operator after IS".to_string(),
+                    ))
+                }
+            };
+            self.advance(); // consume operator
+            let value = self.parse_expression()?;
+            conditions.push(CaseCondition::Is {
+                operator: operator.to_string(),
+                value,
+            });
+        } else {
+            // Parse value or range
+            loop {
+                let start = self.parse_expression()?;
+                if let Some(Token::To) = self.current_token {
+                    self.advance(); // consume TO
+                    let end = self.parse_expression()?;
+                    conditions.push(CaseCondition::Range { start, end });
+                } else {
+                    conditions.push(CaseCondition::Value(start));
+                }
+
+                if let Some(Token::Comma) = self.current_token {
+                    self.advance();
+                } else {
+                    break;
+                }
+            }
+        }
+        Ok(Statement::Case { conditions })
+    }
+
+    fn parse_default_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume DEFAULT
+        Ok(Statement::Default)
+    }
+
+    // System
+    fn parse_system_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume SYSTEM
+        Ok(Statement::System)
+    }
+
+    fn parse_files_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume FILES
+        let pattern = if let Some(Token::String(_)) = self.current_token {
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+        Ok(Statement::Files { pattern })
+    }
+
+    fn parse_kill_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume KILL
+        let file_name = self.parse_expression()?;
+        Ok(Statement::Kill { file_name })
+    }
+
+    fn parse_name_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume NAME
+        let old_name = self.parse_expression()?;
+        self.expect(&Token::As)?;
+        let new_name = self.parse_expression()?;
+        Ok(Statement::Name { old_name, new_name })
+    }
+
+    fn parse_chdir_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume CHDIR
+        let path = self.parse_expression()?;
+        Ok(Statement::Chdir { path })
+    }
+
+    fn parse_mkdir_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume MKDIR
+        let path = self.parse_expression()?;
+        Ok(Statement::Mkdir { path })
+    }
+
+    fn parse_rmdir_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume RMDIR
+        let path = self.parse_expression()?;
+        Ok(Statement::Rmdir { path })
+    }
+
+    // Array
+    fn parse_erase_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume ERASE
+        let mut arrays = Vec::new();
+        loop {
+            if let Some(Token::Identifier(ref id)) = self.current_token {
+                arrays.push(id.clone());
+                self.advance();
+            }
+            if let Some(Token::Comma) = self.current_token {
+                self.advance();
+            } else {
+                break;
+            }
+        }
+        Ok(Statement::Erase { arrays })
+    }
+
+    fn parse_option_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.advance(); // consume OPTION
+        self.expect(&Token::Base)?;
+        let base = self.parse_expression()?;
+        Ok(Statement::OptionBase { base })
+    }
+
     fn parse_expression(&mut self) -> Result<Expression, InterpreterError> {
         self.parse_logical_or()
+    }
+
+    fn parse_print_expressions(
+        &mut self,
+    ) -> Result<(Vec<Expression>, PrintSeparator), InterpreterError> {
+        let mut expressions = Vec::new();
+
+        // Parse first expression or TAB/SPC function
+        if let Some(ref token) = self.current_token {
+            if !matches!(
+                token,
+                Token::Colon | Token::EndOfFile | Token::Comma | Token::Semicolon
+            ) {
+                let expr = self.parse_print_item()?;
+                expressions.push(expr);
+            }
+        }
+
+        // Parse remaining expressions separated by commas or semicolons
+        let mut separator = PrintSeparator::None;
+        while let Some(ref token) = self.current_token {
+            match token {
+                Token::Colon | Token::EndOfFile => break,
+                Token::Comma => {
+                    separator = PrintSeparator::Comma;
+                    self.advance();
+                    if let Some(ref token) = self.current_token {
+                        if !matches!(token, Token::Colon | Token::EndOfFile) {
+                            let expr = self.parse_print_item()?;
+                            expressions.push(expr);
+                        }
+                    }
+                }
+                Token::Semicolon => {
+                    separator = PrintSeparator::Semicolon;
+                    self.advance();
+                    if let Some(ref token) = self.current_token {
+                        if !matches!(token, Token::Colon | Token::EndOfFile) {
+                            let expr = self.parse_print_item()?;
+                            expressions.push(expr);
+                        }
+                    }
+                }
+                _ => break, // No more separators
+            }
+        }
+
+        Ok((expressions, separator))
+    }
+
+    fn parse_print_item(&mut self) -> Result<Expression, InterpreterError> {
+        // Check for TAB or SPC functions
+        if let Some(Token::Tab) = self.current_token {
+            self.advance(); // consume TAB
+            self.expect(&Token::LParen)?;
+            let expr = self.parse_expression()?;
+            self.expect(&Token::RParen)?;
+            Ok(Expression::Tab(Box::new(expr)))
+        } else if let Some(Token::Spc) = self.current_token {
+            self.advance(); // consume SPC
+            self.expect(&Token::LParen)?;
+            let expr = self.parse_expression()?;
+            self.expect(&Token::RParen)?;
+            Ok(Expression::Spc(Box::new(expr)))
+        } else {
+            // Regular expression
+            self.parse_expression()
+        }
+    }
+
+    fn parse_line_number(&mut self) -> Result<usize, InterpreterError> {
+        if let Some(Token::Number(line_num)) = self.current_token {
+            let line = line_num as usize;
+            self.advance();
+            Ok(line)
+        } else {
+            Err(InterpreterError::ParseError(
+                "Expected line number".to_string(),
+            ))
+        }
     }
 
     fn parse_logical_or(&mut self) -> Result<Expression, InterpreterError> {
@@ -1297,6 +2074,7 @@ pub struct GraphicsCommand {
 pub struct BasicInterpreter {
     variables: HashMap<String, Value>,
     arrays: HashMap<String, Vec<Value>>,
+    functions: HashMap<String, FunctionDefinition>,
     current_line: usize,
     pending_input: Option<(String, String)>, // (var, prompt)
     data_pointer: usize,
@@ -1310,6 +2088,11 @@ pub struct BasicInterpreter {
     pub max_instructions: usize,
     current_program: Option<Program>, // Store the parsed program for continuation
     current_output: String,           // Accumulate output across executions
+    error_handler: Option<usize>,     // Line number for error handling
+    loop_stack: Vec<usize>,           // Stack for WHILE loops
+    select_value: Option<Value>,      // Current SELECT CASE value
+    array_base: usize,                // Array base (0 or 1)
+    print_position: usize,            // Current print position for comma tabulation
 }
 
 #[derive(Clone)]
@@ -1326,11 +2109,18 @@ struct ForLoop {
     line: usize,
 }
 
+#[derive(Clone)]
+struct FunctionDefinition {
+    parameter: String,
+    expression: Expression,
+}
+
 impl BasicInterpreter {
     pub fn new() -> Self {
         Self {
             variables: HashMap::new(),
             arrays: HashMap::new(),
+            functions: HashMap::new(),
             current_line: 0,
             pending_input: None,
             data_pointer: 0,
@@ -1346,6 +2136,11 @@ impl BasicInterpreter {
             max_instructions: 10000, // Default limit to prevent infinite loops
             current_program: None,
             current_output: String::new(),
+            error_handler: None,
+            loop_stack: Vec::new(),
+            select_value: None,
+            array_base: 0,
+            print_position: 0,
         }
     }
 
@@ -1502,6 +2297,18 @@ impl BasicInterpreter {
                         "Array index must be numeric".to_string(),
                     )),
                 }
+            }
+            Expression::Tab(expr) => {
+                // TAB is handled specially in PRINT statements, not evaluated as a regular expression
+                Err(InterpreterError::RuntimeError(
+                    "TAB can only be used in PRINT statements".to_string(),
+                ))
+            }
+            Expression::Spc(expr) => {
+                // SPC is handled specially in PRINT statements, not evaluated as a regular expression
+                Err(InterpreterError::RuntimeError(
+                    "SPC can only be used in PRINT statements".to_string(),
+                ))
             }
         }
     }
@@ -1891,23 +2698,83 @@ impl BasicInterpreter {
                 ref expressions,
                 ref separator,
             } => {
+                // Reset print position at start of PRINT statement (GW-BASIC behavior)
+                self.print_position = 0;
                 let mut result = String::new();
+
                 for (i, expr) in expressions.iter().enumerate() {
                     if i > 0 {
+                        // Handle comma tabulation like GW-BASIC (every 14 characters)
                         match separator {
-                            PrintSeparator::Comma => result.push('\t'),
-                            PrintSeparator::Semicolon => {}
-                            PrintSeparator::None => result.push(' '),
+                            PrintSeparator::Comma => {
+                                let tab_width = 14;
+                                let spaces_needed = tab_width - (self.print_position % tab_width);
+                                for _ in 0..spaces_needed {
+                                    result.push(' ');
+                                    self.print_position += 1;
+                                }
+                            }
+                            PrintSeparator::Semicolon => {
+                                // No spacing for semicolon
+                            }
+                            PrintSeparator::None => {
+                                result.push(' ');
+                                self.print_position += 1;
+                            }
                         }
                     }
-                    let value = self.evaluate_expression(expr)?;
-                    match value {
-                        Value::Number(n) => result.push_str(&format!("{}", n)),
-                        Value::String(s) => result.push_str(&s),
+
+                    // Handle TAB and SPC functions specially
+                    match expr {
+                        Expression::Tab(tab_expr) => {
+                            let tab_value = self.evaluate_expression(tab_expr)?;
+                            if let Value::Number(n) = tab_value {
+                                let target_column = n as usize;
+                                while self.print_position < target_column {
+                                    result.push(' ');
+                                    self.print_position += 1;
+                                }
+                            } else {
+                                return Err(InterpreterError::TypeError(
+                                    "TAB argument must be numeric".to_string(),
+                                ));
+                            }
+                        }
+                        Expression::Spc(spc_expr) => {
+                            let spc_value = self.evaluate_expression(spc_expr)?;
+                            if let Value::Number(n) = spc_value {
+                                let spaces = n as usize;
+                                for _ in 0..spaces {
+                                    result.push(' ');
+                                    self.print_position += 1;
+                                }
+                            } else {
+                                return Err(InterpreterError::TypeError(
+                                    "SPC argument must be numeric".to_string(),
+                                ));
+                            }
+                        }
+                        _ => {
+                            let value = self.evaluate_expression(expr)?;
+                            let value_str = match value {
+                                Value::Number(n) => format!("{}", n),
+                                Value::String(s) => s,
+                            };
+
+                            result.push_str(&value_str);
+                            self.print_position += value_str.len();
+                        }
                     }
                 }
+
                 self.current_output.push_str(&result);
-                self.current_output.push('\n');
+
+                // Add newline unless the separator is semicolon (GW-BASIC behavior)
+                if !matches!(separator, PrintSeparator::Semicolon) {
+                    self.current_output.push('\n');
+                    self.print_position = 0; // Reset position after newline
+                }
+
                 Ok(None)
             }
             Statement::Writeln {
@@ -2099,7 +2966,7 @@ impl BasicInterpreter {
                         if should_continue {
                             self.variables
                                 .insert(loop_info.variable.clone(), Value::Number(next_val));
-                            self.current_line = loop_info.line;
+                            self.current_line = loop_info.line + 1; // Jump to statement after FOR
                             return Ok(Some("CONTINUE_LOOP".to_string()));
                         } else {
                             self.for_loops.pop();
@@ -2282,6 +3149,454 @@ impl BasicInterpreter {
                 Ok(None)
             }
             Statement::Rem { .. } => Ok(None),
+
+            // File I/O
+            Statement::Open { .. } => {
+                // TODO: Implement file opening
+                self.current_output.push_str("OPEN not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Close { .. } => {
+                // TODO: Implement file closing
+                self.current_output.push_str("CLOSE not yet implemented\n");
+                Ok(None)
+            }
+            Statement::PrintHash { .. } => {
+                // TODO: Implement file printing
+                self.current_output.push_str("PRINT# not yet implemented\n");
+                Ok(None)
+            }
+            Statement::InputHash { .. } => {
+                // TODO: Implement file input
+                self.current_output.push_str("INPUT# not yet implemented\n");
+                Ok(None)
+            }
+
+            // Graphics
+            Statement::Line {
+                ref x1,
+                ref y1,
+                ref x2,
+                ref y2,
+                ref color,
+                ..
+            } => {
+                let x1_val = self.evaluate_expression(x1)?;
+                let y1_val = self.evaluate_expression(y1)?;
+                let x2_val = self.evaluate_expression(x2)?;
+                let y2_val = self.evaluate_expression(y2)?;
+                if let (
+                    Value::Number(x1),
+                    Value::Number(y1),
+                    Value::Number(x2),
+                    Value::Number(y2),
+                ) = (x1_val, y1_val, x2_val, y2_val)
+                {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "LINE".to_string(),
+                        value: 0.0,
+                        color: color
+                            .as_ref()
+                            .and_then(|c| self.evaluate_expression(c).ok())
+                            .and_then(|v| {
+                                if let Value::Number(n) = v {
+                                    Some(n as u32)
+                                } else {
+                                    None
+                                }
+                            }),
+                    });
+                    // Store line coordinates for rendering
+                    self.current_output.push_str(&format!(
+                        "Drew line from ({}, {}) to ({}, {})\n",
+                        x1, y1, x2, y2
+                    ));
+                }
+                Ok(None)
+            }
+            Statement::Circle {
+                ref x,
+                ref y,
+                ref radius,
+                ref color,
+                ..
+            } => {
+                let x_val = self.evaluate_expression(x)?;
+                let y_val = self.evaluate_expression(y)?;
+                let r_val = self.evaluate_expression(radius)?;
+                if let (Value::Number(x), Value::Number(y), Value::Number(r)) =
+                    (x_val, y_val, r_val)
+                {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "CIRCLE".to_string(),
+                        value: r as f32,
+                        color: color
+                            .as_ref()
+                            .and_then(|c| self.evaluate_expression(c).ok())
+                            .and_then(|v| {
+                                if let Value::Number(n) = v {
+                                    Some(n as u32)
+                                } else {
+                                    None
+                                }
+                            }),
+                    });
+                    self.current_output
+                        .push_str(&format!("Drew circle at ({}, {}) radius {}\n", x, y, r));
+                }
+                Ok(None)
+            }
+            Statement::Pset {
+                ref x,
+                ref y,
+                ref color,
+            } => {
+                let x_val = self.evaluate_expression(x)?;
+                let y_val = self.evaluate_expression(y)?;
+                if let (Value::Number(x), Value::Number(y)) = (x_val, y_val) {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "PSET".to_string(),
+                        value: 0.0,
+                        color: color
+                            .as_ref()
+                            .and_then(|c| self.evaluate_expression(c).ok())
+                            .and_then(|v| {
+                                if let Value::Number(n) = v {
+                                    Some(n as u32)
+                                } else {
+                                    None
+                                }
+                            }),
+                    });
+                    self.current_output
+                        .push_str(&format!("Set pixel at ({}, {})\n", x, y));
+                }
+                Ok(None)
+            }
+            Statement::Preset {
+                ref x,
+                ref y,
+                ref color,
+            } => {
+                let x_val = self.evaluate_expression(x)?;
+                let y_val = self.evaluate_expression(y)?;
+                if let (Value::Number(x), Value::Number(y)) = (x_val, y_val) {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "PRESET".to_string(),
+                        value: 0.0,
+                        color: color
+                            .as_ref()
+                            .and_then(|c| self.evaluate_expression(c).ok())
+                            .and_then(|v| {
+                                if let Value::Number(n) = v {
+                                    Some(n as u32)
+                                } else {
+                                    None
+                                }
+                            }),
+                    });
+                    self.current_output
+                        .push_str(&format!("Reset pixel at ({}, {})\n", x, y));
+                }
+                Ok(None)
+            }
+            Statement::Paint { .. } => {
+                // TODO: Implement paint
+                self.current_output.push_str("PAINT not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Draw { .. } => {
+                // TODO: Implement draw
+                self.current_output.push_str("DRAW not yet implemented\n");
+                Ok(None)
+            }
+
+            // Sound
+            Statement::Beep => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "BEEP".to_string(),
+                    value: 0.0,
+                    color: None,
+                });
+                self.current_output.push_str("Beep!\n");
+                Ok(None)
+            }
+            Statement::Sound {
+                ref frequency,
+                ref duration,
+            } => {
+                let freq_val = self.evaluate_expression(frequency)?;
+                let dur_val = self.evaluate_expression(duration)?;
+                if let (Value::Number(freq), Value::Number(dur)) = (freq_val, dur_val) {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "SOUND".to_string(),
+                        value: freq as f32,
+                        color: None,
+                    });
+                    self.current_output
+                        .push_str(&format!("Sound: {}Hz for {} ticks\n", freq, dur));
+                }
+                Ok(None)
+            }
+
+            // Screen Control
+            Statement::Locate {
+                ref row,
+                ref column,
+            } => {
+                let row_val = self.evaluate_expression(row)?;
+                let col_val = self.evaluate_expression(column)?;
+                if let (Value::Number(r), Value::Number(c)) = (row_val, col_val) {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "LOCATE".to_string(),
+                        value: r as f32,
+                        color: Some(c as u32),
+                    });
+                    self.current_output
+                        .push_str(&format!("Cursor positioned at row {}, column {}\n", r, c));
+                }
+                Ok(None)
+            }
+            Statement::Screen { ref mode } => {
+                let mode_val = self.evaluate_expression(mode)?;
+                if let Value::Number(m) = mode_val {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "SCREEN".to_string(),
+                        value: m as f32,
+                        color: None,
+                    });
+                    self.current_output
+                        .push_str(&format!("Screen mode set to {}\n", m));
+                }
+                Ok(None)
+            }
+            Statement::Width { ref width } => {
+                let width_val = self.evaluate_expression(width)?;
+                if let Value::Number(w) = width_val {
+                    graphics_commands.push(GraphicsCommand {
+                        command: "WIDTH".to_string(),
+                        value: w as f32,
+                        color: None,
+                    });
+                    self.current_output
+                        .push_str(&format!("Width set to {}\n", w));
+                }
+                Ok(None)
+            }
+            Statement::ColorBg {
+                ref foreground,
+                ref background,
+            } => {
+                if let Some(ref fg) = foreground {
+                    let fg_val = self.evaluate_expression(fg)?;
+                    if let Value::Number(f) = fg_val {
+                        graphics_commands.push(GraphicsCommand {
+                            command: "COLOR_FG".to_string(),
+                            value: f as f32,
+                            color: Some(f as u32),
+                        });
+                    }
+                }
+                if let Some(ref bg) = background {
+                    let bg_val = self.evaluate_expression(bg)?;
+                    if let Value::Number(b) = bg_val {
+                        graphics_commands.push(GraphicsCommand {
+                            command: "COLOR_BG".to_string(),
+                            value: b as f32,
+                            color: Some(b as u32),
+                        });
+                    }
+                }
+                self.current_output.push_str("Colors updated\n");
+                Ok(None)
+            }
+            Statement::Palette { .. } => {
+                // TODO: Implement palette
+                self.current_output
+                    .push_str("PALETTE not yet implemented\n");
+                Ok(None)
+            }
+
+            // Error Handling
+            Statement::OnError { ref line_number } => {
+                self.error_handler = *line_number;
+                self.current_output
+                    .push_str(&format!("Error handler set to line {:?}\n", line_number));
+                Ok(None)
+            }
+            Statement::Resume { ref line_number } => {
+                if let Some(line) = line_number {
+                    self.current_line = *line;
+                }
+                self.current_output.push_str("Resumed execution\n");
+                Ok(None)
+            }
+
+            // Control Flow
+            Statement::While { ref condition } => {
+                let cond_val = self.evaluate_expression(condition)?;
+                if let Value::Number(n) = cond_val {
+                    if n != 0.0 {
+                        // Push current line onto loop stack and continue
+                        self.loop_stack.push(self.current_line);
+                        Ok(None)
+                    } else {
+                        // Skip to WEND
+                        self.skip_to_wend()?;
+                        Ok(None)
+                    }
+                } else {
+                    Err(InterpreterError::TypeError(
+                        "WHILE condition must be numeric".to_string(),
+                    ))
+                }
+            }
+            Statement::Wend => {
+                // Jump back to WHILE
+                if let Some(while_line) = self.loop_stack.pop() {
+                    self.current_line = while_line;
+                    return Ok(Some("CONTINUE_LOOP".to_string()));
+                } else {
+                    return Err(InterpreterError::RuntimeError(
+                        "WEND without WHILE".to_string(),
+                    ));
+                }
+            }
+            Statement::Select { ref expression } => {
+                let val = self.evaluate_expression(expression)?;
+                self.select_value = Some(val);
+                Ok(None)
+            }
+            Statement::Case { ref conditions } => {
+                if let Some(ref select_val) = self.select_value {
+                    let select_val = select_val.clone();
+                    for condition in conditions {
+                        let matches = match condition {
+                            CaseCondition::Value(ref expr) => {
+                                let case_val = self.evaluate_expression(expr)?;
+                                self.values_equal(&select_val, &case_val)
+                            }
+                            CaseCondition::Range { ref start, ref end } => {
+                                let start_val = self.evaluate_expression(start)?;
+                                let end_val = self.evaluate_expression(end)?;
+                                match (&select_val, &start_val, &end_val) {
+                                    (Value::Number(s), Value::Number(st), Value::Number(e)) => {
+                                        *s >= *st && *s <= *e
+                                    }
+                                    _ => false,
+                                }
+                            }
+                            CaseCondition::Is {
+                                ref operator,
+                                ref value,
+                            } => {
+                                let case_val = self.evaluate_expression(value)?;
+                                match (&select_val, &case_val) {
+                                    (Value::Number(s), Value::Number(c)) => {
+                                        match operator.as_str() {
+                                            "=" => (s - c).abs() < f64::EPSILON,
+                                            ">" => *s > *c,
+                                            "<" => *s < *c,
+                                            ">=" => *s >= *c,
+                                            "<=" => *s <= *c,
+                                            "<>" => (s - c).abs() >= f64::EPSILON,
+                                            _ => false,
+                                        }
+                                    }
+                                    _ => false,
+                                }
+                            }
+                        };
+                        if matches {
+                            // Execute this case
+                            return Ok(None);
+                        }
+                    }
+                    // No match, skip to next CASE or DEFAULT
+                    self.skip_to_next_case()?;
+                }
+                Ok(None)
+            }
+            Statement::Default => {
+                // Execute default case
+                Ok(None)
+            }
+            Statement::EndSelect => {
+                // Clear select value
+                self.select_value = None;
+                Ok(None)
+            }
+
+            // System
+            Statement::System => {
+                self.current_output.push_str("System exit requested\n");
+                Ok(Some("END".to_string()))
+            }
+            Statement::Files { .. } => {
+                // TODO: Implement directory listing
+                self.current_output.push_str("FILES not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Kill { .. } => {
+                // TODO: Implement file deletion
+                self.current_output.push_str("KILL not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Name { .. } => {
+                // TODO: Implement file renaming
+                self.current_output.push_str("NAME not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Chdir { .. } => {
+                // TODO: Implement directory change
+                self.current_output.push_str("CHDIR not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Mkdir { .. } => {
+                // TODO: Implement directory creation
+                self.current_output.push_str("MKDIR not yet implemented\n");
+                Ok(None)
+            }
+            Statement::Rmdir { .. } => {
+                // TODO: Implement directory removal
+                self.current_output.push_str("RMDIR not yet implemented\n");
+                Ok(None)
+            }
+
+            Statement::Def {
+                ref name,
+                ref parameter,
+                ref expression,
+            } => {
+                // Store the function definition
+                self.functions.insert(
+                    name.clone(),
+                    FunctionDefinition {
+                        parameter: parameter.clone(),
+                        expression: expression.clone(),
+                    },
+                );
+                Ok(None)
+            }
+
+            // Array
+            Statement::Erase { ref arrays } => {
+                for array in arrays {
+                    self.arrays.remove(array);
+                }
+                self.current_output
+                    .push_str(&format!("Erased arrays: {:?}\n", arrays));
+                Ok(None)
+            }
+            Statement::OptionBase { ref base } => {
+                let base_val = self.evaluate_expression(base)?;
+                if let Value::Number(b) = base_val {
+                    self.array_base = b as usize;
+                    self.current_output
+                        .push_str(&format!("Array base set to {}\n", b));
+                }
+                Ok(None)
+            }
         }
     }
 
@@ -2302,6 +3617,15 @@ impl BasicInterpreter {
                     }
                 }
             }
+
+            // Echo the input value(s) to output
+            for (i, input_val) in input_values.iter().enumerate() {
+                if i > 0 {
+                    self.current_output.push_str("  "); // Two spaces between multiple inputs
+                }
+                self.current_output.push_str(input_val);
+            }
+            self.current_output.push('\n');
         }
     }
 
@@ -2392,6 +3716,8 @@ impl BasicInterpreter {
 
             // Check if we need input
             if let Some((var, prompt)) = &self.pending_input {
+                // Increment current_line so continuation starts from next statement
+                self.current_line += 1;
                 return Ok(ExecutionResult::NeedInput {
                     variable_name: var.clone(),
                     prompt: prompt.clone(),
@@ -2406,5 +3732,48 @@ impl BasicInterpreter {
             output: self.current_output.clone(),
             graphics_commands,
         })
+    }
+
+    fn skip_to_wend(&mut self) -> Result<(), InterpreterError> {
+        // Skip to matching WEND
+        let mut nesting = 1;
+        while self.current_line < self.current_program.as_ref().unwrap().statements.len() {
+            match &self.current_program.as_ref().unwrap().statements[self.current_line] {
+                Statement::While { .. } => nesting += 1,
+                Statement::Wend => {
+                    nesting -= 1;
+                    if nesting == 0 {
+                        return Ok(());
+                    }
+                }
+                _ => {}
+            }
+            self.current_line += 1;
+        }
+        Err(InterpreterError::RuntimeError(
+            "WEND without WHILE".to_string(),
+        ))
+    }
+
+    fn values_equal(&self, a: &Value, b: &Value) -> bool {
+        match (a, b) {
+            (Value::Number(x), Value::Number(y)) => (x - y).abs() < 1e-10,
+            (Value::String(x), Value::String(y)) => x == y,
+            _ => false,
+        }
+    }
+
+    fn skip_to_next_case(&mut self) -> Result<(), InterpreterError> {
+        // Skip to next CASE or END SELECT
+        while self.current_line < self.current_program.as_ref().unwrap().statements.len() {
+            match &self.current_program.as_ref().unwrap().statements[self.current_line] {
+                Statement::Case { .. } | Statement::EndSelect => return Ok(()),
+                _ => {}
+            }
+            self.current_line += 1;
+        }
+        Err(InterpreterError::RuntimeError(
+            "END SELECT without SELECT CASE".to_string(),
+        ))
     }
 }

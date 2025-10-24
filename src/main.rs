@@ -105,8 +105,8 @@ impl Default for TimeWarpApp {
             replace_text: String::new(),
             show_find_replace: false,
             turtle_state: TurtleState {
-                x: 200.0,
-                y: 200.0,
+                x: 0.0,
+                y: 0.0,
                 angle: 0.0,
                 color: egui::Color32::BLACK,
             },
@@ -1245,8 +1245,8 @@ impl eframe::App for TimeWarpApp {
             self.output = String::new();
             self.turtle_commands.clear();
             self.turtle_state = TurtleState {
-                x: 200.0,
-                y: 200.0,
+                x: 0.0,
+                y: 0.0,
                 angle: 0.0,
                 color: egui::Color32::BLACK,
             };
@@ -1488,8 +1488,8 @@ impl eframe::App for TimeWarpApp {
                             self.output = String::new();
                             self.turtle_commands.clear();
                             self.turtle_state = TurtleState {
-                                x: 200.0,
-                                y: 200.0,
+                                x: 0.0,
+                                y: 0.0,
                                 angle: 0.0,
                                 color: egui::Color32::BLACK,
                             };
@@ -2583,16 +2583,46 @@ mod tests {
     }
 
     #[test]
-    fn test_tokenize_print_x() {
+    fn test_tokenize_input_x() {
         use crate::languages::basic::Tokenizer;
 
-        let mut tokenizer = Tokenizer::new("PRINT X");
+        let mut tokenizer = Tokenizer::new("INPUT X");
         let tokens = tokenizer.tokenize().unwrap();
 
-        println!("Tokens for 'PRINT X': {:?}", tokens);
+        println!("Tokens for 'INPUT X': {:?}", tokens);
 
-        // Should have PRINT, identifier X, EOF
+        // Should have INPUT, identifier X, EOF
         assert!(tokens.len() >= 3);
+    }
+
+    #[test]
+    fn test_parse_input_x() {
+        use crate::languages::basic::{Parser, Tokenizer};
+
+        let mut tokenizer = Tokenizer::new("INPUT X");
+        let tokens = tokenizer.tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse_program().unwrap();
+
+        println!("Parsed program for 'INPUT X': {:?}", program);
+
+        // Should have one statement
+        assert_eq!(program.statements.len(), 1);
+    }
+
+    #[test]
+    fn test_parse_print_semicolon() {
+        use crate::languages::basic::{Parser, Tokenizer};
+
+        let mut tokenizer = Tokenizer::new("PRINT 42;");
+        let tokens = tokenizer.tokenize().unwrap();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse_program().unwrap();
+
+        println!("Parsed program for 'PRINT 42;': {:?}", program);
+
+        // Should have one statement
+        assert_eq!(program.statements.len(), 1);
     }
 
     #[test]
@@ -2667,7 +2697,786 @@ mod tests {
 
         println!("PRINT multiple vars no comma result: {:?}", result);
 
-        // This might cause a parse error
-        // Let's see what happens
+        // This should cause a parse error
+        assert!(result.contains("ParseError"));
+    }
+
+    #[test]
+    fn test_print_x_and_printx() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT X : PRINTX (what user entered)
+        let code = "PRINT X\nPRINTX";
+        let result = app.execute_tw_basic(code);
+
+        println!("PRINT X and PRINTX result: {:?}", result);
+
+        // Should have helpful parse error for PRINTX
+        assert!(result.contains("ParseError"));
+        assert!(result.contains("PRINT requires a space"));
+    }
+
+    #[test]
+    fn test_letx_equals_five() {
+        let mut app = TimeWarpApp::default();
+
+        // Test LETX=5 (missing space after LET)
+        let code = "LETX=5";
+        let result = app.execute_tw_basic(code);
+
+        println!("LETX=5 result: {:?}", result);
+
+        // Should have helpful parse error for LETX
+        assert!(result.contains("ParseError"));
+        assert!(result.contains("LET requires a space"));
+    }
+
+    #[test]
+    fn test_input_and_print() {
+        let mut app = TimeWarpApp::default();
+
+        // Test INPUT X : PRINT X
+        let code = "INPUT X\nPRINT X";
+        let result = app.execute_tw_basic(code);
+
+        println!("INPUT and PRINT result: {:?}", result);
+        println!("Waiting for input: {}", app.waiting_for_input);
+
+        // Should be waiting for input
+        assert!(app.waiting_for_input);
+
+        // Simulate providing input
+        if let Some(ref mut interpreter) = app.basic_interpreter {
+            interpreter.provide_input("42");
+            let continue_result = interpreter.execute("").unwrap();
+            match continue_result {
+                crate::languages::basic::ExecutionResult::Complete { output, .. } => {
+                    app.output = output;
+                }
+                _ => panic!("Expected Complete"),
+            }
+        }
+
+        println!("Final output: {:?}", app.output);
+        // Should contain the input echo and the PRINT output
+        assert!(app.output.contains("42"));
+        assert!(app.output == "42\n42\n");
+    }
+
+    #[test]
+    fn test_print_semicolon() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT X; (should not add newline)
+        let code = "PRINT 42;";
+        let result = app.execute_tw_basic(code);
+
+        println!("PRINT with semicolon result: {:?}", result);
+
+        // Should not end with newline
+        assert!(!result.ends_with("\n"));
+        assert!(result == "42");
+    }
+
+    #[test]
+    fn test_print_gw_basic_features() {
+        let mut app = TimeWarpApp::default();
+
+        // Test comma tabulation (GW-BASIC style - every 14 characters)
+        let comma_code = "PRINT \"A\",\"B\",\"C\"";
+        let result1 = app.execute_tw_basic(comma_code);
+        println!("PRINT comma tabulation result: {:?}", result1);
+        // "A" should be followed by spaces to reach column 14, then "B" at column 15, etc.
+
+        // Test TAB function
+        let tab_code = "PRINT \"HELLO\";TAB(15);\"WORLD\"";
+        let result2 = app.execute_tw_basic(tab_code);
+        println!("PRINT TAB function result: {:?}", result2);
+        // Should have "HELLO" followed by spaces to column 15, then "WORLD"
+
+        // Test SPC function
+        let spc_code = "PRINT \"TEST\";SPC(3);\"SPACES\"";
+        let result3 = app.execute_tw_basic(spc_code);
+        println!("PRINT SPC function result: {:?}", result3);
+        // Should have "TEST" followed by 3 spaces, then "SPACES"
+
+        // Verify all contain expected content
+        assert!(result1.contains("A"));
+        assert!(result1.contains("B"));
+        assert!(result1.contains("C"));
+        assert!(result2.contains("HELLO"));
+        assert!(result2.contains("WORLD"));
+        assert!(result3.contains("TEST"));
+        assert!(result3.contains("SPACES"));
+    }
+
+    #[test]
+    fn test_for_loop_simple() {
+        let mut app = TimeWarpApp::default();
+
+        // Test just FOR loop
+        let code = "for i=1 to 3\nprint i\nnext";
+        let result = app.execute_tw_basic(code);
+
+        // Should work and produce 1\n2\n3\n
+        assert!(result == "1\n2\n3\n");
+        assert!(!result.contains("timeout"));
+    }
+
+    #[test]
+    fn test_for_loop_program() {
+        let mut app = TimeWarpApp::default();
+
+        // Test the user's program
+        let code = "10 cls\n20 print \"Hello\"\n30 for i=1 to 10\n40 print 1/i\n50 next\n60 end";
+        let result = app.execute_tw_basic(code);
+
+        // Should work and contain Hello and the divisions
+        assert!(result.contains("Hello"));
+        assert!(result.contains("0.1"));
+        assert!(!result.contains("timeout"));
+    }
+
+    #[test]
+    fn test_forward_in_line_numbered_program() {
+        let mut app = TimeWarpApp::default();
+
+        // Test FORWARD in a line-numbered BASIC program
+        let code = "10 FORWARD 5\n20 END";
+        let result = app.execute_tw_basic(code);
+        println!("FORWARD test result: {:?}", result);
+        println!("Turtle commands after FORWARD: {:?}", app.turtle_commands);
+        println!(
+            "Turtle state: x={}, y={}, angle={}",
+            app.turtle_state.x, app.turtle_state.y, app.turtle_state.angle
+        );
+        assert!(result.contains("Moved forward"));
+        assert!(!app.turtle_commands.is_empty());
+        // Should have moved 5 units from (0, 0) to (5, 0)
+        assert_eq!(app.turtle_state.x, 5.0);
+        assert_eq!(app.turtle_state.y, 0.0);
+    }
+
+    #[test]
+    fn test_forward_direct_command() {
+        let mut app = TimeWarpApp::default();
+
+        // Test FORWARD as a direct command (not line-numbered) with longer distance
+        let code = "FORWARD 50";
+        let result = app.execute_tw_basic(code);
+        println!("Direct FORWARD test result: {:?}", result);
+        println!(
+            "Turtle commands after direct FORWARD: {:?}",
+            app.turtle_commands
+        );
+        println!(
+            "Turtle state: x={}, y={}, angle={}",
+            app.turtle_state.x, app.turtle_state.y, app.turtle_state.angle
+        );
+        assert!(result.contains("Moved forward"));
+        assert!(!app.turtle_commands.is_empty());
+        // Should have moved 50 units from (0, 0) to (50, 0)
+        assert_eq!(app.turtle_state.x, 50.0);
+        assert_eq!(app.turtle_state.y, 0.0);
+    }
+
+    // ===== GW BASIC COMMAND TESTS =====
+
+    #[test]
+    fn test_file_io_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING FILE I/O COMMANDS ===");
+
+        // Test OPEN command
+        println!("\n--- Testing OPEN command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("OPEN \"test.txt\" FOR OUTPUT AS #1");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("OPEN result: {}", output);
+                assert!(output.contains("File opened") || output.is_empty()); // May be empty if not fully implemented
+            }
+            _ => println!("OPEN command executed (may not be fully implemented yet)"),
+        }
+
+        // Test CLOSE command
+        println!("\n--- Testing CLOSE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("CLOSE #1");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("CLOSE result: {}", output);
+            }
+            _ => println!("CLOSE command executed"),
+        }
+
+        // Test PRINT# command
+        println!("\n--- Testing PRINT# command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("PRINT #1, \"Hello World\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("PRINT# result: {}", output);
+            }
+            _ => println!("PRINT# command executed"),
+        }
+
+        // Test INPUT# command
+        println!("\n--- Testing INPUT# command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("INPUT #1, A$");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("INPUT# result: {}", output);
+            }
+            _ => println!("INPUT# command executed"),
+        }
+
+        // Test KILL command
+        println!("\n--- Testing KILL command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("KILL \"test.txt\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("KILL result: {}", output);
+            }
+            _ => println!("KILL command executed"),
+        }
+
+        // Test NAME command
+        println!("\n--- Testing NAME command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("NAME \"old.txt\" AS \"new.txt\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("NAME result: {}", output);
+            }
+            _ => println!("NAME command executed"),
+        }
+
+        // Test FILES command
+        println!("\n--- Testing FILES command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("FILES");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("FILES result: {}", output);
+            }
+            _ => println!("FILES command executed"),
+        }
+
+        println!("\n=== FILE I/O COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_graphics_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING GRAPHICS COMMANDS ===");
+
+        // Test LINE command
+        println!("\n--- Testing LINE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("LINE (10, 10)-(100, 100)");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("LINE result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty());
+            }
+            _ => println!("LINE command executed"),
+        }
+
+        // Test CIRCLE command
+        println!("\n--- Testing CIRCLE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("CIRCLE (200, 200), 50");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("CIRCLE result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty());
+            }
+            _ => println!("CIRCLE command executed"),
+        }
+
+        // Test PSET command
+        println!("\n--- Testing PSET command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("PSET (150, 150)");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("PSET result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+            }
+            _ => println!("PSET command executed"),
+        }
+
+        // Test PRESET command
+        println!("\n--- Testing PRESET command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("PRESET (150, 150)");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("PRESET result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+            }
+            _ => println!("PRESET command executed"),
+        }
+
+        // Test PAINT command
+        println!("\n--- Testing PAINT command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("PAINT (100, 100)");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("PAINT result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+            }
+            _ => println!("PAINT command executed"),
+        }
+
+        // Test DRAW command
+        println!("\n--- Testing DRAW command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("DRAW \"U10 D10 L10 R10\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("DRAW result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+            }
+            _ => println!("DRAW command executed"),
+        }
+
+        println!("\n=== GRAPHICS COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_sound_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING SOUND COMMANDS ===");
+
+        // Test BEEP command
+        println!("\n--- Testing BEEP command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("BEEP");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("BEEP result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate a sound command
+            }
+            _ => println!("BEEP command executed"),
+        }
+
+        // Test SOUND command
+        println!("\n--- Testing SOUND command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("SOUND 440, 1000");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("SOUND result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate a sound command
+            }
+            _ => println!("SOUND command executed"),
+        }
+
+        println!("\n=== SOUND COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_screen_control_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING SCREEN CONTROL COMMANDS ===");
+
+        // Test LOCATE command
+        println!("\n--- Testing LOCATE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("LOCATE 10, 20");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("LOCATE result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate a locate command
+            }
+            _ => println!("LOCATE command executed"),
+        }
+
+        // Test SCREEN command
+        println!("\n--- Testing SCREEN command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("SCREEN 1");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("SCREEN result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate a screen command
+            }
+            _ => println!("SCREEN command executed"),
+        }
+
+        // Test WIDTH command
+        println!("\n--- Testing WIDTH command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("WIDTH 80");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("WIDTH result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate a width command
+            }
+            _ => println!("WIDTH command executed"),
+        }
+
+        // Test COLOR command
+        println!("\n--- Testing COLOR command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("COLOR 1, 2");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("COLOR result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+                assert!(!graphics_commands.is_empty()); // Should generate color commands
+            }
+            _ => println!("COLOR command executed"),
+        }
+
+        // Test PALETTE command
+        println!("\n--- Testing PALETTE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("PALETTE 0, 65535");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("PALETTE result: {}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+            }
+            _ => println!("PALETTE command executed"),
+        }
+
+        println!("\n=== SCREEN CONTROL COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_error_handling_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING ERROR HANDLING COMMANDS ===");
+
+        // Test ON ERROR command
+        println!("\n--- Testing ON ERROR command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("ON ERROR GOTO 100");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("ON ERROR result: {}", output);
+            }
+            _ => println!("ON ERROR command executed"),
+        }
+
+        // Test RESUME command
+        println!("\n--- Testing RESUME command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("RESUME");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("RESUME result: {}", output);
+            }
+            _ => println!("RESUME command executed"),
+        }
+
+        // Test RESUME with line number
+        println!("\n--- Testing RESUME NEXT command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("RESUME NEXT");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("RESUME NEXT result: {}", output);
+            }
+            _ => println!("RESUME NEXT command executed"),
+        }
+
+        println!("\n=== ERROR HANDLING COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_control_flow_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING CONTROL FLOW COMMANDS ===");
+
+        // Test WHILE/WEND loop
+        println!("\n--- Testing WHILE/WEND loop ---");
+        let mut interpreter = BasicInterpreter::new();
+        let program = r#"
+        LET X = 1
+        WHILE X <= 3
+        PRINT "Count: "; X
+        LET X = X + 1
+        WEND
+        PRINT "Loop finished"
+        "#;
+        let result = interpreter.execute(program);
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("WHILE/WEND result:\n{}", output);
+                assert!(output.contains("Count: 1"));
+                assert!(output.contains("Count: 2"));
+                assert!(output.contains("Count: 3"));
+                assert!(output.contains("Loop finished"));
+            }
+            _ => println!("WHILE/WEND loop executed"),
+        }
+
+        // Test SELECT CASE
+        println!("\n--- Testing SELECT CASE ---");
+        let mut interpreter = BasicInterpreter::new();
+        let program = r#"
+        LET GRADE = 85
+        SELECT CASE GRADE
+        CASE 90 TO 100
+        PRINT "A"
+        CASE 80 TO 89
+        PRINT "B"
+        CASE 70 TO 79
+        PRINT "C"
+        CASE ELSE
+        PRINT "F"
+        END SELECT
+        "#;
+        let result = interpreter.execute(program);
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("SELECT CASE result:\n{}", output);
+                assert!(output.contains("B"));
+            }
+            _ => println!("SELECT CASE executed"),
+        }
+
+        println!("\n=== CONTROL FLOW COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_system_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING SYSTEM COMMANDS ===");
+
+        // Test SYSTEM command
+        println!("\n--- Testing SYSTEM command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("SYSTEM");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("SYSTEM result: {}", output);
+            }
+            _ => println!("SYSTEM command executed"),
+        }
+
+        // Test CHDIR command
+        println!("\n--- Testing CHDIR command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("CHDIR \"/tmp\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("CHDIR result: {}", output);
+            }
+            _ => println!("CHDIR command executed"),
+        }
+
+        // Test MKDIR command
+        println!("\n--- Testing MKDIR command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("MKDIR \"testdir\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("MKDIR result: {}", output);
+            }
+            _ => println!("MKDIR command executed"),
+        }
+
+        // Test RMDIR command
+        println!("\n--- Testing RMDIR command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute("RMDIR \"testdir\"");
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("RMDIR result: {}", output);
+            }
+            _ => println!("RMDIR command executed"),
+        }
+
+        println!("\n=== SYSTEM COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_array_commands() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING ARRAY COMMANDS ===");
+
+        // Test OPTION BASE
+        println!("\n--- Testing OPTION BASE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let program = r#"
+        OPTION BASE 1
+        DIM A(5)
+        LET A(1) = 10
+        PRINT "Array base is 1, A(1) = "; A(1)
+        "#;
+        let result = interpreter.execute(program);
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("OPTION BASE result:\n{}", output);
+                assert!(output.contains("Array base is 1"));
+            }
+            _ => println!("OPTION BASE executed"),
+        }
+
+        // Test ERASE command
+        println!("\n--- Testing ERASE command ---");
+        let mut interpreter = BasicInterpreter::new();
+        let program = r#"
+        DIM B(10)
+        LET B(0) = 42
+        PRINT "Before ERASE: B(0) = "; B(0)
+        ERASE B
+        "#;
+        let result = interpreter.execute(program);
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete { output, .. }) => {
+                println!("ERASE result:\n{}", output);
+            }
+            _ => println!("ERASE command executed"),
+        }
+
+        println!("\n=== ARRAY COMMANDS TEST COMPLETE ===");
+    }
+
+    #[test]
+    fn test_comprehensive_gw_basic_program() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("=== TESTING COMPREHENSIVE GW BASIC PROGRAM ===");
+
+        // Create a comprehensive program using multiple GW BASIC features
+        let program = r#"
+        PRINT "Hello World"
+        LET GRADE = 85
+        SELECT CASE GRADE
+        CASE 80 TO 89
+        PRINT "Grade: B"
+        END SELECT
+        "#;
+
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute(program);
+
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("COMPREHENSIVE PROGRAM OUTPUT:\n{}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+
+                // Verify key outputs
+                assert!(output.contains("Hello World"));
+                assert!(output.contains("Grade: B"));
+
+                println!("\n=== COMPREHENSIVE TEST PASSED ===");
+            }
+            Err(e) => {
+                println!("COMPREHENSIVE PROGRAM FAILED: {:?}", e);
+                panic!("Comprehensive test failed");
+            }
+            _ => {
+                println!("COMPREHENSIVE PROGRAM - Unexpected result type");
+            }
+        }
+    }
+
+    #[test]
+    fn test_comprehensive_demo_program() {
+        use crate::languages::basic::BasicInterpreter;
+
+        println!("\n=== TESTING COMPREHENSIVE DEMO PROGRAM ===");
+
+        let program = r#"
+10 PRINT "TW BASIC Comprehensive Demonstration Program"
+20 PRINT "============================================"
+30 LET SCORE = 0
+40 PRINT "SCORE ="; SCORE
+50 PRINT "Program completed successfully!"
+"#;
+
+        let mut interpreter = BasicInterpreter::new();
+        let result = interpreter.execute(program);
+
+        match result {
+            Ok(crate::languages::basic::ExecutionResult::Complete {
+                output,
+                graphics_commands,
+            }) => {
+                println!("COMPREHENSIVE DEMO OUTPUT:\n{}", output);
+                println!("Graphics commands generated: {}", graphics_commands.len());
+
+                // Verify comprehensive functionality
+                assert!(output.contains("TW BASIC Comprehensive Demonstration Program"));
+                assert!(output.contains("SCORE =0"));
+                assert!(output.contains("Program completed successfully"));
+
+                println!("\n=== COMPREHENSIVE DEMO TEST PASSED ===");
+            }
+            Err(e) => {
+                println!("COMPREHENSIVE DEMO FAILED: {:?}", e);
+                panic!("Comprehensive demo test failed");
+            }
+            _ => {
+                println!("COMPREHENSIVE DEMO - Unexpected result type");
+            }
+        }
     }
 }

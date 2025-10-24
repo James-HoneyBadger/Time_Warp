@@ -1,0 +1,213 @@
+REM ===================================================
+REM COMPREHENSIVE TW BASIC DEMONSTRATION PROGRAM
+REM This program demonstrates ALL TW BASIC functionality
+REM ===================================================
+
+REM Initialize program
+PRINT "TW BASIC Comprehensive Demonstration Program"
+PRINT "=============================================="
+PRINT
+
+REM ===================================================
+REM VARIABLE DECLARATIONS AND BASIC OPERATIONS
+REM ===================================================
+LET SCORE = 0
+LET LIVES = 3
+LET PLAYER_NAME$ = "Player"
+LET PI = 3.14159
+LET GRAVITY = 9.81
+PRINT "Variables initialized:"
+PRINT "SCORE ="; SCORE
+PRINT "LIVES ="; LIVES
+PRINT "PLAYER_NAME$ ="; PLAYER_NAME$
+PRINT "PI ="; PI
+PRINT "GRAVITY ="; GRAVITY
+PRINT
+
+REM ===================================================
+REM ARRAY OPERATIONS
+REM ===================================================
+OPTION BASE 1
+DIM SCORES(10)
+DIM NAMES$(5)
+DIM MATRIX(3, 3)
+
+PRINT "Arrays initialized with OPTION BASE 1"
+PRINT "SCORES(10), NAMES$(5), MATRIX(3,3)"
+PRINT
+
+REM Initialize arrays
+FOR I = 1 TO 10
+  SCORES(I) = I * 100
+NEXT I
+
+FOR I = 1 TO 5
+  NAMES$(I) = "Player" + STR$(I)
+NEXT I
+
+REM Initialize matrix
+FOR I = 1 TO 3
+  FOR J = 1 TO 3
+    MATRIX(I, J) = I * J
+  NEXT J
+NEXT I
+
+PRINT "Arrays populated with data"
+PRINT
+
+REM ===================================================
+REM STRING OPERATIONS AND FORMATTING
+REM ===================================================
+LET GREETING$ = "Welcome to TW BASIC!"
+LET NUMBER$ = STR$(42.5)
+LET BACK_TO_NUM = VAL("123.45")
+PRINT "String Operations:"
+PRINT "GREETING$ ="; GREETING$
+PRINT "STR$(42.5) ="; NUMBER$
+PRINT "VAL('123.45') ="; BACK_TO_NUM
+PRINT
+
+REM ===================================================
+REM CONTROL FLOW DEMONSTRATION
+REM ===================================================
+
+REM FOR/NEXT loops
+PRINT "FOR/NEXT Loop Demonstration:"
+FOR COUNTER = 1 TO 5
+  PRINT "Iteration:"; COUNTER
+NEXT COUNTER
+PRINT
+
+REM WHILE/WEND loop
+PRINT "WHILE/WEND Loop Demonstration:"
+LET COUNT = 1
+WHILE COUNT <= 3
+  PRINT "While iteration:"; COUNT
+  COUNT = COUNT + 1
+WEND
+PRINT
+
+REM IF/THEN/ELSE conditional
+PRINT "IF/THEN/ELSE Demonstration:"
+LET TEST_VALUE = 5
+IF TEST_VALUE > 10 THEN
+  PRINT "Value is greater than 10"
+ELSE
+  PRINT "Value is not greater than 10"
+END IF
+PRINT
+
+REM SELECT CASE demonstration
+PRINT "SELECT CASE Demonstration:"
+LET GRADE = 85
+SELECT CASE GRADE
+  CASE 90 TO 100
+    PRINT "Grade: A"
+  CASE 80 TO 89
+    PRINT "Grade: B"
+  CASE 70 TO 79
+    PRINT "Grade: C"
+  CASE 60 TO 69
+    PRINT "Grade: D"
+  CASE ELSE
+    PRINT "Grade: F"
+END SELECT
+PRINT
+
+REM ===================================================
+REM MATHEMATICAL OPERATIONS
+REM ===================================================
+PRINT "Mathematical Operations:"
+LET A = 10
+LET B = 3
+PRINT "A + B ="; A + B
+PRINT "A - B ="; A - B
+PRINT "A * B ="; A * B
+PRINT "A / B ="; A / B
+PRINT "A MOD B ="; A MOD B
+PRINT "A ^ B ="; A ^ B
+PRINT "SQRT(16) ="; SQR(16)
+PRINT "SIN(PI/2) ="; SIN(PI/2)
+PRINT "COS(0) ="; COS(0)
+PRINT "TAN(PI/4) ="; TAN(PI/4)
+PRINT "LOG(10) ="; LOG(10)
+PRINT "EXP(1) ="; EXP(1)
+PRINT "ABS(-5) ="; ABS(-5)
+PRINT "INT(3.7) ="; INT(3.7)
+PRINT
+
+REM ===================================================
+REM ADVANCED ARRAY OPERATIONS
+REM ===================================================
+PRINT "Advanced Array Operations:"
+PRINT "High Scores:"
+FOR I = 1 TO 10
+  PRINT "Score"; I; ":"; SCORES(I)
+NEXT I
+PRINT
+
+PRINT "Player Names:"
+FOR I = 1 TO 5
+  PRINT NAMES$(I)
+NEXT I
+PRINT
+
+PRINT "3x3 Matrix:"
+FOR I = 1 TO 3
+  FOR J = 1 TO 3
+    PRINT MATRIX(I, J);
+  NEXT J
+  PRINT
+NEXT I
+PRINT
+
+REM ===================================================
+REM FINAL DEMONSTRATION - SIMPLE GAME LOOP
+REM ===================================================
+PRINT "Simple Game Loop Demonstration:"
+LET GAME_RUNNING = 1
+LET TURNS = 0
+
+WHILE GAME_RUNNING = 1
+  TURNS = TURNS + 1
+  PRINT "Turn"; TURNS; "- Score:"; SCORE; "Lives:"; LIVES
+
+  REM Simulate game logic
+  SCORE = SCORE + 10
+
+  REM Random event (simplified)
+  LET RANDOM_EVENT = (TURNS MOD 3) + 1
+  SELECT CASE RANDOM_EVENT
+    CASE 1
+      PRINT "Bonus points!"
+      SCORE = SCORE + 50
+    CASE 2
+      PRINT "Lost a life!"
+      LIVES = LIVES - 1
+    CASE 3
+      PRINT "Nothing happened"
+  END SELECT
+
+  REM Check game over condition
+  IF LIVES <= 0 OR TURNS >= 5 THEN
+    GAME_RUNNING = 0
+  END IF
+
+WEND
+
+REM ===================================================
+REM PROGRAM COMPLETION
+REM ===================================================
+PRINT
+PRINT "Program completed successfully!"
+PRINT "Final Score:"; SCORE
+PRINT "Final Lives:"; LIVES
+PRINT "Total Turns:"; TURNS
+PRINT
+
+REM Clean up arrays
+ERASE SCORES
+ERASE NAMES$
+ERASE MATRIX
+
+PRINT "Arrays erased. Program ending."

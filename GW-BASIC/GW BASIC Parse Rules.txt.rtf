@@ -1,0 +1,268 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Arial-BoldMT;\f2\fmodern\fcharset0 Courier;
+\f3\fmodern\fcharset0 Courier-Bold;}
+{\colortbl;\red255\green255\blue255;\red1\green22\blue40;\red255\green255\blue255;\red240\green242\blue244;
+}
+{\*\expandedcolortbl;;\cssrgb\c0\c11373\c20784;\cssrgb\c100000\c100000\c100000;\cssrgb\c95294\c96078\c96471;
+}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid102\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid202\'01\'01;}{\levelnumbers\'01;}\fi-360\li1440\lin1440 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs40 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Program structure\
+\pard\pardeftab720\partightenfactor0
+
+\fs32 \cf2 GW-BASIC's parser follows these rules for handling program text:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls1\ilvl0
+\f1\b \cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Program lines
+\f0\b0 : Every line of a program must begin with a unique line number, which can range from 0 to 65529. The parser reads each line sequentially according to its number.\cb1 \
+\ls1\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Direct mode
+\f0\b0 : If a line is entered without a line number, the GW-BASIC interpreter executes it immediately in direct mode. For example, typing\'a0
+\f2\fs28 \cb4 PRINT 1+1
+\f0\fs32 \cb3 \'a0and pressing Enter immediately displays the result,\'a0
+\f2\fs28 \cb4 2
+\f0\fs32 \cb3 .\cb1 \
+\ls1\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Indirect mode
+\f0\b0 : Lines prefixed with a number are stored in memory as part of the program. These lines are parsed and executed only when a command like\'a0
+\f2\fs28 \cb4 RUN
+\f0\fs32 \cb3 \'a0is entered.\cb1 \
+\ls1\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Multiple statements
+\f0\b0 : Multiple statements can be placed on a single program line by separating them with a colon (
+\f2\fs28 \cb4 :
+\f0\fs32 \cb3 ). For example:\'a0
+\f2\fs28 \cb4 10 A=10: B=20: PRINT A+B
+\f0\fs32 \cb3 .\'a0\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\fs40 \cf2 \cb3 Lexical rules\
+\pard\pardeftab720\partightenfactor0
+
+\fs32 \cf2 The parser tokenizes the program text based on the following lexical rules:\'a0\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls2\ilvl0
+\f1\b \cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Tokens
+\f0\b0 : Reserved words (keywords) like\'a0
+\f2\fs28 \cb4 PRINT
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 GOTO
+\f0\fs32 \cb3 , and\'a0
+\f2\fs28 \cb4 WHILE
+\f0\fs32 \cb3 \'a0are converted into single or two-byte tokens for memory efficiency.\cb1 \
+\ls2\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Variable names
+\f0\b0 : Variable names can be up to 40 characters long and must begin with a letter. They can include letters, numbers, and decimal points.\cb1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa320\partightenfactor0
+\ls2\ilvl1
+\f1\b \cf2 \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Reserved words
+\f0\b0 : A variable name cannot be a reserved word, but a reserved word can be embedded within a variable name.\cb1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls2\ilvl0
+\f1\b \cf2 \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Variable types
+\f0\b0 : The parser identifies a variable's data type by a special character at the end of its name.\cb1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa320\partightenfactor0
+\ls2\ilvl1
+\f3\b\fs28 \cf2 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 $
+\f0\b0\fs32 \cb3 : String variable (
+\f2\fs28 \cb4 S$
+\f0\fs32 \cb3 )\cb1 \
+\ls2\ilvl1
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 %
+\f0\b0\fs32 \cb3 : Integer variable (
+\f2\fs28 \cb4 COUNT%
+\f0\fs32 \cb3 )\cb1 \
+\ls2\ilvl1
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 !
+\f0\b0\fs32 \cb3 : Single-precision floating-point variable (
+\f2\fs28 \cb4 PI!
+\f0\fs32 \cb3 )\cb1 \
+\ls2\ilvl1
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 #
+\f0\b0\fs32 \cb3 : Double-precision floating-point variable (
+\f2\fs28 \cb4 LONG#
+\f0\fs32 \cb3 )\cb1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls2\ilvl0
+\f1\b \cf2 \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Default types
+\f0\b0 : Without a type character, a numeric variable is treated as a single-precision floating-point type by default. The\'a0
+\f2\fs28 \cb4 DEFINT
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 DEFSTR
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 DEFSNG
+\f0\fs32 \cb3 , and\'a0
+\f2\fs28 \cb4 DEFDBL
+\f0\fs32 \cb3 \'a0statements can override these defaults.\cb1 \
+\ls2\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Whitespace
+\f0\b0 : Spaces are generally optional in program lines. For example,\'a0
+\f2\fs28 \cb4 10PRINT"HELLO"
+\f0\fs32 \cb3 \'a0is equivalent to\'a0
+\f2\fs28 \cb4 10 PRINT "HELLO"
+\f0\fs32 \cb3 . The interpreter "crunches" the source code into a more compact, tokenized form when saving.\'a0\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\fs40 \cf2 \cb3 Expression and operator rules\
+\pard\pardeftab720\partightenfactor0
+
+\fs32 \cf2 The GW-BASIC parser evaluates expressions based on the following rules:\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls3\ilvl0
+\f1\b \cf2 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Operator precedence
+\f0\b0 : It follows a standard order of operations, with arithmetic operators having higher precedence than relational and logical operators.\cb1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa240\partightenfactor0
+\ls3\ilvl1\cf2 \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Operations within parentheses\'a0
+\f2\fs28 \cb4 ()
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Exponentiation\'a0
+\f2\fs28 \cb4 ^
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Negation\'a0
+\f2\fs28 \cb4 -
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	4	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Multiplication\'a0
+\f2\fs28 \cb4 *
+\f0\fs32 \cb3 \'a0and floating-point division\'a0
+\f2\fs28 \cb4 /
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	5	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Integer division\'a0
+\f2\fs28 \cb4 \\
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	6	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Modulo\'a0
+\f2\fs28 \cb4 MOD
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	7	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Addition\'a0
+\f2\fs28 \cb4 +
+\f0\fs32 \cb3 \'a0and subtraction\'a0
+\f2\fs28 \cb4 -
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	8	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Relational operators\'a0
+\f2\fs28 \cb4 <
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 >
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 =
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 <=
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 >=
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 <>
+\f0\fs32 \cb1 \
+\ls3\ilvl1\cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	9	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Logical operators\'a0
+\f2\fs28 \cb4 NOT
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 AND
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 OR
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 XOR
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 EQV
+\f0\fs32 \cb3 ,\'a0
+\f2\fs28 \cb4 IMP
+\f0\fs32 \cb1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls3\ilvl0
+\f1\b \cf2 \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Numeric conversions
+\f0\b0 : During expression evaluation, numeric operands are converted to the same level of precision as the most precise operand involved in the operation. For example,\'a0
+\f2\fs28 \cb4 10 D = 6#/7
+\f0\fs32 \cb3 \'a0will perform the division in double-precision before assigning the rounded result to the single-precision variable\'a0
+\f2\fs28 \cb4 D
+\f0\fs32 \cb3 .\cb1 \
+\ls3\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Type mismatch
+\f0\b0 : Attempting to perform a numeric operation on a string or vice versa results in a "Type Mismatch" error.\cb1 \
+\ls3\ilvl0
+\f1\b \cb3 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Logical results
+\f0\b0 : Relational and logical expressions return -1 for\'a0
+\f2\fs28 \cb4 TRUE
+\f0\fs32 \cb3 \'a0and 0 for\'a0
+\f2\fs28 \cb4 FALSE
+\f0\fs32 \cb3 .\'a0\cb1 \
+\pard\pardeftab720\partightenfactor0
+
+\fs40 \cf2 \cb3 Control flow statements\
+\pard\pardeftab720\partightenfactor0
+
+\fs32 \cf2 The parser recognizes and handles specific syntax for control flow:\'a0\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa240\partightenfactor0
+\ls4\ilvl0
+\f3\b\fs28 \cf2 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 IF...THEN...ELSE
+\f0\b0\fs32 \cb3 : This is a single-line conditional statement. The\'a0
+\f2\fs28 \cb4 THEN
+\f0\fs32 \cb3 \'a0and\'a0
+\f2\fs28 \cb4 ELSE
+\f0\fs32 \cb3 \'a0clauses can contain multiple statements separated by colons. For example,\'a0
+\f2\fs28 \cb4 10 IF A>B THEN PRINT "A" ELSE PRINT "B"
+\f0\fs32 \cb3 .\cb1 \
+\ls4\ilvl0
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 WHILE...WEND
+\f0\b0\fs32 \cb3 : This block structure allows for multi-line loops, where all lines between\'a0
+\f2\fs28 \cb4 WHILE
+\f0\fs32 \cb3 \'a0and\'a0
+\f2\fs28 \cb4 WEND
+\f0\fs32 \cb3 \'a0are executed as long as the initial condition is true.\cb1 \
+\ls4\ilvl0
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 FOR...NEXT
+\f0\b0\fs32 \cb3 : A\'a0
+\f2\fs28 \cb4 FOR
+\f0\fs32 \cb3 \'a0loop is a multi-line structure that automatically handles the loop counter and its step value.\cb1 \
+\ls4\ilvl0
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 GOSUB
+\f1\fs32 \cb3 \'a0and\'a0
+\f3\fs28 \cb4 RETURN
+\f0\b0\fs32 \cb3 : The\'a0
+\f2\fs28 \cb4 GOSUB
+\f0\fs32 \cb3 \'a0command jumps to a subroutine at a specified line number, while\'a0
+\f2\fs28 \cb4 RETURN
+\f0\fs32 \cb3 \'a0returns control to the statement after the last\'a0
+\f2\fs28 \cb4 GOSUB
+\f0\fs32 \cb3 \'a0command.\cb1 \
+\ls4\ilvl0
+\f3\b\fs28 \cb4 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 GOTO
+\f0\b0\fs32 \cb3 : The\'a0
+\f2\fs28 \cb4 GOTO
+\f0\fs32 \cb3 \'a0command causes an unconditional jump to a specified line number.\'a0\cb1 \
+}
