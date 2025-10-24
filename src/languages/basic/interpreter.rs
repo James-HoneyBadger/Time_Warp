@@ -1,7 +1,7 @@
 use crate::languages::basic::ast::{
-    BinaryOperator, ExecutionContext, ExecutionResult, Expression, ForLoop, FunctionDefinition,
-    GraphicsCommand, InterpreterError, PrintSeparator, Program, Statement, UnaryOperator, Value,
-    VariableType,
+    BinaryOperator, CaseValue, ExecutionContext, ExecutionResult, Expression, ForLoop,
+    FunctionDefinition, GraphicsCommand, InterpreterError, PrintSeparator, Program, Statement,
+    UnaryOperator, Value, VariableType,
 };
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -303,12 +303,26 @@ impl Interpreter {
                 let select_value = self.evaluate_expression(expression)?;
 
                 for case in cases {
-                    let matches = if let Some(case_value_expr) = &case.value {
-                        let case_value = self.evaluate_expression(case_value_expr)?;
-                        self.values_equal(&select_value, &case_value)?
-                    } else {
-                        // CASE ELSE always matches
-                        true
+                    let matches = match &case.value {
+                        Some(CaseValue::Single(expr)) => {
+                            let case_value = self.evaluate_expression(expr)?;
+                            self.values_equal(&select_value, &case_value)?
+                        }
+                        Some(CaseValue::Range(min_expr, max_expr)) => {
+                            let case_min = self.evaluate_expression(min_expr)?;
+                            let case_max = self.evaluate_expression(max_expr)?;
+                            let min_cmp = self.compare_values(&select_value, &case_min)?;
+                            let max_cmp = self.compare_values(&select_value, &case_max)?;
+                            min_cmp >= 0 && max_cmp <= 0 // value >= min && value <= max
+                        }
+                        Some(CaseValue::Is(_, _)) => {
+                            // CASE IS not implemented yet
+                            false
+                        }
+                        None => {
+                            // CASE ELSE always matches
+                            true
+                        }
                     };
 
                     if matches {

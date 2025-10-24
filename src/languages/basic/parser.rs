@@ -1,6 +1,6 @@
 use crate::languages::basic::ast::{
-    BinaryOperator, Expression, FunctionDefinition, InterpreterError, PrintSeparator, Program,
-    Statement, Token, UnaryOperator,
+    BinaryOperator, CaseValue, Expression, FunctionDefinition, InterpreterError, PrintSeparator,
+    Program, SelectCase, Statement, Token, UnaryOperator,
 };
 
 /// Recursive descent parser for BASIC
@@ -769,7 +769,18 @@ impl Parser {
                     self.consume_token(Token::Else)?;
                     None
                 } else {
-                    Some(self.parse_expression()?)
+                    // CASE value or CASE min TO max or CASE IS operator value
+                    let expr1 = self.parse_expression()?;
+                    if self.match_token(&[Token::To]) {
+                        let expr2 = self.parse_expression()?;
+                        Some(CaseValue::Range(expr1, expr2))
+                    } else if self.match_token(&[Token::Is]) {
+                        let operator = self.parse_comparison_operator()?;
+                        let expr2 = self.parse_expression()?;
+                        Some(CaseValue::Is(operator, expr2))
+                    } else {
+                        Some(CaseValue::Single(expr1))
+                    }
                 };
 
                 let mut statements = Vec::new();
@@ -780,7 +791,7 @@ impl Parser {
                     }
                 }
 
-                cases.push(crate::languages::basic::ast::SelectCase { value, statements });
+                cases.push(SelectCase { value, statements });
             } else {
                 break;
             }
@@ -790,6 +801,38 @@ impl Parser {
         self.consume_token(Token::Select)?;
 
         Ok(Statement::Select { expression, cases })
+    }
+
+    fn parse_comparison_operator(&mut self) -> Result<BinaryOperator, InterpreterError> {
+        match self.current_token() {
+            Some(Token::Equal) => {
+                self.advance();
+                Ok(BinaryOperator::Equal)
+            }
+            Some(Token::NotEqual) => {
+                self.advance();
+                Ok(BinaryOperator::NotEqual)
+            }
+            Some(Token::Less) => {
+                self.advance();
+                Ok(BinaryOperator::Less)
+            }
+            Some(Token::LessEqual) => {
+                self.advance();
+                Ok(BinaryOperator::LessEqual)
+            }
+            Some(Token::Greater) => {
+                self.advance();
+                Ok(BinaryOperator::Greater)
+            }
+            Some(Token::GreaterEqual) => {
+                self.advance();
+                Ok(BinaryOperator::GreaterEqual)
+            }
+            _ => Err(InterpreterError::ParseError(
+                "Expected comparison operator after IS".to_string(),
+            )),
+        }
     }
 
     fn parse_forward_statement(&mut self) -> Result<Statement, InterpreterError> {

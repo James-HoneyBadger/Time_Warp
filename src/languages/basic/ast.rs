@@ -59,6 +59,7 @@ pub enum Token {
     Defdbl,
     Select,
     Case,
+    Is,
 
     // Turtle graphics
     Forward,
@@ -274,8 +275,15 @@ pub enum Statement {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum CaseValue {
+    Single(Expression),
+    Range(Expression, Expression),  // min TO max
+    Is(BinaryOperator, Expression), // IS operator value
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct SelectCase {
-    pub value: Option<Expression>, // None for CASE ELSE
+    pub value: Option<CaseValue>, // None for CASE ELSE
     pub statements: Vec<Statement>,
 }
 
