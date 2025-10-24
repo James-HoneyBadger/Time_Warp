@@ -1,6 +1,7 @@
 use crate::languages::basic::ast::{
     BinaryOperator, ExecutionContext, ExecutionResult, Expression, ForLoop, FunctionDefinition,
     GraphicsCommand, InterpreterError, PrintSeparator, Program, Statement, UnaryOperator, Value,
+    VariableType,
 };
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -17,18 +18,7 @@ pub struct Interpreter {
 impl Interpreter {
     pub fn new() -> Self {
         Self {
-            context: ExecutionContext {
-                variables: HashMap::new(),
-                arrays: HashMap::new(),
-                functions: HashMap::new(),
-                for_loops: Vec::new(),
-                gosub_stack: Vec::new(),
-                data: Vec::new(),
-                data_pointer: 0,
-                random_seed: 12345, // Fixed seed for reproducibility
-                array_base: 0,
-                input_variable: None,
-            },
+            context: ExecutionContext::new(),
             program: None,
             current_line: 0,
             instruction_count: 0,
@@ -88,7 +78,7 @@ impl Interpreter {
             }
 
             let statement = &statements[self.current_line];
-            let result = self.execute_statement(statement, &mut graphics_commands)?;
+            let result = self.execute_statement(statement, &mut output, &mut graphics_commands)?;
 
             match result {
                 Some(special_result) => {
@@ -123,6 +113,7 @@ impl Interpreter {
     fn execute_statement(
         &mut self,
         statement: &Statement,
+        output: &mut String,
         graphics_commands: &mut Vec<GraphicsCommand>,
     ) -> Result<Option<String>, InterpreterError> {
         match statement {
@@ -131,14 +122,17 @@ impl Interpreter {
                 expression,
             } => {
                 let value = self.evaluate_expression(expression)?;
-                self.context.variables.insert(variable.clone(), value);
+                let var_type = self.context.get_variable_type(variable);
+                let converted_value = self.convert_value_to_variable_type(&value, variable)?;
+                let var_info = self.context.get_variable(variable);
+                var_info.value = converted_value;
+                var_info.declared_type = var_type;
                 Ok(None)
             }
             Statement::Print {
                 expressions,
                 separators,
             } => {
-                let mut output = String::new();
                 for (i, expr) in expressions.iter().enumerate() {
                     let value = self.evaluate_expression(expr)?;
                     let value_str = self.value_to_string(&value);
@@ -159,7 +153,7 @@ impl Interpreter {
                 {
                     output.push('\n');
                 }
-                Ok(Some(format!("PRINT {}", output)))
+                Ok(None)
             }
             Statement::Input { prompt, variable } => {
                 self.context.input_variable = Some(variable.clone());
@@ -175,9 +169,9 @@ impl Interpreter {
                 let condition_bool = self.value_to_bool(&condition_value)?;
 
                 if condition_bool {
-                    self.execute_statement_block(then_branch, graphics_commands)?;
+                    self.execute_statement_block(then_branch, output, graphics_commands)?;
                 } else if let Some(else_branch) = else_branch {
-                    self.execute_statement_block(else_branch, graphics_commands)?;
+                    self.execute_statement_block(else_branch, output, graphics_commands)?;
                 }
                 Ok(None)
             }
@@ -200,9 +194,12 @@ impl Interpreter {
                 let step_num = self.value_to_number(&step_value)?;
 
                 // Initialize loop variable
-                self.context
-                    .variables
-                    .insert(variable.clone(), Value::Number(start_num));
+                let var_type = self.context.get_variable_type(variable);
+                let converted_start = self
+                    .convert_value_to_variable_type(&Value::Single(start_num as f32), variable)?;
+                let var_info = self.context.get_variable(variable);
+                var_info.value = converted_start;
+                var_info.declared_type = var_type;
 
                 // Push loop context
                 self.context.for_loops.push(ForLoop {
@@ -259,16 +256,166 @@ impl Interpreter {
                 );
                 Ok(None)
             }
+            Statement::Clear => {
+                self.context.variables.clear();
+                output.push_str("Variables cleared\n");
+                Ok(None)
+            }
+            Statement::Writeln { expression } => {
+                let value = self.evaluate_expression(expression)?;
+                let value_str = self.value_to_string(&value);
+                output.push_str(&value_str);
+                output.push('\n');
+                Ok(None)
+            }
+            Statement::Printx { expression } => {
+                let value = self.evaluate_expression(expression)?;
+                let value_str = self.value_to_string(&value);
+                output.push_str(&value_str);
+                Ok(None)
+            }
+            Statement::DefInt { ranges } => {
+                for range in ranges {
+                    self.set_type_declaration(range, VariableType::Integer)?;
+                }
+                Ok(None)
+            }
+            Statement::DefSng { ranges } => {
+                for range in ranges {
+                    self.set_type_declaration(range, VariableType::Single)?;
+                }
+                Ok(None)
+            }
+            Statement::DefStr { ranges } => {
+                for range in ranges {
+                    self.set_type_declaration(range, VariableType::String)?;
+                }
+                Ok(None)
+            }
+            Statement::DefDbl { ranges } => {
+                for range in ranges {
+                    self.set_type_declaration(range, VariableType::Double)?;
+                }
+                Ok(None)
+            }
+            Statement::Select { expression, cases } => {
+                let select_value = self.evaluate_expression(expression)?;
+
+                for case in cases {
+                    let matches = if let Some(case_value_expr) = &case.value {
+                        let case_value = self.evaluate_expression(case_value_expr)?;
+                        self.values_equal(&select_value, &case_value)?
+                    } else {
+                        // CASE ELSE always matches
+                        true
+                    };
+
+                    if matches {
+                        self.execute_statement_block(&case.statements, output, graphics_commands)?;
+                        break;
+                    }
+                }
+                Ok(None)
+            }
+            Statement::Forward { distance } => {
+                let dist = self.evaluate_expression(distance)?;
+                let dist_num = self.value_to_number(&dist)?;
+                graphics_commands.push(GraphicsCommand {
+                    command: "FORWARD".to_string(),
+                    value: dist_num as f32,
+                });
+                output.push_str(&format!("Moved forward by {}\n", dist_num));
+                Ok(None)
+            }
+            Statement::Back { distance } => {
+                let dist = self.evaluate_expression(distance)?;
+                let dist_num = self.value_to_number(&dist)?;
+                graphics_commands.push(GraphicsCommand {
+                    command: "BACK".to_string(),
+                    value: dist_num as f32,
+                });
+                output.push_str(&format!("Moved back by {}\n", dist_num));
+                Ok(None)
+            }
+            Statement::TurnLeft { angle } => {
+                let ang = self.evaluate_expression(angle)?;
+                let ang_num = self.value_to_number(&ang)?;
+                graphics_commands.push(GraphicsCommand {
+                    command: "LEFT".to_string(),
+                    value: ang_num as f32,
+                });
+                output.push_str(&format!("Turned left by {} degrees\n", ang_num));
+                Ok(None)
+            }
+            Statement::TurnRight { angle } => {
+                let ang = self.evaluate_expression(angle)?;
+                let ang_num = self.value_to_number(&ang)?;
+                graphics_commands.push(GraphicsCommand {
+                    command: "RIGHT".to_string(),
+                    value: ang_num as f32,
+                });
+                output.push_str(&format!("Turned right by {} degrees\n", ang_num));
+                Ok(None)
+            }
+            Statement::Penup => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "PENUP".to_string(),
+                    value: 0.0,
+                });
+                output.push_str("Pen up\n");
+                Ok(None)
+            }
+            Statement::Pendown => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "PENDOWN".to_string(),
+                    value: 0.0,
+                });
+                output.push_str("Pen down\n");
+                Ok(None)
+            }
+            Statement::Home => {
+                graphics_commands.push(GraphicsCommand {
+                    command: "HOME".to_string(),
+                    value: 0.0,
+                });
+                output.push_str("Moved to home position\n");
+                Ok(None)
+            }
+            Statement::Setxy { x, y } => {
+                let x_val = self.evaluate_expression(x)?;
+                let y_val = self.evaluate_expression(y)?;
+                let x_num = self.value_to_number(&x_val)?;
+                let y_num = self.value_to_number(&y_val)?;
+                // For SETXY, we might need to store both values somehow
+                // For now, just store x and handle y separately if needed
+                graphics_commands.push(GraphicsCommand {
+                    command: "SETXY".to_string(),
+                    value: x_num as f32,
+                });
+                output.push_str(&format!("Moved to ({}, {})\n", x_num, y_num));
+                Ok(None)
+            }
+            Statement::Turn { angle } => {
+                let ang = self.evaluate_expression(angle)?;
+                let ang_num = self.value_to_number(&ang)?;
+                graphics_commands.push(GraphicsCommand {
+                    command: "TURN".to_string(),
+                    value: ang_num as f32,
+                });
+                output.push_str(&format!("Turned by {} degrees\n", ang_num));
+                Ok(None)
+            }
         }
     }
 
     fn execute_statement_block(
         &mut self,
         statements: &[Statement],
+        output: &mut String,
         graphics_commands: &mut Vec<GraphicsCommand>,
     ) -> Result<(), InterpreterError> {
         for statement in statements {
-            self.execute_statement(statement, graphics_commands)?;
+            self.execute_statement(statement, output, graphics_commands)?;
         }
         Ok(())
     }
@@ -278,52 +425,55 @@ impl Interpreter {
         variable: &Option<String>,
     ) -> Result<Option<String>, InterpreterError> {
         if let Some(for_loop) = self.context.for_loops.last() {
+            let loop_var = for_loop.variable.clone();
+            let loop_end = for_loop.end_value;
+            let loop_step = for_loop.step_value;
+
             // Check if variable matches (if specified)
             if let Some(var_name) = variable {
-                if *var_name != for_loop.variable {
+                if *var_name != loop_var {
                     return Err(InterpreterError::RuntimeError(format!(
                         "NEXT {} does not match FOR {}",
-                        var_name, for_loop.variable
+                        var_name, loop_var
                     )));
                 }
             }
 
             // Get current value
-            let current_value = self
-                .context
-                .variables
-                .get(&for_loop.variable)
-                .ok_or_else(|| InterpreterError::UndefinedVariable(for_loop.variable.clone()))?;
-            let current_num = self.value_to_number(current_value)?;
+            let var_info = self.context.get_variable(&loop_var);
+            let current_value = var_info.value.clone();
+            let current_num = self.value_to_number(&current_value)?;
 
-            // Now borrow mutably to modify
-            if let Some(for_loop_mut) = self.context.for_loops.last_mut() {
-                // Increment
-                let new_value = current_num + for_loop_mut.step_value;
-                self.context
-                    .variables
-                    .insert(for_loop_mut.variable.clone(), Value::Number(new_value));
+            // Increment
+            let new_value = current_num + loop_step;
+            let var_type = self.context.get_variable_type(&loop_var);
+            let converted_value =
+                self.convert_value_to_variable_type(&Value::Single(new_value as f32), &loop_var)?;
+            let var_info_mut = self.context.get_variable(&loop_var);
+            var_info_mut.value = converted_value;
+            var_info_mut.declared_type = var_type;
 
-                // Check if loop should continue
-                let should_continue = if for_loop_mut.step_value >= 0.0 {
-                    new_value <= for_loop_mut.end_value
-                } else {
-                    new_value >= for_loop_mut.end_value
-                };
+            // Check if loop should continue
+            let should_continue = if loop_step >= 0.0 {
+                new_value <= loop_end
+            } else {
+                new_value >= loop_end
+            };
 
-                if should_continue {
-                    // Continue loop
-                    self.current_line = for_loop_mut.body_start - 1; // Will be incremented after return
+            if should_continue {
+                // Continue loop - find the body start from the for loop
+                if let Some(for_loop) = self.context.for_loops.last() {
+                    self.current_line = for_loop.body_start - 1; // Will be incremented after return
                     Ok(Some("CONTINUE_LOOP".to_string()))
                 } else {
-                    // Exit loop
-                    self.context.for_loops.pop();
-                    Ok(None)
+                    Err(InterpreterError::RuntimeError(
+                        "FOR loop state corrupted".to_string(),
+                    ))
                 }
             } else {
-                Err(InterpreterError::RuntimeError(
-                    "FOR loop state corrupted".to_string(),
-                ))
+                // Exit loop
+                self.context.for_loops.pop();
+                Ok(None)
             }
         } else {
             Err(InterpreterError::RuntimeError(
@@ -336,12 +486,10 @@ impl Interpreter {
         match expression {
             Expression::Number(n) => Ok(Value::Number(*n)),
             Expression::String(s) => Ok(Value::String(s.clone())),
-            Expression::Variable(name) => self
-                .context
-                .variables
-                .get(name)
-                .cloned()
-                .ok_or_else(|| InterpreterError::UndefinedVariable(name.clone())),
+            Expression::Variable(name) => {
+                let var_info = self.context.get_variable(name);
+                Ok(var_info.value.clone())
+            }
             Expression::BinaryOp {
                 left,
                 operator,
@@ -542,6 +690,69 @@ impl Interpreter {
                     ))
                 }
             }
+            "TAB" => {
+                if arguments.len() == 1 {
+                    let col = self.value_to_number(&arguments[0])? as usize;
+                    // TAB(n) moves to column n, padding with spaces if necessary
+                    // For simplicity, we'll just return a string with spaces
+                    let spaces = if col > 0 {
+                        " ".repeat(col)
+                    } else {
+                        String::new()
+                    };
+                    Ok(Value::String(spaces))
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "TAB requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "SPC" => {
+                if arguments.len() == 1 {
+                    let count = self.value_to_number(&arguments[0])? as usize;
+                    let spaces = " ".repeat(count);
+                    Ok(Value::String(spaces))
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "SPC requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "ENVIRON$" => {
+                if arguments.len() == 1 {
+                    match &arguments[0] {
+                        Value::String(var_name) => {
+                            // Get environment variable by name
+                            match std::env::var(var_name) {
+                                Ok(value) => Ok(Value::String(value)),
+                                Err(_) => Ok(Value::String(String::new())), // Empty string if not found
+                            }
+                        }
+                        Value::Number(index) => {
+                            // Get environment variable by index (1-based)
+                            let index = *index as usize;
+                            if index > 0 {
+                                let env_vars: Vec<_> = std::env::vars().collect();
+                                if index <= env_vars.len() {
+                                    let (key, value) = &env_vars[index - 1];
+                                    Ok(Value::String(format!("{}={}", key, value)))
+                                } else {
+                                    Ok(Value::String(String::new()))
+                                }
+                            } else {
+                                Ok(Value::String(String::new()))
+                            }
+                        }
+                        _ => Err(InterpreterError::TypeError(
+                            "ENVIRON$ argument must be string or number".to_string(),
+                        )),
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "ENVIRON$ requires 1 argument".to_string(),
+                    ))
+                }
+            }
             _ => {
                 // Check for user-defined functions
                 if let Some(func_def) = self.context.functions.get(name).cloned() {
@@ -583,22 +794,26 @@ impl Interpreter {
         // Save current variable values
         let mut saved_vars = HashMap::new();
         for param in &func_def.parameters {
-            if let Some(value) = self.context.variables.get(param) {
-                saved_vars.insert(param.clone(), value.clone());
+            if let Some(var_info) = self.context.variables.get(param) {
+                saved_vars.insert(param.clone(), var_info.clone());
             }
         }
 
-        // Set parameter values
+        // Set parameter values (parameters are treated as Single by default in GW-BASIC)
         for (param, arg) in func_def.parameters.iter().zip(arguments) {
-            self.context.variables.insert(param.clone(), arg.clone());
+            let var_type = self.context.get_variable_type(param);
+            let converted_arg = self.convert_value_to_variable_type(&arg, param)?;
+            let var_info = self.context.get_variable(param);
+            var_info.value = converted_arg;
+            var_info.declared_type = var_type;
         }
 
         // Evaluate function body
         let result = self.evaluate_expression(&func_def.body);
 
         // Restore saved variables
-        for (param, value) in saved_vars {
-            self.context.variables.insert(param, value);
+        for (param, var_info) in saved_vars {
+            self.context.variables.insert(param, var_info);
         }
 
         result
@@ -643,11 +858,24 @@ impl Interpreter {
         }
     }
 
+    fn values_equal(&self, left: &Value, right: &Value) -> Result<bool, InterpreterError> {
+        match (left, right) {
+            (Value::Number(l), Value::Number(r)) => Ok((l - r).abs() < f64::EPSILON),
+            (Value::String(l), Value::String(r)) => Ok(l == r),
+            (Value::Integer(l), Value::Integer(r)) => Ok(l == r),
+            (Value::Number(l), Value::Integer(r)) => Ok((l - *r as f64).abs() < f64::EPSILON),
+            (Value::Integer(l), Value::Number(r)) => Ok((*l as f64 - r).abs() < f64::EPSILON),
+            _ => Ok(false), // Different types are not equal
+        }
+    }
+
     // Helper methods for type conversion
     fn value_to_number(&self, value: &Value) -> Result<f64, InterpreterError> {
         match value {
             Value::Number(n) => Ok(*n),
             Value::Integer(i) => Ok(*i as f64),
+            Value::Single(s) => Ok(*s as f64),
+            Value::Double(d) => Ok(*d),
             Value::String(s) => s.parse::<f64>().map_err(|_| {
                 InterpreterError::TypeError(format!("Cannot convert '{}' to number", s))
             }),
@@ -658,6 +886,8 @@ impl Interpreter {
         match value {
             Value::Number(n) => n.to_string(),
             Value::Integer(i) => i.to_string(),
+            Value::Single(s) => s.to_string(),
+            Value::Double(d) => d.to_string(),
             Value::String(s) => s.clone(),
         }
     }
@@ -666,6 +896,8 @@ impl Interpreter {
         match value {
             Value::Number(n) => Ok(*n != 0.0),
             Value::Integer(i) => Ok(*i != 0),
+            Value::Single(s) => Ok(*s != 0.0),
+            Value::Double(d) => Ok(*d != 0.0),
             Value::String(s) => Ok(!s.is_empty()),
         }
     }
@@ -687,20 +919,133 @@ impl Interpreter {
     }
 
     pub fn provide_input(&mut self, input: &str) -> Result<ExecutionResult, InterpreterError> {
-        // Parse the input value
-        let value = if let Ok(num) = input.trim().parse::<f64>() {
-            Value::Number(num)
+        // Parse the input value - default to Single type for numeric input
+        let parsed_value = if let Ok(num) = input.trim().parse::<f64>() {
+            Value::Single(num as f32) // GW-BASIC default for input
         } else {
             Value::String(input.trim().to_string())
         };
 
         // Set the input variable if one is expected
-        if let Some(ref var_name) = self.context.input_variable {
-            self.context.variables.insert(var_name.clone(), value);
+        if let Some(ref var_name) = self.context.input_variable.clone() {
+            let var_type = self.context.get_variable_type(&var_name);
+            let converted_value = self.convert_value_to_variable_type(&parsed_value, &var_name)?;
+            let var_info = self.context.get_variable(&var_name);
+            var_info.value = converted_value;
+            var_info.declared_type = var_type;
             self.context.input_variable = None;
         }
 
         // Continue execution
         self.execute_program()
+    }
+
+    /// Set type declaration for a range of variable names
+    fn set_type_declaration(
+        &mut self,
+        range: &str,
+        var_type: VariableType,
+    ) -> Result<(), InterpreterError> {
+        if range.len() == 1 {
+            // Single character range like "A"
+            let first_char = range.chars().next().unwrap().to_ascii_uppercase();
+            self.context
+                .type_declarations
+                .insert(first_char.to_string(), var_type);
+        } else if range.len() == 3 && range.chars().nth(1) == Some('-') {
+            // Range like "A-C"
+            let start = range.chars().next().unwrap().to_ascii_uppercase();
+            let end = range.chars().nth(2).unwrap().to_ascii_uppercase();
+            if start <= end {
+                for ch in start..=end {
+                    self.context
+                        .type_declarations
+                        .insert(ch.to_string(), var_type.clone());
+                }
+            } else {
+                return Err(InterpreterError::RuntimeError(format!(
+                    "Invalid range specification: {}",
+                    range
+                )));
+            }
+        } else {
+            return Err(InterpreterError::RuntimeError(format!(
+                "Invalid range specification: {}",
+                range
+            )));
+        }
+        Ok(())
+    }
+
+    /// Convert a value to the appropriate type for a variable
+    fn convert_value_to_variable_type(
+        &self,
+        value: &Value,
+        variable_name: &str,
+    ) -> Result<Value, InterpreterError> {
+        let target_type = self.context.get_variable_type(variable_name);
+
+        match (value, target_type) {
+            // Legacy Number type support
+            (Value::Number(n), VariableType::Integer) => Ok(Value::Integer(n.round() as i32)),
+            (Value::Number(n), VariableType::Single) => Ok(Value::Single(*n as f32)),
+            (Value::Number(n), VariableType::Double) => Ok(Value::Double(*n)),
+            (Value::Number(n), VariableType::String) => Ok(Value::String(n.to_string())),
+
+            // No conversion needed if types match
+            (Value::Integer(i), VariableType::Integer) => Ok(Value::Integer(*i)),
+            (Value::Single(s), VariableType::Single) => Ok(Value::Single(*s)),
+            (Value::Double(d), VariableType::Double) => Ok(Value::Double(*d)),
+            (Value::String(s), VariableType::String) => Ok(Value::String(s.clone())),
+
+            // Convert to Integer
+            (Value::Single(s), VariableType::Integer) => Ok(Value::Integer(s.round() as i32)),
+            (Value::Double(d), VariableType::Integer) => Ok(Value::Integer(d.round() as i32)),
+
+            // Convert to Single
+            (Value::Integer(i), VariableType::Single) => Ok(Value::Single(*i as f32)),
+            (Value::Double(d), VariableType::Single) => Ok(Value::Single(*d as f32)),
+
+            // Convert to Double
+            (Value::Integer(i), VariableType::Double) => Ok(Value::Double(*i as f64)),
+            (Value::Single(s), VariableType::Double) => Ok(Value::Double(*s as f64)),
+
+            // String conversions - GW-BASIC allows some numeric conversions
+            (Value::String(s), VariableType::Integer) => {
+                if let Ok(num) = s.parse::<i32>() {
+                    Ok(Value::Integer(num))
+                } else {
+                    Err(InterpreterError::TypeError(format!(
+                        "Cannot convert string '{}' to integer",
+                        s
+                    )))
+                }
+            }
+            (Value::String(s), VariableType::Single) => {
+                if let Ok(num) = s.parse::<f32>() {
+                    Ok(Value::Single(num))
+                } else {
+                    Err(InterpreterError::TypeError(format!(
+                        "Cannot convert string '{}' to single",
+                        s
+                    )))
+                }
+            }
+            (Value::String(s), VariableType::Double) => {
+                if let Ok(num) = s.parse::<f64>() {
+                    Ok(Value::Double(num))
+                } else {
+                    Err(InterpreterError::TypeError(format!(
+                        "Cannot convert string '{}' to double",
+                        s
+                    )))
+                }
+            }
+
+            // Numeric to string conversion
+            (Value::Integer(i), VariableType::String) => Ok(Value::String(i.to_string())),
+            (Value::Single(s), VariableType::String) => Ok(Value::String(s.to_string())),
+            (Value::Double(d), VariableType::String) => Ok(Value::String(d.to_string())),
+        }
     }
 }

@@ -187,7 +187,8 @@ impl Tokenizer {
 
         while self.position < self.input.len()
             && (self.input[self.position].is_ascii_alphanumeric()
-                || self.input[self.position] == '_')
+                || self.input[self.position] == '_'
+                || self.input[self.position] == '$')
         {
             self.advance();
         }
@@ -216,6 +217,26 @@ impl Tokenizer {
             "DIM" => Token::Dim,
             "DEF" => Token::Def,
             "FN" => Token::Fn,
+            "CLEAR" => Token::Clear,
+            "WRITELN" => Token::Writeln,
+            "PRINTX" => Token::Printx,
+            "DEFINT" => Token::Defint,
+            "DEFSNG" => Token::Defsng,
+            "DEFSTR" => Token::Defstr,
+            "DEFDBL" => Token::Defdbl,
+            "SELECT" => Token::Select,
+            "CASE" => Token::Case,
+            "FORWARD" => Token::Forward,
+            "BACK" => Token::Back,
+            "LEFT" => Token::TurnLeft,
+            "RIGHT" => Token::TurnRight,
+            "PENUP" => Token::Penup,
+            "PENDOWN" => Token::Pendown,
+            "HOME" => Token::Home,
+            "SETXY" => Token::Setxy,
+            "TURN" => Token::Turn,
+            "TAB" => Token::Tab,
+            "SPC" => Token::Spc,
             "AND" => Token::And,
             "OR" => Token::Or,
             "NOT" => Token::Not,

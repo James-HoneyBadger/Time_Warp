@@ -1,12 +1,30 @@
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Core value types in BASIC
+/// Variable type declarations
+#[derive(Debug, Clone, PartialEq)]
+pub enum VariableType {
+    Integer, // %
+    Single,  // ! or default
+    Double,  // #
+    String,  // $
+}
+
+/// Runtime value types
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
-    Number(f64),
-    String(String),
     Integer(i32),
+    Single(f32),
+    Double(f64),
+    String(String),
+    Number(f64), // Legacy support
+}
+
+/// Variable information with type tracking
+#[derive(Debug, Clone, PartialEq)]
+pub struct VariableInfo {
+    pub value: Value,
+    pub declared_type: VariableType,
 }
 
 /// Token types for lexical analysis
@@ -32,6 +50,26 @@ pub enum Token {
     Dim,
     Def,
     Fn,
+    Clear,
+    Writeln,
+    Printx,
+    Defint,
+    Defsng,
+    Defstr,
+    Defdbl,
+    Select,
+    Case,
+
+    // Turtle graphics
+    Forward,
+    Back,
+    TurnLeft,
+    TurnRight,
+    Penup,
+    Pendown,
+    Home,
+    Setxy,
+    Turn,
 
     // Operators
     Plus,
@@ -66,6 +104,8 @@ pub enum Token {
     Asc,
     Val,
     Str,
+    Tab,
+    Spc,
 
     // System functions
     Date,
@@ -186,6 +226,57 @@ pub enum Statement {
         parameters: Vec<String>,
         body: Expression,
     },
+    Clear,
+    Writeln {
+        expression: Expression,
+    },
+    Printx {
+        expression: Expression,
+    },
+    Select {
+        expression: Expression,
+        cases: Vec<SelectCase>,
+    },
+    Forward {
+        distance: Expression,
+    },
+    Back {
+        distance: Expression,
+    },
+    TurnLeft {
+        angle: Expression,
+    },
+    TurnRight {
+        angle: Expression,
+    },
+    Penup,
+    Pendown,
+    Home,
+    Setxy {
+        x: Expression,
+        y: Expression,
+    },
+    Turn {
+        angle: Expression,
+    },
+    DefInt {
+        ranges: Vec<String>, // e.g., "A-C", "X"
+    },
+    DefSng {
+        ranges: Vec<String>,
+    },
+    DefDbl {
+        ranges: Vec<String>,
+    },
+    DefStr {
+        ranges: Vec<String>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SelectCase {
+    pub value: Option<Expression>, // None for CASE ELSE
+    pub statements: Vec<Statement>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -212,7 +303,7 @@ pub struct FunctionDefinition {
 /// Execution context and state
 #[derive(Debug, Clone)]
 pub struct ExecutionContext {
-    pub variables: HashMap<String, Value>,
+    pub variables: HashMap<String, VariableInfo>,
     pub arrays: HashMap<String, Vec<Value>>,
     pub functions: HashMap<String, FunctionDefinition>,
     pub for_loops: Vec<ForLoop>,
@@ -222,6 +313,80 @@ pub struct ExecutionContext {
     pub random_seed: u64,
     pub array_base: usize,
     pub input_variable: Option<String>,
+    pub type_declarations: HashMap<String, VariableType>, // Range -> Type mappings
+}
+
+impl ExecutionContext {
+    pub fn new() -> Self {
+        Self {
+            variables: HashMap::new(),
+            arrays: HashMap::new(),
+            functions: HashMap::new(),
+            for_loops: Vec::new(),
+            gosub_stack: Vec::new(),
+            data: Vec::new(),
+            data_pointer: 0,
+            random_seed: 12345,
+            array_base: 0,
+            input_variable: None,
+            type_declarations: HashMap::new(),
+        }
+    }
+
+    /// Extract base name and type from variable name with declaration character
+    pub fn parse_variable_name(name: &str) -> (String, Option<VariableType>) {
+        let name = name.to_uppercase();
+        if let Some(stripped) = name.strip_suffix('%') {
+            (stripped.to_string(), Some(VariableType::Integer))
+        } else if let Some(stripped) = name.strip_suffix('!') {
+            (stripped.to_string(), Some(VariableType::Single))
+        } else if let Some(stripped) = name.strip_suffix('#') {
+            (stripped.to_string(), Some(VariableType::Double))
+        } else if let Some(stripped) = name.strip_suffix('$') {
+            (stripped.to_string(), Some(VariableType::String))
+        } else {
+            (name, None)
+        }
+    }
+
+    /// Get the declared type for a variable, considering both declaration characters and DEF statements
+    pub fn get_variable_type(&self, name: &str) -> VariableType {
+        let (base_name, explicit_type) = Self::parse_variable_name(name);
+
+        // Explicit type declaration character takes precedence
+        if let Some(var_type) = explicit_type {
+            return var_type;
+        }
+
+        // Check DEF statements for the first character
+        if let Some(first_char) = base_name.chars().next() {
+            let range_key = first_char.to_string();
+            if let Some(def_type) = self.type_declarations.get(&range_key) {
+                return def_type.clone();
+            }
+        }
+
+        // Default to Single (GW-BASIC default for undeclared variables)
+        VariableType::Single
+    }
+
+    /// Get or create a variable with proper typing
+    pub fn get_variable(&mut self, name: &str) -> &mut VariableInfo {
+        let var_type = self.get_variable_type(name);
+        let (base_name, _) = Self::parse_variable_name(name);
+
+        self.variables
+            .entry(base_name)
+            .or_insert_with(|| VariableInfo {
+                value: match var_type {
+                    VariableType::Integer => Value::Integer(0),
+                    VariableType::Single => Value::Single(0.0),
+                    VariableType::Double => Value::Double(0.0),
+                    VariableType::String => Value::String(String::new()),
+                },
+                declared_type: var_type,
+            })
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -29,13 +29,35 @@ impl Parser {
                 break;
             }
 
+            // Check for line number at start of statement
+            let line_number = if let Some(Token::Number(num)) = self.current_token() {
+                if num.fract() == 0.0 && *num >= 0.0 && *num <= 65529.0 {
+                    let line_num = *num as usize;
+                    self.advance(); // consume the line number
+                    Some(line_num)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
             let statement = self.parse_statement()?;
+            let statement_index = statements.len();
             statements.push(statement);
 
-            // Expect end of line or end of file
-            if !self.match_token(&[Token::Eol]) && !self.is_at_end() {
+            // Store line number mapping if present
+            if let Some(line_num) = line_number {
+                line_numbers.insert(line_num, statement_index);
+            }
+
+            // Expect statement separator (colon), end of line, or end of file
+            if !self.match_token(&[Token::Colon])
+                && !self.match_token(&[Token::Eol])
+                && !self.is_at_end()
+            {
                 return Err(InterpreterError::ParseError(
-                    "Expected end of line".to_string(),
+                    "Expected ':' or end of line after statement".to_string(),
                 ));
             }
         }
@@ -62,6 +84,23 @@ impl Parser {
             Some(Token::Rem) => self.parse_rem_statement(),
             Some(Token::Dim) => self.parse_dim_statement(),
             Some(Token::Def) => self.parse_def_statement(),
+            Some(Token::Clear) => self.parse_clear_statement(),
+            Some(Token::Writeln) => self.parse_writeln_statement(),
+            Some(Token::Printx) => self.parse_printx_statement(),
+            Some(Token::Defint) => self.parse_defint_statement(),
+            Some(Token::Defsng) => self.parse_defsng_statement(),
+            Some(Token::Defstr) => self.parse_defstr_statement(),
+            Some(Token::Defdbl) => self.parse_defdbl_statement(),
+            Some(Token::Select) => self.parse_select_statement(),
+            Some(Token::Forward) => self.parse_forward_statement(),
+            Some(Token::Back) => self.parse_back_statement(),
+            Some(Token::TurnLeft) => self.parse_turn_left_statement(),
+            Some(Token::TurnRight) => self.parse_turn_right_statement(),
+            Some(Token::Penup) => self.parse_penup_statement(),
+            Some(Token::Pendown) => self.parse_pendown_statement(),
+            Some(Token::Home) => self.parse_home_statement(),
+            Some(Token::Setxy) => self.parse_setxy_statement(),
+            Some(Token::Turn) => self.parse_turn_statement(),
             Some(Token::Identifier(_)) => self.parse_assignment_or_call(),
             _ => Err(InterpreterError::ParseError(format!(
                 "Unexpected token in statement: {:?}",
@@ -481,24 +520,103 @@ impl Parser {
                 self.advance();
                 Ok(Expression::String(s))
             }
+            Some(Token::Date) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "DATE".to_string(),
+                    arguments: vec![],
+                })
+            }
+            Some(Token::Time) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "TIME".to_string(),
+                    arguments: vec![],
+                })
+            }
+            Some(Token::Timer) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "TIMER".to_string(),
+                    arguments: vec![],
+                })
+            }
+            Some(Token::Int) => {
+                self.advance();
+                self.consume_token(Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.consume_token(Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "INT".to_string(),
+                    arguments: vec![arg],
+                })
+            }
+            Some(Token::Rnd) => {
+                self.advance();
+                self.consume_token(Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.consume_token(Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "RND".to_string(),
+                    arguments: vec![arg],
+                })
+            }
+            Some(Token::Environ) => {
+                self.advance();
+                // ENVIRON requires an argument
+                self.consume_token(Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.consume_token(Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "ENVIRON".to_string(),
+                    arguments: vec![arg],
+                })
+            }
             Some(Token::Identifier(ident)) => {
                 self.advance();
 
-                if self.match_token(&[Token::LParen]) {
-                    // Function call or array access
+                // Check if this is a function call (with or without parentheses)
+                let is_function = self.check(&[Token::LParen])
+                    || ident.ends_with('$')
+                    || matches!(
+                        ident.to_uppercase().as_str(),
+                        "TAB"
+                            | "SPC"
+                            | "SIN"
+                            | "COS"
+                            | "TAN"
+                            | "SQR"
+                            | "ABS"
+                            | "INT"
+                            | "RND"
+                            | "LEN"
+                            | "MID"
+                            | "LEFT"
+                            | "RIGHT"
+                            | "CHR"
+                            | "ASC"
+                            | "VAL"
+                            | "STR"
+                    );
+
+                if is_function {
                     let mut arguments = Vec::new();
 
-                    if let Some(Token::RParen) = self.current_token() {
-                        self.advance();
-                    } else {
-                        loop {
-                            arguments.push(self.parse_expression()?);
-                            if !self.match_token(&[Token::Comma]) {
-                                self.consume_token(Token::RParen)?;
-                                break;
+                    if self.match_token(&[Token::LParen]) {
+                        // Function call with parentheses
+                        if let Some(Token::RParen) = self.current_token() {
+                            self.advance();
+                        } else {
+                            loop {
+                                arguments.push(self.parse_expression()?);
+                                if !self.match_token(&[Token::Comma]) {
+                                    self.consume_token(Token::RParen)?;
+                                    break;
+                                }
                             }
                         }
                     }
+                    // For functions without parentheses, arguments is empty
 
                     Ok(Expression::FunctionCall {
                         name: ident,
@@ -539,6 +657,147 @@ impl Parser {
         } else {
             None
         }
+    }
+
+    fn parse_clear_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Clear)?;
+        Ok(Statement::Clear)
+    }
+
+    fn parse_writeln_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Writeln)?;
+        let expression = self.parse_expression()?;
+        Ok(Statement::Writeln { expression })
+    }
+
+    fn parse_printx_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Printx)?;
+        let expression = self.parse_expression()?;
+        Ok(Statement::Printx { expression })
+    }
+
+    fn parse_defint_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Defint)?;
+        let ranges = self.parse_range_list()?;
+        Ok(Statement::DefInt { ranges })
+    }
+
+    fn parse_defsng_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Defsng)?;
+        let ranges = self.parse_range_list()?;
+        Ok(Statement::DefSng { ranges })
+    }
+
+    fn parse_defstr_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Defstr)?;
+        let ranges = self.parse_range_list()?;
+        Ok(Statement::DefStr { ranges })
+    }
+
+    fn parse_defdbl_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Defdbl)?;
+        let ranges = self.parse_range_list()?;
+        Ok(Statement::DefDbl { ranges })
+    }
+
+    fn parse_range_list(&mut self) -> Result<Vec<String>, InterpreterError> {
+        let mut ranges = Vec::new();
+        loop {
+            let range = self.parse_identifier()?;
+            ranges.push(range);
+            if !self.match_token(&[Token::Comma]) {
+                break;
+            }
+        }
+        Ok(ranges)
+    }
+
+    fn parse_select_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Select)?;
+        let expression = self.parse_expression()?;
+        self.consume_token(Token::Eol)?;
+
+        let mut cases = Vec::new();
+        while !self.check(&[Token::End]) {
+            if self.match_token(&[Token::Case]) {
+                let value = if self.check(&[Token::Else]) {
+                    self.consume_token(Token::Else)?;
+                    None
+                } else {
+                    Some(self.parse_expression()?)
+                };
+
+                let mut statements = Vec::new();
+                while !self.check(&[Token::Case, Token::End, Token::Eol]) {
+                    statements.push(self.parse_statement()?);
+                    if !self.match_token(&[Token::Colon]) {
+                        break;
+                    }
+                }
+
+                cases.push(crate::languages::basic::ast::SelectCase { value, statements });
+            } else {
+                break;
+            }
+        }
+
+        self.consume_token(Token::End)?;
+        self.consume_token(Token::Select)?;
+
+        Ok(Statement::Select { expression, cases })
+    }
+
+    fn parse_forward_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Forward)?;
+        let distance = self.parse_expression()?;
+        Ok(Statement::Forward { distance })
+    }
+
+    fn parse_back_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Back)?;
+        let distance = self.parse_expression()?;
+        Ok(Statement::Back { distance })
+    }
+
+    fn parse_turn_left_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::TurnLeft)?;
+        let angle = self.parse_expression()?;
+        Ok(Statement::TurnLeft { angle })
+    }
+
+    fn parse_turn_right_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::TurnRight)?;
+        let angle = self.parse_expression()?;
+        Ok(Statement::TurnRight { angle })
+    }
+
+    fn parse_penup_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Penup)?;
+        Ok(Statement::Penup)
+    }
+
+    fn parse_pendown_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Pendown)?;
+        Ok(Statement::Pendown)
+    }
+
+    fn parse_home_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Home)?;
+        Ok(Statement::Home)
+    }
+
+    fn parse_setxy_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Setxy)?;
+        let x = self.parse_expression()?;
+        self.consume_token(Token::Comma)?;
+        let y = self.parse_expression()?;
+        Ok(Statement::Setxy { x, y })
+    }
+
+    fn parse_turn_statement(&mut self) -> Result<Statement, InterpreterError> {
+        self.consume_token(Token::Turn)?;
+        let angle = self.parse_expression()?;
+        Ok(Statement::Turn { angle })
     }
 
     fn previous_token(&self) -> Option<&Token> {
