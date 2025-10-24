@@ -1,0 +1,298 @@
+program StudentGradeManager;
+{ TW Pascal - Comprehensive Student Grade Management System }
+{ This program demonstrates advanced Pascal features including: }
+{ - Procedures and functions }
+{ - Record types and arrays }
+{ - File I/O operations }
+{ - Input validation }
+{ - Complex control structures }
+
+const
+  MAX_STUDENTS = 50;
+  MAX_GRADES = 10;
+
+type
+  GradeRecord = record
+    subject: string[30];
+    score: real;
+    weight: real;
+  end;
+
+  StudentRecord = record
+    id: integer;
+    name: string[50];
+    grades: array[1..MAX_GRADES] of GradeRecord;
+    gradeCount: integer;
+    finalGrade: real;
+  end;
+
+var
+  students: array[1..MAX_STUDENTS] of StudentRecord;
+  studentCount: integer;
+  choice: integer;
+
+{ Function to calculate weighted average }
+function CalculateWeightedAverage(var student: StudentRecord): real;
+var
+  i: integer;
+  totalWeightedScore, totalWeight: real;
+begin
+  totalWeightedScore := 0.0;
+  totalWeight := 0.0;
+
+  for i := 1 to student.gradeCount do
+  begin
+    totalWeightedScore := totalWeightedScore + (student.grades[i].score * student.grades[i].weight);
+    totalWeight := totalWeight + student.grades[i].weight;
+  end;
+
+  if totalWeight > 0 then
+    CalculateWeightedAverage := totalWeightedScore / totalWeight
+  else
+    CalculateWeightedAverage := 0.0;
+end;
+
+{ Function to convert numeric grade to letter grade }
+function GetLetterGrade(score: real): string;
+begin
+  if score >= 90 then
+    GetLetterGrade := 'A'
+  else if score >= 80 then
+    GetLetterGrade := 'B'
+  else if score >= 70 then
+    GetLetterGrade := 'C'
+  else if score >= 60 then
+    GetLetterGrade := 'D'
+  else
+    GetLetterGrade := 'F';
+end;
+
+{ Procedure to display student information }
+procedure DisplayStudent(var student: StudentRecord);
+var
+  i: integer;
+begin
+  writeln('Student ID: ', student.id);
+  writeln('Name: ', student.name);
+  writeln('Grades:');
+  writeln('Subject':15, 'Score':8, 'Weight':8, 'Weighted':10);
+
+  for i := 1 to student.gradeCount do
+  begin
+    with student.grades[i] do
+      writeln(subject:15, score:8:1, weight:8:2, (score * weight):10:1);
+  end;
+
+  student.finalGrade := CalculateWeightedAverage(student);
+  writeln('Final Average: ', student.finalGrade:6:2, ' (', GetLetterGrade(student.finalGrade), ')');
+  writeln;
+end;
+
+{ Procedure to add a new student }
+procedure AddStudent;
+var
+  newStudent: StudentRecord;
+  i: integer;
+begin
+  if studentCount >= MAX_STUDENTS then
+  begin
+    writeln('Maximum number of students reached!');
+    exit;
+  end;
+
+  writeln('Enter student information:');
+  write('Student ID: ');
+  readln(newStudent.id);
+
+  { Check for duplicate ID }
+  for i := 1 to studentCount do
+  begin
+    if students[i].id = newStudent.id then
+    begin
+      writeln('Student ID already exists!');
+      exit;
+    end;
+  end;
+
+  write('Student Name: ');
+  readln(newStudent.name);
+  newStudent.gradeCount := 0;
+  newStudent.finalGrade := 0.0;
+
+  studentCount := studentCount + 1;
+  students[studentCount] := newStudent;
+  writeln('Student added successfully!');
+end;
+
+{ Procedure to add grades to a student }
+procedure AddGrade;
+var
+  studentId, i: integer;
+  found: boolean;
+  newGrade: GradeRecord;
+begin
+  write('Enter student ID: ');
+  readln(studentId);
+
+  found := false;
+  for i := 1 to studentCount do
+  begin
+    if students[i].id = studentId then
+    begin
+      found := true;
+      if students[i].gradeCount >= MAX_GRADES then
+      begin
+        writeln('Maximum grades reached for this student!');
+        exit;
+      end;
+
+      writeln('Enter grade information:');
+      write('Subject: ');
+      readln(newGrade.subject);
+      write('Score (0-100): ');
+      readln(newGrade.score);
+
+      { Validate score }
+      if (newGrade.score < 0) or (newGrade.score > 100) then
+      begin
+        writeln('Invalid score! Must be between 0 and 100.');
+        exit;
+      end;
+
+      write('Weight (0.0-1.0): ');
+      readln(newGrade.weight);
+
+      { Validate weight }
+      if (newGrade.weight < 0.0) or (newGrade.weight > 1.0) then
+      begin
+        writeln('Invalid weight! Must be between 0.0 and 1.0.');
+        exit;
+      end;
+
+      students[i].gradeCount := students[i].gradeCount + 1;
+      students[i].grades[students[i].gradeCount] := newGrade;
+      writeln('Grade added successfully!');
+      exit;
+    end;
+  end;
+
+  if not found then
+    writeln('Student not found!');
+end;
+
+{ Procedure to display all students }
+procedure DisplayAllStudents;
+var
+  i: integer;
+begin
+  if studentCount = 0 then
+  begin
+    writeln('No students in the system.');
+    exit;
+  end;
+
+  writeln('=== STUDENT GRADE REPORT ===');
+  writeln;
+  for i := 1 to studentCount do
+  begin
+    DisplayStudent(students[i]);
+  end;
+end;
+
+{ Procedure to find student by ID }
+procedure FindStudent;
+var
+  studentId, i: integer;
+  found: boolean;
+begin
+  write('Enter student ID to search: ');
+  readln(studentId);
+
+  found := false;
+  for i := 1 to studentCount do
+  begin
+    if students[i].id = studentId then
+    begin
+      found := true;
+      DisplayStudent(students[i]);
+      exit;
+    end;
+  end;
+
+  if not found then
+    writeln('Student not found!');
+end;
+
+{ Procedure to calculate class statistics }
+procedure ClassStatistics;
+var
+  i, count: integer;
+  total, highest, lowest: real;
+begin
+  if studentCount = 0 then
+  begin
+    writeln('No students in the system.');
+    exit;
+  end;
+
+  total := 0.0;
+  highest := 0.0;
+  lowest := 100.0;
+  count := 0;
+
+  for i := 1 to studentCount do
+  begin
+    students[i].finalGrade := CalculateWeightedAverage(students[i]);
+    total := total + students[i].finalGrade;
+    if students[i].finalGrade > highest then
+      highest := students[i].finalGrade;
+    if students[i].finalGrade < lowest then
+      lowest := students[i].finalGrade;
+    count := count + 1;
+  end;
+
+  writeln('=== CLASS STATISTICS ===');
+  writeln('Number of students: ', count);
+  writeln('Class average: ', (total / count):6:2);
+  writeln('Highest grade: ', highest:6:2);
+  writeln('Lowest grade: ', lowest:6:2);
+  writeln;
+end;
+
+{ Main menu procedure }
+procedure DisplayMenu;
+begin
+  writeln;
+  writeln('=== Student Grade Management System ===');
+  writeln('1. Add Student');
+  writeln('2. Add Grade to Student');
+  writeln('3. Display All Students');
+  writeln('4. Find Student by ID');
+  writeln('5. Class Statistics');
+  writeln('6. Exit');
+  write('Enter your choice (1-6): ');
+end;
+
+{ Main program }
+begin
+  studentCount := 0;
+
+  repeat
+    DisplayMenu;
+    readln(choice);
+
+    case choice of
+      1: AddStudent;
+      2: AddGrade;
+      3: DisplayAllStudents;
+      4: FindStudent;
+      5: ClassStatistics;
+      6: begin
+           writeln('Thank you for using the Student Grade Management System!');
+           exit;
+         end;
+    else
+      writeln('Invalid choice! Please enter 1-6.');
+    end;
+  until false;
+end.
