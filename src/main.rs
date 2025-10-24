@@ -3552,4 +3552,51 @@ mod tests {
 
         println!("\n=== TYPE DECLARATION COMMANDS TEST PASSED ===");
     }
+
+    #[test]
+    fn test_system_functions() {
+        println!("\n=== TESTING SYSTEM FUNCTIONS ===");
+        let mut app = TimeWarpApp::default();
+
+        // Test DATE$ function
+        let program = "PRINT DATE$";
+        let result = app.execute_tw_basic(program);
+        println!("DATE$ test output: {}", result);
+        // Should return a date string in MM-DD-YYYY format
+        assert!(result.contains("-"), "DATE$ should return formatted date");
+
+        // Test TIME$ function
+        let program = "PRINT TIME$";
+        let result = app.execute_tw_basic(program);
+        println!("TIME$ test output: {}", result);
+        // Should return a time string in HH:MM:SS format
+        assert!(result.contains(":"), "TIME$ should return formatted time");
+
+        // Test TIMER function
+        let program = "PRINT TIMER";
+        let result = app.execute_tw_basic(program);
+        println!("TIMER test output: {}", result);
+        // Should return a number (seconds since midnight)
+        assert!(
+            result
+                .chars()
+                .all(|c| c.is_numeric() || c == '.' || c == '\n'),
+            "TIMER should return a numeric value"
+        );
+
+        // Test ENVIRON$ with variable name
+        let program = "PRINT ENVIRON$(\"PATH\")";
+        let result = app.execute_tw_basic(program);
+        println!("ENVIRON$ test output: {}", result);
+        // Should return the PATH environment variable or empty string
+        // (We can't assert specific content since it depends on the environment)
+
+        // Test ENVIRON$ with numeric index
+        let program = "PRINT ENVIRON$(1)";
+        let result = app.execute_tw_basic(program);
+        println!("ENVIRON$ numeric test output: {}", result);
+        // Should return the first environment variable in KEY=VALUE format
+
+        println!("\n=== SYSTEM FUNCTIONS TEST PASSED ===");
+    }
 }

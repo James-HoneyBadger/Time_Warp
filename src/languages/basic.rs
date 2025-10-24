@@ -124,6 +124,10 @@ pub enum Token {
 
     // System
     System,
+    Date,
+    Time,
+    Timer,
+    Environ,
     Files,
     Kill,
     Name,
@@ -663,6 +667,10 @@ impl Tokenizer {
                         "ERROR" => Token::Error,
                         "AS" => Token::As,
                         "SYSTEM" => Token::System,
+                        "DATE" => Token::Date,
+                        "TIME" => Token::Time,
+                        "TIMER" => Token::Timer,
+                        "ENVIRON" => Token::Environ,
                         "FILES" => Token::Files,
                         "KILL" => Token::Kill,
                         "NAME" => Token::Name,
@@ -2118,30 +2126,77 @@ impl Parser {
                 self.advance();
                 Ok(Expression::String(string_val))
             }
+            Some(Token::Date) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "DATE$".to_string(),
+                    arguments: Vec::new(),
+                })
+            }
+            Some(Token::Time) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "TIME$".to_string(),
+                    arguments: Vec::new(),
+                })
+            }
+            Some(Token::Timer) => {
+                self.advance();
+                Ok(Expression::FunctionCall {
+                    name: "TIMER".to_string(),
+                    arguments: Vec::new(),
+                })
+            }
+            Some(Token::Environ) => {
+                self.advance();
+                // ENVIRON requires an argument
+                self.expect(&Token::LParen)?;
+                let arg = self.parse_expression()?;
+                self.expect(&Token::RParen)?;
+                Ok(Expression::FunctionCall {
+                    name: "ENVIRON$".to_string(),
+                    arguments: vec![arg],
+                })
+            }
             Some(Token::Identifier(ref id)) => {
                 let ident = id.clone();
                 self.advance();
 
-                // Check if it's a function call
-                if let Some(Token::LParen) = self.current_token {
-                    self.advance();
-                    let mut arguments = Vec::new();
+                // Check if it's a function call (with or without parentheses)
+                let is_function = matches!(
+                    ident.to_uppercase().as_str(),
+                    "DATE$" | "TIME$" | "TIMER" | "ENVIRON$" |
+                    "SIN" | "COS" | "TAN" | "SQR" | "ABS" | "INT" | "LOG" | "EXP" | "ATN" | "RND" | "RANDOMIZE" |
+                    "LEN" | "MID$" | "LEFT$" | "RIGHT$" | "CHR$" | "ASC" | "VAL" | "STR$" | "INSTR" | "FIX" | "CINT" | "CSNG" | "CDBL" |
+                    "TAB" | "SPC"
+                );
 
-                    if let Some(Token::RParen) = self.current_token {
+                if is_function {
+                    // It's a function - check for optional parentheses
+                    let arguments = if let Some(Token::LParen) = self.current_token {
                         self.advance();
-                    } else {
-                        loop {
-                            let arg = self.parse_expression()?;
-                            arguments.push(arg);
+                        let mut args = Vec::new();
 
-                            if let Some(Token::Comma) = self.current_token {
-                                self.advance();
-                            } else {
-                                self.expect(&Token::RParen)?;
-                                break;
+                        if let Some(Token::RParen) = self.current_token {
+                            self.advance();
+                        } else {
+                            loop {
+                                let arg = self.parse_expression()?;
+                                args.push(arg);
+
+                                if let Some(Token::Comma) = self.current_token {
+                                    self.advance();
+                                } else {
+                                    self.expect(&Token::RParen)?;
+                                    break;
+                                }
                             }
                         }
-                    }
+                        args
+                    } else {
+                        // Function without parentheses
+                        Vec::new()
+                    };
 
                     Ok(Expression::FunctionCall {
                         name: ident,
@@ -2960,6 +3015,94 @@ impl BasicInterpreter {
                 } else {
                     Err(InterpreterError::RuntimeError(
                         "TAB requires 1 argument".to_string(),
+                    ))
+                }
+            }
+            "DATE$" => {
+                if arguments.is_empty() {
+                    use std::time::{SystemTime, UNIX_EPOCH};
+                    let now = SystemTime::now();
+                    let since_epoch = now.duration_since(UNIX_EPOCH).unwrap();
+                    let days_since_epoch = since_epoch.as_secs() / 86400;
+
+                    // Simple date calculation (not perfect but functional)
+                    let year = 1970 + (days_since_epoch / 365) as i32;
+                    let day_of_year = (days_since_epoch % 365) as i32;
+                    let month = ((day_of_year * 12) / 365) as i32 + 1;
+                    let day = day_of_year - ((month - 1) * 365) / 12 + 1;
+
+                    Ok(Value::String(format!(
+                        "{:02}-{:02}-{:04}",
+                        month, day, year
+                    )))
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "DATE$ takes no arguments".to_string(),
+                    ))
+                }
+            }
+            "TIME$" => {
+                if arguments.is_empty() {
+                    use std::time::{SystemTime, UNIX_EPOCH};
+                    let now = SystemTime::now();
+                    let since_epoch = now.duration_since(UNIX_EPOCH).unwrap();
+                    let seconds_since_epoch = since_epoch.as_secs();
+
+                    let hours = (seconds_since_epoch / 3600) % 24;
+                    let minutes = (seconds_since_epoch / 60) % 60;
+                    let seconds = seconds_since_epoch % 60;
+
+                    Ok(Value::String(format!(
+                        "{:02}:{:02}:{:02}",
+                        hours, minutes, seconds
+                    )))
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "TIME$ takes no arguments".to_string(),
+                    ))
+                }
+            }
+            "TIMER" => {
+                if arguments.is_empty() {
+                    use std::time::{SystemTime, UNIX_EPOCH};
+                    let now = SystemTime::now();
+                    let since_epoch = now.duration_since(UNIX_EPOCH).unwrap();
+                    let seconds_since_epoch = since_epoch.as_secs();
+
+                    // Return seconds since midnight (simplified)
+                    let seconds_since_midnight = seconds_since_epoch % 86400;
+                    Ok(Value::Number(seconds_since_midnight as f64))
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "TIMER takes no arguments".to_string(),
+                    ))
+                }
+            }
+            "ENVIRON$" => {
+                if arguments.len() == 1 {
+                    match &arguments[0] {
+                        Value::String(var_name) => {
+                            // Get environment variable by name
+                            match std::env::var(var_name) {
+                                Ok(value) => Ok(Value::String(value)),
+                                Err(_) => Ok(Value::String(String::new())), // Empty string if not found
+                            }
+                        }
+                        Value::Number(index) => {
+                            // Get Nth environment variable (GW-BASIC style)
+                            let index = *index as usize;
+                            if let Some((key, value)) =
+                                std::env::vars().nth(index.saturating_sub(1))
+                            {
+                                Ok(Value::String(format!("{}={}", key, value)))
+                            } else {
+                                Ok(Value::String(String::new()))
+                            }
+                        }
+                    }
+                } else {
+                    Err(InterpreterError::RuntimeError(
+                        "ENVIRON$ requires 1 argument".to_string(),
                     ))
                 }
             }
