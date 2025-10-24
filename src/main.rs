@@ -1779,17 +1779,8 @@ impl eframe::App for TimeWarpApp {
                                 // Output & Graphics Tab
                                 ui.vertical(|ui| {
                                     ui.label("Output:");
-                                    egui::ScrollArea::vertical()
-                                        .max_height(200.0)
-                                        .show(ui, |ui| {
-                                            ui.add(
-                                                egui::TextEdit::multiline(&mut self.output)
-                                                    .font(egui::TextStyle::Monospace)
-                                                    .desired_width(f32::INFINITY),
-                                            );
-                                        });
 
-                                    // Input prompt - integrated into the same screen
+                                    // Input prompt - show prominently at the top when needed
                                     if self.waiting_for_input {
                                         ui.separator();
                                         ui.label("📝 Program Input Required");
@@ -1817,7 +1808,7 @@ impl eframe::App for TimeWarpApp {
                                                                 graphics_commands,
                                                             } => {
                                                                 self.process_graphics_commands(&graphics_commands);
-                                                                self.output = format!("{}{}", self.output, output);
+                                                                self.output = output;
                                                                 self.basic_interpreter = None;
                                                             }
                                                             crate::languages::basic::ExecutionResult::NeedInput {
@@ -1863,7 +1854,20 @@ impl eframe::App for TimeWarpApp {
                                                 self.basic_interpreter = None;
                                             }
                                         });
+                                        ui.separator();
                                     }
+
+                                    egui::ScrollArea::vertical()
+                                        .max_height(200.0)
+                                        .show(ui, |ui| {
+                                            ui.add(
+                                                egui::TextEdit::multiline(&mut self.output)
+                                                    .font(egui::TextStyle::Monospace)
+                                                    .desired_width(f32::INFINITY),
+                                            );
+                                        });
+
+                                    // Turtle Graphics section
 
                                     ui.separator();
                                     ui.label("Turtle Graphics:");
@@ -2548,5 +2552,62 @@ mod tests {
         // Verify TAB function produces spaces for positioning
         assert!(result.contains("Hello"));
         assert!(result.contains("World"));
+    }
+
+    #[test]
+    fn test_print_variable() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT with a variable
+        let print_code = "LET X = 42\nPRINT X";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT variable result: {:?}", result);
+
+        // Should contain the variable value
+        assert!(result.contains("42"));
+    }
+
+    #[test]
+    fn test_print_variable_simple() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT with a variable (simple case)
+        let print_code = "PRINT X";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT variable simple result: {:?}", result);
+
+        // Should not crash with parse error
+        assert!(!result.contains("ParseError"));
+    }
+
+    #[test]
+    fn test_tokenize_print_x() {
+        use crate::languages::basic::Tokenizer;
+
+        let mut tokenizer = Tokenizer::new("PRINT X");
+        let tokens = tokenizer.tokenize().unwrap();
+
+        println!("Tokens for 'PRINT X': {:?}", tokens);
+
+        // Should have PRINT, identifier X, EOF
+        assert!(tokens.len() >= 3);
+    }
+
+    #[test]
+    fn test_print_with_line_number() {
+        let mut app = TimeWarpApp::default();
+
+        // Test PRINT with line number (like user might enter)
+        let print_code = "10 PRINT X";
+        let result = app.execute_tw_basic(print_code);
+
+        println!("PRINT with line number result: {:?}", result);
+
+        // Should not crash with parse error
+        assert!(!result.contains("ParseError"));
+        // Should contain the variable value
+        assert!(result.contains("0"));
     }
 }

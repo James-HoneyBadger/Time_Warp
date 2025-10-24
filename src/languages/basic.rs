@@ -1308,6 +1308,8 @@ pub struct BasicInterpreter {
     random_seed: u64,
     instruction_count: usize,
     pub max_instructions: usize,
+    current_program: Option<Program>, // Store the parsed program for continuation
+    current_output: String,           // Accumulate output across executions
 }
 
 #[derive(Clone)]
@@ -1342,6 +1344,8 @@ impl BasicInterpreter {
                 .as_secs(),
             instruction_count: 0,
             max_instructions: 10000, // Default limit to prevent infinite loops
+            current_program: None,
+            current_output: String::new(),
         }
     }
 
@@ -1872,7 +1876,6 @@ impl BasicInterpreter {
     fn execute_statement(
         &mut self,
         statement: &Statement,
-        output: &mut String,
         graphics_commands: &mut Vec<GraphicsCommand>,
     ) -> Result<Option<String>, InterpreterError> {
         match *statement {
@@ -1903,8 +1906,8 @@ impl BasicInterpreter {
                         Value::String(s) => result.push_str(&s),
                     }
                 }
-                output.push_str(&result);
-                output.push('\n');
+                self.current_output.push_str(&result);
+                self.current_output.push('\n');
                 Ok(None)
             }
             Statement::Writeln {
@@ -1926,8 +1929,8 @@ impl BasicInterpreter {
                         Value::String(s) => result.push_str(&s),
                     }
                 }
-                output.push_str(&result);
-                output.push('\n');
+                self.current_output.push_str(&result);
+                self.current_output.push('\n');
                 Ok(None)
             }
             Statement::Readln {
@@ -1935,9 +1938,9 @@ impl BasicInterpreter {
                 ref variables,
             } => {
                 if let Some(prompt_text) = prompt {
-                    output.push_str(prompt_text);
+                    self.current_output.push_str(prompt_text);
                 } else {
-                    output.push_str("? ");
+                    self.current_output.push_str("? ");
                 }
                 // For now, return the prompt - input handling would need more complex logic
                 Ok(Some(format!(
@@ -1953,8 +1956,9 @@ impl BasicInterpreter {
                         value: dist as f32,
                         color: None,
                     });
-                    output.push_str(&format!("Moved forward {}", dist));
-                    output.push('\n');
+                    self.current_output
+                        .push_str(&format!("Moved forward {}", dist));
+                    self.current_output.push('\n');
                 }
                 Ok(None)
             }
@@ -1966,8 +1970,9 @@ impl BasicInterpreter {
                         value: -(dist as f32),
                         color: None,
                     });
-                    output.push_str(&format!("Moved back {}", dist));
-                    output.push('\n');
+                    self.current_output
+                        .push_str(&format!("Moved back {}", dist));
+                    self.current_output.push('\n');
                 }
                 Ok(None)
             }
@@ -1979,8 +1984,9 @@ impl BasicInterpreter {
                         value: -(ang as f32),
                         color: None,
                     });
-                    output.push_str(&format!("Turned left {} degrees", ang));
-                    output.push('\n');
+                    self.current_output
+                        .push_str(&format!("Turned left {} degrees", ang));
+                    self.current_output.push('\n');
                 }
                 Ok(None)
             }
@@ -1992,8 +1998,9 @@ impl BasicInterpreter {
                         value: ang as f32,
                         color: None,
                     });
-                    output.push_str(&format!("Turned right {} degrees", ang));
-                    output.push('\n');
+                    self.current_output
+                        .push_str(&format!("Turned right {} degrees", ang));
+                    self.current_output.push('\n');
                 }
                 Ok(None)
             }
@@ -2003,7 +2010,7 @@ impl BasicInterpreter {
                     value: 0.0,
                     color: None,
                 });
-                output.push_str("Pen up\n");
+                self.current_output.push_str("Pen up\n");
                 Ok(None)
             }
             Statement::Pendown => {
@@ -2012,7 +2019,7 @@ impl BasicInterpreter {
                     value: 0.0,
                     color: None,
                 });
-                output.push_str("Pen down\n");
+                self.current_output.push_str("Pen down\n");
                 Ok(None)
             }
             Statement::If {
@@ -2027,14 +2034,14 @@ impl BasicInterpreter {
                 };
                 if condition_met {
                     for stmt in then_statements {
-                        let result = self.execute_statement(stmt, output, graphics_commands)?;
+                        let result = self.execute_statement(stmt, graphics_commands)?;
                         if result.is_some() {
                             return Ok(result);
                         }
                     }
                 } else if let Some(else_stmts) = else_statements {
                     for stmt in else_stmts {
-                        let result = self.execute_statement(stmt, output, graphics_commands)?;
+                        let result = self.execute_statement(stmt, graphics_commands)?;
                         if result.is_some() {
                             return Ok(result);
                         }
@@ -2153,9 +2160,9 @@ impl BasicInterpreter {
                 ref variables,
             } => {
                 if let Some(p) = prompt {
-                    output.push_str(p);
-                    output.push('?');
-                    output.push(' ');
+                    self.current_output.push_str(p);
+                    self.current_output.push('?');
+                    self.current_output.push(' ');
                 }
                 self.pending_input =
                     Some((variables.join(","), prompt.clone().unwrap_or_default()));
@@ -2299,12 +2306,27 @@ impl BasicInterpreter {
     }
 
     pub fn execute(&mut self, code: &str) -> Result<ExecutionResult, InterpreterError> {
+        if code.is_empty() {
+            // Continue execution of current program
+            if self.current_program.is_some() {
+                return self.execute_program();
+            } else {
+                return Ok(ExecutionResult::Complete {
+                    output: self.current_output.clone(),
+                    graphics_commands: Vec::new(),
+                });
+            }
+        }
+
+        // Reset state for new execution
         self.pending_input = None;
         self.data_pointer = 0;
         self.data.clear();
         self.for_loops.clear();
         self.gosub_stack.clear();
         self.instruction_count = 0; // Reset instruction counter
+        self.current_line = 0; // Reset to beginning
+        self.current_output.clear(); // Clear accumulated output
 
         // Tokenize the input
         let mut tokenizer = Tokenizer::new(code);
@@ -2314,15 +2336,17 @@ impl BasicInterpreter {
         let mut parser = Parser::new(tokens);
         let program = parser.parse_program()?;
 
+        // Store the program for potential continuation
+        self.current_program = Some(program);
+
         // Execute the program
-        self.execute_program(&program)
+        self.execute_program()
     }
 
-    fn execute_program(&mut self, program: &Program) -> Result<ExecutionResult, InterpreterError> {
-        let mut output = String::new();
+    fn execute_program(&mut self) -> Result<ExecutionResult, InterpreterError> {
         let mut graphics_commands = Vec::new();
 
-        while self.current_line < program.statements.len() {
+        while self.current_line < self.current_program.as_ref().unwrap().statements.len() {
             // Check for instruction limit to prevent infinite loops
             self.instruction_count += 1;
             if self.instruction_count > self.max_instructions {
@@ -2332,16 +2356,17 @@ impl BasicInterpreter {
                 )));
             }
 
-            let statement = &program.statements[self.current_line];
+            let statement =
+                self.current_program.as_ref().unwrap().statements[self.current_line].clone();
 
-            let result = self.execute_statement(statement, &mut output, &mut graphics_commands)?;
+            let result = self.execute_statement(&statement, &mut graphics_commands)?;
 
             // Handle special results
             match result {
                 Some(ref res) => {
                     if res.starts_with("GOTO ") {
                         if let Ok(line_num) = res[5..].parse::<usize>() {
-                            if line_num < program.statements.len() {
+                            if line_num < self.current_program.as_ref().unwrap().statements.len() {
                                 self.current_line = line_num;
                                 continue;
                             } else {
@@ -2358,8 +2383,8 @@ impl BasicInterpreter {
                         // END or STOP statement
                         break;
                     } else {
-                        output.push_str(res);
-                        output.push('\n');
+                        self.current_output.push_str(res);
+                        self.current_output.push('\n');
                     }
                 }
                 None => {}
@@ -2370,7 +2395,7 @@ impl BasicInterpreter {
                 return Ok(ExecutionResult::NeedInput {
                     variable_name: var.clone(),
                     prompt: prompt.clone(),
-                    partial_output: output.clone(),
+                    partial_output: self.current_output.clone(),
                     partial_graphics: graphics_commands.clone(),
                 });
             }
@@ -2378,7 +2403,7 @@ impl BasicInterpreter {
             self.current_line += 1;
         }
         Ok(ExecutionResult::Complete {
-            output,
+            output: self.current_output.clone(),
             graphics_commands,
         })
     }
