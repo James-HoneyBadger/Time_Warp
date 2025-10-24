@@ -2318,6 +2318,45 @@ impl BasicInterpreter {
         name: &str,
         arguments: &[Value],
     ) -> Result<Value, InterpreterError> {
+        // Handle user-defined functions
+        if name.to_uppercase() == "FN" {
+            if arguments.len() == 2 {
+                if let (Value::String(func_name), arg_value) = (&arguments[0], &arguments[1]) {
+                    if let Some(func_def) = self.functions.get(func_name) {
+                        // Create a temporary variable for the parameter
+                        let old_value = self
+                            .variables
+                            .insert(func_def.parameter.clone(), arg_value.clone());
+
+                        // Evaluate the function expression
+                        let result = self.evaluate_expression(&func_def.expression);
+
+                        // Restore the old variable value
+                        if let Some(old_val) = old_value {
+                            self.variables.insert(func_def.parameter.clone(), old_val);
+                        } else {
+                            self.variables.remove(&func_def.parameter);
+                        }
+
+                        return result;
+                    } else {
+                        return Err(InterpreterError::RuntimeError(format!(
+                            "Undefined function: {}",
+                            func_name
+                        )));
+                    }
+                } else {
+                    return Err(InterpreterError::TypeError(
+                        "FN requires string function name and argument".to_string(),
+                    ));
+                }
+            } else {
+                return Err(InterpreterError::RuntimeError(
+                    "FN requires 2 arguments: function name and parameter".to_string(),
+                ));
+            }
+        }
+
         match name.to_uppercase().as_str() {
             "SIN" => {
                 if arguments.len() == 1 {
