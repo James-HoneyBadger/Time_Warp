@@ -1,7 +1,7 @@
 use crate::languages::basic::ast::{
-    BinaryOperator, CaseValue, ExecutionContext, ExecutionResult, Expression, ForLoop,
-    FunctionDefinition, GraphicsCommand, InterpreterError, PrintSeparator, Program, Statement,
-    UnaryOperator, Value, VariableType,
+    BinaryOperator, ExecutionContext, ExecutionResult, Expression, ForLoop, FunctionDefinition,
+    GraphicsCommand, InterpreterError, PrintSeparator, Program, Statement, UnaryOperator, Value,
+    VariableType,
 };
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -27,23 +27,18 @@ impl Interpreter {
     }
 
     pub fn execute(&mut self, code: &str) -> Result<ExecutionResult, InterpreterError> {
-        if code.is_empty() && self.program.is_some() {
-            // Continue execution without resetting
-            self.execute_program()
-        } else {
-            // Reset state
-            self.reset();
+        // Reset state
+        self.reset();
 
-            // Tokenize and parse
-            let mut tokenizer = crate::languages::basic::tokenizer::Tokenizer::new(code);
-            let tokens = tokenizer.tokenize()?;
+        // Tokenize and parse
+        let mut tokenizer = crate::languages::basic::tokenizer::Tokenizer::new(code);
+        let tokens = tokenizer.tokenize()?;
 
-            let mut parser = crate::languages::basic::parser::Parser::new(tokens);
-            let program = parser.parse_program()?;
+        let mut parser = crate::languages::basic::parser::Parser::new(tokens);
+        let program = parser.parse_program()?;
 
-            self.program = Some(program);
-            self.execute_program()
-        }
+        self.program = Some(program);
+        self.execute_program()
     }
 
     fn reset(&mut self) {
@@ -101,18 +96,6 @@ impl Interpreter {
                     } else if special_result == "CONTINUE_LOOP" {
                         // NEXT statement handled the line adjustment
                         continue;
-                    } else if special_result.starts_with("INPUT ") {
-                        let prompt = special_result[6..].to_string();
-                        return Ok(ExecutionResult::NeedInput {
-                            variable: self
-                                .context
-                                .input_variable
-                                .clone()
-                                .unwrap_or("".to_string()),
-                            prompt,
-                            partial_output: output,
-                            partial_graphics: graphics_commands,
-                        });
                     }
                 }
                 None => {}
@@ -164,8 +147,11 @@ impl Interpreter {
                         }
                     }
                 }
-                // Add newline if there are fewer separators than expressions
-                if separators.len() < expressions.len() {
+                // Add newline unless the last separator suppresses it (comma or semicolon)
+                if expressions.is_empty()
+                    || separators.is_empty()
+                    || matches!(separators.last(), Some(PrintSeparator::None))
+                {
                     output.push('\n');
                 }
                 Ok(None)
@@ -263,7 +249,7 @@ impl Interpreter {
                 body,
             } => {
                 self.context.functions.insert(
-                    format!("FN{}", name),
+                    name.clone(),
                     FunctionDefinition {
                         parameters: parameters.clone(),
                         body: body.clone(),
@@ -275,12 +261,6 @@ impl Interpreter {
                 self.context.variables.clear();
                 self.context.type_declarations.clear();
                 output.push_str("Variables cleared\n");
-                Ok(None)
-            }
-            Statement::Cls => {
-                // Clear screen - in text mode, this might just be a visual command
-                // For now, just output a message
-                output.push_str("Screen cleared\n");
                 Ok(None)
             }
             Statement::Writeln { expression } => {
@@ -324,26 +304,12 @@ impl Interpreter {
                 let select_value = self.evaluate_expression(expression)?;
 
                 for case in cases {
-                    let matches = match &case.value {
-                        Some(CaseValue::Single(expr)) => {
-                            let case_value = self.evaluate_expression(expr)?;
-                            self.values_equal(&select_value, &case_value)?
-                        }
-                        Some(CaseValue::Range(min_expr, max_expr)) => {
-                            let case_min = self.evaluate_expression(min_expr)?;
-                            let case_max = self.evaluate_expression(max_expr)?;
-                            let min_cmp = self.compare_values(&select_value, &case_min)?;
-                            let max_cmp = self.compare_values(&select_value, &case_max)?;
-                            min_cmp >= 0 && max_cmp <= 0 // value >= min && value <= max
-                        }
-                        Some(CaseValue::Is(_, _)) => {
-                            // CASE IS not implemented yet
-                            false
-                        }
-                        None => {
-                            // CASE ELSE always matches
-                            true
-                        }
+                    let matches = if let Some(case_value_expr) = &case.value {
+                        let case_value = self.evaluate_expression(case_value_expr)?;
+                        self.values_equal(&select_value, &case_value)?
+                    } else {
+                        // CASE ELSE always matches
+                        true
                     };
 
                     if matches {
@@ -497,7 +463,7 @@ impl Interpreter {
             };
 
             if should_continue {
-                // Continue loop - jump to the body start
+                // Continue loop - jump back to the first statement after FOR
                 if let Some(for_loop) = self.context.for_loops.last() {
                     self.current_line = for_loop.body_start;
                     Ok(Some("CONTINUE_LOOP".to_string()))
@@ -791,7 +757,12 @@ impl Interpreter {
             }
             _ => {
                 // Check for user-defined functions
-                if let Some(func_def) = self.context.functions.get(name).cloned() {
+                let lookup_name = if name.starts_with("FN") {
+                    &name[2..] // Remove "FN" prefix
+                } else {
+                    name
+                };
+                if let Some(func_def) = self.context.functions.get(lookup_name).cloned() {
                     self.call_user_function(&func_def, arguments)
                 } else {
                     Err(InterpreterError::UndefinedFunction(name.to_string()))
@@ -947,83 +918,7 @@ impl Interpreter {
             } else {
                 0
             }),
-            (Value::Integer(l), Value::Integer(r)) => Ok(l.cmp(r) as i32),
-            (Value::Single(l), Value::Single(r)) => Ok(if l < r {
-                -1
-            } else if l > r {
-                1
-            } else {
-                0
-            }),
-            (Value::Double(l), Value::Double(r)) => Ok(if l < r {
-                -1
-            } else if l > r {
-                1
-            } else {
-                0
-            }),
             (Value::String(l), Value::String(r)) => Ok(l.cmp(r) as i32),
-            // Cross-type comparisons
-            (Value::Number(l), Value::Integer(r)) => {
-                let cmp = if l < &(*r as f64) {
-                    -1
-                } else if l > &(*r as f64) {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
-            (Value::Integer(l), Value::Number(r)) => {
-                let cmp = if (*l as f64) < *r {
-                    -1
-                } else if (*l as f64) > *r {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
-            (Value::Number(l), Value::Single(r)) => {
-                let cmp = if l < &(*r as f64) {
-                    -1
-                } else if l > &(*r as f64) {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
-            (Value::Single(l), Value::Number(r)) => {
-                let cmp = if (*l as f64) < *r {
-                    -1
-                } else if (*l as f64) > *r {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
-            (Value::Integer(l), Value::Single(r)) => {
-                let cmp = if (*l as f32) < *r {
-                    -1
-                } else if (*l as f32) > *r {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
-            (Value::Single(l), Value::Integer(r)) => {
-                let cmp = if l < &(*r as f32) {
-                    -1
-                } else if l > &(*r as f32) {
-                    1
-                } else {
-                    0
-                };
-                Ok(cmp)
-            }
             _ => Err(InterpreterError::TypeError(
                 "Cannot compare different types".to_string(),
             )),

@@ -2711,9 +2711,9 @@ mod tests {
 
         println!("PRINT X and PRINTX result: {:?}", result);
 
-        // Should have helpful parse error for PRINTX
+        // Should have parse error for PRINTX with no expression
         assert!(result.contains("ParseError"));
-        assert!(result.contains("PRINT requires a space"));
+        assert!(result.contains("Unexpected token in expression"));
     }
 
     #[test]
